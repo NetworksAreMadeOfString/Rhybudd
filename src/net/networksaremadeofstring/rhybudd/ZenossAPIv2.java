@@ -15,6 +15,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
@@ -33,26 +34,25 @@ import android.util.Log;
 
 public class ZenossAPIv2 
 {
-	private final static String ZENOSS_INSTANCE = "N/A";
-    private final static String ZENOSS_USERNAME = "N/A";
-    private final static String ZENOSS_PASSWORD = "N/A";
+	private String ZENOSS_INSTANCE = null;
+    private String ZENOSS_USERNAME = null;
+    private String ZENOSS_PASSWORD = null;
     private DefaultHttpClient httpclient = new DefaultHttpClient();  
     private ResponseHandler responseHandler = new BasicResponseHandler();
     private int reqCount = 1;
-    private Resources res = null;
+    private boolean LoginSuccessful = false;
     
 	// Constructor logs in to the Zenoss instance (getting the auth cookie)
-    public ZenossAPIv2(Resources _res) throws Exception 
+    public ZenossAPIv2(String UserName, String Password, String URL) throws Exception 
     {
-    	this.res = _res;
     	Log.i("Constructor","Entering constructor");
-        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/acl_users/cookieAuthHelper/login");
+        HttpPost httpost = new HttpPost(URL + "/zport/acl_users/cookieAuthHelper/login");
 
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("__ac_name", ZENOSS_USERNAME));
-        nvps.add(new BasicNameValuePair("__ac_password", ZENOSS_PASSWORD));
+        nvps.add(new BasicNameValuePair("__ac_name", UserName));
+        nvps.add(new BasicNameValuePair("__ac_password", Password));
         nvps.add(new BasicNameValuePair("submitted", "true"));
-        nvps.add(new BasicNameValuePair("came_from", ZENOSS_INSTANCE + "/zport/dmd"));
+        nvps.add(new BasicNameValuePair("came_from", URL + "/zport/dmd"));
 
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
@@ -61,18 +61,54 @@ public class ZenossAPIv2
         // Consume so we can reuse httpclient
         response.getEntity().consumeContent();
         
-        List<Cookie> cookies = httpclient.getCookieStore().getCookies();
+        //Set the variables for later
+        this.ZENOSS_INSTANCE = URL;
+        this.ZENOSS_USERNAME = UserName;
+        this.ZENOSS_PASSWORD = Password;
+        
+        /*List<Cookie> cookies = httpclient.getCookieStore().getCookies();
         int i = 0;
         while(i < cookies.size())
         {
         	Log.i("Cookie: " + cookies.get(i).getName().toString(),cookies.get(i).getValue());
+        	if(cookies.get(i).getName().equals("__ginger_snap"))
+        	{
+
+        	}
         	i++;
-        }
+        }*/
         Log.i("Constructor","Leaving constructor");
     }
     
+    public boolean getLoggedInStatus()
+    {
+    	return this.LoginSuccessful;
+    }
+    
+	public boolean CheckLoggedIn()
+    {
+		//If we got JSON back rather than HTML then we are probably logged in
+		//Why the fuck I can't hit an endpoint and get a 401 or 200 depending
+		//on whether my cookie is valid appears to be waaaay too complicated
+    	try 
+    	{
+			this.GetEvents();
+			Log.i("CheckLoggedIn", "Success");
+			this.LoginSuccessful = true;
+			return true;
+		} 
+    	catch (Exception e) 
+    	{
+			Log.e("CheckLoggedIn", e.getMessage());
+			this.LoginSuccessful = false;
+			return false;
+		}
+    	
+		
+    }
+    
     @SuppressWarnings("unchecked")
-	public void GetEvents() throws JSONException, ClientProtocolException, IOException
+	public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
     {
     	Log.i("Test:", "Entering Get Events");
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -109,5 +145,6 @@ public class ZenossAPIv2
 		
 		JSONObject json = new JSONObject(test);
     	Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
     }
 }
