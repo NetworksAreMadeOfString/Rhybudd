@@ -1,0 +1,5 @@
+
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:id="@+id/MessageText" android:text="Loading Data....."></TextView>
+        <ListView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@+id/MessageText" android:layout_centerHorizontal="true" android:id="@+id/ZenossEventsList"></ListView>
+    </RelativeLayout>
