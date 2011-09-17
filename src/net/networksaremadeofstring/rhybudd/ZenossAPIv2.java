@@ -4,6 +4,7 @@ package net.networksaremadeofstring.rhybudd;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,6 +108,52 @@ public class ZenossAPIv2
 		
     }
     
+	public JSONObject AcknowledgeEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
+	{
+		//{"action":"EventsRouter","method":"acknowledge","data":[{"evids":["35f000dd-a069-4129-a11a-215c3cc2ed48"],"excludeIds":{},"selectState":null,"field":"severity","direction":"DESC","params":"{\"severity\":[5,4,3,2],\"eventState\":[0,1]}","asof":1316269924.493517}],"type":"rpc","tid":4}
+		Log.i("Test:", "Entering AcknowledgeEvent");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+    	
+    	JSONObject dataContents = new JSONObject();
+    	dataContents.put("excludeIds", new JSONObject());
+    	dataContents.put("selectState", null);
+    	dataContents.put("direction", "DESC");
+    	dataContents.put("field", "severity");
+    	dataContents.put("asof", (System.currentTimeMillis()/1000));
+    	
+    	JSONArray evids = new JSONArray();
+    	evids.put(_EventID);
+    	dataContents.put("evids", evids);
+    	
+        JSONObject params = new JSONObject();
+        params.put("severity", new JSONArray("[5, 4, 3, 2]"));
+        params.put("eventState", new JSONArray("[0, 1]"));
+        dataContents.put("params", params);
+        
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "acknowledge");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        httpost.setEntity(new StringEntity(reqData.toString()));
+    	
+    	Log.i("Execute","Executing with string: " + reqData.toString());
+    	String test = httpclient.execute(httpost, responseHandler);
+    	Log.i("Test:", test);
+		
+		JSONObject json = new JSONObject(test);
+    	Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
+	}
+	
     @SuppressWarnings("unchecked")
 	public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
     {

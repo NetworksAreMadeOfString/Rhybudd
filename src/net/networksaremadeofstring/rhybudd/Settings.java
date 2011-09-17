@@ -35,12 +35,16 @@ public class Settings extends Activity
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
         EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
+        EditText pagerDutyET = (EditText) findViewById(R.id.PagerDutyAPIKey);
         
         if(settings.getString("URL", "--").equals("--") == false)
         	urlET.setText(settings.getString("URL",""));
         
         if(settings.getString("userName", "--").equals("--") == false)
         	nameET.setText(settings.getString("userName",""));
+        
+        if(settings.getString("passWord", "--").equals("--") == false)
+        	passwordET.setText(settings.getString("passWord",""));
         
         if(settings.getString("passWord", "--").equals("--") == false)
         	passwordET.setText(settings.getString("passWord",""));

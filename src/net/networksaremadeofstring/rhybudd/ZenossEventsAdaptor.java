@@ -1,7 +1,6 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +57,9 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         SummaryTextView.setText(Event.getSummary());
         
         ImageView SeverityImage = (ImageView) convertView.findViewById(R.id.SeverityImageView);
+        ImageView AckImage = (ImageView) convertView.findViewById(R.id.AckImage);
+        
+        
         if(Event.getSeverity().equals("5"))
         	SeverityImage.setImageResource(R.drawable.severity_critical);
         
@@ -73,6 +75,9 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         if(Event.getSeverity().equals("1"))
         	SeverityImage.setImageResource(R.drawable.severity_info); //Technically debug
         
+        if(Event.getEventState().equals("Acknowledged"))
+        	AckImage.setImageResource(R.drawable.ack);
+        
         convertView.setTag(Event.getEVID());
         convertView.setOnClickListener(this);
         convertView.setOnLongClickListener(this);
@@ -87,8 +92,10 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
 	
 	public boolean onLongClick(View v)
 	{
-		Log.i("LongClick","Long click: " + v.getTag());
-		return false;
+		//Log.i("LongClick","Long click: " + v.getTag());
+		Boolean test = ((rhestr)context).AcknowledgeEvent(v.getTag().toString(), v.getId());
+		Log.i("R",test.toString());
+		return true;
 	}
 
 }

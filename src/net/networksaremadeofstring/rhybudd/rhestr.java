@@ -1,17 +1,20 @@
 package net.networksaremadeofstring.rhybudd;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,8 +22,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class rhestr extends Activity 
 {
@@ -31,6 +37,10 @@ public class rhestr extends Activity
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	private boolean totalFailure = false;
 	private int EventCount = 0;
+	Thread dataPreload;
+	Handler handler;
+	ProgressDialog dialog;
+	ListView list;
 	
     /** Called when the activity is first created. */
     @Override
@@ -40,14 +50,23 @@ public class rhestr extends Activity
         settings = getSharedPreferences("rhybudd", 0);
         
         setContentView(R.layout.eventlist);
-        final ListView list = (ListView)findViewById(R.id.ZenossEventsList);
-	    
-	    final ProgressDialog dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
-    	final Handler handler = new Handler() 
+        list = (ListView)findViewById(R.id.ZenossEventsList);
+        try 
+        {
+			API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+		} 
+        catch (Exception e) 
+        {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+	    dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
+    	handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
-    			dialog.dismiss();
+    			dialog.hide();
     			if(totalFailure == false)
     			{
     				if(EventCount > 0)
@@ -68,13 +87,28 @@ public class rhestr extends Activity
     		}
     	};
     	
-    	Thread dataPreload = new Thread() 
+    	CreateThread();
+    	
+    	dataPreload.start();
+
+    }
+    
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.rhestr_menu, menu);
+	    return true;
+	}
+    
+    public void CreateThread()
+    {
+    	dataPreload = new Thread() 
     	{  
     		public void run() 
     		{
     			try 
     			{
-					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 					EventsObject = API.GetEvents();
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
 				} 
@@ -119,36 +153,110 @@ public class rhestr extends Activity
 				}
     		}
     	};
-    	
-    	dataPreload.start();
+    }
+	
+    
+    
+    public boolean AcknowledgeEvent(final String EventID, final int viewID)
+    {
+    	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+    	 alertbox.setMessage("Acknowledge Event?");
+    	 Log.i("View",Integer.toString(viewID));
+    	 dialog.setTitle("Contacting Zenoss");
+    	 dialog.setMessage("Please wait: Sending Events Acknowledgement");
+    	 dialog.setProgressStyle(0);
+    	 
+    	 handler = new Handler() 
+     	 {
+     		public void handleMessage(Message msg) 
+     		{
+     			dialog.hide();
+     			if(msg.what == 1)
+     			{
+	     			RelativeLayout ListItem = (RelativeLayout) list.findViewById(viewID);
+					ImageView ACKImg = (ImageView) ListItem.findViewById(R.id.AckImage);
+					ACKImg.setImageResource(R.drawable.ack);
+					ACKImg.invalidate();
+     			}
+     			else
+     			{
+     				Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+     			}
+     		}
+     	 };
+     	 
+    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
+    	 {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
+            	 dialog.show();
+        		 dataPreload = new Thread() 
+        	    	{  
+        	    		public void run() 
+        	    		{
+        	    			try 
+        	    			{
+								API.AcknowledgeEvent(EventID);
+								handler.sendEmptyMessage(1);
+        	    			}
+        	    			catch (Exception e)
+        	    			{
+        	    				Log.e("ACK",e.getMessage());
+        	    				handler.sendEmptyMessage(0);
+        	    			}
+        	    		}
+        	    	};
+        	    	dataPreload.start();
+             }
+    	 });
 
+         alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
+         {
+             public void onClick(DialogInterface arg0, int arg1) {
+                 Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
+             }
+         });
+
+         // display box
+         alertbox.show();
+         return true;
     }
     
-    @Override
-	public boolean onCreateOptionsMenu(Menu menu) 
-	{
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.rhestr_menu, menu);
-	    return true;
-	}
-	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) 
     {
         switch (item.getItemId()) 
         {
-	        /*case R.id.change:
+	        case R.id.settings:
 	        {
-	        	//Toast.makeText(this, "Changes", Toast.LENGTH_SHORT).show();
-	        	Intent EditServerIntent = new Intent(ViewServer.this, EditServer.class);
-	        	
-	        	EditServerIntent.putExtra("servercode", getIntent().getStringExtra("servercode"));
-	        	EditServerIntent.putExtra("description", getIntent().getStringExtra("description"));
-	        	EditServerIntent.putExtra("software", getIntent().getStringExtra("software"));
-	        	EditServerIntent.putExtra("sessionid", getIntent().getStringExtra("sessionid"));
-	        	ViewServer.this.startActivity(EditServerIntent);
+	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
+	        	rhestr.this.startActivity(SettingsIntent);
 	            return true;
-	        }*/
+	        }
+	        
+	        case R.id.infrastructure:
+	        {
+	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
+	        	rhestr.this.startActivity(SettingsIntent);
+	            return true;
+	        }
+	        
+	        case R.id.pagerduty:
+	        {
+	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
+	        	rhestr.this.startActivity(SettingsIntent);
+	            return true;
+	        }
+	        
+	        case R.id.refresh:
+	        {
+	        	dialog.show();
+	        	listOfZenossEvents.clear();
+	        	list.setAdapter(null);
+	        	CreateThread();
+	        	dataPreload.start();
+	            return true;
+	        }
         }
         return false;
     }
