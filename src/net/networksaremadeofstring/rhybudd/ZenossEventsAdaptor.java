@@ -70,6 +70,7 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Event.getDevice());
         
+        
         TextView SummaryTextView = (TextView) convertView.findViewById(R.id.EventSummary);
         SummaryTextView.setText(Event.getSummary());
         

@@ -1,0 +1,6 @@
+
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+        <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/MainTitle" android:background="@drawable/background_tile" android:layout_width="fill_parent" android:text="Rhybudd - Zenoss Event List" android:textColor="#FFFFFF" android:textSize="32px" android:layout_height="75px"></TextView>
+        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:text="Loading Data....." android:id="@+id/MessageText" android:layout_marginTop="44px" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_centerHorizontal="true"></TextView>
+        <ListView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/ZenossEventsList" android:fastScrollEnabled="true" android:fadingEdge="vertical" android:isScrollContainer="true" android:layout_below="@+id/MainTitle"></ListView>
+    </RelativeLayout>
