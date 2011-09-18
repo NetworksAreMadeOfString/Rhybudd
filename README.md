@@ -17,6 +17,7 @@ Features:
     * PagerDuty details
     * Disable / Enable Background poller
 * Background poller with Notifications support
+* View Device (Infrastructure) list with Crit / Err / Warn status
 
 To Do:
 --------
@@ -25,6 +26,12 @@ To Do:
 * Pager Duty listing
 * Pager Duty Acknowledge
 * Pager Duty Escalate
+* Settings
+    * Choose severity levels for search
+    * Choose severity levels for background poller
+    * Choose Production state for device list query
+* Device Search
+* Event History
 * EC2 Portal
 * Dedipower Portal
 * Rackspace Portal
