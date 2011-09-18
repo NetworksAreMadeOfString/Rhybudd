@@ -1,4 +1,24 @@
+/*
+* Copyright (C) 2011 - Gareth Llewellyn
+*
+* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package net.networksaremadeofstring.rhybudd;
+
+import java.text.DecimalFormat;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,7 +29,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class Settings extends Activity
@@ -32,10 +56,13 @@ public class Settings extends Activity
 
         setContentView(R.layout.settings);
         
+        
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
         EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
         EditText pagerDutyET = (EditText) findViewById(R.id.PagerDutyAPIKey);
+        CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
+        SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
         
         if(settings.getString("URL", "--").equals("--") == false)
         	urlET.setText(settings.getString("URL",""));
@@ -46,9 +73,45 @@ public class Settings extends Activity
         if(settings.getString("passWord", "--").equals("--") == false)
         	passwordET.setText(settings.getString("passWord",""));
         
-        if(settings.getString("passWord", "--").equals("--") == false)
-        	passwordET.setText(settings.getString("passWord",""));
+        if(settings.getString("pagerDuty", "--").equals("--") == false)
+        	pagerDutyET.setText(settings.getString("pagerDuty",""));
         
+        if(settings.getBoolean("AllowBackgroundService", true) == true)
+        	BackgroundService.setChecked(true);
+        
+        BackgroundServiceDelay.setProgress(settings.getInt("BackgroundServiceDelay", 30));
+        
+        BackgroundServiceDelay.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) 
+			{
+				if(progress >= 30)
+				{
+					TextView DelayLabel = (TextView) findViewById(R.id.DelayLabel);
+					if(progress < 60)
+					{
+						DelayLabel.setText(Integer.toString(progress) + " secs");
+					}
+					else
+					{
+						double minutes = (0.016666667 * progress);
+						DecimalFormat df = new DecimalFormat("#.##");
+						DelayLabel.setText(df.format(minutes) + " mins");
+					}
+				}
+				else
+				{
+					seekBar.setProgress(30);
+				}
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+		});
         
         handler = new Handler() 
     	{
@@ -87,13 +150,27 @@ public class Settings extends Activity
             	EditText urlET = (EditText) findViewById(R.id.ZenossURL);
                 EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
                 EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
-            	
+                EditText pagerDutyET = (EditText) findViewById(R.id.PagerDutyAPIKey);
+                CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
+                SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
+                
             	SharedPreferences.Editor editor = settings.edit();
                 editor.putString("URL", urlET.getText().toString());
                 editor.putString("userName", nameET.getText().toString());
                 editor.putString("passWord", passwordET.getText().toString());
+                editor.putString("pagerDuty", pagerDutyET.getText().toString());
+                editor.putBoolean("AllowBackgroundService", BackgroundService.isChecked());
+                editor.putInt("BackgroundServiceDelay", BackgroundServiceDelay.getProgress());
                 editor.commit();
                 
+                if(BackgroundService.isChecked())
+                {
+                	startService(new Intent(v.getContext(), ZenossPoller.class));
+                }
+                else
+                {
+                	stopService(new Intent(v.getContext(), ZenossPoller.class));
+                }
                 CreateThread();
                 peformLogin.start();
                     

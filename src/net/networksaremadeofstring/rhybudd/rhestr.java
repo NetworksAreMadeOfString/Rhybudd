@@ -1,3 +1,21 @@
+/*
+* Copyright (C) 2011 - Gareth Llewellyn
+*
+* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
@@ -37,8 +55,8 @@ public class rhestr extends Activity
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	private boolean totalFailure = false;
 	private int EventCount = 0;
-	Thread dataPreload;
-	Handler handler;
+	Thread dataPreload,AckEvent;
+	Handler handler, AckEventHandler;
 	ProgressDialog dialog;
 	ListView list;
 	
@@ -61,12 +79,12 @@ public class rhestr extends Activity
 			e.printStackTrace();
 		}
         
-	    dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
+	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
-    			dialog.hide();
+    			dialog.dismiss();
     			if(totalFailure == false)
     			{
     				if(EventCount > 0)
@@ -103,6 +121,10 @@ public class rhestr extends Activity
     
     public void CreateThread()
     {
+    	dialog = new ProgressDialog(this);
+    	dialog.setTitle("Contacting Zenoss");
+   	 	dialog.setMessage("Please wait: loading Events....");
+   	 	dialog.show();
     	dataPreload = new Thread() 
     	{  
     		public void run() 
@@ -162,21 +184,21 @@ public class rhestr extends Activity
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
     	 Log.i("View",Integer.toString(viewID));
+    	 dialog = new ProgressDialog(this);
     	 dialog.setTitle("Contacting Zenoss");
     	 dialog.setMessage("Please wait: Sending Events Acknowledgement");
-    	 dialog.setProgressStyle(0);
     	 
-    	 handler = new Handler() 
+    	 AckEventHandler = new Handler() 
      	 {
      		public void handleMessage(Message msg) 
      		{
-     			dialog.hide();
+     			dialog.dismiss();
      			if(msg.what == 1)
      			{
-	     			RelativeLayout ListItem = (RelativeLayout) list.findViewById(viewID);
+	     			RelativeLayout ListItem = (RelativeLayout) list.findViewWithTag(EventID);
 					ImageView ACKImg = (ImageView) ListItem.findViewById(R.id.AckImage);
 					ACKImg.setImageResource(R.drawable.ack);
-					ACKImg.invalidate();
+					list.invalidate();
      			}
      			else
      			{
@@ -190,23 +212,23 @@ public class rhestr extends Activity
              public void onClick(DialogInterface arg0, int arg1) 
              {
             	 dialog.show();
-        		 dataPreload = new Thread() 
+            	 AckEvent = new Thread() 
         	    	{  
         	    		public void run() 
         	    		{
         	    			try 
         	    			{
 								API.AcknowledgeEvent(EventID);
-								handler.sendEmptyMessage(1);
+								AckEventHandler.sendEmptyMessage(1);
         	    			}
         	    			catch (Exception e)
         	    			{
         	    				Log.e("ACK",e.getMessage());
-        	    				handler.sendEmptyMessage(0);
+        	    				AckEventHandler.sendEmptyMessage(0);
         	    			}
         	    		}
         	    	};
-        	    	dataPreload.start();
+        	    	AckEvent.start();
              }
     	 });
 
@@ -250,7 +272,8 @@ public class rhestr extends Activity
 	        
 	        case R.id.refresh:
 	        {
-	        	dialog.show();
+	        	//dialog = new ProgressDialog(this.getApplicationContext());
+	        	//dialog.show();
 	        	listOfZenossEvents.clear();
 	        	list.setAdapter(null);
 	        	CreateThread();

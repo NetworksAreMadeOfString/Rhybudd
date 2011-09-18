@@ -1,13 +1,27 @@
+/*
+* Copyright (C) 2011 - Gareth Llewellyn
+*
+* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package net.networksaremadeofstring.rhybudd;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,11 +29,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class ZenossPoller extends Service
 {
@@ -28,11 +40,12 @@ public class ZenossPoller extends Service
 	private SharedPreferences settings = null;
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
-	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	//List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	Thread dataPreload;
 	private int EventCount = 0;
 	private Handler handler = new Handler();
 	private Runnable runnable;
+	private int NotificationID = 0;
 	
 	@Override
 	public void onCreate() 
@@ -44,32 +57,33 @@ public class ZenossPoller extends Service
 		} 
         catch (Exception e) 
         {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SendNotification("Background service failed",5);
+			stopSelf();
 		}
-		
-		//Toast.makeText(this, "My Service Created", Toast.LENGTH_LONG).show();
+
 		Log.d("Service", "onCreate");
 		
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
-		runnable = new Runnable() { public void run() { CreateThread(); handler.postDelayed(this, 30000); } }; 
+		runnable = new Runnable() { public void run() { final int Delay = settings.getInt("BackgroundServiceDelay", 30); Log.i("Delay", Integer.toString(Delay)); CreateThread(); handler.postDelayed(this, Delay * 1000); } }; 
 		runnable.run();
 	}
 
 	@Override
 	public void onDestroy() 
 	{
-		Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
-		Log.d("Service", "onDestroy");
+		//Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
+		//Log.d("Service", "onDestroy");
+		handler.removeCallbacks(runnable);
 	}
 	
 	@Override
 	public void onStart(Intent intent, int startid) 
 	{
 		//Toast.makeText(this, "My Service Started", Toast.LENGTH_LONG).show();
-		Log.d("Service", "onStart");
+		//Log.d("Service", "onStart");
+		//SendNotification("Zenoss Poller Background task started.",5);
 	}
 	
 	@Override
@@ -81,6 +95,7 @@ public class ZenossPoller extends Service
 	private void SendNotification(String EventSummary,int Severity)
 	{
 		Notification notification = new Notification(R.drawable.stat_sys_warning, "New Zenoss Events!", System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_SOUND;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		//notification.defaults |= Notification.DEFAULT_LIGHTS;
@@ -102,7 +117,7 @@ public class ZenossPoller extends Service
 		Intent notificationIntent = new Intent(this, launcher.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Rhybudd Notification", EventSummary, contentIntent);
-		mNM.notify(1, notification);
+		mNM.notify(NotificationID++, notification);
 	}
 	
 	private void CreateThread()
@@ -120,7 +135,8 @@ public class ZenossPoller extends Service
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				SendNotification("Background service failed",5);
+    				stopSelf();
 				}
     			
     			
@@ -139,13 +155,16 @@ public class ZenossPoller extends Service
 	    				}
 	    				catch (JSONException e) 
 	    				{
-	    					Log.e("API - Stage 2 - Inner", e.getMessage());
+	    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+	    					//SendNotification("Background service failed",5);
+	    					//stopSelf();
 	    				}
 	    			}
 				} 
 				catch (JSONException e) 
 				{
-					Log.e("API - Stage 2", e.getMessage());
+					//SendNotification("Background service failed",5);
+					//stopSelf();
 				}
     		}
     	};

@@ -1,3 +1,21 @@
+/*
+* Copyright (C) 2011 - Gareth Llewellyn
+*
+* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.Activity;
@@ -25,8 +43,14 @@ public class launcher extends Activity
 	     else
 	     {
 	    	 //Start the background service
-	    	 if(settings.getBoolean("AllowBackground", true) == true)
+	    	 if(settings.getBoolean("AllowBackgroundService", true) == true)
+	    	 {
 	    		 startService(new Intent(this, ZenossPoller.class));
+	    	 }
+	    	 else
+	    	 {
+	    		 stopService(new Intent(this, ZenossPoller.class));
+	    	 }
 	    	 
 	    	 Intent EventListIntent = new Intent(launcher.this, rhestr.class);
 	    	 launcher.this.startActivity(EventListIntent);
