@@ -26,6 +26,7 @@ import android.os.Bundle;
 public class launcher extends Activity
 {
 	private SharedPreferences settings = null;
+	Thread StartService;
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) 
 	 {
@@ -45,7 +46,13 @@ public class launcher extends Activity
 	    	 //Start the background service
 	    	 if(settings.getBoolean("AllowBackgroundService", true) == true)
 	    	 {
-	    		 startService(new Intent(this, ZenossPoller.class));
+	    		 StartService = new Thread() 
+	    		 {  
+	    			 public void run() 
+					{
+					startService(new Intent(launcher.this.getApplicationContext(), ZenossPoller.class));
+					}
+	    		 };
 	    	 }
 	    	 else
 	    	 {

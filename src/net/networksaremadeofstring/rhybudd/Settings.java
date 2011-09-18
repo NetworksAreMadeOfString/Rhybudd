@@ -130,9 +130,9 @@ public class Settings extends Activity
     		{
     			dialog.dismiss();
     			
-    			if(API.getLoggedInStatus() == true)
+    			if(API != null && API.getLoggedInStatus() == true)
     			{
-            		Toast.makeText(Settings.this, "Login Successful", Toast.LENGTH_SHORT).show();
+            		//Toast.makeText(Settings.this, "Login Successful", Toast.LENGTH_SHORT).show();
             		if(getIntent().getBooleanExtra("firstRun", false) == true)
             		{
             			Intent EventListIntent = new Intent(Settings.this, rhestr.class);
@@ -204,12 +204,28 @@ public class Settings extends Activity
     			{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					handler.sendEmptyMessage(0);
 				}
     			
     			//Double check it all worked
-    			API.CheckLoggedIn();
-            	
-    			handler.sendEmptyMessage(0);
+    			Boolean Success = false;
+    			try
+    			{
+    				Success = API.CheckLoggedIn();
+    			}
+    			catch(Exception e)
+    			{
+    				Success = false;
+    			}
+    			
+            	if(Success)
+            	{
+            		handler.sendEmptyMessage(1);
+            	}
+            	else
+            	{
+            		handler.sendEmptyMessage(0);
+            	}
             	return;
     		}
     	};

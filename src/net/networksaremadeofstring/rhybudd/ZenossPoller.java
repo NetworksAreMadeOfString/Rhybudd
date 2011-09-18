@@ -46,12 +46,13 @@ public class ZenossPoller extends Service
 	private Handler handler = new Handler();
 	private Runnable runnable;
 	private int NotificationID = 0;
+	private int failureCount = 0;
 	
 	@Override
 	public void onCreate() 
 	{
 		settings = getSharedPreferences("rhybudd", 0);
-		try 
+		/*try 
         {
 			API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 		} 
@@ -59,7 +60,7 @@ public class ZenossPoller extends Service
         {
 			SendNotification("Background service failed",5);
 			stopSelf();
-		}
+		}*/
 
 		Log.d("Service", "onCreate");
 		
@@ -130,41 +131,61 @@ public class ZenossPoller extends Service
     		{
     			try 
     			{
+    				if(API == null)
+    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+    				
 					EventsObject = API.GetEvents();
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
+	    			failureCount = 0;
 				} 
     			catch (Exception e) 
     			{
-    				SendNotification("Background service failed",5);
-    				stopSelf();
+    				failureCount++;
+    				Log.e("Service", "Failure Count: " + Integer.toString(failureCount));
+    				
+    				if(failureCount > 10)
+    				{
+    					SendNotification("Background service failed",5);
+    					stopSelf();
+    				}
 				}
     			
     			
 				try 
 				{
-					EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-					for(int i = 0; i < EventCount; i++)
-	    			{
-	    				JSONObject CurrentEvent = null;
-	    				try 
-	    				{
-	    					CurrentEvent = Events.getJSONObject(i);
-	    					
-	    					if(CurrentEvent.getString("eventState").equals("New"))
-	    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
-	    				}
-	    				catch (JSONException e) 
-	    				{
-	    					//Log.e("API - Stage 2 - Inner", e.getMessage());
-	    					//SendNotification("Background service failed",5);
-	    					//stopSelf();
-	    				}
-	    			}
+					if(EventsObject != null)
+					{
+						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+						for(int i = 0; i < EventCount; i++)
+		    			{
+		    				JSONObject CurrentEvent = null;
+		    				try 
+		    				{
+		    					CurrentEvent = Events.getJSONObject(i);
+		    					
+		    					if(CurrentEvent.getString("eventState").equals("New"))
+		    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
+		    				}
+		    				catch (JSONException e) 
+		    				{
+		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+		    					//SendNotification("Background service failed",5);
+		    					//stopSelf();
+		    					//failureCount++;
+		    				}
+		    			}
+					}
+					else
+					{
+						//Might consider this a full failure?
+						//failureCount++;
+					}
 				} 
 				catch (JSONException e) 
 				{
 					//SendNotification("Background service failed",5);
 					//stopSelf();
+					failureCount++;
 				}
     		}
     	};

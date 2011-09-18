@@ -129,7 +129,8 @@ public class rhestr extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
+    				e.printStackTrace();
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -137,28 +138,36 @@ public class rhestr extends Activity
     			
 				try 
 				{
-					EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-					
-					for(int i = 0; i < EventCount; i++)
-	    			{
-	    				JSONObject CurrentEvent = null;
-	    				try 
-	    				{
-		    				CurrentEvent = Events.getJSONObject(i);
-		    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
-										    						CurrentEvent.getJSONObject("device").getString("text"),
-										    						CurrentEvent.getString("summary"), 
-										    						CurrentEvent.getString("eventState"),
-										    						CurrentEvent.getString("severity")));
-		    				Log.i("ForLoop",CurrentEvent.getString("summary"));
-	    				}
-	    				catch (JSONException e) 
-	    				{
-	    					Log.e("API - Stage 2 - Inner", e.getMessage());
-	    				}
-	    			}
-					
-					handler.sendEmptyMessage(0);
+					if(EventsObject != null)
+					{
+						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+						
+						for(int i = 0; i < EventCount; i++)
+		    			{
+		    				JSONObject CurrentEvent = null;
+		    				try 
+		    				{
+			    				CurrentEvent = Events.getJSONObject(i);
+			    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+											    						CurrentEvent.getJSONObject("device").getString("text"),
+											    						CurrentEvent.getString("summary"), 
+											    						CurrentEvent.getString("eventState"),
+											    						CurrentEvent.getString("severity")));
+			    				Log.i("ForLoop",CurrentEvent.getString("summary"));
+		    				}
+		    				catch (JSONException e) 
+		    				{
+		    					Log.e("API - Stage 2 - Inner", e.getMessage());
+		    				}
+		    			}
+						
+						handler.sendEmptyMessage(0);
+					}
+					else
+					{
+						totalFailure = true;
+	    				handler.sendEmptyMessage(0);
+					}
 				} 
 				catch (JSONException e) 
 				{
