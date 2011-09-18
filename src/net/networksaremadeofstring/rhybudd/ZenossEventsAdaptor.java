@@ -104,14 +104,14 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
 	}
 	
 	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		Log.i("Click","Short Click");
+	public void onClick(View v) 
+	{
+		((rhestr)context).AcknowledgeEvent(v.getTag().toString(), v.getId());
 	}
 	
 	public boolean onLongClick(View v)
 	{
-		((rhestr)context).AcknowledgeEvent(v.getTag().toString(), v.getId());
+		((rhestr)context).ViewEvent(v.getTag().toString());
 		return true;
 	}
 

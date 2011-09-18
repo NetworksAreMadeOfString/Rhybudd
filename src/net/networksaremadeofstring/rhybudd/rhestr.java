@@ -69,7 +69,7 @@ public class rhestr extends Activity
         
         setContentView(R.layout.eventlist);
         list = (ListView)findViewById(R.id.ZenossEventsList);
-        try 
+        /*try 
         {
 			API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 		} 
@@ -77,7 +77,7 @@ public class rhestr extends Activity
         {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
@@ -131,6 +131,11 @@ public class rhestr extends Activity
     		{
     			try 
     			{
+    				if(API == null)
+    				{
+    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+    				}
+    				
 					EventsObject = API.GetEvents();
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
 				} 
@@ -177,9 +182,14 @@ public class rhestr extends Activity
     	};
     }
 	
+    public void ViewEvent(String EventID)
+    {
+    	Intent ViewEventIntent = new Intent(rhestr.this, ViewZenossEvent.class);
+    	ViewEventIntent.putExtra("EventID", EventID);
+    	rhestr.this.startActivity(ViewEventIntent);
+    }
     
-    
-    public boolean AcknowledgeEvent(final String EventID, final int viewID)
+    public void AcknowledgeEvent(final String EventID, final int viewID)
     {
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
@@ -241,7 +251,6 @@ public class rhestr extends Activity
 
          // display box
          alertbox.show();
-         return true;
     }
     
 	@Override

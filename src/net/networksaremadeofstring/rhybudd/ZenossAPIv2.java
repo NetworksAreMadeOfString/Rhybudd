@@ -212,4 +212,52 @@ public class ZenossAPIv2
     	Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
+    
+    @SuppressWarnings("unchecked")
+	public JSONObject GetEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
+    {
+    	Log.i("Test:", "Entering GetEvent");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+    	
+    	JSONObject dataContents = new JSONObject();
+    	//dataContents.put("excludeIds", new JSONObject());
+    	//dataContents.put("selectState", null);
+    	//dataContents.put("direction", "DESC");
+    	//dataContents.put("field", "severity");
+    	//dataContents.put("asof", (System.currentTimeMillis()/1000));
+    	
+    	/*JSONArray evids = new JSONArray();
+    	evids.put(_EventID);
+    	dataContents.put("evids", evids);*/
+    	dataContents.put("evid",_EventID);
+    	dataContents.put("history", false);
+    	
+        /*JSONObject params = new JSONObject();
+        params.put("severity", new JSONArray("[5, 4, 3, 2]"));
+        params.put("eventState", new JSONArray("[0, 1]"));
+        dataContents.put("params", params);*/
+        
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "detail");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        httpost.setEntity(new StringEntity(reqData.toString()));
+    	
+    	Log.i("Execute","Executing with string: " + reqData.toString());
+    	String test = httpclient.execute(httpost, responseHandler);
+    	Log.i("Test:", test);
+		
+		JSONObject json = new JSONObject(test);
+    	Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
+    }
 }
