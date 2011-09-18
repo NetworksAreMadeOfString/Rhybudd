@@ -262,15 +262,14 @@ public class rhestr extends Activity
 	        
 	        case R.id.pagerduty:
 	        {
-	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
-	        	rhestr.this.startActivity(SettingsIntent);
+	        	/*Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
+	        	rhestr.this.startActivity(SettingsIntent);*/
+	        	Toast.makeText(getApplicationContext(), "PagerDuty functionality will be available soon.", Toast.LENGTH_SHORT).show();
 	            return true;
 	        }
 	        
 	        case R.id.refresh:
 	        {
-	        	//dialog = new ProgressDialog(this.getApplicationContext());
-	        	//dialog.show();
 	        	listOfZenossEvents.clear();
 	        	list.setAdapter(null);
 	        	CreateThread();
