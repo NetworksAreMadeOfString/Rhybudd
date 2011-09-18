@@ -125,6 +125,46 @@ public class ZenossAPIv2
     	
 		
     }
+	
+	public JSONObject GetDevices() throws JSONException, ClientProtocolException, IOException
+	{
+		HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/device_router");
+
+		httpost.addHeader("Content-type", "application/json; charset=utf-8");
+		httpost.setHeader("Accept", "application/json");
+		
+		JSONObject dataContents = new JSONObject();
+    	dataContents.put("start", 0);
+    	dataContents.put("limit", 150);
+    	dataContents.put("dir", "ASC");
+    	dataContents.put("sort", "name");
+    	dataContents.put("uid", "/zport/dmd/Devices");
+    	
+    	JSONObject params = new JSONObject();
+        params.put("productionState", new JSONArray("[1000]"));
+        dataContents.put("params", params);
+        
+    	JSONArray data = new JSONArray();
+        data.put(dataContents);
+        
+		JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getDevices");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        httpost.setEntity(new StringEntity(reqData.toString()));
+    	
+    	Log.i("Execute","Executing with string: " + reqData.toString());
+    	String test = httpclient.execute(httpost, responseHandler);
+    	Log.i("Test:", test);
+		
+		JSONObject json = new JSONObject(test);
+    	Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
+        
+	}
     
 	public JSONObject AcknowledgeEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
 	{

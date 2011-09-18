@@ -69,15 +69,6 @@ public class rhestr extends Activity
         
         setContentView(R.layout.eventlist);
         list = (ListView)findViewById(R.id.ZenossEventsList);
-        /*try 
-        {
-			API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-		} 
-        catch (Exception e) 
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
         
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
@@ -245,7 +236,7 @@ public class rhestr extends Activity
          alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
          {
              public void onClick(DialogInterface arg0, int arg1) {
-                 Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
+                 //Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
              }
          });
 
@@ -267,8 +258,8 @@ public class rhestr extends Activity
 	        
 	        case R.id.infrastructure:
 	        {
-	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
-	        	rhestr.this.startActivity(SettingsIntent);
+	        	Intent DeviceListIntent = new Intent(rhestr.this, DeviceList.class);
+	        	rhestr.this.startActivity(DeviceListIntent);
 	            return true;
 	        }
 	        

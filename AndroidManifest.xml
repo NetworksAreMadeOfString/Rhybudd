@@ -30,6 +30,10 @@
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
 			android:label="Rhybudd - Event Details">
 		</activity>
+		
+		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
+			android:label="Rhybudd - Infrastructure List">
+		</activity>
 
     </application>
 </manifest>
