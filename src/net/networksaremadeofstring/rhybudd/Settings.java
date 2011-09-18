@@ -80,6 +80,17 @@ public class Settings extends Activity
         	BackgroundService.setChecked(true);
         
         BackgroundServiceDelay.setProgress(settings.getInt("BackgroundServiceDelay", 30));
+        TextView DelayLabel = (TextView) findViewById(R.id.DelayLabel);
+        if(settings.getInt("BackgroundServiceDelay", 30) < 60)
+		{
+			DelayLabel.setText(Integer.toString(settings.getInt("BackgroundServiceDelay", 30)) + " secs");
+		}
+		else
+		{
+			double minutes = (0.016666667 * settings.getInt("BackgroundServiceDelay", 30));
+			DecimalFormat df = new DecimalFormat("#.##");
+			DelayLabel.setText(df.format(minutes) + " mins");
+		}
         
         BackgroundServiceDelay.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
