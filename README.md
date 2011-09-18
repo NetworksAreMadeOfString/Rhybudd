@@ -7,9 +7,31 @@ control panels such as Amazon EC2, Rackspace and DediPower.
 
 The source code has been released under the GPL version 3 license.
 
+Features:
+--------
+* List Events
+* Acknowledge Event
+* View Event Details
+* Settings
+    * Zenoss details
+    * PagerDuty details
+    * Disable / Enable Background poller
+* Background poller with Notifications support
 
-Links
+To Do:
+--------
+* Device Details
+* Device Editing
+* Pager Duty listing
+* Pager Duty Acknowledge
+* Pager Duty Escalate
+* EC2 Portal
+* Dedipower Portal
+* Rackspace Portal
+
+Links:
 --------
 * Email: Gareth@NetworksAreMadeOfString.co.uk
 * GitHub: https://github.com/NetworksAreMadeOfString/Rhybudd
 * Market URL: https://market.android.com/details?id=net.networksaremadeofstring.rhybudd
+* Twitter: @NetworkString
