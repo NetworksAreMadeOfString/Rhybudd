@@ -1,14 +1,10 @@
 package net.networksaremadeofstring.rhybudd;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;

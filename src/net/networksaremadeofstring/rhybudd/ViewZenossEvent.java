@@ -18,10 +18,7 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
@@ -29,7 +26,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 

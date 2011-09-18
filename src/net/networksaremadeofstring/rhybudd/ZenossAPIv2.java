@@ -18,25 +18,15 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.apache.http.client.HttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -46,8 +36,6 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.content.res.Resources;
 
 import android.util.Log;
 

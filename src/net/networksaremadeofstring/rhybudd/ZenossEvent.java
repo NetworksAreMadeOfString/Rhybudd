@@ -45,6 +45,16 @@ public class ZenossEvent {
     	return this.evid;
     }
     
+    public int getCount()
+    {
+    	return this.Count;
+    }
+    
+    public String getlastTime()
+    {
+    	return this.lastTime;
+    }
+    
     public String getDevice()
     {
     	return this.device;
@@ -65,5 +75,8 @@ public class ZenossEvent {
     	return this.severity;
     }
     
-
+    public String getfirstTime()
+    {
+    	return this.firstTime;
+    }
 }
