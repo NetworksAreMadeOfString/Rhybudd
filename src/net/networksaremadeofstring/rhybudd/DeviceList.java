@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -34,8 +35,8 @@ public class DeviceList extends Activity
     {
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
-        
-        setContentView(R.layout.devicelist);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.skinned_devicelist);
         list = (ListView)findViewById(R.id.ZenossDeviceList);
         
         firstLoadHandler = new Handler() 
