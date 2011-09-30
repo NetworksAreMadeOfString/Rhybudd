@@ -37,6 +37,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -63,9 +66,21 @@ public class rhestr extends Activity
     {
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
-        
-        setContentView(R.layout.eventlist);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.skinned_eventlist);
         list = (ListView)findViewById(R.id.ZenossEventsList);
+        
+        ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
+        refreshButton.setClickable(true);
+        refreshButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				listOfZenossEvents.clear();
+	        	list.setAdapter(null);
+	        	CreateThread();
+	        	dataPreload.start();
+			}
+        });
         
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 

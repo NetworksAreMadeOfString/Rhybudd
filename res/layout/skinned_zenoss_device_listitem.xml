@@ -1,0 +1,15 @@
+
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#858585">
+        <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:text="TextView" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/DeviceName"></TextView>
+        <ImageView android:src="@drawable/item_list_background_tile" android:id="@+id/item_bottom_tile" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"></ImageView>
+        <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/linearLayout1" android:layout_below="@+id/DeviceName" android:layout_centerHorizontal="true">
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/CriticalImage" android:src="@drawable/severity_critical"></ImageView>
+            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:id="@+id/CriticalCount" android:text="0" android:layout_marginRight="20px" android:textColor="#FF00"></TextView>
+            
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/ErrorImage" android:src="@drawable/severity_error"></ImageView>
+            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/ErrorCount" android:textColor="#FF6600"></TextView>
+            
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/WarningImage" android:src="@drawable/severity_warning"></ImageView>
+            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/WarningCount" android:textColor="#FFE303"></TextView>
+        </LinearLayout>
+    </RelativeLayout>
