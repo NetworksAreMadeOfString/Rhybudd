@@ -79,7 +79,7 @@ public class DeviceList extends Activity
     				{
     					DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
     					
-    					Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
+    					//Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
     					
     					for(int i = 0; i < DeviceCount; i++)
     	    			{
@@ -101,7 +101,7 @@ public class DeviceList extends Activity
     		    						CurrentDevice.getString("name"),
     		    						CurrentDevice.getString("uid")));
     		    				
-    		    				Log.i("ForLoop",CurrentDevice.getString("name"));
+    		    				//Log.i("ForLoop",CurrentDevice.getString("name"));
     	    				}
     	    				catch (JSONException e) 
     	    				{

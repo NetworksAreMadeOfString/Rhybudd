@@ -67,7 +67,16 @@ public class ZenossPoller extends Service
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
-		runnable = new Runnable() { public void run() { final int Delay = settings.getInt("BackgroundServiceDelay", 30); Log.i("Delay", Integer.toString(Delay)); CreateThread(); handler.postDelayed(this, Delay * 1000); } }; 
+		runnable = new Runnable() 
+		{ 
+			public void run() 
+			{ 
+				final int Delay = settings.getInt("BackgroundServiceDelay", 30); 
+				//Log.i("Delay", Integer.toString(Delay)); 
+				CreateThread(); 
+				handler.postDelayed(this, Delay * 1000); 
+			} 
+		}; 
 		runnable.run();
 	}
 
@@ -82,7 +91,6 @@ public class ZenossPoller extends Service
 	@Override
 	public void onStart(Intent intent, int startid) 
 	{
-		//Toast.makeText(this, "My Service Started", Toast.LENGTH_LONG).show();
 		//Log.d("Service", "onStart");
 		//SendNotification("Zenoss Poller Background task started.",5);
 	}
@@ -141,11 +149,11 @@ public class ZenossPoller extends Service
     			catch (Exception e) 
     			{
     				failureCount++;
-    				Log.e("Service", "Failure Count: " + Integer.toString(failureCount));
+    				//Log.e("Service", "Failure Count: " + Integer.toString(failureCount));
     				
     				if(failureCount > 10)
     				{
-    					SendNotification("Background service failed",5);
+    					SendNotification("Background poller couldn't connect. Stopping. \r\nLaunch Rhybudd to restart poller.",5);
     					stopSelf();
     				}
 				}

@@ -82,6 +82,17 @@ public class rhestr extends Activity
 			}
         });
         
+        
+        ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
+        deviceListButton.setClickable(true);
+        deviceListButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent DeviceListIntent = new Intent(rhestr.this, DeviceList.class);
+	        	rhestr.this.startActivity(DeviceListIntent);
+			}
+        });
+        
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
     	{
@@ -168,7 +179,7 @@ public class rhestr extends Activity
 											    						CurrentEvent.getString("summary"), 
 											    						CurrentEvent.getString("eventState"),
 											    						CurrentEvent.getString("severity")));
-			    				Log.i("ForLoop",CurrentEvent.getString("summary"));
+			    				//Log.i("ForLoop",CurrentEvent.getString("summary"));
 		    				}
 		    				catch (JSONException e) 
 		    				{
@@ -205,7 +216,7 @@ public class rhestr extends Activity
     {
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
-    	 Log.i("View",Integer.toString(viewID));
+    	 //Log.i("View",Integer.toString(viewID));
     	 dialog = new ProgressDialog(this);
     	 dialog.setTitle("Contacting Zenoss");
     	 dialog.setMessage("Please wait: Sending Events Acknowledgement");
@@ -286,9 +297,8 @@ public class rhestr extends Activity
 	        
 	        case R.id.pagerduty:
 	        {
-	        	/*Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
-	        	rhestr.this.startActivity(SettingsIntent);*/
-	        	Toast.makeText(getApplicationContext(), "PagerDuty functionality will be available soon.", Toast.LENGTH_SHORT).show();
+	        	Intent RhestrPagerDutyIntent = new Intent(rhestr.this, RhestrPagerDuty.class);
+	        	rhestr.this.startActivity(RhestrPagerDutyIntent);
 	            return true;
 	        }
 	        

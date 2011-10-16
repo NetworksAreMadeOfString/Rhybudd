@@ -60,7 +60,10 @@ public class Settings extends Activity
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
         EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
-        EditText pagerDutyET = (EditText) findViewById(R.id.PagerDutyAPIKey);
+        EditText pagerDutyURL = (EditText) findViewById(R.id.PagerDutyURL);
+        EditText pagerDutyEmail = (EditText) findViewById(R.id.PagerDutyEmailAddress);
+        EditText pagerDutyPass = (EditText) findViewById(R.id.PagerDutyPassword);
+        
         CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
         SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
         
@@ -73,8 +76,14 @@ public class Settings extends Activity
         if(settings.getString("passWord", "--").equals("--") == false)
         	passwordET.setText(settings.getString("passWord",""));
         
-        if(settings.getString("pagerDuty", "--").equals("--") == false)
-        	pagerDutyET.setText(settings.getString("pagerDuty",""));
+        if(settings.getString("pagerDutyURL", "--").equals("--") == false)
+        	pagerDutyURL.setText(settings.getString("pagerDutyURL",""));
+        
+        if(settings.getString("pagerDutyEmail", "--").equals("--") == false)
+        	pagerDutyEmail.setText(settings.getString("pagerDutyEmail",""));
+        
+        if(settings.getString("pagerDutyPass", "--").equals("--") == false)
+        	pagerDutyPass.setText(settings.getString("pagerDutyPass",""));
         
         if(settings.getBoolean("AllowBackgroundService", true) == true)
         	BackgroundService.setChecked(true);
@@ -161,7 +170,10 @@ public class Settings extends Activity
             	EditText urlET = (EditText) findViewById(R.id.ZenossURL);
                 EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
                 EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
-                EditText pagerDutyET = (EditText) findViewById(R.id.PagerDutyAPIKey);
+                
+                EditText pagerDutyURL = (EditText) findViewById(R.id.PagerDutyURL);
+                EditText pagerDutyEmail = (EditText) findViewById(R.id.PagerDutyEmailAddress);
+                EditText pagerDutyPass = (EditText) findViewById(R.id.PagerDutyPassword);
                 CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
                 SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
                 
@@ -169,7 +181,9 @@ public class Settings extends Activity
                 editor.putString("URL", urlET.getText().toString());
                 editor.putString("userName", nameET.getText().toString());
                 editor.putString("passWord", passwordET.getText().toString());
-                editor.putString("pagerDuty", pagerDutyET.getText().toString());
+                editor.putString("pagerDutyURL", pagerDutyURL.getText().toString());
+                editor.putString("pagerDutyEmail", pagerDutyEmail.getText().toString());
+                editor.putString("pagerDutyPass", pagerDutyPass.getText().toString());
                 editor.putBoolean("AllowBackgroundService", BackgroundService.isChecked());
                 editor.putInt("BackgroundServiceDelay", BackgroundServiceDelay.getProgress());
                 editor.commit();
