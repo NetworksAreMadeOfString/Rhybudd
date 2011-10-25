@@ -200,8 +200,8 @@ public class rhestr extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
-    				e.printStackTrace();
+    				//Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
+    				//e.printStackTrace();
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -228,7 +228,7 @@ public class rhestr extends Activity
 		    				}
 		    				catch (JSONException e) 
 		    				{
-		    					Log.e("API - Stage 2 - Inner", e.getMessage());
+		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
 		    				}
 		    			}
 						
@@ -242,7 +242,7 @@ public class rhestr extends Activity
 				} 
 				catch (JSONException e) 
 				{
-					Log.e("API - Stage 2", e.getMessage());
+					//Log.e("API - Stage 2", e.getMessage());
 					totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -291,8 +291,8 @@ public class rhestr extends Activity
         	    			}
         	    			catch (Exception e)
         	    			{
-        	    				Log.e("ACK",e.getMessage());
-        	    				e.printStackTrace();
+        	    				//Log.e("ACK",e.getMessage());
+        	    				//e.printStackTrace();
         	    				AckEventHandler.sendEmptyMessage(99);
         	    			}
         	    		}

@@ -130,7 +130,7 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
 	
 	public boolean onLongClick(View v)
 	{
-		((rhestr)context).ViewEvent(v.getTag().toString());
+		((rhestr)context).ViewEvent(v.getTag(R.integer.EventID).toString());
 		return true;
 	}
 
