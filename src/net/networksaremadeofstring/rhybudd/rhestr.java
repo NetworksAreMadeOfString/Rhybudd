@@ -30,6 +30,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,12 +57,25 @@ public class rhestr extends Activity
 	private boolean totalFailure = false;
 	private int EventCount = 0;
 	Thread dataPreload,AckEvent;
-	Handler handler, AckEventHandler;
+	volatile Handler handler, AckEventHandler;
 	ProgressDialog dialog;
 	ListView list;
+	ZenossEventsAdaptor adapter;
+	
+	@Override
+	public Object onRetainNonConfigurationInstance() 
+	{
+		if(dialog != null && dialog.isShowing())
+		{
+			dialog.dismiss();
+		}
+	
+	    return listOfZenossEvents;
+	}
 	
     /** Called when the activity is first created. */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
@@ -104,7 +118,7 @@ public class rhestr extends Activity
     				if(EventCount > 0)
     				{
 	    				UpdateErrorMessage("",false);
-	    				ZenossEventsAdaptor adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	    				adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
 	        	        list.setAdapter(adapter);
     				}
     				else
@@ -119,9 +133,40 @@ public class rhestr extends Activity
     		}
     	};
     	
-    	CreateThread();
+    	AckEventHandler = new Handler() 
+    	 {
+    		public void handleMessage(Message msg) 
+    		{
+    			if(msg.what == 0)
+    			{
+    				adapter.notifyDataSetChanged();
+    			}
+    			else if(msg.what == 1)
+    			{
+    				adapter.notifyDataSetChanged();
+    			}
+    			else
+    			{
+    				Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+    			}
+    		}
+    	 };
     	
-    	dataPreload.start();
+    	listOfZenossEvents = (List<ZenossEvent>) getLastNonConfigurationInstance();
+    	
+    	if(listOfZenossEvents == null || listOfZenossEvents.size() < 1)
+    	{
+    		listOfZenossEvents = new ArrayList<ZenossEvent>();
+    		CreateThread();
+	    	dataPreload.start();
+    	}
+    	else
+    	{
+	    	Log.i("rhestr","We already had data!");
+	    	UpdateErrorMessage("",false);
+	    	ZenossEventsAdaptor adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	        list.setAdapter(adapter);
+    	}
 
     }
     
@@ -212,52 +257,43 @@ public class rhestr extends Activity
     	rhestr.this.startActivity(ViewEventIntent);
     }
     
-    public void AcknowledgeEvent(final String EventID, final int viewID)
+    public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
     {
+    	Log.i("AcknowledgeEvent", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
     	 //Log.i("View",Integer.toString(viewID));
-    	 dialog = new ProgressDialog(this);
+		/*dialog = new ProgressDialog(this);
     	 dialog.setTitle("Contacting Zenoss");
-    	 dialog.setMessage("Please wait: Sending Events Acknowledgement");
-    	 
-    	 AckEventHandler = new Handler() 
-     	 {
-     		public void handleMessage(Message msg) 
-     		{
-     			dialog.dismiss();
-     			if(msg.what == 1)
-     			{
-	     			RelativeLayout ListItem = (RelativeLayout) list.findViewWithTag(EventID);
-					ImageView ACKImg = (ImageView) ListItem.findViewById(R.id.AckImage);
-					ACKImg.setImageResource(R.drawable.ack);
-					list.invalidate();
-     			}
-     			else
-     			{
-     				Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
-     			}
-     		}
-     	 };
-     	 
+    	 dialog.setMessage("Please wait: Sending Events Acknowledgement");*/
+
     	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
     	 {
              public void onClick(DialogInterface arg0, int arg1) 
              {
-            	 dialog.show();
+            	 Log.i("AcknowledgeEvent Yes", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
+            	 listOfZenossEvents.get(Position).setProgress(true);
+            	 AckEventHandler.sendEmptyMessage(0);
+            	 //dialog.show();
             	 AckEvent = new Thread() 
         	    	{  
         	    		public void run() 
         	    		{
         	    			try 
         	    			{
-								API.AcknowledgeEvent(EventID);
+        	    				Log.i("AcknowledgeEvent Thread", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
+        	    				
+        	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+        	    				ackEventAPI.AcknowledgeEvent(EventID);
+								listOfZenossEvents.get(Position).setProgress(false);
+								listOfZenossEvents.get(Position).setAcknowledged();
 								AckEventHandler.sendEmptyMessage(1);
         	    			}
         	    			catch (Exception e)
         	    			{
         	    				Log.e("ACK",e.getMessage());
-        	    				AckEventHandler.sendEmptyMessage(0);
+        	    				e.printStackTrace();
+        	    				AckEventHandler.sendEmptyMessage(99);
         	    			}
         	    		}
         	    	};

@@ -27,6 +27,7 @@ public class ZenossEvent {
 	private String eventState;
 	private String firstTime;
 	private String severity;
+	private Boolean inProgress = false;
 	
 	
 	 // Constructor for the Ticket class
@@ -48,6 +49,21 @@ public class ZenossEvent {
     public int getCount()
     {
     	return this.Count;
+    }
+    
+    public Boolean getProgress()
+    {
+    	return this.inProgress;
+    }
+    
+    public void setProgress(Boolean _inProgress)
+    {
+    	this.inProgress = _inProgress;
+    }
+    
+    public void setAcknowledged()
+    {
+    	this.eventState = "Acknowledged";
     }
     
     public String getlastTime()

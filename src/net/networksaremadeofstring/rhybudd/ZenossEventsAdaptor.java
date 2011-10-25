@@ -19,6 +19,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -94,9 +96,27 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         	SeverityImage.setImageResource(R.drawable.severity_info); //Technically debug
         
         if(Event.getEventState().equals("Acknowledged"))
+        {
         	AckImage.setImageResource(R.drawable.ack);
+        }
+        else
+        {
+        	AckImage.setImageResource(R.drawable.nack);
+        }
         
-        convertView.setTag(Event.getEVID());
+        
+        if(Event.getProgress())
+        {
+        	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(0);
+        }
+        else
+        {
+        	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
+        }
+        
+        //convertView.setTag(Event.getEVID());
+        convertView.setTag(R.integer.EventID,Event.getEVID());
+        convertView.setTag(R.integer.EventPositionInList,position);
         convertView.setOnClickListener(this);
         convertView.setOnLongClickListener(this);
         return convertView;
@@ -105,7 +125,7 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
 	@Override
 	public void onClick(View v) 
 	{
-		((rhestr)context).AcknowledgeEvent(v.getTag().toString(), v.getId());
+		((rhestr)context).AcknowledgeEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
 	}
 	
 	public boolean onLongClick(View v)
