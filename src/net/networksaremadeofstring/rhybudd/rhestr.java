@@ -164,7 +164,7 @@ public class rhestr extends Activity
     	{
 	    	Log.i("rhestr","We already had data!");
 	    	UpdateErrorMessage("",false);
-	    	ZenossEventsAdaptor adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
 	        list.setAdapter(adapter);
     	}
 
