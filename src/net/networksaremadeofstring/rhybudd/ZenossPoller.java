@@ -52,15 +52,6 @@ public class ZenossPoller extends Service
 	public void onCreate() 
 	{
 		settings = getSharedPreferences("rhybudd", 0);
-		/*try 
-        {
-			API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-		} 
-        catch (Exception e) 
-        {
-			SendNotification("Background service failed",5);
-			stopSelf();
-		}*/
 
 		Log.d("Service", "onCreate");
 		
@@ -74,7 +65,7 @@ public class ZenossPoller extends Service
 				final int Delay = settings.getInt("BackgroundServiceDelay", 30); 
 				//Log.i("Delay", Integer.toString(Delay)); 
 				CreateThread(); 
-				handler.postDelayed(this, Delay * 1000); 
+				//handler.postDelayed(this, Delay * 1000); 
 			} 
 		}; 
 		runnable.run();
@@ -195,6 +186,11 @@ public class ZenossPoller extends Service
 					//stopSelf();
 					failureCount++;
 				}
+				
+				//At this point it might be a good idea to set stuff we don't need
+				//anymore to null so GC can collect it
+				
+				ZenossPoller.this.stopSelf();
     		}
     	};
     	

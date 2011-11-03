@@ -21,6 +21,8 @@ package net.networksaremadeofstring.rhybudd;
 import java.text.DecimalFormat;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,6 +45,7 @@ public class Settings extends Activity
 	Thread peformLogin;
 	Handler handler;
 	ZenossAPIv2 API = null;
+	private PendingIntent mAlarmSender;
 	
 	 /** Called when the activity is first created. */
     @Override
@@ -188,13 +191,19 @@ public class Settings extends Activity
                 editor.putInt("BackgroundServiceDelay", BackgroundServiceDelay.getProgress());
                 editor.commit();
                 
+                mAlarmSender = PendingIntent.getService(Settings.this, 0, new Intent(Settings.this, ZenossPoller.class), 0);
+                AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+                
                 if(BackgroundService.isChecked())
                 {
-                	startService(new Intent(v.getContext(), ZenossPoller.class));
+                	//Stop it first and then start it otherwise it'll never get it's new time
+                	//Eventually I'll enable two way comms
+                	am.cancel(mAlarmSender);
+                	am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) BackgroundServiceDelay.getProgress(), ((long) BackgroundServiceDelay.getProgress() * 1000), mAlarmSender);
                 }
                 else
                 {
-                	stopService(new Intent(v.getContext(), ZenossPoller.class));
+                    am.cancel(mAlarmSender);
                 }
                 CreateThread();
                 peformLogin.start();

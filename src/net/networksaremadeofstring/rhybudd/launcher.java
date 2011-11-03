@@ -43,22 +43,6 @@ public class launcher extends Activity
 	     }
 	     else
 	     {
-	    	 //Start the background service
-	    	 if(settings.getBoolean("AllowBackgroundService", true) == true)
-	    	 {
-	    		 StartService = new Thread() 
-	    		 {  
-	    			 public void run() 
-					{
-					startService(new Intent(launcher.this.getApplicationContext(), ZenossPoller.class));
-					}
-	    		 };
-	    	 }
-	    	 else
-	    	 {
-	    		 stopService(new Intent(this, ZenossPoller.class));
-	    	 }
-	    	 
 	    	 Intent EventListIntent = new Intent(launcher.this, rhestr.class);
 	    	 launcher.this.startActivity(EventListIntent);
 	    	 finish();
