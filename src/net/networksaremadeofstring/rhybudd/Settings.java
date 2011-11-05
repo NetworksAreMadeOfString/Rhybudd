@@ -67,7 +67,6 @@ public class Settings extends Activity
         EditText pagerDutyEmail = (EditText) findViewById(R.id.PagerDutyEmailAddress);
         EditText pagerDutyPass = (EditText) findViewById(R.id.PagerDutyPassword);
         
-        CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
         SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
         
         if(settings.getString("URL", "--").equals("--") == false)
@@ -89,7 +88,22 @@ public class Settings extends Activity
         	pagerDutyPass.setText(settings.getString("pagerDutyPass",""));
         
         if(settings.getBoolean("AllowBackgroundService", true) == true)
-        	BackgroundService.setChecked(true);
+        	((CheckBox) findViewById(R.id.AllowBackgroundService)).setChecked(true);
+        
+        if(settings.getBoolean("SeverityCritical", true) == true)
+        	((CheckBox) findViewById(R.id.criticalCheckBox)).setChecked(true);
+        
+        if(settings.getBoolean("SeverityError", true) == true)
+        	((CheckBox) findViewById(R.id.errorCheckBox)).setChecked(true);
+        
+        if(settings.getBoolean("SeverityWarning", true) == true)
+        	((CheckBox) findViewById(R.id.warningCheckBox)).setChecked(true);
+        
+        if(settings.getBoolean("SeverityInfo", false) == true)
+        	((CheckBox) findViewById(R.id.infoCheckBox)).setChecked(true);
+        
+        if(settings.getBoolean("SeverityDebug", false) == true)
+        	((CheckBox) findViewById(R.id.debugCheckBox)).setChecked(true);
         
         BackgroundServiceDelay.setProgress(settings.getInt("BackgroundServiceDelay", 30));
         TextView DelayLabel = (TextView) findViewById(R.id.DelayLabel);
@@ -180,6 +194,12 @@ public class Settings extends Activity
                 CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
                 SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
                 
+                CheckBox criticalCheckBox = (CheckBox) findViewById(R.id.criticalCheckBox);
+                CheckBox errorCheckBox = (CheckBox) findViewById(R.id.errorCheckBox);
+                CheckBox warningCheckBox = (CheckBox) findViewById(R.id.warningCheckBox);
+                CheckBox infoCheckBox = (CheckBox) findViewById(R.id.infoCheckBox);
+                CheckBox debugCheckBox = (CheckBox) findViewById(R.id.debugCheckBox);
+                
             	SharedPreferences.Editor editor = settings.edit();
                 editor.putString("URL", urlET.getText().toString());
                 editor.putString("userName", nameET.getText().toString());
@@ -189,6 +209,12 @@ public class Settings extends Activity
                 editor.putString("pagerDutyPass", pagerDutyPass.getText().toString());
                 editor.putBoolean("AllowBackgroundService", BackgroundService.isChecked());
                 editor.putInt("BackgroundServiceDelay", BackgroundServiceDelay.getProgress());
+                
+                editor.putBoolean("SeverityCritical", criticalCheckBox.isChecked());
+                editor.putBoolean("SeverityError", errorCheckBox.isChecked());
+                editor.putBoolean("SeverityWarning", warningCheckBox.isChecked());
+                editor.putBoolean("SeverityInfo", infoCheckBox.isChecked());
+                editor.putBoolean("SeverityDebug", debugCheckBox.isChecked());
                 editor.commit();
                 
                 mAlarmSender = PendingIntent.getService(Settings.this, 0, new Intent(Settings.this, ZenossPoller.class), 0);
@@ -197,7 +223,6 @@ public class Settings extends Activity
                 if(BackgroundService.isChecked())
                 {
                 	//Stop it first and then start it otherwise it'll never get it's new time
-                	//Eventually I'll enable two way comms
                 	am.cancel(mAlarmSender);
                 	am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) BackgroundServiceDelay.getProgress(), ((long) BackgroundServiceDelay.getProgress() * 1000), mAlarmSender);
                 }

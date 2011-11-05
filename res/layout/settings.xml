@@ -1,6 +1,6 @@
 
     <ScrollView android:id="@+id/scrollView1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-        <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:isScrollContainer="true" android:fadeScrollbars="true" android:fadingEdge="vertical" android:scrollbars="vertical" android:layout_height="wrap_content">
+        <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:isScrollContainer="true" android:fadeScrollbars="true" android:fadingEdge="vertical" android:scrollbars="vertical" android:layout_height="fill_parent">
         <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/URLLabel" android:layout_marginLeft="6px" android:layout_marginTop="6dp" android:text="Zenoss URL:"></TextView>
         <EditText android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/ZenossURL" android:hint="http://zenoss.url:8080" android:layout_below="@+id/URLLabel" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:inputType="textUri">
             <requestFocus></requestFocus>
@@ -8,7 +8,7 @@
         <EditText android:inputType="textPersonName" android:layout_height="wrap_content" android:id="@+id/ZenossUserName" android:layout_marginLeft="10px" android:layout_width="fill_parent" android:layout_marginRight="10px" android:hint="Zenoss User Name" android:layout_below="@+id/ZenossURL" android:layout_marginTop="6dp"></EditText>
         <EditText android:inputType="textPassword" android:layout_height="wrap_content" android:id="@+id/ZenossPassword" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_below="@+id/ZenossUserName" android:hint="Zenoss Password"></EditText>
         <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/ZenossPassword" android:layout_centerHorizontal="true" android:id="@+id/PasswordWarning" android:textSize="4pt" android:text="!! Password is stored unencrypted on local storage !!" android:textColor="#FF0000"></TextView>
-        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/SaveButton" android:text="Save Settings" android:layout_below="@+id/AllowBackgroundService" android:layout_marginTop="12px"></Button>
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/SaveButton" android:text="Save Settings" android:layout_marginTop="12px" android:layout_alignParentBottom="true" android:layout_below="@+id/severityContainer2"></Button>
         
         
         
@@ -19,6 +19,15 @@
         <SeekBar android:layout_height="wrap_content" android:id="@+id/BackgroundServiceDelay" android:layout_toRightOf="@+id/AllowBackgroundService" android:layout_marginLeft="20px" android:layout_width="180px" android:progress="30" android:layout_below="@+id/PagerDutyPassword" android:layout_marginTop="15dp" android:max="900"></SeekBar>
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_below="@+id/BackgroundServiceDelay" android:layout_alignRight="@+id/ZenossPassword" android:layout_marginRight="16dp" android:id="@+id/DelayLabel" android:text="30 secs" android:textSize="4pt"></TextView>
         <EditText android:layout_height="wrap_content" android:inputType="textPassword" android:layout_below="@+id/PagerDutyEmailAddress" android:id="@+id/PagerDutyPassword" android:layout_centerHorizontal="true" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_width="fill_parent" android:hint="PagerDuty Password"></EditText>
+        <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/DelayLabel" android:layout_centerHorizontal="true" android:id="@+id/severityContainer" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal">
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/criticalCheckBox" android:text="Critical" android:layout_marginLeft="4dp" android:layout_marginRight="4dp" android:checked="true"></CheckBox>
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Error" android:id="@+id/errorCheckBox" android:layout_marginLeft="4dp" android:layout_marginRight="4dp" android:checked="true"></CheckBox>
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/warningCheckBox" android:text="Warning" android:layout_marginLeft="4dp" android:layout_marginRight="4dp" android:checked="true"></CheckBox>
+        </LinearLayout>
+        <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/severityContainer" android:layout_centerHorizontal="true" android:id="@+id/severityContainer2">
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:text="Info" android:layout_marginRight="4dp" android:id="@+id/infoCheckBox"></CheckBox>
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:text="Debug" android:layout_marginRight="4dp" android:id="@+id/debugCheckBox"></CheckBox>
+        </LinearLayout>
     </RelativeLayout>
     
     

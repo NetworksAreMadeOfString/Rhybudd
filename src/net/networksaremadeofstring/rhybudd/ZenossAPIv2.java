@@ -72,19 +72,6 @@ public class ZenossAPIv2
         this.ZENOSS_INSTANCE = URL;
         this.ZENOSS_USERNAME = UserName;
         this.ZENOSS_PASSWORD = Password;
-        
-        /*List<Cookie> cookies = httpclient.getCookieStore().getCookies();
-        int i = 0;
-        while(i < cookies.size())
-        {
-        	//Log.i("Cookie: " + cookies.get(i).getName().toString(),cookies.get(i).getValue());
-        	if(cookies.get(i).getName().equals("__ginger_snap"))
-        	{
-
-        	}
-        	i++;
-        }*/
-        //Log.i("Constructor","Leaving constructor");
     }
     
     public boolean getLoggedInStatus()
@@ -200,10 +187,38 @@ public class ZenossAPIv2
     	return json;
 	}
 	
-    @SuppressWarnings("unchecked")
 	public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
+	{
+		return this.GetEvents("5,4,3,2");
+	}
+	
+	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug) throws JSONException, ClientProtocolException, IOException
+	{
+		String SeverityLevels = "";
+        
+        if(Critical)
+        	SeverityLevels += "5,";
+        
+        if(Error)
+        	SeverityLevels += "4,";
+        
+        if(Warning)
+        	SeverityLevels += "3,";
+        
+        if(Info)
+        	SeverityLevels += "2,";
+        
+        if(Debug)
+        	SeverityLevels += "1,";
+        
+        //Remove last comma
+		return this.GetEvents(SeverityLevels.substring(0, SeverityLevels.length() - 1));
+	}
+	
+    @SuppressWarnings("unchecked")
+	private JSONObject GetEvents(String Severity) throws JSONException, ClientProtocolException, IOException
     {
-    	//Log.i("Test:", "Entering Get Events");
+    	Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
@@ -216,7 +231,7 @@ public class ZenossAPIv2
     	dataContents.put("sort", "severity");
         
         JSONObject params = new JSONObject();
-        params.put("severity", new JSONArray("[5, 4, 3, 2]"));
+        params.put("severity", new JSONArray("["+Severity+"]"));
         params.put("eventState", new JSONArray("[0, 1]"));
         dataContents.put("params", params);
         

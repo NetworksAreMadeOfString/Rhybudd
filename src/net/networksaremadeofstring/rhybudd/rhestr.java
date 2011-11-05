@@ -195,7 +195,13 @@ public class rhestr extends Activity
     					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
     				}
     				
-					EventsObject = API.GetEvents();
+					//EventsObject = API.GetEvents();
+    				EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true),
+							settings.getBoolean("SeverityError", true),
+							settings.getBoolean("SeverityWarning", true),
+							settings.getBoolean("SeverityInfo", false),
+							settings.getBoolean("SeverityDebug", false));
+    				
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
 				} 
     			catch (Exception e) 
