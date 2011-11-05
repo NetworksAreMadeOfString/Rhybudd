@@ -1,5 +1,5 @@
 <ScrollView android:id="@+id/viewDeviceContainer" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/filler_tile">
-    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/filler_tile" android:layout_height="fill_parent">
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/filler_tile" android:layout_height="wrap_content">
         <RelativeLayout android:id="@+id/TopMenu" android:layout_width="fill_parent" android:background="@drawable/background_tile" android:layout_height="wrap_content">
         <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/top_menu_button_devicelist" android:id="@+id/DeviceListImage" android:layout_alignParentRight="true" android:layout_marginLeft="4dp" android:layout_marginRight="12dp"></ImageView>
         <ImageView android:src="@drawable/title" android:id="@+id/imageView1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:layout_marginLeft="18dp"></ImageView>
@@ -18,6 +18,8 @@
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/uptimeLabel" android:layout_alignBottom="@+id/uptimeLabel" android:layout_toRightOf="@+id/uptimeLabel" android:text="00d:00h:00m:00s" android:id="@+id/uptime"></TextView>
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_below="@+id/uptimeLabel" android:layout_alignParentLeft="true" android:id="@+id/productionStateLabel" android:text="Production State:" android:layout_marginRight="12dp"></TextView>
         <TextView android:text="TextView" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/productionStateLabel" android:layout_alignBottom="@+id/productionStateLabel" android:layout_toRightOf="@+id/productionStateLabel" android:id="@+id/productionState"></TextView>
+        <ListView android:layout_width="match_parent" android:layout_below="@+id/productionState" android:layout_centerHorizontal="true" android:layout_marginTop="4dp" android:minHeight="400dp" android:id="@+id/ZenossEventsList" android:layout_height="200dp"></ListView>
+        <ProgressBar android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/eventsProgressBar" android:layout_below="@+id/productionStateLabel"></ProgressBar>
     
     
     

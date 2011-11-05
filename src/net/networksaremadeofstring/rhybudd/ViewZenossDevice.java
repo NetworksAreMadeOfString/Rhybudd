@@ -1,5 +1,10 @@
 package net.networksaremadeofstring.rhybudd;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -13,19 +18,26 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ViewZenossDevice extends Activity
 {
 	ZenossAPIv2 API = null;
-	JSONObject DeviceObject = null;
+	JSONObject DeviceObject = null, EventsObject = null;
 	JSONObject DeviceDetails = null;
 	private SharedPreferences settings = null;
-	Handler firstLoadHandler;
+	Handler firstLoadHandler, eventsHandler;
 	ProgressDialog dialog;
-	Thread dataPreload;
+	Thread dataPreload, eventsLoad;
 	private String EventID;
+	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	ListView list;
+	ZenossEventsAdaptor adapter;
+	JSONArray Events = null;
+	private int EventCount = 0;
 	
 	/** Called when the activity is first created. */
     @Override
@@ -44,6 +56,27 @@ public class ViewZenossDevice extends Activity
 				finish();
 			}
         });
+        
+        list = (ListView)findViewById(R.id.ZenossEventsList);
+        
+        eventsHandler = new Handler()
+        {
+        	public void handleMessage(Message msg) 
+    		{
+        		((ProgressBar) findViewById(R.id.eventsProgressBar)).setVisibility(4);
+        		
+				if(EventCount > 0 && msg.what == 1)
+				{
+    				adapter = new ZenossEventsAdaptor(ViewZenossDevice.this, listOfZenossEvents, false);
+        	        list.setAdapter(adapter);
+				}
+				else
+				{
+					list = null;
+					
+				}
+    		}
+        };
         
         firstLoadHandler = new Handler() 
     	{
@@ -176,8 +209,6 @@ public class ViewZenossDevice extends Activity
     				}
     				
 					DeviceObject = API.GetDevice(getIntent().getStringExtra("UID"));
-	    			//Events = EventsObject.getJSONObject("result").getJSONArray("events");
-					DeviceObject.toString(2);
 				} 
     			catch (Exception e) 
     			{
@@ -190,5 +221,66 @@ public class ViewZenossDevice extends Activity
     	};
     	
     	dataPreload.start();
+    	
+    	eventsLoad = new Thread() 
+    	{  
+    		public void run() 
+    		{
+    			try 
+    			{
+    				if(API == null)
+    				{
+    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+    				}
+    				
+					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"));
+					Events = EventsObject.getJSONObject("result").getJSONArray("events");
+					
+					try 
+					{
+						if(EventsObject != null)
+						{
+							EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+							
+							for(int i = 0; i < EventCount; i++)
+			    			{
+			    				JSONObject CurrentEvent = null;
+			    				try 
+			    				{
+				    				CurrentEvent = Events.getJSONObject(i);
+				    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+												    						CurrentEvent.getJSONObject("device").getString("text"),
+												    						CurrentEvent.getString("summary"), 
+												    						CurrentEvent.getString("eventState"),
+												    						CurrentEvent.getString("severity")));
+				    				//Log.i("ForLoop",CurrentEvent.getString("summary"));
+			    				}
+			    				catch (JSONException e) 
+			    				{
+			    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+			    				}
+			    			}
+							
+							eventsHandler.sendEmptyMessage(1);
+						}
+						else
+						{
+							eventsHandler.sendEmptyMessage(0);
+						}
+					} 
+					catch (JSONException e) 
+					{
+						eventsHandler.sendEmptyMessage(0);
+					}
+				} 
+    			catch (Exception e) 
+    			{
+    				Log.e("API - Stage 1", e.getMessage());
+    				eventsHandler.sendEmptyMessage(0);
+				}
+    		}
+    	};
+    	
+    	eventsLoad.start();
     }
 }

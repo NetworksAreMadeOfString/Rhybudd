@@ -314,7 +314,7 @@ public class ZenossAPIv2
     	httpost.setHeader("Accept", "application/json");
     	
     	
-    	JSONArray keys = new JSONArray("[uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
+    	JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
     	JSONArray data = new JSONArray();
         
         JSONObject dataObject = new JSONObject();
@@ -339,7 +339,47 @@ public class ZenossAPIv2
     	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
+    	Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
+    
+    @SuppressWarnings("unchecked")
+	public JSONObject GetDeviceEvents(String UID) throws JSONException, ClientProtocolException, IOException
+    {
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/evconsole_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+
+    	JSONArray data = new JSONArray();
+        
+        JSONObject dataObject = new JSONObject();
+        dataObject.put("uid", UID);
+        dataObject.put("start", 0);
+        dataObject.put("limit", 100);
+        dataObject.put("sort", "severity");
+        dataObject.put("dir", "DESC");
+        
+        data.put(dataObject);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "query");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));
+    	
+    	//Log.i("Execute","Executing with string: " + Wrapper.toString());
+    	String test = httpclient.execute(httpost, responseHandler);
+    	//Log.i("Test:", test);
+		
+		JSONObject json = new JSONObject(test);
+    	Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
+    }
+    
 }

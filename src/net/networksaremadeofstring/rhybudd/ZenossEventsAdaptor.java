@@ -37,7 +37,14 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
 {
 	private Context context;
     private List<ZenossEvent> listZenossEvents;
-	
+    private Boolean isRhestr = true;
+
+    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, Boolean _isRhestr) 
+    {
+        this.context = context;
+        this.listZenossEvents = _listZenossEvents;
+        this.isRhestr = _isRhestr;
+    }
     
     public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents) 
     {
@@ -117,8 +124,12 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         //convertView.setTag(Event.getEVID());
         convertView.setTag(R.integer.EventID,Event.getEVID());
         convertView.setTag(R.integer.EventPositionInList,position);
-        convertView.setOnClickListener(this);
-        convertView.setOnLongClickListener(this);
+        
+        if(this.isRhestr)
+        {
+	        convertView.setOnClickListener(this);
+	        convertView.setOnLongClickListener(this);
+        }
         return convertView;
 	}
 	
