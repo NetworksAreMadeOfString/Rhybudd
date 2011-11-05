@@ -212,7 +212,7 @@ public class ViewZenossDevice extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				//Log.e("API - Stage 1", e.getMessage());
     				firstLoadHandler.sendEmptyMessage(0);
 				}
     			
@@ -275,7 +275,7 @@ public class ViewZenossDevice extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				//Log.e("API - Stage 1", e.getMessage());
     				eventsHandler.sendEmptyMessage(0);
 				}
     		}

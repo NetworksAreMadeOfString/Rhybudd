@@ -155,7 +155,7 @@ public class ViewZenossEvent extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				//Log.e("API - Stage 1", e.getMessage());
     				firstLoadHandler.sendEmptyMessage(0);
 				}
     			

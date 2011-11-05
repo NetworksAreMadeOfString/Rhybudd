@@ -147,7 +147,7 @@ public class RhestrPagerDuty extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
+    				//Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
     				e.printStackTrace();
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
@@ -174,7 +174,7 @@ public class RhestrPagerDuty extends Activity
 		    				}
 		    				catch (JSONException e) 
 		    				{
-		    					Log.e("API - Stage 2 - Inner", e.getMessage());
+		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
 		    				}
 		    			}
 						
@@ -188,7 +188,7 @@ public class RhestrPagerDuty extends Activity
 				} 
 				catch (JSONException e) 
 				{
-					Log.e("API - Stage 2", e.getMessage());
+					//Log.e("API - Stage 2", e.getMessage());
 					totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -264,7 +264,7 @@ public class RhestrPagerDuty extends Activity
         	    			}
         	    			catch (Exception e)
         	    			{
-        	    				Log.e("ACK",e.getMessage());
+        	    				//Log.e("ACK",e.getMessage());
         	    				AckEventHandler.sendEmptyMessage(0);
         	    			}
         	    		}

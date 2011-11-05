@@ -162,7 +162,7 @@ public class rhestr extends Activity
     	}
     	else
     	{
-	    	Log.i("rhestr","We already had data!");
+	    	//Log.i("rhestr","We already had data!");
 	    	UpdateErrorMessage("",false);
 	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
 	        list.setAdapter(adapter);
@@ -265,7 +265,7 @@ public class rhestr extends Activity
     
     public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
     {
-    	Log.i("AcknowledgeEvent", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
+    	//Log.i("AcknowledgeEvent", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
     	 //Log.i("View",Integer.toString(viewID));
@@ -277,7 +277,7 @@ public class rhestr extends Activity
     	 {
              public void onClick(DialogInterface arg0, int arg1) 
              {
-            	 Log.i("AcknowledgeEvent Yes", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
+            	 //Log.i("AcknowledgeEvent Yes", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
             	 listOfZenossEvents.get(Position).setProgress(true);
             	 AckEventHandler.sendEmptyMessage(0);
             	 //dialog.show();
@@ -287,7 +287,7 @@ public class rhestr extends Activity
         	    		{
         	    			try 
         	    			{
-        	    				Log.i("AcknowledgeEvent Thread", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
+        	    				//Log.i("AcknowledgeEvent Thread", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
         	    				
         	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
         	    				ackEventAPI.AcknowledgeEvent(EventID);

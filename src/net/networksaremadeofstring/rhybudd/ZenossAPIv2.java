@@ -94,7 +94,7 @@ public class ZenossAPIv2
 		} 
     	catch (Exception e) 
     	{
-			Log.e("CheckLoggedIn", e.getMessage());
+			//Log.e("CheckLoggedIn", e.getMessage());
 			this.LoginSuccessful = false;
 			return false;
 		}
@@ -219,7 +219,7 @@ public class ZenossAPIv2
     @SuppressWarnings("unchecked")
 	private JSONObject GetEvents(String Severity) throws JSONException, ClientProtocolException, IOException
     {
-    	Log.i("Test:", Severity);
+    	//Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
@@ -378,7 +378,7 @@ public class ZenossAPIv2
     	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	Log.i("ZenossEvents -------------> ", json.toString());
+    	//Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
     

@@ -53,7 +53,7 @@ public class ZenossPoller extends Service
 	{
 		settings = getSharedPreferences("rhybudd", 0);
 
-		Log.d("Service", "onCreate");
+		//Log.d("Service", "onCreate");
 		
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
@@ -122,7 +122,7 @@ public class ZenossPoller extends Service
 	
 	private void CreateThread()
     {
-		Log.i("Service","Create Thread Called");
+		//Log.i("Service","Create Thread Called");
 		
     	dataPreload = new Thread() 
     	{  
