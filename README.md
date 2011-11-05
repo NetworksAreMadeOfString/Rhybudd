@@ -15,19 +15,18 @@ Features:
     * Zenoss details
     * PagerDuty details
     * Disable / Enable Background poller
+    * Choose severity levels used for background poller / event search
 * Background poller with Notifications support
 * View Device (Infrastructure) list with Crit / Err / Warn status
+* View Device Details (with associated events)
 * Pager Duty incident listing
 
 To Do:
 --------
-* Device Details
 * Device Editing
 * Pager Duty Acknowledge
 * Pager Duty Escalate
 * Settings
-    * Choose severity levels for search
-    * Choose severity levels for background poller
     * Choose Production state for device list query
 * Device Search
 * Event History
