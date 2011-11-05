@@ -7,12 +7,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -58,6 +62,23 @@ public class DeviceList extends Activity
     		}
     	};
     	
+    	GetDevices();
+    	
+    	ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
+        refreshButton.setClickable(true);
+        refreshButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				listOfZenossDevices.clear();
+	        	list.setAdapter(null);
+	        	GetDevices();
+			}
+        });
+        
+    }
+    
+    public void GetDevices()
+    {
     	dialog = new ProgressDialog(this);
     	dialog.setTitle("Contacting Zenoss");
    	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
@@ -88,6 +109,7 @@ public class DeviceList extends Activity
     	    				{
     	    					CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
     		    				
+    	    					//Log.i("Device", CurrentDevice.toString());
     	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
     	    					events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
     	    					events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
@@ -105,7 +127,7 @@ public class DeviceList extends Activity
     	    				}
     	    				catch (JSONException e) 
     	    				{
-    	    					Log.e("API - Stage 2 - Inner", e.getMessage());
+    	    					//Log.e("API - Stage 2 - Inner", e.getMessage());
     	    				}
     	    			}
     					
@@ -113,13 +135,13 @@ public class DeviceList extends Activity
     				} 
     				catch (JSONException e) 
     				{
-    					Log.e("API - Stage 2", e.getMessage());
+    					//Log.e("API - Stage 2", e.getMessage());
     					firstLoadHandler.sendEmptyMessage(0);
     				}
 				} 
     			catch (Exception e) 
     			{
-    				Log.e("API - Stage 1", e.getMessage());
+    				//Log.e("API - Stage 1", e.getMessage());
     				firstLoadHandler.sendEmptyMessage(0);
 				}
     			
@@ -128,7 +150,6 @@ public class DeviceList extends Activity
     	};
     	
     	dataPreload.start();
-        
     }
     
     public void UpdateErrorMessage(String MessageText,boolean Critical)
@@ -149,4 +170,11 @@ public class DeviceList extends Activity
 				ErrorMessage.setTextColor(-65536);
 		}
 	}
+    
+    public void ViewDevice(String UID)
+    {
+    	Intent ViewDeviceIntent = new Intent(DeviceList.this, ViewZenossDevice.class);
+    	ViewDeviceIntent.putExtra("UID", UID);
+    	DeviceList.this.startActivity(ViewDeviceIntent);
+    }
 }

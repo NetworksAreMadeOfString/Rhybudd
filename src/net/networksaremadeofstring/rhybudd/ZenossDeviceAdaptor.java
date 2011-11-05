@@ -80,6 +80,9 @@ public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener,
         //convertView.setTag(Event.getEVID());
         convertView.setOnClickListener(this);
         convertView.setOnLongClickListener(this);
+        
+        convertView.setTag(R.integer.DeviceUID,Device.getuid());
+        
         return convertView;
 	}
 
@@ -90,9 +93,9 @@ public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener,
 	}
 
 	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
+	public void onClick(View v) 
+	{
+		((DeviceList)context).ViewDevice(v.getTag(R.integer.DeviceUID).toString());
 	}
 
 }

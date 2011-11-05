@@ -19,6 +19,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.HttpResponse;
@@ -296,6 +297,44 @@ public class ZenossAPIv2
         httpost.setEntity(new StringEntity(reqData.toString()));
     	
     	//Log.i("Execute","Executing with string: " + reqData.toString());
+    	String test = httpclient.execute(httpost, responseHandler);
+    	//Log.i("Test:", test);
+		
+		JSONObject json = new JSONObject(test);
+    	//Log.i("ZenossEvents -------------> ", json.toString());
+    	return json;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public JSONObject GetDevice(String UID) throws JSONException, ClientProtocolException, IOException
+    {
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/device_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+    	
+    	
+    	JSONArray keys = new JSONArray("[uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
+    	JSONArray data = new JSONArray();
+        
+        JSONObject dataObject = new JSONObject();
+        dataObject.put("uid", UID);
+        dataObject.put("keys", keys);
+        
+        data.put(dataObject);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getInfo");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));
+    	
+    	//Log.i("Execute","Executing with string: " + Wrapper.toString());
     	String test = httpclient.execute(httpost, responseHandler);
     	//Log.i("Test:", test);
 		
