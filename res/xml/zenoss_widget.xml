@@ -1,0 +1,7 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="144dp"
+    android:minHeight="36dp"
+    android:updatePeriodMillis="900000"
+    android:label="Rhybudd - Event Counts"
+    android:initialLayout="@layout/zenoss_widget">
+</appwidget-provider>

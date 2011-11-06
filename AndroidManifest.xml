@@ -43,5 +43,12 @@
 			android:label="Rhybudd - PagerDuty Incidents">
 		</activity>
 
+		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" >
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+		    </intent-filter>
+		    <meta-data android:name="android.appwidget.provider"
+		               android:resource="@xml/zenoss_widget" />
+		</receiver>
     </application>
 </manifest>
