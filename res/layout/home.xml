@@ -1,5 +1,5 @@
 
-    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#8d8d8d">
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#929ba4">
         
         
         <RelativeLayout android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:id="@+id/HomeHeader" android:background="@drawable/home_title_tile" android:gravity="top" android:layout_height="65px">
@@ -10,18 +10,18 @@
         
         
         <LinearLayout android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow1" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_below="@+id/HomeHeader" android:layout_marginTop="24dp">
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView2" android:src="@drawable/home_events" android:layout_marginLeft="24dp" android:layout_marginRight="24dp"></ImageView>
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView3" android:src="@drawable/home_infrastructure" android:layout_marginRight="24dp" android:layout_marginLeft="24dp"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/home_events" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:id="@+id/EventsImageView"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/home_infrastructure" android:layout_marginRight="24dp" android:layout_marginLeft="24dp" android:id="@+id/DevicesImageView"></ImageView>
         </LinearLayout>
         
         <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/homeButtonsRow1" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow2" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="48dp">
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView4" android:src="@drawable/home_reports" android:layout_marginLeft="24dp" android:layout_marginRight="24dp"></ImageView>
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView5" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_settings"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/home_reports" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:id="@+id/ReportsImageView"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_settings" android:id="@+id/SettingsImageView"></ImageView>
         </LinearLayout>
         
         <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/homeButtonsRow2" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow3" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="48dp">
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView6" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search"></ImageView>
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView7" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search_voice"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search" android:id="@+id/SearchImageView"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search_voice" android:id="@+id/VoiceSearchImageView"></ImageView>
         </LinearLayout>
         
         <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/imageView1" android:src="@drawable/zenoss" android:layout_alignParentBottom="true" android:layout_alignParentRight="true"></ImageView>

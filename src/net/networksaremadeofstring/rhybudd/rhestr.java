@@ -35,6 +35,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -87,7 +88,8 @@ public class rhestr extends Activity
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.skinned_eventlist);
+        setContentView(R.layout.eventlist);
+        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
         list = (ListView)findViewById(R.id.ZenossEventsList);
         
         ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
@@ -103,7 +105,7 @@ public class rhestr extends Activity
         });
         
         
-        ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
+        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
         deviceListButton.setClickable(true);
         deviceListButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -111,7 +113,7 @@ public class rhestr extends Activity
 				Intent DeviceListIntent = new Intent(rhestr.this, DeviceList.class);
 	        	rhestr.this.startActivity(DeviceListIntent);
 			}
-        });
+        });*/
         
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
@@ -191,7 +193,14 @@ public class rhestr extends Activity
     private Boolean CheckDB()
     {
     	rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-    	dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
+    	try
+    	{
+    		dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
+	    }
+		catch(Exception e)
+		{
+			return false;
+		}
     	
     	if(dbResults.getCount() != 0)
     	{

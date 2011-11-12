@@ -28,6 +28,7 @@
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.RhybuddHome"
 			android:label="Rhybudd - Launcher">
+			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
@@ -36,6 +37,7 @@
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
 			android:label="Rhybudd - Infrastructure List">
+			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
@@ -46,7 +48,20 @@
 		<activity android:name="net.networksaremadeofstring.rhybudd.RhestrPagerDuty"
 			android:label="Rhybudd - PagerDuty Incidents">
 		</activity>
+		
+		<activity android:name="net.networksaremadeofstring.rhybudd.Search"
+			android:label="Rhybudd - Search">
+		</activity>
 
+		<activity android:name="Search" android:label="Search" android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH_LONG_PRESS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
+        </activity>
+        
 		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" 
 			android:label="Rhybudd - Current Event Count">
 		    <intent-filter>

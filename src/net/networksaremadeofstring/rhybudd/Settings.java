@@ -67,7 +67,7 @@ public class Settings extends Activity
     			{
     				SQLiteDatabase cacheDB = Settings.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
     				cacheDB.execSQL("CREATE  TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
-    				cacheDB.execSQL("CREATE  TABLE \"devices\" (\"productionState\" TEXT, \"ipAddress\" INTEGER, \"events\" TEXT, \"name\" TEXT, \"uid\" TEXT PRIMARY KEY  NOT NULL  UNIQUE )");
+    				cacheDB.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
     				cacheDB.close();
     			}
     		};
@@ -178,7 +178,7 @@ public class Settings extends Activity
             		//Toast.makeText(Settings.this, "Login Successful", Toast.LENGTH_SHORT).show();
             		if(getIntent().getBooleanExtra("firstRun", false) == true)
             		{
-            			Intent EventListIntent = new Intent(Settings.this, rhestr.class);
+            			Intent EventListIntent = new Intent(Settings.this, RhybuddHome.class);
             			Settings.this.startActivity(EventListIntent);
            	    	 	finish();
             		}

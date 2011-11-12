@@ -1,12 +1,12 @@
-<ScrollView android:id="@+id/viewDeviceContainer" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/filler_tile">
-    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/filler_tile" android:layout_height="wrap_content">
-        <RelativeLayout android:id="@+id/TopMenu" android:layout_width="fill_parent" android:background="@drawable/background_tile" android:layout_height="wrap_content">
-        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/top_menu_button_devicelist" android:id="@+id/DeviceListImage" android:layout_alignParentRight="true" android:layout_marginLeft="4dp" android:layout_marginRight="12dp"></ImageView>
-        <ImageView android:src="@drawable/title" android:id="@+id/imageView1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:layout_marginLeft="18dp"></ImageView>
-        <ImageView android:src="@drawable/top_left" android:id="@+id/imageView2" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></ImageView>
-        <ImageView android:src="@drawable/top_right" android:id="@+id/imageView3" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true"></ImageView>
-    </RelativeLayout>
-        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:layout_below="@+id/TopMenu" android:layout_alignParentLeft="true" android:id="@+id/Title" android:text="-"></TextView>
+<ScrollView android:id="@+id/viewDeviceContainer" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content">
+		<RelativeLayout android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:id="@+id/HomeHeader" android:background="@drawable/home_title_tile" android:gravity="top" android:layout_height="65px">	
+			<TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:id="@+id/HomeHeaderTitle" android:textSize="32dp" android:layout_marginLeft="12dp" android:text="Device Details"></TextView>
+	            <ProgressBar android:layout_width="wrap_content" style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content" android:id="@+id/progressBar1" android:layout_alignBottom="@+id/HomeHeaderTitle" android:layout_alignParentRight="true" android:layout_marginRight="8dp"></ProgressBar>
+	            <TextView android:textSize="10dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/CurrentTaskLabel" android:text="Refreshing...." android:layout_height="wrap_content" android:layout_alignBottom="@+id/progressBar1" android:layout_toLeftOf="@+id/progressBar1"></TextView>
+	    </RelativeLayout>
+    
+        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/Title" android:text="-" android:layout_below="@+id/HomeHeader"></TextView>
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_below="@+id/Title" android:id="@+id/lastCollected" android:text="       /  /     00:00:00" android:layout_alignParentRight="true"></TextView>
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_below="@+id/lastCollected" android:layout_alignParentLeft="true" android:text="OS Modelling:" android:id="@+id/osModelLabel" android:layout_marginRight="12dp"></TextView>
         <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:id="@+id/osModel" android:layout_alignBaseline="@+id/osModelLabel" android:layout_alignBottom="@+id/osModelLabel" android:layout_toRightOf="@+id/osModelLabel" android:text="......"></TextView>
@@ -20,9 +20,6 @@
         <TextView android:text="TextView" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/productionStateLabel" android:layout_alignBottom="@+id/productionStateLabel" android:layout_toRightOf="@+id/productionStateLabel" android:id="@+id/productionState"></TextView>
         <ListView android:layout_width="match_parent" android:layout_below="@+id/productionState" android:layout_centerHorizontal="true" android:layout_marginTop="4dp" android:minHeight="400dp" android:id="@+id/ZenossEventsList" android:layout_height="200dp"></ListView>
         <ProgressBar android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/eventsProgressBar" android:layout_below="@+id/productionStateLabel"></ProgressBar>
-    
-    
-    
-    
+
     </RelativeLayout>
 </ScrollView>

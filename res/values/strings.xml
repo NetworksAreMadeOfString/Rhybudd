@@ -3,4 +3,7 @@
     <string name="hello">Hello World, rhestr!</string>
     <string name="app_name">Rhybudd</string>
     <string name="Description">Rhybudd is a Zenoss Events and Device Management App for Android Uses the new Zenoss 3.0 API to poll for, alert on and Acknowledge or delve into Zenoss alerts.</string>
+    <string name="searchLabel">Search</string>
+    <string name="searchHintDevice">Device Name</string>
+    <string name="searchVoicePromptDevice">For best results use a short single word to describe the name of the device you are searching for.</string>
 </resources>

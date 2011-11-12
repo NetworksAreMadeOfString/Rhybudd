@@ -9,6 +9,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,26 +35,44 @@ public class DeviceList extends Activity
 	List<ZenossDevice> listOfZenossDevices = new ArrayList<ZenossDevice>();
 	int DeviceCount = 0;
 	ListView list;
+	ZenossDeviceAdaptor adapter = null;
+	Cursor dbResults = null;
+	SQLiteDatabase rhybuddCache = null;
+	
+	@Override
+	public Object onRetainNonConfigurationInstance() 
+	{
+		if(dialog != null && dialog.isShowing())
+		{
+			dialog.dismiss();
+		}
+	
+	    return listOfZenossDevices;
+	}
 	
 	/** Called when the activity is first created. */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.skinned_devicelist);
+        setContentView(R.layout.devicelist);
+        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
         list = (ListView)findViewById(R.id.ZenossDeviceList);
         
         firstLoadHandler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
-    			dialog.dismiss();
+    			if(dialog != null)
+    				dialog.dismiss();
+    			
     			if(listOfZenossDevices.size() > 0)
     			{
     				UpdateErrorMessage("",false);
-					ZenossDeviceAdaptor adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
+					adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
 	    	        list.setAdapter(adapter);
     			}
     			else
@@ -62,7 +83,33 @@ public class DeviceList extends Activity
     		}
     	};
     	
-    	GetDevices();
+    	
+    	listOfZenossDevices = (List<ZenossDevice>) getLastNonConfigurationInstance();
+    	
+    	if(listOfZenossDevices == null || listOfZenossDevices.size() < 1)
+    	{
+    		listOfZenossDevices = new ArrayList<ZenossDevice>();
+    		
+    		
+    		//Check the DB first
+    		if(CheckDB())
+    		{
+    			Log.i("CheckDB","We have data!");
+    			DBGetDevices();
+    		}
+    		else
+    		{
+    			GetDevices();
+    		}
+    	}
+    	else
+    	{
+	    	UpdateErrorMessage("",false);
+	    	adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
+	        list.setAdapter(adapter);
+    	}
+    	
+    	
     	
     	ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
         refreshButton.setClickable(true);
@@ -75,6 +122,63 @@ public class DeviceList extends Activity
 			}
         });
         
+    }
+    
+    public void DBGetDevices()
+    {
+    	dataPreload = new Thread() 
+    	{  
+    		public void run() 
+    		{
+    			Log.i("DBGetDevices",Integer.toString(dbResults.getCount()));
+    			
+    			while(dbResults.moveToNext())
+    			{
+    				HashMap<String, Integer> events = new HashMap<String, Integer>();
+					events.put("info", dbResults.getInt(5));
+					events.put("debug", dbResults.getInt(6));
+					events.put("warning", dbResults.getInt(7));
+					events.put("error", dbResults.getInt(8));
+					events.put("critical", dbResults.getInt(9));
+					
+    				listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+    						dbResults.getInt(2), 
+    						events,
+    						dbResults.getString(3),
+    						dbResults.getString(4)));
+    			}
+    			
+    			rhybuddCache.close();
+        		dbResults.close();
+        		Log.i("DBGetThread",Integer.toString(listOfZenossDevices.size()));
+        		firstLoadHandler.sendEmptyMessage(0);
+    		}
+    	};
+    	dataPreload.start();
+    }
+    
+    private Boolean CheckDB()
+    {
+    	rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    	try
+    	{
+    		dbResults = rhybuddCache.query("devices",new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
+    	}
+    	catch(Exception e)
+    	{
+    		return false;
+    	}
+    	
+    	if(dbResults.getCount() != 0)
+    	{
+    		return true;
+    	}
+    	else
+    	{
+    		rhybuddCache.close();
+    		dbResults.close();
+    		return false;
+    	}
     }
     
     public void GetDevices()

@@ -67,7 +67,7 @@ public class RhestrPagerDuty extends Activity
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.skinned_eventlist);
+        setContentView(R.layout.eventlist);
         list = (ListView)findViewById(R.id.ZenossEventsList);
         
         ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
@@ -82,7 +82,7 @@ public class RhestrPagerDuty extends Activity
 			}
         });
         
-        ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
+        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
         deviceListButton.setClickable(true);
         deviceListButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -91,7 +91,7 @@ public class RhestrPagerDuty extends Activity
 				RhestrPagerDuty.this.startActivity(DeviceListIntent);
 				finish();
 			}
-        });
+        });*/
         
 	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 

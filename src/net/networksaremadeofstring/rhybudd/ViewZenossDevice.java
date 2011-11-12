@@ -48,14 +48,14 @@ public class ViewZenossDevice extends Activity
         
         setContentView(R.layout.view_zenoss_device);
         
-        ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
+        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
         deviceListButton.setClickable(true);
         deviceListButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				finish();
 			}
-        });
+        });*/
         
         list = (ListView)findViewById(R.id.ZenossEventsList);
         
