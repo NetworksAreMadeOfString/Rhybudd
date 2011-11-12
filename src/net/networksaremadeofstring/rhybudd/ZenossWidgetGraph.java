@@ -1,12 +1,19 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
@@ -17,19 +24,153 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ZenossWidgetGraph extends AppWidgetProvider
 {
+	int CritCount = 0, ErrCount = 0, WarnCount = 0;
+	ZenossAPIv2 API = null;
+	private SharedPreferences settings = null;
+	JSONObject EventsObject = null;
+	JSONArray Events = null;
+	private int EventCount = 0;
+	Thread dataPreload;
+	volatile Handler handler = null;
+	int HighestCount = 0;
+	
 	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
         final int N = appWidgetIds.length;
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget_graph);
-		Intent intent = new Intent(context, rhestr.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         
-        Bitmap emptyBmap = Bitmap.createBitmap(290,150, Config.ARGB_8888); 
+        if(settings == null)
+			settings = context.getSharedPreferences("rhybudd", 0);
+        
+        ProcessEvents();
+        
+        handler = new Handler() 
+    	{
+    		public void handleMessage(Message msg) 
+    		{
+    			if(msg.what == 1)
+    			{
+    				Bundle Values = msg.getData();
+    				
+	    			final int N = appWidgetIds.length;
+			        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget_graph);
+					Intent intent = new Intent(context, rhestr.class);
+			        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+	    		        
+					Log.i("GraphWidget","Drawing Graph!");
+					for (int i=0; i<N; i++) 
+			        {
+						int appWidgetId = appWidgetIds[i];
+						views.setImageViewBitmap(R.id.graphCanvas, RenderBarGraph(Values.getInt("CritCount"),Values.getInt("ErrCount"),Values.getInt("WarnCount")));
+						appWidgetManager.updateAppWidget(appWidgetId, views);
+			        }
+    			}
+    		}
+    	};
+    }
+	
+	
+	private void ProcessEvents()
+	{
+		dataPreload = new Thread() 
+    	{  
+    		public void run() 
+    		{
+    			//Log.i("Widget","Started!");
+    			CritCount = 0;
+    			WarnCount = 0;
+    			ErrCount = 0;
+    			ZenossAPIv2 API;
+    			
+    			try 
+    			{
+    				API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+    				
+    				EventsObject = API.GetEventsHistory();
+    				
+	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
+				} 
+    			catch (Exception e) 
+    			{
+    				Log.e("Thread","Fuck up");
+    				handler.sendEmptyMessage(0);
+    				e.printStackTrace();
+				}
+    			
+				try 
+				{
+					if(EventsObject != null)
+					{
+						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+						
+						for(int i = 0; i < EventCount; i++)
+		    			{
+		    				JSONObject CurrentEvent = null;
+		    				try 
+		    				{
+			    				CurrentEvent = Events.getJSONObject(i);
+
+			    				if(CurrentEvent.getString("severity").equals("5"))
+			    					CritCount++;
+			    				
+			    				if(CurrentEvent.getString("severity").equals("4"))
+			    					ErrCount++;
+			    				
+			    				if(CurrentEvent.getString("severity").equals("3"))
+			    					WarnCount++;
+		    				}
+		    				catch (JSONException e) 
+		    				{
+		    					//e.printStackTrace();
+		    				}
+		    			}
+					}
+					else
+					{
+	    				//handler.sendEmptyMessage(0);
+					}
+				} 
+				catch (JSONException e) 
+				{
+    				handler.sendEmptyMessage(0);
+    				//e.printStackTrace();
+				}
+
+				Message Msg = new Message();
+				Bundle data = new Bundle();
+				data.putInt("CritCount", CritCount);
+				data.putInt("ErrCount", ErrCount);
+				data.putInt("WarnCount", WarnCount);
+				Msg.setData(data);
+				Msg.what = 1;
+		    	//handler.sendEmptyMessage(0);
+				handler.sendMessage(Msg);
+		    	
+				//Help out the garbage collector
+				EventsObject = null;
+				Events = null;
+				API = null;
+				dataPreload = null;
+				//Log.i("Widget-Thread", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " +  Integer.toString(WarnCount));
+    		}
+    	};
+    	
+    	
+    	dataPreload.start();
+	}
+	
+	private Bitmap RenderBarGraph(int CritCount, int ErrCount, int WarnCount)
+	{
+		
+		Log.i("Counts", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " + Integer.toString(WarnCount));
+		Bitmap emptyBmap = Bitmap.createBitmap(290,150, Config.ARGB_8888); 
         
 		int width =  emptyBmap.getWidth();
 		int height = emptyBmap.getHeight();
@@ -38,17 +179,69 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 		Canvas canvas = new Canvas(charty);
 		final int color = 0xff0B0B61; 
 		final Paint paint = new Paint();
-		/*final Rect rect = new Rect(0, 0, emptyBmap.getWidth(), emptyBmap.getHeight());
-		final RectF rectF = new RectF(rect);   
-		final float roundPx = 12;
-		paint.setAntiAlias(true);
-		canvas.drawARGB(128, 0, 0, 0);
-		paint.setColor(color);
-		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);*/
 
 		paint.setStyle(Paint.Style.FILL); 
 		paint.setColor(Color.WHITE ); 
 		
+		//y
+		canvas.drawLine(25,0,25,289, paint);
+		//x
+		canvas.drawLine(25,149,289,149, paint);
+
+		paint.setAntiAlias(true);
+		int Max = 0;
+		
+		if ( CritCount > ErrCount && CritCount > WarnCount )
+	         Max = CritCount;
+	    else if ( ErrCount > CritCount && ErrCount > WarnCount )
+	    	  Max = ErrCount;
+	    else if ( WarnCount > CritCount && WarnCount > ErrCount )
+	    	  Max = WarnCount;
+	    else   
+	    	  Max = CritCount;
+		
+		canvas.drawText(Integer.toString(Max),  0, 10 , paint );
+		canvas.drawText(Integer.toString(Max / 2),  0, 75 , paint );
+		canvas.drawText("0",  0, 148 , paint);
+		
+		double divisor = 148 / (double)Max;
+
+		Rect rect = new Rect(32, (int)(148 - (divisor * CritCount)), 64, 148);  
+		paint.setColor(Color.RED ); 
+		canvas.drawRect(new RectF(rect), paint);
+		
+		rect = new Rect(128, (int)(148 - (divisor * ErrCount)), 160, 148);  
+		paint.setColor(Color.rgb(255, 102, 0));
+		canvas.drawRect(new RectF(rect), paint);
+		
+		rect = new Rect(224, (int)(148 - (divisor * WarnCount)), 256, 148);  
+		paint.setColor(Color.YELLOW ); 
+		canvas.drawRect(new RectF(rect), paint);
+		
+
+		//Return
+		ByteArrayOutputStream out =  new ByteArrayOutputStream();
+		charty.compress(CompressFormat.PNG, 50, out);
+		
+		return BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
+	}
+	
+	private Bitmap RenderLineGraph()
+	{
+		Bitmap emptyBmap = Bitmap.createBitmap(290,150, Config.ARGB_8888); 
+        
+		int width =  emptyBmap.getWidth();
+		int height = emptyBmap.getHeight();
+		Bitmap charty = Bitmap.createBitmap(width , height , Bitmap.Config.ARGB_8888);
+
+		Canvas canvas = new Canvas(charty);
+		final int color = 0xff0B0B61; 
+		final Paint paint = new Paint();
+
+		paint.setStyle(Paint.Style.FILL); 
+		paint.setColor(Color.WHITE ); 
+		
+		//if(warningEvents > )
 		canvas.drawText("100",  0, 10 , paint );
 		
 		//y
@@ -95,44 +288,14 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	    
 		for (int a : WarnArray) 
 		{
-			//myPath.moveTo(curX - 2, curY - 2);
-			//myPath.quadTo(curX, curY, curX + 32, (148 - (a * divisor)));
 			canvas.drawLine(curX,curY,curX + 32, (148 - (a * divisor)), paint);
 			curX += 32;
 			curY = 148 - (a * divisor);
         }
-		//canvas.drawPath(myPath, paint);
-		
-		
-		/*int x = 0, label = 0;
-		//Grid
-		for(int i=1; i < 45 ; i++)
-		{
-			x = i * 10;
-			canvas.drawLine(x,0,x,80, paint);
-			//canvas.drawLine(drawSizes[0]+ (i * drawSizes[2] / 5), drawSizes[1], drawSizes[0] + (i * drawSizes[2] / 5), drawSizes[1] + drawSizes[3], paint);
 
-			if(label == 0)
-			{
-				canvas.drawText(Integer.toString((int)Math.round(x / 2.5)) + "m",  (float)x, 95 , paint );
-				label = 3;
-			}
-			else
-			{
-				label--;
-			}
-		}*/
-		
 		ByteArrayOutputStream out =  new ByteArrayOutputStream();
 		charty.compress(CompressFormat.PNG, 50, out);
 		
-		Bitmap finalBMP = BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
-		Log.i("GraphWidget","Drawing Graph!");
-		for (int i=0; i<N; i++) 
-        {
-			int appWidgetId = appWidgetIds[i];
-			views.setImageViewBitmap(R.id.graphCanvas, finalBMP);
-			appWidgetManager.updateAppWidget(appWidgetId, views);
-        }
-    }
+		return BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
+	}
 }
