@@ -21,7 +21,9 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Message;
 
 public class launcher extends Activity
 {
@@ -43,11 +45,13 @@ public class launcher extends Activity
 	     }
 	     else
 	     {
-	    	 Intent EventListIntent = new Intent(launcher.this, rhestr.class);
+	    	 /*Intent EventListIntent = new Intent(launcher.this, rhestr.class);
 	    	 launcher.this.startActivity(EventListIntent);
+	    	 finish();*/
+	    	 
+	    	 Intent RhybuddHomeIntent = new Intent(launcher.this, RhybuddHome.class);
+	    	 launcher.this.startActivity(RhybuddHomeIntent);
 	    	 finish();
 	     }
 	 }
-	 
-	 
 }

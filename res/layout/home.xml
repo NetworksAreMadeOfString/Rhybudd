@@ -1,0 +1,29 @@
+
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#8d8d8d">
+        
+        
+        <RelativeLayout android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:id="@+id/HomeHeader" android:background="@drawable/home_title_tile" android:gravity="top" android:layout_height="65px">
+            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:id="@+id/HomeHeaderTitle" android:text="Rhybudd" android:textSize="32dp" android:layout_marginLeft="12dp"></TextView>
+            <ProgressBar android:layout_width="wrap_content" style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content" android:id="@+id/progressBar1" android:layout_alignBottom="@+id/HomeHeaderTitle" android:layout_alignParentRight="true" android:layout_marginRight="8dp"></ProgressBar>
+            <TextView android:textSize="10dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/CurrentTaskLabel" android:text="Refreshing...." android:layout_height="wrap_content" android:layout_alignBottom="@+id/progressBar1" android:layout_toLeftOf="@+id/progressBar1"></TextView>
+        </RelativeLayout>
+        
+        
+        <LinearLayout android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow1" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_below="@+id/HomeHeader" android:layout_marginTop="24dp">
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView2" android:src="@drawable/home_events" android:layout_marginLeft="24dp" android:layout_marginRight="24dp"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView3" android:src="@drawable/home_infrastructure" android:layout_marginRight="24dp" android:layout_marginLeft="24dp"></ImageView>
+        </LinearLayout>
+        
+        <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/homeButtonsRow1" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow2" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="48dp">
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView4" android:src="@drawable/home_reports" android:layout_marginLeft="24dp" android:layout_marginRight="24dp"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView5" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_settings"></ImageView>
+        </LinearLayout>
+        
+        <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/homeButtonsRow2" android:layout_centerHorizontal="true" android:id="@+id/homeButtonsRow3" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal" android:layout_marginTop="48dp">
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView6" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search"></ImageView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView7" android:layout_marginLeft="24dp" android:layout_marginRight="24dp" android:src="@drawable/home_search_voice"></ImageView>
+        </LinearLayout>
+        
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/imageView1" android:src="@drawable/zenoss" android:layout_alignParentBottom="true" android:layout_alignParentRight="true"></ImageView>
+        
+    </RelativeLayout>

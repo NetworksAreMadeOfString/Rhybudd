@@ -26,6 +26,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -46,6 +47,7 @@ public class Settings extends Activity
 	Handler handler;
 	ZenossAPIv2 API = null;
 	private PendingIntent mAlarmSender;
+	private Boolean firstRun = false;
 	
 	 /** Called when the activity is first created. */
     @Override
@@ -57,8 +59,23 @@ public class Settings extends Activity
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
 
-        setContentView(R.layout.settings);
+        if(getIntent().getBooleanExtra("firstRun", false))
+        {
+        	Thread ProcessDatabase = new Thread() 
+    		{  
+    			public void run() 
+    			{
+    				SQLiteDatabase cacheDB = Settings.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    				cacheDB.execSQL("CREATE  TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
+    				cacheDB.execSQL("CREATE  TABLE \"devices\" (\"productionState\" TEXT, \"ipAddress\" INTEGER, \"events\" TEXT, \"name\" TEXT, \"uid\" TEXT PRIMARY KEY  NOT NULL  UNIQUE )");
+    				cacheDB.close();
+    			}
+    		};
+    		
+    		ProcessDatabase.start();
+        }
         
+        setContentView(R.layout.settings);
         
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
@@ -232,7 +249,6 @@ public class Settings extends Activity
                 }
                 CreateThread();
                 peformLogin.start();
-                    
             }
         });
         

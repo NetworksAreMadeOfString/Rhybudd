@@ -27,10 +27,14 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,6 +65,8 @@ public class rhestr extends Activity
 	ProgressDialog dialog;
 	ListView list;
 	ZenossEventsAdaptor adapter;
+	Cursor dbResults = null;
+	SQLiteDatabase rhybuddCache = null;
 	
 	@Override
 	public Object onRetainNonConfigurationInstance() 
@@ -112,7 +118,9 @@ public class rhestr extends Activity
     	{
     		public void handleMessage(Message msg) 
     		{
-    			dialog.dismiss();
+    			if(dialog != null)
+    				dialog.dismiss();
+    			
     			if(totalFailure == false)
     			{
     				if(EventCount > 0)
@@ -157,17 +165,45 @@ public class rhestr extends Activity
     	if(listOfZenossEvents == null || listOfZenossEvents.size() < 1)
     	{
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
-    		CreateThread();
-	    	dataPreload.start();
+    		
+    		
+    		//Check the DB first
+    		if(CheckDB())
+    		{
+    			Log.i("CheckDB","We have data!");
+    			DBGetThread();
+    		}
+    		else
+    		{
+    			CreateThread();
+    			dataPreload.start();
+    		}
     	}
     	else
     	{
-	    	//Log.i("rhestr","We already had data!");
 	    	UpdateErrorMessage("",false);
 	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
 	        list.setAdapter(adapter);
     	}
 
+    }
+    
+    private Boolean CheckDB()
+    {
+    	rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    	dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
+    	
+    	if(dbResults.getCount() != 0)
+    	{
+    		EventCount = dbResults.getCount();
+    		return true;
+    	}
+    	else
+    	{
+    		rhybuddCache.close();
+    		dbResults.close();
+    		return false;
+    	}
     }
     
     @Override
@@ -178,12 +214,40 @@ public class rhestr extends Activity
 	    return true;
 	}
     
+    public void DBGetThread()
+    {
+    	dataPreload = new Thread() 
+    	{  
+    		public void run() 
+    		{
+    			Log.i("DBGetThread",Integer.toString(dbResults.getCount()));
+    			
+    			while(dbResults.moveToNext())
+    			{
+    				//Log.i("DBGetThread",dbResults.getString(3));
+    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+    						dbResults.getString(3),
+    						dbResults.getString(4), 
+    						dbResults.getString(5),
+    						dbResults.getString(7)));
+    			}
+    			
+    			rhybuddCache.close();
+        		dbResults.close();
+        		Log.i("DBGetThread",Integer.toString(listOfZenossEvents.size()));
+    			handler.sendEmptyMessage(0);
+    		}
+    	};
+    	dataPreload.start();
+    }
+    
     public void CreateThread()
     {
     	dialog = new ProgressDialog(this);
     	dialog.setTitle("Contacting Zenoss");
    	 	dialog.setMessage("Please wait: loading Events....");
    	 	dialog.show();
+    	
     	dataPreload = new Thread() 
     	{  
     		public void run() 
@@ -219,9 +283,13 @@ public class rhestr extends Activity
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 						
+						SQLiteDatabase cacheDB = rhestr.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+						cacheDB.delete("events", null, null);
+						
 						for(int i = 0; i < EventCount; i++)
 		    			{
 		    				JSONObject CurrentEvent = null;
+		    				ContentValues values = new ContentValues(2);
 		    				try 
 		    				{
 			    				CurrentEvent = Events.getJSONObject(i);
@@ -230,14 +298,21 @@ public class rhestr extends Activity
 											    						CurrentEvent.getString("summary"), 
 											    						CurrentEvent.getString("eventState"),
 											    						CurrentEvent.getString("severity")));
-			    				//Log.i("ForLoop",CurrentEvent.getString("summary"));
+			    				
+			    				values.put("EVID", CurrentEvent.getString("evid"));
+								values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+								values.put("summary", CurrentEvent.getString("summary"));
+								values.put("eventState", CurrentEvent.getString("eventState"));
+								values.put("severity", CurrentEvent.getString("severity"));
+								
+			    				cacheDB.insert("events", null, values);
 		    				}
 		    				catch (JSONException e) 
 		    				{
 		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
 		    				}
 		    			}
-						
+						cacheDB.close();
 						handler.sendEmptyMessage(0);
 					}
 					else

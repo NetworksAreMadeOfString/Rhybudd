@@ -26,9 +26,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -114,7 +116,7 @@ public class ZenossPoller extends Service
 
 		
 		Context context = getApplicationContext();
-		Intent notificationIntent = new Intent(this, launcher.class);
+		Intent notificationIntent = new Intent(this, rhestr.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Rhybudd Notification", EventSummary, contentIntent);
 		mNM.notify(NotificationID++, notification);
@@ -160,15 +162,28 @@ public class ZenossPoller extends Service
 					if(EventsObject != null)
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+						
+						SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+						cacheDB.delete("events", null, null);
+						
 						for(int i = 0; i < EventCount; i++)
 		    			{
 		    				JSONObject CurrentEvent = null;
+		    				ContentValues values = new ContentValues(2);
 		    				try 
 		    				{
 		    					CurrentEvent = Events.getJSONObject(i);
 		    					
 		    					if(CurrentEvent.getString("eventState").equals("New"))
 		    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
+		    					
+		    					values.put("EVID", CurrentEvent.getString("evid"));
+								values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+								values.put("summary", CurrentEvent.getString("summary"));
+								values.put("eventState", CurrentEvent.getString("eventState"));
+								values.put("severity", CurrentEvent.getString("severity"));
+								
+			    				cacheDB.insert("events", null, values);
 		    				}
 		    				catch (JSONException e) 
 		    				{
@@ -178,6 +193,8 @@ public class ZenossPoller extends Service
 		    					//failureCount++;
 		    				}
 		    			}
+						cacheDB.close();
+						cacheDB = null;
 					}
 					else
 					{

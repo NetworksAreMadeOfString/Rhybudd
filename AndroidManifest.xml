@@ -26,6 +26,10 @@
 			android:label="Rhybudd - Zenoss Events List">
 		</activity>
 		
+		<activity android:name="net.networksaremadeofstring.rhybudd.RhybuddHome"
+			android:label="Rhybudd - Launcher">
+		</activity>
+		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
 			android:label="Rhybudd - Event Details">
 		</activity>
@@ -43,12 +47,22 @@
 			android:label="Rhybudd - PagerDuty Incidents">
 		</activity>
 
-		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" >
+		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" 
+			android:label="Rhybudd - Current Event Count">
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 		    </intent-filter>
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/zenoss_widget" />
+		</receiver>
+		
+		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidgetGraph" 
+			android:label="Rhybudd - Events Graph">
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+		    </intent-filter>
+		    <meta-data android:name="android.appwidget.provider"
+		               android:resource="@xml/zenoss_widget_graph" />
 		</receiver>
     </application>
 </manifest>
