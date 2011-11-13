@@ -47,6 +47,7 @@ public class Settings extends Activity
 	Handler handler;
 	ZenossAPIv2 API = null;
 	private PendingIntent mAlarmSender;
+	@SuppressWarnings("unused")
 	private Boolean firstRun = false;
 	
 	 /** Called when the activity is first created. */

@@ -1,18 +1,30 @@
+/*
+* Copyright (C) 2011 - Gareth Llewellyn
+*
+* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -44,8 +56,6 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	
 	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
-        final int N = appWidgetIds.length;
-        
         if(settings == null)
 			settings = context.getSharedPreferences("rhybudd", 0);
         
@@ -61,8 +71,8 @@ public class ZenossWidgetGraph extends AppWidgetProvider
     				
 	    			final int N = appWidgetIds.length;
 			        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget_graph);
-					Intent intent = new Intent(context, rhestr.class);
-			        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+					//Intent intent = new Intent(context, rhestr.class);
+			        //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 	    		        
 					Log.i("GraphWidget","Drawing Graph!");
 					for (int i=0; i<N; i++) 
@@ -177,7 +187,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 		Bitmap charty = Bitmap.createBitmap(width , height , Bitmap.Config.ARGB_8888);
 
 		Canvas canvas = new Canvas(charty);
-		final int color = 0xff0B0B61; 
+		//final int color = 0xff0B0B61; 
 		final Paint paint = new Paint();
 
 		paint.setStyle(Paint.Style.FILL); 
@@ -226,6 +236,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 		return BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size());
 	}
 	
+	@SuppressWarnings("unused")
 	private Bitmap RenderLineGraph()
 	{
 		Bitmap emptyBmap = Bitmap.createBitmap(290,150, Config.ARGB_8888); 

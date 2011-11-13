@@ -19,30 +19,16 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Base64;
-import android.util.Log;
 
 public class PagerDutyAPI 
 {
@@ -50,9 +36,12 @@ public class PagerDutyAPI
     private String PAGERDUTY_USERNAME = null;
     private String PAGERDUTY_PASSWORD = null;
     private DefaultHttpClient httpclient = new DefaultHttpClient();  
-    private ResponseHandler responseHandler = new BasicResponseHandler();
-    private int reqCount = 1;
-    private boolean LoginSuccessful = false;
+    @SuppressWarnings("rawtypes")
+	private ResponseHandler responseHandler = new BasicResponseHandler();
+    @SuppressWarnings("unused")
+	private int reqCount = 1;
+    @SuppressWarnings("unused")
+	private boolean LoginSuccessful = false;
     
 	// Constructor logs in to the Zenoss instance (getting the auth cookie)
     public PagerDutyAPI(String UserName, String Password, String URL) throws Exception 
@@ -62,7 +51,8 @@ public class PagerDutyAPI
     	this.PAGERDUTY_PASSWORD = Password;
     }
     
-    public JSONObject GetIncidents() throws ClientProtocolException, IOException, JSONException
+    @SuppressWarnings("unchecked")
+	public JSONObject GetIncidents() throws ClientProtocolException, IOException, JSONException
     {
     	//Log.i("Constructor","Entering GetIncidents");
     	Calendar c = Calendar.getInstance(); 

@@ -19,7 +19,6 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -40,14 +39,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

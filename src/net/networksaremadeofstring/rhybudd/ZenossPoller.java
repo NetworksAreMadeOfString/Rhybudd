@@ -33,7 +33,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 
 public class ZenossPoller extends Service
 {
@@ -42,7 +41,6 @@ public class ZenossPoller extends Service
 	private SharedPreferences settings = null;
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
-	//List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	Thread dataPreload;
 	private int EventCount = 0;
 	private Handler handler = new Handler();
@@ -62,6 +60,7 @@ public class ZenossPoller extends Service
 		
 		runnable = new Runnable() 
 		{ 
+			@SuppressWarnings("unused")
 			public void run() 
 			{ 
 				final int Delay = settings.getInt("BackgroundServiceDelay", 30); 
