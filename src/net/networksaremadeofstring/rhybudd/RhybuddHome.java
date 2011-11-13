@@ -1,29 +1,31 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
-import java.util.HashMap;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RhybuddHome extends Activity {
 	private SharedPreferences settings = null;
@@ -98,15 +100,50 @@ public class RhybuddHome extends Activity {
 		VoiceSearchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/*Intent SearchIntent = new Intent(RhybuddHome.this, Search.class);
-				SearchIntent.putExtra("Voice", true);
-				RhybuddHome.this.startActivity(SearchIntent);*/
 				onSearchRequested();
 			}
         });
 
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.home_menu, menu);
+	    return true;
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        switch (item.getItemId()) 
+        {
+	        case R.id.infrastructure:
+	        {
+	        	Intent DeviceListIntent = new Intent(RhybuddHome.this, DeviceList.class);
+	        	RhybuddHome.this.startActivity(DeviceListIntent);
+	            return true;
+	        }
+	        
+	        case R.id.Help:
+	        {
+	        	Intent i = new Intent(Intent.ACTION_VIEW);
+	        	i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
+	        	startActivity(i);
+	        	return true;
+	        }
+	        
+	        case R.id.EmptyDB:
+	        {
+	        	Toast.makeText(RhybuddHome.this, "Cache Clearing isn't available yet\n\nPlease use the Clear Data Function in Application Settings", Toast.LENGTH_LONG).show();
+	        	startActivityForResult(new Intent(Settings.ACTION_APPLICATION_SETTINGS),0);
+	        	return true;
+	        }
+        }
+        return false;
+    }
+	
 	private void ConfigureHandler() {
 		runnablesHandler = new Handler();
 
@@ -127,13 +164,11 @@ public class RhybuddHome extends Activity {
 				} 
 				else if (msg.what == 99)// Hide
 				{
-					Log.i("HomeHandler","Hiding Progress bar etc");
 					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(8);
 					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(8);
 				} 
 				else if (msg.what == 100)// Show
 				{
-					Log.i("HomeHandler","Showing Progress bar etc");
 					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
 					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
 				}

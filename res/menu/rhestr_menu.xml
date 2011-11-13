@@ -1,7 +1,7 @@
 
     <menu xmlns:android="http://schemas.android.com/apk/res/android">
         <item android:title="Infrastructure" android:id="@+id/infrastructure" android:icon="@drawable/ic_menu_infrastructure" android:titleCondensed="Device List"></item>
-        <item android:title="Pager Duty Alerts" android:icon="@drawable/ic_menu_pagerduty" android:id="@+id/pagerduty" android:titleCondensed="Pager Duty"></item>
+        <item android:id="@+id/Help" android:title="Help"  android:icon="@drawable/ic_menu_help"></item>
         <item android:icon="@drawable/ic_menu_settings" android:title="Settings" android:titleCondensed="Settings" android:id="@+id/settings"></item>
         <item android:id="@+id/refresh" android:title="Refresh Events" android:titleCondensed="Refresh" android:icon="@drawable/ic_menu_refresh"></item>
         

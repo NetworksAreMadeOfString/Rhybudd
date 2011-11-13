@@ -36,6 +36,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -421,11 +422,12 @@ public class rhestr extends Activity
 	            return true;
 	        }
 	        
-	        case R.id.pagerduty:
+	        case R.id.Help:
 	        {
-	        	Intent RhestrPagerDutyIntent = new Intent(rhestr.this, RhestrPagerDuty.class);
-	        	rhestr.this.startActivity(RhestrPagerDutyIntent);
-	            return true;
+	        	Intent i = new Intent(Intent.ACTION_VIEW);
+	        	i.setData(Uri.parse("http://www.android-zenoss.info/help.php#Events"));
+	        	startActivity(i);
+	        	return true;
 	        }
 	        
 	        case R.id.refresh:

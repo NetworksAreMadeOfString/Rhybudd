@@ -28,7 +28,7 @@
 			     <action android:name="android.intent.action.VIEW" />
 			     <category android:name="android.intent.category.DEFAULT" />
 			     <category android:name="android.intent.category.BROWSABLE" />
-			     <data android:scheme="http" android:path="*/zport/dmd/Events/evconsole*" />
+			     <data android:path="/zport/dmd/Events/evconsole*" />
 			 </intent-filter>
 		</activity>
 		
@@ -53,7 +53,7 @@
 			     <action android:name="android.intent.action.VIEW" />
 			     <category android:name="android.intent.category.DEFAULT" />
 			     <category android:name="android.intent.category.BROWSABLE" />
-			     <data android:scheme="http" android:path="*/zport/dmd/Devices/*" />
+			     <data android:path="/zport/dmd/Devices/*" />
 			 </intent-filter>
 		</activity>
 		

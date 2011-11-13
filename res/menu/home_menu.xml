@@ -1,0 +1,6 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/Help" android:title="Help"  android:icon="@drawable/ic_menu_help"></item>
+        <item android:title="Pager Duty Alerts" android:icon="@drawable/ic_menu_pagerduty" android:id="@+id/pagerduty" android:titleCondensed="Pager Duty"></item>
+        <item android:id="@+id/EmptyDB" android:title="Empty Database"  android:icon="@drawable/ic_menu_empty_db"></item>
+    </menu>

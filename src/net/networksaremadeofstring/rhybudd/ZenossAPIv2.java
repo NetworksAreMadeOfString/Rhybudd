@@ -24,8 +24,13 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -358,7 +363,6 @@ public class ZenossAPIv2
     @SuppressWarnings("unchecked")
    	public JSONObject GetEventsHistory() throws JSONException, ClientProtocolException, IOException
        {
-       	//Log.i("Test:", Severity);
        	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
 
        	httpost.addHeader("Content-type", "application/json; charset=utf-8");
@@ -370,30 +374,30 @@ public class ZenossAPIv2
        	dataContents.put("dir", "DESC");
        	dataContents.put("sort", "severity");
            
-           JSONObject params = new JSONObject();
-           params.put("severity", new JSONArray("[5,4,3]"));
-           params.put("eventState", new JSONArray("[0, 1]"));
-           params.put("lastTime", "2011-11-12T12:00:00");
-           dataContents.put("params", params);
-           
-           JSONArray data = new JSONArray();
-           data.put(dataContents);
-           
-           JSONObject reqData = new JSONObject();
-           reqData.put("action", "EventsRouter");
-           reqData.put("method", "queryHistory");
-           reqData.put("data", data);
-           reqData.put("type", "rpc");
-           reqData.put("tid", String.valueOf(this.reqCount++));
-           
-           httpost.setEntity(new StringEntity(reqData.toString()));
+       	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK);
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String DefaultDate = sdf.format(new Date(System.currentTimeMillis() - 28800000)).toString();
+       JSONObject params = new JSONObject();
+       params.put("severity", new JSONArray("[5,4,3]"));
+       params.put("eventState", new JSONArray("[0, 1]"));
+       params.put("lastTime", DefaultDate);
+       dataContents.put("params", params);
+       
+       JSONArray data = new JSONArray();
+       data.put(dataContents);
+       
+       JSONObject reqData = new JSONObject();
+       reqData.put("action", "EventsRouter");
+       reqData.put("method", "queryHistory");
+       reqData.put("data", data);
+       reqData.put("type", "rpc");
+       reqData.put("tid", String.valueOf(this.reqCount++));
+       
+       httpost.setEntity(new StringEntity(reqData.toString()));
        	
-       	//Log.i("Execute","Executing with string: " + reqData.toString());
        	String test = httpclient.execute(httpost, responseHandler);
-       	//Log.i("Test:", test);
    		
    		JSONObject json = new JSONObject(test);
-       	Log.i("ZenossEvents -------------> ", json.toString());
        	return json;
        }
     
