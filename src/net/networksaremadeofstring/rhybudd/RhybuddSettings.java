@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -39,7 +40,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Settings extends Activity
+public class RhybuddSettings extends Activity
 {
 	private SharedPreferences settings = null;
 	ProgressDialog dialog;
@@ -56,7 +57,7 @@ public class Settings extends Activity
     {
     	dialog = new ProgressDialog(this);
 		dialog.setMessage("Checking Details.....");
-		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         settings = getSharedPreferences("rhybudd", 0);
 
@@ -66,7 +67,7 @@ public class Settings extends Activity
     		{  
     			public void run() 
     			{
-    				SQLiteDatabase cacheDB = Settings.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    				SQLiteDatabase cacheDB = RhybuddSettings.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
     				cacheDB.execSQL("CREATE  TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
     				cacheDB.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
     				cacheDB.close();
@@ -179,8 +180,8 @@ public class Settings extends Activity
             		//Toast.makeText(Settings.this, "Login Successful", Toast.LENGTH_SHORT).show();
             		if(getIntent().getBooleanExtra("firstRun", false) == true)
             		{
-            			Intent EventListIntent = new Intent(Settings.this, RhybuddHome.class);
-            			Settings.this.startActivity(EventListIntent);
+            			Intent EventListIntent = new Intent(RhybuddSettings.this, RhybuddHome.class);
+            			RhybuddSettings.this.startActivity(EventListIntent);
            	    	 	finish();
             		}
             		else
@@ -190,7 +191,7 @@ public class Settings extends Activity
     			}
     			else
     			{
-    				Toast.makeText(Settings.this, "Login Failed", Toast.LENGTH_SHORT).show();
+    				Toast.makeText(RhybuddSettings.this, "Login Failed", Toast.LENGTH_SHORT).show();
     			}
     		}
     	};
@@ -235,7 +236,7 @@ public class Settings extends Activity
                 editor.putBoolean("SeverityDebug", debugCheckBox.isChecked());
                 editor.commit();
                 
-                mAlarmSender = PendingIntent.getService(Settings.this, 0, new Intent(Settings.this, ZenossPoller.class), 0);
+                mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);
                 AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
                 
                 if(BackgroundService.isChecked())

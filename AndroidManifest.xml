@@ -18,7 +18,7 @@
         
         <service android:name=".ZenossPoller" />
         
-        <activity android:name="net.networksaremadeofstring.rhybudd.Settings"
+        <activity android:name=".RhybuddSettings"
 			android:label="@string/app_name">
 		</activity>
 		

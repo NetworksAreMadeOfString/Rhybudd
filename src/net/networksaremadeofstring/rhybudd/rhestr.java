@@ -407,7 +407,7 @@ public class rhestr extends Activity
         {
 	        case R.id.settings:
 	        {
-	        	Intent SettingsIntent = new Intent(rhestr.this, Settings.class);
+	        	Intent SettingsIntent = new Intent(rhestr.this, RhybuddSettings.class);
 	        	rhestr.this.startActivity(SettingsIntent);
 	            return true;
 	        }

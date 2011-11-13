@@ -1,0 +1,48 @@
+
+    <ScrollView android:id="@+id/scrollView1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+        
+        <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
+		        <RelativeLayout android:id="@+id/relativeLayout1" xmlns:android="http://schemas.android.com/apk/res/android" android:isScrollContainer="true" android:fadeScrollbars="true" android:fadingEdge="vertical" android:scrollbars="vertical" android:layout_height="wrap_content" android:background="#929ba4" android:layout_width="228dp">
+		        <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/URLLabel" android:layout_marginLeft="6px" android:layout_marginTop="6dp" android:text="Zenoss URL:"></TextView>
+		        <EditText android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/ZenossURL" android:hint="http://zenoss.url:8080" android:layout_below="@+id/URLLabel" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:inputType="textUri">
+		            <requestFocus></requestFocus>
+		        </EditText>
+		        <EditText android:inputType="textPersonName" android:layout_height="wrap_content" android:id="@+id/ZenossUserName" android:layout_marginLeft="10px" android:layout_width="fill_parent" android:layout_marginRight="10px" android:hint="Zenoss User Name" android:layout_below="@+id/ZenossURL" android:layout_marginTop="6dp"></EditText>
+		        <EditText android:inputType="textPassword" android:layout_height="wrap_content" android:id="@+id/ZenossPassword" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_below="@+id/ZenossUserName" android:hint="Zenoss Password"></EditText>
+		        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/ZenossPassword" android:layout_centerHorizontal="true" android:id="@+id/PasswordWarning" android:textSize="4pt" android:text="!! Password is stored unencrypted on local storage !!" android:textColor="#FF0000" android:visibility="invisible"></TextView>
+		        
+		        
+		        
+		        <TextView android:layout_below="@+id/PasswordWarning" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:text="PagerDuty Subdomain:" android:layout_marginLeft="6px" android:layout_marginTop="6dp" android:id="@+id/PagerDutyDomainLabel"></TextView>
+		        <EditText android:layout_height="wrap_content" android:id="@+id/PagerDutyURL" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_below="@+id/PagerDutyDomainLabel" android:hint="domain.pagerduty.com"></EditText>
+		        <EditText android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:layout_marginLeft="10px" android:hint="email@domain.com" android:id="@+id/PagerDutyEmailAddress" android:layout_marginRight="10px" android:layout_below="@+id/PagerDutyURL" android:layout_marginTop="6dp" android:inputType="textEmailAddress"></EditText>
+		        <EditText android:layout_height="wrap_content" android:inputType="textPassword" android:layout_below="@+id/PagerDutyEmailAddress" android:id="@+id/PagerDutyPassword" android:layout_centerHorizontal="true" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_width="fill_parent" android:hint="PagerDuty Password"></EditText>
+		    </RelativeLayout>
+		        <RelativeLayout android:id="@+id/relativeLayout2" android:layout_height="match_parent" android:layout_width="wrap_content" android:background="#929ba4">
+		            <LinearLayout android:id="@+id/severityContainer" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal">
+		                <CheckBox android:text="Critical" android:id="@+id/criticalCheckBox" android:checked="true" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
+		                <CheckBox android:text="Error" android:id="@+id/errorCheckBox" android:checked="true" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
+		                <CheckBox android:text="Warning" android:id="@+id/warningCheckBox" android:checked="true" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
+		            </LinearLayout>
+		            <LinearLayout android:id="@+id/severityContainer2" android:layout_height="wrap_content" android:layout_below="@+id/severityContainer" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal">
+		                <CheckBox android:text="Info" android:id="@+id/infoCheckBox" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
+		                <CheckBox android:text="Debug" android:id="@+id/debugCheckBox" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
+		            </LinearLayout>
+		            <LinearLayout android:id="@+id/productionStateFilter" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_below="@+id/severityContainer2">
+		                <RadioGroup android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/productionStateRadioGroup">
+		                    <RadioButton android:checked="true" android:id="@+id/radioProductionOnly" android:layout_height="wrap_content" android:text="Production Only [1000]" android:layout_width="wrap_content"></RadioButton>
+		                    <RadioButton android:id="@+id/radioState500" android:layout_height="wrap_content" android:text="Production State &gt;= 500" android:layout_width="wrap_content"></RadioButton>
+		                    <RadioButton android:checked="true" android:id="@+id/radioState1" android:layout_height="wrap_content" android:text="Production State &gt; 1" android:layout_width="wrap_content"></RadioButton>
+		                </RadioGroup>
+		            </LinearLayout>
+		            <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/productionStateFilter" android:layout_centerHorizontal="true" android:id="@+id/PollerLayout" android:layout_width="wrap_content">
+		                <CheckBox android:layout_width="wrap_content" android:id="@+id/AllowBackgroundService" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_marginLeft="10px" android:text="Poller"></CheckBox>
+		                <SeekBar android:layout_weight="1" android:max="900" android:id="@+id/BackgroundServiceDelay" android:layout_width="180px" android:layout_height="wrap_content" android:layout_marginTop="15dp" android:progress="30" android:layout_marginLeft="20px"></SeekBar>
+		            </LinearLayout>
+		            <Button android:layout_width="wrap_content" android:text="Save Settings" android:id="@+id/SaveButton" android:layout_height="wrap_content" android:layout_below="@+id/PollerLayout" android:layout_centerHorizontal="true" android:layout_marginTop="12dp"></Button>
+		            <TextView android:textSize="4pt" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/DelayLabel" android:text="30 secs" android:layout_height="wrap_content" android:layout_below="@+id/PollerLayout" android:layout_alignRight="@+id/PollerLayout"></TextView>
+		        </RelativeLayout>
+     
+        </LinearLayout>
+
+    </ScrollView>

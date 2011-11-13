@@ -36,7 +36,7 @@ public class launcher extends Activity
 	        
 		 if(settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals(""))
 	     {
-			Intent SettingsIntent = new Intent(launcher.this, Settings.class);
+			Intent SettingsIntent = new Intent(launcher.this, RhybuddSettings.class);
 			SettingsIntent.putExtra("firstRun", true);
      		launcher.this.startActivity(SettingsIntent);
      		finish();

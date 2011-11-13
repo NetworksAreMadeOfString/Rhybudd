@@ -210,23 +210,30 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	    else   
 	    	  Max = CritCount;
 		
-		canvas.drawText(Integer.toString(Max),  0, 10 , paint );
-		canvas.drawText(Integer.toString(Max / 2),  0, 75 , paint );
+		if(Max > 0)
+			canvas.drawText(Integer.toString(Max),  0, 10 , paint );
+		
+		if(Max > 1)
+			canvas.drawText(Integer.toString(Max / 2),  0, 75 , paint );
 		canvas.drawText("0",  0, 148 , paint);
 		
 		double divisor = 148 / (double)Max;
 
 		Rect rect = new Rect(32, (int)(148 - (divisor * CritCount)), 64, 148);  
 		paint.setColor(Color.RED ); 
-		canvas.drawRect(new RectF(rect), paint);
+		
+		if(CritCount > 0)
+			canvas.drawRect(new RectF(rect), paint);
 		
 		rect = new Rect(128, (int)(148 - (divisor * ErrCount)), 160, 148);  
 		paint.setColor(Color.rgb(255, 102, 0));
-		canvas.drawRect(new RectF(rect), paint);
+		if(ErrCount > 0)
+			canvas.drawRect(new RectF(rect), paint);
 		
 		rect = new Rect(224, (int)(148 - (divisor * WarnCount)), 256, 148);  
 		paint.setColor(Color.YELLOW ); 
-		canvas.drawRect(new RectF(rect), paint);
+		if(WarnCount > 0)
+			canvas.drawRect(new RectF(rect), paint);
 		
 
 		//Return

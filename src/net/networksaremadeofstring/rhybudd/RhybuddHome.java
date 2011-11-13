@@ -19,6 +19,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.util.Date;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,9 +98,10 @@ public class RhybuddHome extends Activity {
 		SettingsButton.setClickable(true);
 		SettingsButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				Intent SettingsIntent = new Intent(RhybuddHome.this, Settings.class);
-				RhybuddHome.this.startActivity(SettingsIntent);
+			public void onClick(View v) 
+			{
+				Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
+				startActivity(SettingsIntent);
 			}
         });
 		
@@ -109,7 +111,7 @@ public class RhybuddHome extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent SearchIntent = new Intent(RhybuddHome.this, Search.class);
-				RhybuddHome.this.startActivity(SearchIntent);
+				startActivity(SearchIntent);
 			}
         });
 		
@@ -182,12 +184,12 @@ public class RhybuddHome extends Activity {
 				} 
 				else if (msg.what == 99)// Hide
 				{
-					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(8);
-					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(8);
+					((TextView) findViewById(R.id.CurrentTaskLabel)).setText("Last Update:\n" + (new Date()).toString());
+					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
 				} 
 				else if (msg.what == 100)// Show
 				{
-					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
+					((TextView) findViewById(R.id.CurrentTaskLabel)).setText("Update in Progress..");
 					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
 				}
 			}
@@ -223,7 +225,8 @@ public class RhybuddHome extends Activity {
 						JSONObject DeviceObject = null;
 						try 
 						{
-							DeviceObject = API.GetDevices();
+							if(API != null)
+								DeviceObject = API.GetDevices();
 						} 
 						catch (ClientProtocolException e1) {
 							// TODO Auto-generated catch block
