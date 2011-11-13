@@ -17,6 +17,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -110,7 +111,8 @@ public class RhybuddHome extends Activity {
 		runnablesHandler = new Handler();
 
 		HomeHandler = new Handler() {
-			public void handleMessage(Message msg) {
+			public void handleMessage(Message msg) 
+			{
 				if (msg.what == 0) 
 				{
 					((TextView) findViewById(R.id.CurrentTaskLabel)).setText("Refreshing Events...");
@@ -125,11 +127,13 @@ public class RhybuddHome extends Activity {
 				} 
 				else if (msg.what == 99)// Hide
 				{
+					Log.i("HomeHandler","Hiding Progress bar etc");
 					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(8);
 					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(8);
 				} 
 				else if (msg.what == 100)// Show
 				{
+					Log.i("HomeHandler","Showing Progress bar etc");
 					((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
 					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
 				}
@@ -137,15 +141,18 @@ public class RhybuddHome extends Activity {
 		};
 	}
 
-	private void ConfigureRunnable() {
-		updateDevices = new Runnable() {
-			public void run() {
+	private void ConfigureRunnable() 
+	{
+		updateDevices = new Runnable() 
+		{
+			public void run() 
+			{
 				// Update the GUI
 				HomeHandler.sendEmptyMessage(100);
 				HomeHandler.sendEmptyMessage(1);
 
 				// Thread
-				Thread test = new Thread() 
+				Thread devicesRefreshThread = new Thread() 
 				{
 					public void run() 
 					{
@@ -161,9 +168,11 @@ public class RhybuddHome extends Activity {
 						}
     				
 						JSONObject DeviceObject = null;
-						try {
+						try 
+						{
 							DeviceObject = API.GetDevices();
-						} catch (ClientProtocolException e1) {
+						} 
+						catch (ClientProtocolException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						} catch (JSONException e1) {
@@ -198,19 +207,8 @@ public class RhybuddHome extends Activity {
 	    	    					values.put("warningEvents", CurrentDevice.getJSONObject("events").getInt("warning"));
 	    	    					values.put("errorEvents", CurrentDevice.getJSONObject("events").getInt("error"));
 	    	    					values.put("criticalEvents", CurrentDevice.getJSONObject("events").getInt("critical"));
-									
-									/*values.put("productionState","productionState");
-									values.put("ipAddress", 1234567890);
-									values.put("name", "name");
-									values.put("uid", "uid");
-									values.put("infoEvents", 0);
-	    	    					values.put("debugEvents", 0);
-	    	    					values.put("warningEvents", 0);
-	    	    					values.put("errorEvents", 0);
-	    	    					values.put("criticalEvents", 0);*/
 	    	    					
 									cacheDB.insert("devices", null, values);
-									//cacheDB.execSQL("insert into devices (productionState,ipAddress,name,uid,infoEvents,debugEvents,warningEvents,errorEvents,criticalEvents) VALUES (\"test\",1,\"test\",\""+CurrentDevice.getString("uid")+"\",1,1,1,1,1)");
 	    	    				}
 	    	    				catch (JSONException e) 
 	    	    				{
@@ -231,24 +229,31 @@ public class RhybuddHome extends Activity {
 						runnablesHandler.postDelayed(this, 3604000);// 1 hour
 					}
 				};
-				test.start();
+				devicesRefreshThread.start();
 			}
 		};
 
-		updateEvents = new Runnable() {
-			public void run() {
+		updateEvents = new Runnable() 
+		{
+			public void run() 
+			{
 				// Update the GUI
 				HomeHandler.sendEmptyMessage(100);
 				HomeHandler.sendEmptyMessage(0);
 
 				// Thread
-				Thread test = new Thread() {
-					public void run() {
-
+				Thread eventsRefreshThread = new Thread() 
+				{
+					public void run() 
+					{
+						HomeHandler.sendEmptyMessage(100);
+						HomeHandler.sendEmptyMessage(0);
+						
 						JSONObject EventsObject = null;
 						JSONArray Events = null;
 
-						try {
+						try 
+						{
 							ZenossAPIv2 API = new ZenossAPIv2(
 									settings.getString("userName", ""),
 									settings.getString("passWord", ""),
@@ -266,58 +271,62 @@ public class RhybuddHome extends Activity {
 													.getBoolean(
 															"SeverityDebug",
 															false));
-
-							Events = EventsObject.getJSONObject("result")
-									.getJSONArray("events");
-						} catch (Exception e) {
+							Events = EventsObject.getJSONObject("result").getJSONArray("events");
+						} 
+						catch (Exception e) 
+						{
 							HomeHandler.sendEmptyMessage(0);
+							e.printStackTrace();
 						}
 
-						try {
-							if (EventsObject != null) {
-								int EventCount = EventsObject.getJSONObject(
-										"result").getInt("totalCount");
+						try 
+						{
+							if (EventsObject != null) 
+							{
+								int EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 
-								SQLiteDatabase cacheDB = RhybuddHome.this
-										.openOrCreateDatabase("rhybuddCache",
-												MODE_PRIVATE, null);
+								SQLiteDatabase cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache",MODE_PRIVATE, null);
 								cacheDB.delete("events", null, null);
 
-								for (int i = 0; i < EventCount; i++) {
+								for (int i = 0; i < EventCount; i++) 
+								{
 									JSONObject CurrentEvent = null;
 									ContentValues values = new ContentValues(2);
-									try {
+									try 
+									{
 										CurrentEvent = Events.getJSONObject(i);
 
-										values.put("EVID",
-												CurrentEvent.getString("evid"));
-										values.put("device", CurrentEvent
-												.getJSONObject("device")
-												.getString("text"));
-										values.put("summary", CurrentEvent
-												.getString("summary"));
-										values.put("eventState", CurrentEvent
-												.getString("eventState"));
-										values.put("severity", CurrentEvent
-												.getString("severity"));
+										values.put("EVID",CurrentEvent.getString("evid"));
+										values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+										values.put("summary", CurrentEvent.getString("summary"));
+										values.put("eventState", CurrentEvent.getString("eventState"));
+										values.put("severity", CurrentEvent.getString("severity"));
 
 										cacheDB.insert("events", null, values);
-									} catch (JSONException e) {
+									} 
+									catch (JSONException e) 
+									{
 										// Log.e("API - Stage 2 - Inner",
 										// e.getMessage());
+										e.printStackTrace();
 									}
 								}
 								cacheDB.close();
 							}
-						} catch (Exception e) {
+						} 
+						catch (Exception e) 
+						{
 							// Log.e("API - Stage 2 - Inner", e.getMessage());
+							e.printStackTrace();
 						}
+						
 						// Hide progress
-						HomeHandler.sendEmptyMessage(99);
+						HomeHandler.sendEmptyMessageDelayed(99, 2000);
 
-						runnablesHandler.postDelayed(this, 300000);// 5 mins
+						runnablesHandler.postDelayed(this, 300000);// 5 mins 300000
 
-						if (OneOff) {
+						if (OneOff) 
+						{
 							// Kick off the infrastructure refresh now we're
 							// done with the other bit
 							HomeHandler.sendEmptyMessage(98);
@@ -325,7 +334,7 @@ public class RhybuddHome extends Activity {
 						}
 					}
 				};
-				test.start();
+				eventsRefreshThread.start();
 
 			}
 		};
