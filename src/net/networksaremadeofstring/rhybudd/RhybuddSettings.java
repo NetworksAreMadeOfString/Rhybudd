@@ -68,6 +68,8 @@ public class RhybuddSettings extends Activity
     			public void run() 
     			{
     				SQLiteDatabase cacheDB = RhybuddSettings.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    				cacheDB.execSQL("DROP TABLE events");
+    				cacheDB.execSQL("DROP TABLE devices");
     				cacheDB.execSQL("CREATE  TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
     				cacheDB.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
     				cacheDB.close();

@@ -97,7 +97,6 @@ public class DeviceList extends Activity
     			{
     				UpdateErrorMessage("There are no devices in the list",false);
     			}
-    			
     		}
     	};
     	

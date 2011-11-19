@@ -38,7 +38,8 @@
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
-			android:label="Rhybudd - Event Details">
+			android:label="Rhybudd - Event Details"
+			android:theme="@android:style/Theme.NoTitleBar">
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"

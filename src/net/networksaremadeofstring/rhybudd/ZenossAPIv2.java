@@ -352,8 +352,39 @@ public class ZenossAPIv2
     	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
+    	Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public Boolean AddEventLog(String _EventID, String Message) throws JSONException, ClientProtocolException, IOException
+    {
+    	//Log.i("Test:", "Entering GetEvent");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+    	
+    	JSONObject dataContents = new JSONObject();
+    	dataContents.put("evid",_EventID);
+    	dataContents.put("message", Message);
+        
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "write_log");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        httpost.setEntity(new StringEntity(reqData.toString()));
+    	String test = httpclient.execute(httpost, responseHandler);
+		
+		JSONObject json = new JSONObject(test);
+
+    	return json.getJSONObject("result").getBoolean("success");
     }
     
     
@@ -427,12 +458,10 @@ public class ZenossAPIv2
         Wrapper.put(reqData);
         httpost.setEntity(new StringEntity(Wrapper.toString()));
     	
-    	//Log.i("Execute","Executing with string: " + Wrapper.toString());
     	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	Log.i("ZenossEvents -------------> ", json.toString());
+    	//Log.i("ZenossDevice -------------> ", json.toString());
     	return json;
     }
     

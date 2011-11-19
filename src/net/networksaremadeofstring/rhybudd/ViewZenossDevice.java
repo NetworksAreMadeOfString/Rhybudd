@@ -61,15 +61,6 @@ public class ViewZenossDevice extends Activity
         
         setContentView(R.layout.view_zenoss_device);
         
-        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
-        deviceListButton.setClickable(true);
-        deviceListButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-        });*/
-        
         list = (ListView)findViewById(R.id.ZenossEventsList);
         
         eventsHandler = new Handler()
@@ -104,7 +95,7 @@ public class ViewZenossDevice extends Activity
     					
     					try
     					{
-    						((TextView) findViewById(R.id.Title)).setText(DeviceDetails.getString("snmpSysName") + " Details");
+    						((TextView) findViewById(R.id.Title)).setText(DeviceDetails.getString("snmpSysName").toUpperCase());
     					}
     					catch(Exception e)
     					{

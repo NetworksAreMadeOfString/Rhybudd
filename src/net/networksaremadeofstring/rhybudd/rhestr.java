@@ -170,7 +170,7 @@ public class rhestr extends Activity
     		//Check the DB first
     		if(CheckDB())
     		{
-    			Log.i("CheckDB","We have data!");
+    			//Log.i("CheckDB","We have data!");
     			DBGetThread();
     		}
     		else
@@ -227,7 +227,7 @@ public class rhestr extends Activity
     	{  
     		public void run() 
     		{
-    			Log.i("DBGetThread",Integer.toString(dbResults.getCount()));
+    			//Log.i("DBGetThread",Integer.toString(dbResults.getCount()));
     			
     			while(dbResults.moveToNext())
     			{
@@ -241,7 +241,7 @@ public class rhestr extends Activity
     			
     			rhybuddCache.close();
         		dbResults.close();
-        		Log.i("DBGetThread",Integer.toString(listOfZenossEvents.size()));
+        		//Log.i("DBGetThread",Integer.toString(listOfZenossEvents.size()));
     			handler.sendEmptyMessage(0);
     		}
     	};
