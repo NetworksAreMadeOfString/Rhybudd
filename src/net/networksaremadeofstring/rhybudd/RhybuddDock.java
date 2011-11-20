@@ -258,8 +258,8 @@ public class RhybuddDock extends Activity
 		
 		Paint scalePaint = new Paint();
 		scalePaint.setStyle(Paint.Style.STROKE);
-		scalePaint.setColor(getResources().getColor(R.color.WarningGreen));//0x9f004d0f
-		scalePaint.setStrokeWidth(1);//0.005f
+		scalePaint.setColor(getResources().getColor(R.color.WarningGreen));
+		scalePaint.setStrokeWidth(1);
 		scalePaint.setAntiAlias(true);
 		
 		scalePaint.setTextSize(12);
@@ -268,8 +268,7 @@ public class RhybuddDock extends Activity
 		
 		float scalePosition = 10;
 		RectF scaleRect = new RectF();
-		scaleRect.set(faceRect.left + scalePosition, faceRect.top + scalePosition,
-					  faceRect.right - scalePosition, faceRect.bottom - scalePosition);
+		scaleRect.set(faceRect.left + scalePosition, faceRect.top + scalePosition,faceRect.right - scalePosition, faceRect.bottom - scalePosition);
 
 		if(!Colors)
 			scalePaint.setColor(Color.WHITE);
@@ -289,8 +288,6 @@ public class RhybuddDock extends Activity
 				if(i > 60)
 					scalePaint.setColor(getResources().getColor(R.color.WarningRed));
 			}
-			
-			//float y1 = scaleRect.top;
 			
 			canvas.drawLine(100, 20, 100, 18, scalePaint);
 			int divisor = 5;
@@ -375,24 +372,14 @@ public class RhybuddDock extends Activity
 						try 
 						{
 							ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""),settings.getString("passWord", ""),settings.getString("URL", ""));
-
-							EventsObject = API
-									.GetEvents(settings.getBoolean(
-											"SeverityCritical", true), settings
-											.getBoolean("SeverityError", true),
-											settings.getBoolean(
-													"SeverityWarning", true),
-											settings.getBoolean("SeverityInfo",
-													false), settings
-													.getBoolean(
-															"SeverityDebug",
-															false));
+							EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false));
 							EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 							GaugeHandler.sendEmptyMessage(1);
 						} 
 						catch (Exception e) 
 						{
-							e.printStackTrace();
+							//TODO We should inform the user about this
+							//e.printStackTrace();
 						}
 						
 						runnablesHandler.postDelayed(this, 30000);
