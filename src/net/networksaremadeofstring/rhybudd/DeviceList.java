@@ -33,7 +33,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -106,12 +105,10 @@ public class DeviceList extends Activity
     	if(listOfZenossDevices == null || listOfZenossDevices.size() < 1)
     	{
     		listOfZenossDevices = new ArrayList<ZenossDevice>();
-    		
-    		
-    		//Check the DB first
+
     		if(CheckDB())
     		{
-    			Log.i("CheckDB","We have data!");
+    			//Log.i("CheckDB","We have data!");
     			DBGetDevices();
     		}
     		else
@@ -147,7 +144,7 @@ public class DeviceList extends Activity
     	{  
     		public void run() 
     		{
-    			Log.i("DBGetDevices",Integer.toString(dbResults.getCount()));
+    			//Log.i("DBGetDevices",Integer.toString(dbResults.getCount()));
     			
     			while(dbResults.moveToNext())
     			{
@@ -159,15 +156,15 @@ public class DeviceList extends Activity
 					events.put("critical", dbResults.getInt(9));
 					
     				listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-    						dbResults.getInt(2), 
-    						events,
-    						dbResults.getString(3),
-    						dbResults.getString(4)));
+									    					 dbResults.getInt(2), 
+									    					 events,
+									    					 dbResults.getString(3),
+									    					 dbResults.getString(4)));
     			}
     			
     			rhybuddCache.close();
         		dbResults.close();
-        		Log.i("DBGetThread",Integer.toString(listOfZenossDevices.size()));
+        		//Log.i("DBGetThread",Integer.toString(listOfZenossDevices.size()));
         		firstLoadHandler.sendEmptyMessage(0);
     		}
     	};
@@ -248,7 +245,7 @@ public class DeviceList extends Activity
     	    				}
     	    				catch (JSONException e) 
     	    				{
-    	    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+    	    					//TODO We should probably tell the user that something went wrong
     	    				}
     	    			}
     					
@@ -256,16 +253,18 @@ public class DeviceList extends Activity
     				} 
     				catch (JSONException e) 
     				{
-    					//Log.e("API - Stage 2", e.getMessage());
+    					//TODO We should probably tell the user that something went wrong
     					firstLoadHandler.sendEmptyMessage(0);
     				}
 				} 
     			catch (Exception e) 
     			{
+    				//TODO We should probably tell the user that something went wrong
     				//Log.e("API - Stage 1", e.getMessage());
     				firstLoadHandler.sendEmptyMessage(0);
 				}
     			
+    			//1 is good
     			firstLoadHandler.sendEmptyMessage(1);
     		}
     	};
