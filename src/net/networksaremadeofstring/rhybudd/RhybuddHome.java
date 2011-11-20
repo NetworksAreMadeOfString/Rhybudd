@@ -206,76 +206,76 @@ public class RhybuddHome extends Activity
 				HomeHandler.sendEmptyMessage(100);
 				HomeHandler.sendEmptyMessage(1);
 
-				// Thread
 				Thread devicesRefreshThread = new Thread() 
 				{
 					public void run() 
 					{
 						ZenossAPIv2 API = null;
+						JSONObject DeviceObject = null;
+						SQLiteDatabase cacheDB = null;
 						try 
 						{
 							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							
+							if(API != null)
+							{
+								DeviceObject = API.GetDevices();
+								int DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
+								cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+								cacheDB.delete("devices", null, null);
+								
+								for(int i = 0; i < DeviceCount; i++)
+								{
+									JSONObject CurrentDevice = null;
+									ContentValues values = new ContentValues(2);
+									
+									try 
+									{
+										CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
+	    		    				
+		    		    				values.put("productionState",CurrentDevice.getString("productionState"));
+										values.put("ipAddress", CurrentDevice.getInt("ipAddress"));
+										values.put("name", CurrentDevice.getString("name"));
+										values.put("uid", CurrentDevice.getString("uid"));
+										values.put("infoEvents", CurrentDevice.getJSONObject("events").getInt("info"));
+		    	    					values.put("debugEvents", CurrentDevice.getJSONObject("events").getInt("debug"));
+		    	    					values.put("warningEvents", CurrentDevice.getJSONObject("events").getInt("warning"));
+		    	    					values.put("errorEvents", CurrentDevice.getJSONObject("events").getInt("error"));
+		    	    					values.put("criticalEvents", CurrentDevice.getJSONObject("events").getInt("critical"));
+		    	    					
+										cacheDB.insert("devices", null, values);
+		    	    				}
+		    	    				catch (JSONException e) 
+		    	    				{
+		    	    					e.printStackTrace();
+		    	    				}
+								}
+								cacheDB.close();
+							}
+						}
+						catch (ClientProtocolException e1) 
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						} 
+						catch (JSONException e1) 
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 
+						catch (IOException e1) 
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						catch (Exception e1) 
 						{
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-    				
-						JSONObject DeviceObject = null;
-						try 
+						finally
 						{
-							if(API != null)
-								DeviceObject = API.GetDevices();
-						} 
-						catch (ClientProtocolException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (JSONException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-    				
-						try 
-						{
-							int DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
-							SQLiteDatabase cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-							cacheDB.delete("devices", null, null);
-							
-							for(int i = 0; i < DeviceCount; i++)
-							{
-								JSONObject CurrentDevice = null;
-								ContentValues values = new ContentValues(2);
-								
-								try 
-								{
-									CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
-    		    				
-	    		    				values.put("productionState",CurrentDevice.getString("productionState"));
-									values.put("ipAddress", CurrentDevice.getInt("ipAddress"));
-									values.put("name", CurrentDevice.getString("name"));
-									values.put("uid", CurrentDevice.getString("uid"));
-									values.put("infoEvents", CurrentDevice.getJSONObject("events").getInt("info"));
-	    	    					values.put("debugEvents", CurrentDevice.getJSONObject("events").getInt("debug"));
-	    	    					values.put("warningEvents", CurrentDevice.getJSONObject("events").getInt("warning"));
-	    	    					values.put("errorEvents", CurrentDevice.getJSONObject("events").getInt("error"));
-	    	    					values.put("criticalEvents", CurrentDevice.getJSONObject("events").getInt("critical"));
-	    	    					
-									cacheDB.insert("devices", null, values);
-	    	    				}
-	    	    				catch (JSONException e) 
-	    	    				{
-	    	    					e.printStackTrace();
-	    	    				}
-							}
 							cacheDB.close();
-						}
-						catch(Exception e)
-						{
-							
 						}
 
 						// Hide progress
@@ -310,29 +310,15 @@ public class RhybuddHome extends Activity
 
 						try 
 						{
-							ZenossAPIv2 API = new ZenossAPIv2(
-									settings.getString("userName", ""),
-									settings.getString("passWord", ""),
-									settings.getString("URL", ""));
+							ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""),settings.getString("passWord", ""),settings.getString("URL", ""));
 
-							// EventsObject = API.GetEvents();
-							EventsObject = API
-									.GetEvents(settings.getBoolean(
-											"SeverityCritical", true), settings
-											.getBoolean("SeverityError", true),
-											settings.getBoolean(
-													"SeverityWarning", true),
-											settings.getBoolean("SeverityInfo",
-													false), settings
-													.getBoolean(
-															"SeverityDebug",
-															false));
+							EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false));
 							Events = EventsObject.getJSONObject("result").getJSONArray("events");
 						} 
 						catch (Exception e) 
 						{
 							HomeHandler.sendEmptyMessage(0);
-							e.printStackTrace();
+							//e.printStackTrace();
 						}
 
 						try 
@@ -364,7 +350,8 @@ public class RhybuddHome extends Activity
 									{
 										// Log.e("API - Stage 2 - Inner",
 										// e.getMessage());
-										e.printStackTrace();
+										//e.printStackTrace();
+										//TODO We should tell the user about this or recover from it as they could miss an alert
 									}
 								}
 								cacheDB.close();
@@ -373,7 +360,8 @@ public class RhybuddHome extends Activity
 						catch (Exception e) 
 						{
 							// Log.e("API - Stage 2 - Inner", e.getMessage());
-							e.printStackTrace();
+							//e.printStackTrace();
+							//TODO Total failure is pretty bad - we should tell the user about it
 						}
 						
 						// Hide progress
@@ -391,7 +379,6 @@ public class RhybuddHome extends Activity
 					}
 				};
 				eventsRefreshThread.start();
-
 			}
 		};
 	}
