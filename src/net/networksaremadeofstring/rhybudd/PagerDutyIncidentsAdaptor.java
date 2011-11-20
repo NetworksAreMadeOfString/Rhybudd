@@ -93,7 +93,9 @@ public class PagerDutyIncidentsAdaptor extends BaseAdapter implements OnClickLis
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
 	@Override
+	//TOOD Replace this with a setOnClickListener on the activity side
 	public void onClick(View v) {
 		((RhestrPagerDuty)context).AcknowledgeIncident(v.getTag().toString(), v.getId());
 	}

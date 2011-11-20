@@ -101,18 +101,35 @@ public class rhestr extends Activity
 			}
         });
         
-        
-        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
-        deviceListButton.setClickable(true);
-        deviceListButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent DeviceListIntent = new Intent(rhestr.this, DeviceList.class);
-	        	rhestr.this.startActivity(DeviceListIntent);
-			}
-        });*/
-        
-	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
+    	ConfigureHandlers();
+    	
+    	listOfZenossEvents = (List<ZenossEvent>) getLastNonConfigurationInstance();
+    	
+    	if(listOfZenossEvents == null || listOfZenossEvents.size() < 1)
+    	{
+    		listOfZenossEvents = new ArrayList<ZenossEvent>();
+
+    		if(CheckDB())
+    		{
+    			DBGetThread();
+    		}
+    		else
+    		{
+    			CreateThread();
+    			dataPreload.start();
+    		}
+    	}
+    	else
+    	{
+	    	UpdateErrorMessage("",false);
+	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	        list.setAdapter(adapter);
+    	}
+
+    }
+    
+    private void ConfigureHandlers()
+    {
     	handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
@@ -158,33 +175,6 @@ public class rhestr extends Activity
     			}
     		}
     	 };
-    	
-    	listOfZenossEvents = (List<ZenossEvent>) getLastNonConfigurationInstance();
-    	
-    	if(listOfZenossEvents == null || listOfZenossEvents.size() < 1)
-    	{
-    		listOfZenossEvents = new ArrayList<ZenossEvent>();
-    		
-    		
-    		//Check the DB first
-    		if(CheckDB())
-    		{
-    			//Log.i("CheckDB","We have data!");
-    			DBGetThread();
-    		}
-    		else
-    		{
-    			CreateThread();
-    			dataPreload.start();
-    		}
-    	}
-    	else
-    	{
-	    	UpdateErrorMessage("",false);
-	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
-	        list.setAdapter(adapter);
-    	}
-
     }
     
     private Boolean CheckDB()
@@ -226,21 +216,17 @@ public class rhestr extends Activity
     	{  
     		public void run() 
     		{
-    			//Log.i("DBGetThread",Integer.toString(dbResults.getCount()));
-    			
     			while(dbResults.moveToNext())
     			{
-    				//Log.i("DBGetThread",dbResults.getString(3));
     				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-    						dbResults.getString(3),
-    						dbResults.getString(4), 
-    						dbResults.getString(5),
-    						dbResults.getString(7)));
+														   dbResults.getString(3),
+														   dbResults.getString(4), 
+														   dbResults.getString(5),
+														   dbResults.getString(7)));
     			}
     			
     			rhybuddCache.close();
         		dbResults.close();
-        		//Log.i("DBGetThread",Integer.toString(listOfZenossEvents.size()));
     			handler.sendEmptyMessage(0);
     		}
     	};
@@ -264,8 +250,7 @@ public class rhestr extends Activity
     				{
     					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
     				}
-    				
-					//EventsObject = API.GetEvents();
+
     				EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true),
 							settings.getBoolean("SeverityError", true),
 							settings.getBoolean("SeverityWarning", true),
@@ -276,12 +261,9 @@ public class rhestr extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				//Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
-    				//e.printStackTrace();
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
-    			
     			
 				try 
 				{
@@ -315,7 +297,7 @@ public class rhestr extends Activity
 		    				}
 		    				catch (JSONException e) 
 		    				{
-		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+		    					//TODO Handle this better - we dont' need to the the user as it's in the loop but we do lose an entire device because of it
 		    				}
 		    			}
 						cacheDB.close();
@@ -329,7 +311,6 @@ public class rhestr extends Activity
 				} 
 				catch (JSONException e) 
 				{
-					//Log.e("API - Stage 2", e.getMessage());
 					totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -346,30 +327,21 @@ public class rhestr extends Activity
     
     public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
     {
-    	//Log.i("AcknowledgeEvent", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Event?");
-    	 //Log.i("View",Integer.toString(viewID));
-		/*dialog = new ProgressDialog(this);
-    	 dialog.setTitle("Contacting Zenoss");
-    	 dialog.setMessage("Please wait: Sending Events Acknowledgement");*/
 
     	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
     	 {
              public void onClick(DialogInterface arg0, int arg1) 
              {
-            	 //Log.i("AcknowledgeEvent Yes", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
             	 listOfZenossEvents.get(Position).setProgress(true);
             	 AckEventHandler.sendEmptyMessage(0);
-            	 //dialog.show();
             	 AckEvent = new Thread() 
         	    	{  
         	    		public void run() 
         	    		{
         	    			try 
         	    			{
-        	    				//Log.i("AcknowledgeEvent Thread", EventID + " - " + Integer.toString(Position) + " - " + Integer.toString(viewID));
-        	    				
         	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
         	    				ackEventAPI.AcknowledgeEvent(EventID);
 								listOfZenossEvents.get(Position).setProgress(false);
@@ -378,8 +350,6 @@ public class rhestr extends Activity
         	    			}
         	    			catch (Exception e)
         	    			{
-        	    				//Log.e("ACK",e.getMessage());
-        	    				//e.printStackTrace();
         	    				AckEventHandler.sendEmptyMessage(99);
         	    			}
         	    		}
@@ -390,12 +360,11 @@ public class rhestr extends Activity
 
          alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
          {
-             public void onClick(DialogInterface arg0, int arg1) {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
                  //Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
              }
          });
-
-         // display box
          alertbox.show();
     }
     
@@ -447,7 +416,6 @@ public class rhestr extends Activity
 		}
 		else
 		{
-			
 			ErrorMessage.setHeight(24);
 			ErrorMessage.setTextColor(-16711936);
 			ErrorMessage.setText(MessageText);
