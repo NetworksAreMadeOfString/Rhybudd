@@ -26,7 +26,7 @@ import android.os.Bundle;
 public class launcher extends Activity
 {
 	private SharedPreferences settings = null;
-	Thread StartService;
+
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) 
 	 {
