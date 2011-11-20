@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, rhestr!</string>
+    <string name="app_name">Rhybudd</string>
+    <string name="Description">Rhybudd is een Zenoss Evenementen en Device Management App voor Android Maakt gebruik van de nieuwe Zenoss 3.0 API om poll voor, alert en-bevestiging of in Zenoss waarschuwingen verdiepen.</string>
+    <string name="widget_GraphTitle">8Hr Evenement Distributie</string>
+    <string name="AddtoLogButton">Voeg toe aan Log</string>
+    <string name="DefaultStatusMessageText">Verfrissend..</string>
+    <string name="deviceListTitle">Infrastructuur</string>
+    <string name="eventListTitle">Events Lijst</string>
+    
+    
+    <string name="mangeDatabaseTitle">Beheren Cache</string>
+    <string name="mangeDatabaseDBSizeTitle">Stroom DB Maat:</string>
+    <string name="manageCache_RefreshTitle">Vernieuwen Local Cache</string>
+    <string name="refreshDesc">De cache wordt vernieuwd elke keer dat de app laadt, dus er is geen noodzaak om een refresh kracht.</string>
+    <string name="manageCache_moveToSDTitle">Verhuizen App naar SD-kaart</string>
+    <string name="moveToSDDesc">Afhankelijk van de grootte van uw infrastructuur deze cache kunnen vrij groot worden. Verhuizen naar SD is aan te raden.</string>
+    <string name="manageCache_emptyCacheTitle">Lege Local Cache</string>
+    <string name="emptyCacheDesc">De lokale cache wordt geleegd elke keer dat de app laadt, maar kunt u deze handmatig spoelen indien nodig.</string>
+    
+    
+    <string name="homeMenu_Help">Hulp</string>
+    <string name="homeMenu_PagerDuty">Pager Duty</string>
+    <string name="homeMenu_ManageDB">Database beheren</string>
+    <string name="homeMenu_Infrastructure">Infrastructuur</string>
+    <string name="homeMenu_Settings">Instellingen</string>
+    <string name="homeMenu_Refresh">Verversen</string>
+    
+    
+    <string name="searchTitle">Zoekresultaten</string>
+    <string name="searchStatus">Zoeken..</string>
+    <string name="searchHint">Zoektermen</string>
+    <string name="searchButton">Zoeken</string>
+    <string name="searchLabel">Zoeken</string>
+    <string name="searchHintDevice">Apparaatnaam</string>
+    <string name="searchVoicePromptDevice">Voor het beste resultaat gebruik maken van een korte enkel woord om de naam van het apparaat dat u zoekt te beschrijven.</string>
+    
+    
+    <string name="deviceDetailsTitle">Apparaat Details</string>
+    <string name="deviceDetailsOSModelLabel">OS Modeling:</string>
+    <string name="deviceDetailsGroupsLabel">Groepen:</string>
+    <string name="deviceDetailsSystemsLabel">Systemen:</string>
+    <string name="deviceDetailsUptimeLabel">Uptime:</string>
+    <string name="deviceDetailsProductionStateLabel">Productie Staat:</string>
+    
+    
+    <string name="eventDetailsTitle">Evenement Details</string>
+    <string name="eventDetailsComponentLabel">Bestanddeel</string>
+    <string name="eventDetailsEventClassLabel">Klasse Event:</string>
+    <string name="eventDetailsSummaryLabel">Overzicht:</string>
+    <string name="eventDetailsFirstSeenLabel">Eerst Gezien:</string>
+    <string name="eventDetailslastSeenLabel">Laatst Gezien:</string>
+    <string name="eventDetailsEventCountLabel">Event Tellen:</string>
+    <string name="eventDetailsAgentLabel">Agent:</string>
+    <string name="eventDetailsLogLabel">Logboek:</string>
+</resources>

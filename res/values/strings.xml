@@ -3,11 +3,55 @@
     <string name="hello">Hello World, rhestr!</string>
     <string name="app_name">Rhybudd</string>
     <string name="Description">Rhybudd is a Zenoss Events and Device Management App for Android Uses the new Zenoss 3.0 API to poll for, alert on and Acknowledge or delve into Zenoss alerts.</string>
+    <string name="widget_GraphTitle">8Hr Event Distribution</string>
+    <string name="AddtoLogButton">Add to Log</string>
+    <string name="DefaultStatusMessageText">Refreshing..</string>
+    <string name="deviceListTitle">Infrastructure</string>
+    <string name="eventListTitle">Events List</string>
+    
+    
+    <string name="mangeDatabaseTitle">Manage Cache</string>
+    <string name="mangeDatabaseDBSizeTitle">Current DB Size:</string>
+    <string name="manageCache_RefreshTitle">Refresh Local Cache</string>
+    <string name="refreshDesc">The cache is refreshed each time the app loads so there is no need to force a refresh.</string>
+    <string name="manageCache_moveToSDTitle">Move App to SD Card</string>
+    <string name="moveToSDDesc">Depending on the size of your infrastructure this cache can get quite large. Moving to SD is advisable.</string>
+    <string name="manageCache_emptyCacheTitle">Empty Local Cache</string>
+    <string name="emptyCacheDesc">The local cache is emptied each time the app loads but you can flush it manually if required.</string>
+    
+    
+    <string name="homeMenu_Help">Help</string>
+    <string name="homeMenu_PagerDuty">Pager Duty</string>
+    <string name="homeMenu_ManageDB">Manage Database</string>
+    <string name="homeMenu_Infrastructure">Infrastructure</string>
+    <string name="homeMenu_Settings">Settings</string>
+    <string name="homeMenu_Refresh">Refresh</string>
+    
+    
+    <string name="searchTitle">Search Results</string>
+    <string name="searchStatus">Searching..</string>
+    <string name="searchHint">Search Terms</string>
+    <string name="searchButton">Search</string>
     <string name="searchLabel">Search</string>
     <string name="searchHintDevice">Device Name</string>
     <string name="searchVoicePromptDevice">For best results use a short single word to describe the name of the device you are searching for.</string>
     
-    <string name="refreshDesc">The cache is refreshed each time the app loads so there is no need to force a refresh.</string>
-    <string name="moveToSDDesc">Depending on the size of your infrastructure this cache can get quite large. Moving to SD is advisable.</string>
-    <string name="emptyCacheDesc">The local cache is emptied each time the app loads but you can flush it manually if required.</string>
+    
+    <string name="deviceDetailsTitle">Device Details</string>
+    <string name="deviceDetailsOSModelLabel">OS Modeling:</string>
+    <string name="deviceDetailsGroupsLabel">Groups:</string>
+    <string name="deviceDetailsSystemsLabel">Systems:</string>
+    <string name="deviceDetailsUptimeLabel">Uptime:</string>
+    <string name="deviceDetailsProductionStateLabel">Production State:</string>
+    
+    
+    <string name="eventDetailsTitle">Event Details</string>
+    <string name="eventDetailsComponentLabel">Component:</string>
+    <string name="eventDetailsEventClassLabel">Event Class:</string>
+    <string name="eventDetailsSummaryLabel">Summary:</string>
+    <string name="eventDetailsFirstSeenLabel">First Seen:</string>
+    <string name="eventDetailslastSeenLabel">Last Seen:</string>
+    <string name="eventDetailsEventCountLabel">Event Count:</string>
+    <string name="eventDetailsAgentLabel">Agent:</string>
+    <string name="eventDetailsLogLabel">Log:</string>
 </resources>

@@ -5,7 +5,7 @@
         <RelativeLayout android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:id="@+id/HomeHeader" android:background="@drawable/home_title_tile" android:gravity="top" android:layout_height="65px">
             <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:id="@+id/HomeHeaderTitle" android:text="Rhybudd" android:textSize="32dp" android:layout_marginLeft="12dp"></TextView>
             <ProgressBar android:layout_width="wrap_content" style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content" android:id="@+id/progressBar1" android:layout_alignBottom="@+id/HomeHeaderTitle" android:layout_alignParentRight="true" android:layout_marginRight="8dp"></ProgressBar>
-            <TextView android:textSize="10dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/CurrentTaskLabel" android:text="Refreshing...." android:layout_height="wrap_content" android:layout_alignBottom="@+id/progressBar1" android:layout_toLeftOf="@+id/progressBar1"></TextView>
+            <TextView android:textSize="10dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/CurrentTaskLabel" android:layout_height="wrap_content" android:layout_alignBottom="@+id/progressBar1" android:layout_toLeftOf="@+id/progressBar1" android:text="@string/DefaultStatusMessageText"></TextView>
         </RelativeLayout>
         
         

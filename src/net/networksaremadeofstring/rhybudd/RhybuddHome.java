@@ -141,8 +141,8 @@ public class RhybuddHome extends Activity {
         {
 	        case R.id.pagerduty:
 	        {
-	        	//Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhestrPagerDuty.class);
-	        	Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhybuddDock.class);
+	        	Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhestrPagerDuty.class);
+	        	//Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhybuddDock.class);
 	        	RhybuddHome.this.startActivity(PagerDutyIntent);
 	            return true;
 	        }
