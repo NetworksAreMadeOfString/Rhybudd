@@ -16,6 +16,16 @@
             </intent-filter>
         </activity>
         
+        <activity android:name="net.networksaremadeofstring.rhybudd.RhybuddDock"
+                  android:label="Rhybudd Dock"
+                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <category android:name="android.intent.category.DESK_DOCK" />
+                <category android:name="android.intent.category.HE_DESK_DOCK" />
+                <category android:name="android.intent.category.LE_DESK_DOCK" />
+            </intent-filter>
+        </activity>
+        
         <service android:name=".ZenossPoller" />
         
         <activity android:name=".RhybuddSettings"
@@ -45,6 +55,10 @@
 		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
 			android:label="Rhybudd - Infrastructure List">
 			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
+		</activity>
+		
+		<activity android:name="net.networksaremadeofstring.rhybudd.ManageDatabase"
+			android:label="Rhybudd - Manage Cache">
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"

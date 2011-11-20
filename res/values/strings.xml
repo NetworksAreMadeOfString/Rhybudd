@@ -6,4 +6,8 @@
     <string name="searchLabel">Search</string>
     <string name="searchHintDevice">Device Name</string>
     <string name="searchVoicePromptDevice">For best results use a short single word to describe the name of the device you are searching for.</string>
+    
+    <string name="refreshDesc">The cache is refreshed each time the app loads so there is no need to force a refresh.</string>
+    <string name="moveToSDDesc">Depending on the size of your infrastructure this cache can get quite large. Moving to SD is advisable.</string>
+    <string name="emptyCacheDesc">The local cache is emptied each time the app loads but you can flush it manually if required.</string>
 </resources>

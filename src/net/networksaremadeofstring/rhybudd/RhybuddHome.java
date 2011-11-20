@@ -139,10 +139,11 @@ public class RhybuddHome extends Activity {
     {
         switch (item.getItemId()) 
         {
-	        case R.id.infrastructure:
+	        case R.id.pagerduty:
 	        {
-	        	Intent DeviceListIntent = new Intent(RhybuddHome.this, DeviceList.class);
-	        	RhybuddHome.this.startActivity(DeviceListIntent);
+	        	//Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhestrPagerDuty.class);
+	        	Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhybuddDock.class);
+	        	RhybuddHome.this.startActivity(PagerDutyIntent);
 	            return true;
 	        }
 	        
@@ -156,9 +157,9 @@ public class RhybuddHome extends Activity {
 	        
 	        case R.id.EmptyDB:
 	        {
-	        	Toast.makeText(RhybuddHome.this, "Cache Clearing isn't available yet\n\nPlease use the Clear Data Function in Application Settings", Toast.LENGTH_LONG).show();
-	        	startActivityForResult(new Intent(Settings.ACTION_APPLICATION_SETTINGS),0);
-	        	return true;
+	        	Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
+	        	RhybuddHome.this.startActivity(MangeDBIntent);
+	            return true;
 	        }
         }
         return false;

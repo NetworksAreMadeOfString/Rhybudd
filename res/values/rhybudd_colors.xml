@@ -1,0 +1,9 @@
+<resources>
+        <color name="DarkBlue">#6b7681</color>
+        <color name="LightBlue">#929ba4</color>
+        <color name="HighlightBlack">#80c0c0c0</color>
+        <color name="WarningYellow">#FFCC11</color>
+        <color name="WarningOrange">#FF7F00</color>
+        <color name="WarningRed">#FF0000</color>
+        <color name="WarningGreen">#458B00</color>
+</resources>
