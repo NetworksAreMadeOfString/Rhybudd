@@ -131,7 +131,6 @@ public class Search extends Activity
     			{
 	    			if(listOfZenossDevices.size() > 0)
 	    			{
-		    	        //list.setAdapter(new ArrayAdapter<String>(Search.this, R.layout.search_simple,SearchResults));
 	    				list.setAdapter(new ZenossSearchAdaptor(Search.this, listOfZenossDevices));
 	    			}
 	    			else
