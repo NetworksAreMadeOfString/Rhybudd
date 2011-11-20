@@ -75,18 +75,6 @@ public class RhestrPagerDuty extends Activity
 			}
         });
         
-        /*ImageView deviceListButton = (ImageView) findViewById(R.id.DeviceListImage);
-        deviceListButton.setClickable(true);
-        deviceListButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent DeviceListIntent = new Intent(RhestrPagerDuty.this, DeviceList.class);
-				RhestrPagerDuty.this.startActivity(DeviceListIntent);
-				finish();
-			}
-        });*/
-        
-	    //dialog = ProgressDialog.show(this, "Contacting Zenoss", "Please wait: loading Events....", true);
     	handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
@@ -140,8 +128,7 @@ public class RhestrPagerDuty extends Activity
 				} 
     			catch (Exception e) 
     			{
-    				//Log.e("API - Stage 1", e.getMessage() + " " + e.getLocalizedMessage());
-    				e.printStackTrace();
+    				//e.printStackTrace();
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -163,10 +150,10 @@ public class RhestrPagerDuty extends Activity
 											    						CurrentEvent.getJSONObject("trigger_summary_data").getString("description"),
 											    						CurrentEvent.getString("status"),
 											    						CurrentEvent.getString("incident_key")));
-			    				//Log.i("ForLoop",CurrentEvent.getJSONObject("trigger_summary_data").getString("description"));
 		    				}
 		    				catch (JSONException e) 
 		    				{
+		    					//TODO This needs to be handled as users could miss important errors
 		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
 		    				}
 		    			}
@@ -181,16 +168,12 @@ public class RhestrPagerDuty extends Activity
 				} 
 				catch (JSONException e) 
 				{
-					//Log.e("API - Stage 2", e.getMessage());
 					totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
     		}
     	};
     }
-    
-    
-    
     
     
     public void UpdateErrorMessage(String MessageText,boolean Critical)
@@ -202,7 +185,6 @@ public class RhestrPagerDuty extends Activity
 		}
 		else
 		{
-			
 			ErrorMessage.setHeight(24);
 			ErrorMessage.setTextColor(-16711936);
 			ErrorMessage.setText(MessageText);
@@ -216,7 +198,6 @@ public class RhestrPagerDuty extends Activity
     {
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("Acknowledge Incident?");
-    	 //Log.i("View",Integer.toString(viewID));
     	 dialog = new ProgressDialog(this);
     	 dialog.setTitle("Contacting Zenoss");
     	 dialog.setMessage("Please wait: Sending Incident Acknowledgement");
@@ -257,7 +238,6 @@ public class RhestrPagerDuty extends Activity
         	    			}
         	    			catch (Exception e)
         	    			{
-        	    				//Log.e("ACK",e.getMessage());
         	    				AckEventHandler.sendEmptyMessage(0);
         	    			}
         	    		}
@@ -268,12 +248,11 @@ public class RhestrPagerDuty extends Activity
 
          alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
          {
-             public void onClick(DialogInterface arg0, int arg1) {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
                  //Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
              }
          });
-
-         // display box
          alertbox.show();
     }
 }
