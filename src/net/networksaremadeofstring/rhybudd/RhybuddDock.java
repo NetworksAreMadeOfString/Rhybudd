@@ -1,19 +1,13 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
-import java.util.Date;
-
 import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,16 +23,9 @@ import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 public class RhybuddDock extends Activity
 {
-	// scale configuration
-	private static final int totalNicks = 100;
-	private static final float degreesPerNick = 360.0f / totalNicks;	
-	private static final int centerDegree = 50; // the one in the top center (12 o'clock)
-	Canvas EventsCanvas;
 	private Handler GaugeHandler = null, runnablesHandler = null;
 	private Runnable updateEvents = null, updateDevices = null;
 	private SharedPreferences settings = null;
@@ -169,7 +156,7 @@ public class RhybuddDock extends Activity
 	private void DrawEvents()
 	{
 		Bitmap charty = Bitmap.createBitmap(200 , 200 , Bitmap.Config.ARGB_8888);
-		EventsCanvas = new Canvas(charty);
+		Canvas EventsCanvas = new Canvas(charty);
 		final Paint paint = new Paint();
 
 		paint.setStyle(Paint.Style.FILL); 
@@ -196,24 +183,21 @@ public class RhybuddDock extends Activity
 		((ImageView) findViewById(R.id.EventsGauge)).setImageBitmap(charty);
 	}
 	
+	@SuppressWarnings("unused")
 	private void drawGloss(Canvas canvas)
 	{
 		final Paint paint = new Paint();
-		//RadialGradient gradient = new RadialGradient(50, 50, 200, 0x80c0c0c0, 0x00000000, android.graphics.Shader.TileMode.CLAMP);
 		LinearGradient gradient = new LinearGradient(50, 50, 176,110,0x80c0c0c0,0x00000000, android.graphics.Shader.TileMode.CLAMP);
 		paint.setDither(true);
 		paint.setAntiAlias(true);
 		paint.setShader(gradient);
-		//paint.setColor(getResources().getColor(R.color.HighlightBlack));
-		EventsCanvas.drawOval(new RectF(24, 6, 176, 110), paint);
+		canvas.drawOval(new RectF(24, 6, 176, 110), paint);
 		
 	}
 	
 	private void drawGaugeNeedle(Canvas canvas, int count, int Scale)
 	{
 		canvas.save(Canvas.MATRIX_SAVE_FLAG);
-		/*if(count > 99)
-			count = 99;*/
 		float divisor = 360.0f / Scale;
 		
 		canvas.rotate((float) (divisor * count), 100, 100);
@@ -280,16 +264,13 @@ public class RhybuddDock extends Activity
 		
 		scalePaint.setTextSize(12);
 		scalePaint.setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
-		//scalePaint.setTextScaleX(0.6f);
 		scalePaint.setTextAlign(Paint.Align.CENTER);		
 		
-		float scalePosition = 10; //0.10f
+		float scalePosition = 10;
 		RectF scaleRect = new RectF();
 		scaleRect.set(faceRect.left + scalePosition, faceRect.top + scalePosition,
 					  faceRect.right - scalePosition, faceRect.bottom - scalePosition);
 
-		
-		//canvas.drawOval(scaleRect, scalePaint);
 		if(!Colors)
 			scalePaint.setColor(Color.WHITE);
 		
@@ -309,8 +290,7 @@ public class RhybuddDock extends Activity
 					scalePaint.setColor(getResources().getColor(R.color.WarningRed));
 			}
 			
-			float y1 = scaleRect.top;
-			float y2 = y1 - 0.020f;
+			//float y1 = scaleRect.top;
 			
 			canvas.drawLine(100, 20, 100, 18, scalePaint);
 			int divisor = 5;
@@ -320,30 +300,15 @@ public class RhybuddDock extends Activity
 			
 			if (i % divisor == 0) 
 			{
-				canvas.drawText(Integer.toString(i), 100, 16, scalePaint);// y2 - 0.015f
-				
-				/*int value = nickToDegree(i);
-				
-				if (value >= minDegrees && value <= maxDegrees) {
-					String valueString = Integer.toString(value);
-					canvas.drawText(valueString, 100, 12, scalePaint);// y2 - 0.015f
-				}*/
+				canvas.drawText(Integer.toString(i), 100, 16, scalePaint);
 			}
 			
 			canvas.rotate((360.0f / Max), 100, 100);
 		}
 
 		canvas.restore();		
-		//canvas.rotate(180, 100, 100);
 	}
-	
-	private int nickToDegree(int nick) 
-	{
-		int rawDegree = ((nick < totalNicks / 2) ? nick : (nick - totalNicks)) * 2;
-		int shiftedDegree = rawDegree + centerDegree;
-		return shiftedDegree;
-	}
-	
+
 	
 	private void ConfigureRunnable() 
 	{
@@ -351,48 +316,44 @@ public class RhybuddDock extends Activity
 		{
 			public void run() 
 			{
-				// Thread
 				Thread devicesRefreshThread = new Thread() 
 				{
 					public void run() 
 					{
 						ZenossAPIv2 API = null;
+						JSONObject DeviceObject = null;
+						
 						try 
 						{
 							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-						} 
-						catch (Exception e1) 
-						{
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-    				
-						JSONObject DeviceObject = null;
-						try 
-						{
 							if(API != null)
+							{
 								DeviceObject = API.GetDevices();
+								
+								DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
+								GaugeHandler.sendEmptyMessage(99);
+							}
 						} 
-						catch (ClientProtocolException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (JSONException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-    				
-						try 
+						catch (ClientProtocolException e1) 
 						{
-							DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
-							GaugeHandler.sendEmptyMessage(99);
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 
+						catch (JSONException e1) 
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 
+						catch (IOException e1) 
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
 						catch(Exception e)
 						{
 							
 						}
+						
 						// Try again later if the app is still live
 						runnablesHandler.postDelayed(this, 300000);// 1 hour
 					}
@@ -405,22 +366,16 @@ public class RhybuddDock extends Activity
 		{
 			public void run() 
 			{
-				// Thread
 				Thread eventsRefreshThread = new Thread() 
 				{
 					public void run() 
 					{
 						JSONObject EventsObject = null;
-						JSONArray Events = null;
 
 						try 
 						{
-							ZenossAPIv2 API = new ZenossAPIv2(
-									settings.getString("userName", ""),
-									settings.getString("passWord", ""),
-									settings.getString("URL", ""));
+							ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""),settings.getString("passWord", ""),settings.getString("URL", ""));
 
-							// EventsObject = API.GetEvents();
 							EventsObject = API
 									.GetEvents(settings.getBoolean(
 											"SeverityCritical", true), settings
@@ -432,30 +387,19 @@ public class RhybuddDock extends Activity
 													.getBoolean(
 															"SeverityDebug",
 															false));
-							Events = EventsObject.getJSONObject("result").getJSONArray("events");
+							EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+							GaugeHandler.sendEmptyMessage(1);
 						} 
 						catch (Exception e) 
 						{
-							e.printStackTrace();
-						}
-
-						try 
-						{
-								EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-						} 
-						catch (Exception e) 
-						{
-							// Log.e("API - Stage 2 - Inner", e.getMessage());
 							e.printStackTrace();
 						}
 						
-						GaugeHandler.sendEmptyMessage(1);
-
-						runnablesHandler.postDelayed(this, 30000);// 5 mins 300000
+						runnablesHandler.postDelayed(this, 30000);
 					}
 				};
+				
 				eventsRefreshThread.start();
-
 			}
 		};
 	}

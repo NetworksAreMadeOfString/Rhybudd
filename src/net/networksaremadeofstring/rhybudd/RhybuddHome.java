@@ -34,7 +34,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,9 +43,9 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class RhybuddHome extends Activity {
+public class RhybuddHome extends Activity 
+{
 	private SharedPreferences settings = null;
 	private Handler HomeHandler = null, runnablesHandler = null;
 	private Runnable updateEvents = null, updateDevices = null;

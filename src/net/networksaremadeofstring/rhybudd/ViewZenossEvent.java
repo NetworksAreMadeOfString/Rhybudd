@@ -48,7 +48,7 @@ public class ViewZenossEvent extends Activity
 	Handler firstLoadHandler, addLogMessageHandler;
 	ProgressDialog dialog,addMessageProgressDialog;
 	Thread dataPreload, addLogMessageThread;
-	private String EventID;
+	//private String EventID;
 	Dialog addMessageDialog;
 	String[] LogEntries;
 	

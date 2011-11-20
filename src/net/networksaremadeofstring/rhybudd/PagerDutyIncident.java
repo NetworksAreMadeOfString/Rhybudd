@@ -47,9 +47,29 @@ public class PagerDutyIncident
     	return this.trigger_summary_data;
     }
 	
+	public int getIncidentNumber()
+    {
+    	return this.incident_number;
+    }
+    
+    public String getTriggerDetailsURL()
+    {
+    	return this.trigger_details_html_url;
+    }
+    
+    public String getCreatedDate()
+    {
+    	return this.created_on;
+    }
+	
 	public String getStatus()
     {
     	return this.status;
+    }
+	
+	public String getAssignedUser()
+    {
+    	return this.assigned_to_user;
     }
 	
 	public String getIncidentKey()

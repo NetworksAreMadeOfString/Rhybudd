@@ -21,11 +21,9 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -37,7 +35,6 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -49,7 +46,7 @@ import android.widget.Toast;
 
 public class Search extends Activity
 {
-	private SharedPreferences settings = null;
+	//private SharedPreferences settings = null;
 	ListView list;
 	String query, index;
 	Handler searchResultsHandler;
@@ -61,7 +58,7 @@ public class Search extends Activity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        //settings = getSharedPreferences("rhybudd", 0);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.search);
         ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
@@ -165,8 +162,6 @@ public class Search extends Activity
     			
     			while(dbResults.moveToNext())
     			{
-    				//SearchResults.add(dbResults.getString(3));
-    				
     				HashMap<String, Integer> events = new HashMap<String, Integer>();
 					events.put("info", dbResults.getInt(5));
 					events.put("debug", dbResults.getInt(6));

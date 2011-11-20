@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -33,16 +32,14 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ManageDatabase extends Activity
 {
-	private SharedPreferences settings = null;
+	//private SharedPreferences settings = null;
 	Thread FlushDBThread;
 	Handler UIUpdate;
 	
@@ -50,7 +47,7 @@ public class ManageDatabase extends Activity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+       // settings = getSharedPreferences("rhybudd", 0);
         
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.manage_database);

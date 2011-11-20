@@ -63,7 +63,8 @@ public class ZenossAPIv2
   	
   	private DefaultHttpClient httpclient;
   	
-    private ResponseHandler responseHandler = new BasicResponseHandler();
+    @SuppressWarnings("rawtypes")
+	private ResponseHandler responseHandler = new BasicResponseHandler();
     private int reqCount = 1;
     private boolean LoginSuccessful = false;
     
@@ -153,6 +154,7 @@ public class ZenossAPIv2
 		
     }
 	
+	@SuppressWarnings("unchecked")
 	public JSONObject GetDevices() throws JSONException, ClientProtocolException, IOException
 	{
 		HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/device_router");
@@ -193,6 +195,7 @@ public class ZenossAPIv2
         
 	}
     
+	@SuppressWarnings("unchecked")
 	public JSONObject AcknowledgeEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
 	{
 		//{"action":"EventsRouter","method":"acknowledge","data":[{"evids":["35f000dd-a069-4129-a11a-215c3cc2ed48"],"excludeIds":{},"selectState":null,"field":"severity","direction":"DESC","params":"{\"severity\":[5,4,3,2],\"eventState\":[0,1]}","asof":1316269924.493517}],"type":"rpc","tid":4}
