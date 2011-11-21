@@ -126,6 +126,9 @@ public class RhybuddSettings extends Activity
         if(settings.getBoolean("SeverityDebug", false) == true)
         	((CheckBox) findViewById(R.id.debugCheckBox)).setChecked(true);
         
+        if(settings.getBoolean("onlyProductionAlerts", false) == true)
+        	((CheckBox) findViewById(R.id.productionOnlyCheckBox)).setChecked(true);
+        
         BackgroundServiceDelay.setProgress(settings.getInt("BackgroundServiceDelay", 30));
         TextView DelayLabel = (TextView) findViewById(R.id.DelayLabel);
         if(settings.getInt("BackgroundServiceDelay", 30) < 60)
@@ -220,6 +223,8 @@ public class RhybuddSettings extends Activity
                 CheckBox warningCheckBox = (CheckBox) findViewById(R.id.warningCheckBox);
                 CheckBox infoCheckBox = (CheckBox) findViewById(R.id.infoCheckBox);
                 CheckBox debugCheckBox = (CheckBox) findViewById(R.id.debugCheckBox);
+                CheckBox productionOnlyCheckBox = (CheckBox) findViewById(R.id.productionOnlyCheckBox);
+                
                 
             	SharedPreferences.Editor editor = settings.edit();
                 editor.putString("URL", urlET.getText().toString());
@@ -236,6 +241,8 @@ public class RhybuddSettings extends Activity
                 editor.putBoolean("SeverityWarning", warningCheckBox.isChecked());
                 editor.putBoolean("SeverityInfo", infoCheckBox.isChecked());
                 editor.putBoolean("SeverityDebug", debugCheckBox.isChecked());
+                editor.putBoolean("onlyProductionAlerts", productionOnlyCheckBox.isChecked());
+                
                 editor.commit();
                 
                 mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);

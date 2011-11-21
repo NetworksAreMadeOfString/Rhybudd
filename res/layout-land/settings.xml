@@ -29,11 +29,7 @@
 		                <CheckBox android:text="Debug" android:id="@+id/debugCheckBox" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_width="wrap_content" android:layout_marginRight="4dp"></CheckBox>
 		            </LinearLayout>
 		            <LinearLayout android:id="@+id/productionStateFilter" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_vertical|center_horizontal" android:layout_below="@+id/severityContainer2">
-		                <RadioGroup android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/productionStateRadioGroup">
-		                    <RadioButton android:checked="true" android:id="@+id/radioProductionOnly" android:layout_height="wrap_content" android:text="Production Only [1000]" android:layout_width="wrap_content"></RadioButton>
-		                    <RadioButton android:id="@+id/radioState500" android:layout_height="wrap_content" android:text="Production State &gt;= 500" android:layout_width="wrap_content"></RadioButton>
-		                    <RadioButton android:checked="true" android:id="@+id/radioState1" android:layout_height="wrap_content" android:text="Production State &gt; 1" android:layout_width="wrap_content"></RadioButton>
-		                </RadioGroup>
+		                <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/productionOnlyCheckBox" android:text="@string/productionStateNotificationLabel"></CheckBox>
 		            </LinearLayout>
 		            <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/productionStateFilter" android:layout_centerHorizontal="true" android:id="@+id/PollerLayout" android:layout_width="wrap_content">
 		                <CheckBox android:layout_width="wrap_content" android:id="@+id/AllowBackgroundService" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_marginLeft="10px" android:text="Poller"></CheckBox>

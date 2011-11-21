@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -48,7 +49,7 @@ public class RhybuddHome extends Activity
 {
 	private SharedPreferences settings = null;
 	private Handler HomeHandler = null, runnablesHandler = null;
-	private Runnable updateEvents = null, updateDevices = null;
+	private Runnable updateEvents = null, updateDevices = null, updateDeviceDetails = null;
 	private Boolean OneOff = true;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -198,6 +199,57 @@ public class RhybuddHome extends Activity
 
 	private void ConfigureRunnable() 
 	{
+		/*updateDeviceDetails = new Runnable() 
+		{
+			public void run() 
+			{
+				
+				HomeHandler.sendEmptyMessage(100);
+				HomeHandler.sendEmptyMessage(1);
+				Thread devicesDetailsRefreshThread = new Thread() 
+		    	{  
+		    		public void run() 
+		    		{
+		    			try 
+		    			{
+		    				ZenossAPIv2 API = null;
+							JSONObject DeviceObject = null;
+							SQLiteDatabase cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+							Cursor dbResults = null;
+							
+					    	try
+					    	{
+					    		dbResults = cacheDB.query("devices",new String[]{"rhybuddDeviceID","uid"},null, null, null, null, null);
+					    	}
+					    	catch(Exception e)
+					    	{
+					    		throw e;
+					    	}
+					    	
+					    	API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					    	
+					    	while(dbResults.moveToNext())
+			    			{
+					    		DeviceObject = API.GetDevice(dbResults.getString(1));
+			    			}
+						} 
+		    			catch (Exception e) 
+		    			{
+		    				//TODO We should probably do something about this
+						}
+		    			
+		    			// Hide progress
+						HomeHandler.sendEmptyMessage(99);
+
+						// Try again later if the app is still live
+						runnablesHandler.postDelayed(this, 3604000);// 1 hour
+		    		}
+		    	};
+		    	
+				devicesDetailsRefreshThread.start();
+			}
+		};*/
+		
 		updateDevices = new Runnable() 
 		{
 			public void run() 

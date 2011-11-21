@@ -30,9 +30,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 public class ZenossPoller extends Service
 {
@@ -99,7 +101,6 @@ public class ZenossPoller extends Service
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_SOUND;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
-		//notification.defaults |= Notification.DEFAULT_LIGHTS;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
 		if(Severity == 5)
 			notification.ledARGB = 0xffff0000;
@@ -173,7 +174,7 @@ public class ZenossPoller extends Service
 		    				{
 		    					CurrentEvent = Events.getJSONObject(i);
 		    					
-		    					if(CurrentEvent.getString("eventState").equals("New"))
+		    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(CurrentEvent.getJSONObject("device").getString("uid")))
 		    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
 		    					
 		    					values.put("EVID", CurrentEvent.getString("evid"));
@@ -218,4 +219,34 @@ public class ZenossPoller extends Service
     	dataPreload.start();
     }
 
+	private Boolean CheckIfNotify(String UID)
+	{
+		SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+		Cursor dbResults = cacheDB.query("devices",new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
+		
+		if(dbResults.moveToFirst())
+		{
+			String prodState = dbResults.getString(1);
+			if(prodState.equals("Production"))
+			{
+				dbResults.close();
+				cacheDB.close();
+				return true;
+			}
+			else
+			{
+				dbResults.close();
+				cacheDB.close();
+				return false;
+			}
+		}
+		else
+		{
+			//We always return true just in case
+			dbResults.close();
+			cacheDB.close();
+			return true;
+		}
+		
+	}
 }

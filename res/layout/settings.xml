@@ -29,11 +29,7 @@
             <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:text="Debug" android:layout_marginRight="4dp" android:id="@+id/debugCheckBox"></CheckBox>
         </LinearLayout>
         <LinearLayout android:layout_height="wrap_content" android:layout_below="@+id/severityContainer2" android:layout_centerHorizontal="true" android:id="@+id/productionStateFilter" android:layout_width="fill_parent" android:gravity="center_vertical|center_horizontal">
-            <RadioGroup android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/productionStateRadioGroup">
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:id="@+id/radioProductionOnly" android:text="Production Only [1000]"></RadioButton>
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/radioState500" android:text="Production State &gt;= 500"></RadioButton>
-                <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/radioState1" android:text="Production State &gt; 1" android:checked="true"></RadioButton>
-            </RadioGroup>
+            <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/productionOnlyCheckBox" android:text="@string/productionStateNotificationLabel"></CheckBox>
         </LinearLayout>
     </RelativeLayout>
     
