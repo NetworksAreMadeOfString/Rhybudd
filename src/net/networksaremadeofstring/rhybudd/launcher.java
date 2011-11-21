@@ -34,7 +34,7 @@ public class launcher extends Activity
 	     settings = getSharedPreferences("rhybudd", 0);
 	     setContentView(R.layout.main);  
 	        
-		 if(settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals(""))
+		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("DBCreated", false) == false)
 	     {
 			Intent SettingsIntent = new Intent(launcher.this, RhybuddSettings.class);
 			SettingsIntent.putExtra("firstRun", true);
