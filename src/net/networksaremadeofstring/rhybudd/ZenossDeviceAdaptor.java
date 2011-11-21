@@ -93,6 +93,7 @@ public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener,
 	}
 
 	@Override
+	//TODO Replace with a setOnClickListener from within the Activity
 	public void onClick(View v) 
 	{
 		((DeviceList)context).ViewDevice(v.getTag(R.integer.DeviceUID).toString());

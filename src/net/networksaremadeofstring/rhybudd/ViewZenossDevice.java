@@ -45,7 +45,6 @@ public class ViewZenossDevice extends Activity
 	Handler firstLoadHandler, eventsHandler;
 	ProgressDialog dialog;
 	Thread dataPreload, eventsLoad;
-	//private String EventID;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	ListView list;
 	ZenossEventsAdaptor adapter;

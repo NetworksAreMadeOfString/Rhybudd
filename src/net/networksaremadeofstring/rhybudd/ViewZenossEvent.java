@@ -193,7 +193,7 @@ public class ViewZenossEvent extends Activity
     					}
     					catch(Exception e)
     					{
-    						e.printStackTrace();
+    						//e.printStackTrace();
     						String[] LogEntries = {"No log entries could be found"};
     						((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
     					}
@@ -277,7 +277,7 @@ public class ViewZenossEvent extends Activity
 					} 
 					catch (Exception e) 
 					{
-						e.printStackTrace();
+						//e.printStackTrace();
 						Toast.makeText(ViewZenossEvent.this, "The log message was successfully sent to Zenoss but an error occured when updating the UI", Toast.LENGTH_LONG).show();
 					}
     			}
