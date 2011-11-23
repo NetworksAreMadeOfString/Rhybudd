@@ -71,6 +71,7 @@ public class Search extends Activity
 			public void onClick(View v) 
 			{
 				query = ((EditText) findViewById(R.id.searchTermEditText)).getText().toString();
+				ConfigureHandler();
 				PerformSearch(true);
 			}	
 		}
@@ -108,7 +109,7 @@ public class Search extends Activity
 	    	((RelativeLayout) findViewById(R.id.searchContainer)).setVisibility(8);
 	    	query = intent.getStringExtra(SearchManager.QUERY);
 	    	index = "device";
-	    	
+	    	ConfigureHandler();
 	    	PerformSearch(false);
 	    }
 	    else
@@ -116,8 +117,11 @@ public class Search extends Activity
 	    	((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
 	    	((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
 	    }
-	    
-	    searchResultsHandler = new Handler() 
+    }
+	
+	private void ConfigureHandler()
+	{
+		searchResultsHandler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
@@ -143,7 +147,7 @@ public class Search extends Activity
     			}
     		}
     	};
-    }
+	}
 	
 	public void PerformSearch(Boolean Crafted)
 	{
