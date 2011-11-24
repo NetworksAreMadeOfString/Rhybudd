@@ -108,6 +108,7 @@ public class Search extends Activity
 	    {
 	    	((RelativeLayout) findViewById(R.id.searchContainer)).setVisibility(8);
 	    	query = intent.getStringExtra(SearchManager.QUERY);
+	    	((EditText) findViewById(R.id.searchTermEditText)).setText(query);
 	    	index = "device";
 	    	ConfigureHandler();
 	    	PerformSearch(false);
