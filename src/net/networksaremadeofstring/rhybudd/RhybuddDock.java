@@ -5,6 +5,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -20,6 +22,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -30,10 +33,15 @@ public class RhybuddDock extends Activity
 	private Runnable updateEvents = null, updateDevices = null;
 	private SharedPreferences settings = null;
 	int EventCount = 0, DeviceCount = 0;
-	
+	public Intent callingIntent;
+    public Integer DockMode;
+    
 	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
+		/*callingIntent = super.getIntent();
+        DockMode = callingIntent.getIntExtra("EXTRA_DOCK_STATE", 9);
+        Log.e("Dock",Integer.toString(DockMode));*/
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.dock);

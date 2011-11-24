@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 public class launcher extends Activity
 {
@@ -33,7 +34,7 @@ public class launcher extends Activity
 		 super.onCreate(savedInstanceState);
 	     settings = getSharedPreferences("rhybudd", 0);
 	     setContentView(R.layout.main);  
-	        
+	     
 		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("DBCreated", false) == false)
 	     {
 			Intent SettingsIntent = new Intent(launcher.this, RhybuddSettings.class);
@@ -43,8 +44,16 @@ public class launcher extends Activity
 	     }
 	     else
 	     {
-	    	 Intent RhybuddHomeIntent = new Intent(launcher.this, RhybuddHome.class);
-	    	 launcher.this.startActivity(RhybuddHomeIntent);
+	    	 if(getIntent().hasCategory(Intent.CATEGORY_DESK_DOCK) || getIntent().hasCategory("android.intent.category.HE_DESK_DOCK") || getIntent().hasCategory("android.intent.category.LE_DESK_DOCK"))
+	    	 {
+	    		 Intent RhybuddDockIntent = new Intent(launcher.this, RhybuddDock.class);
+		    	 launcher.this.startActivity(RhybuddDockIntent);
+	    	 }
+	    	 else
+	    	 {
+		    	 Intent RhybuddHomeIntent = new Intent(launcher.this, RhybuddHome.class);
+		    	 launcher.this.startActivity(RhybuddHomeIntent);
+	    	 }
 	    	 finish();
 	     }
 	 }

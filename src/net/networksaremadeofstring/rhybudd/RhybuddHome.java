@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -49,6 +48,7 @@ public class RhybuddHome extends Activity
 {
 	private SharedPreferences settings = null;
 	private Handler HomeHandler = null, runnablesHandler = null;
+	@SuppressWarnings("unused")
 	private Runnable updateEvents = null, updateDevices = null, updateDeviceDetails = null;
 	private Boolean OneOff = true;
 
@@ -327,7 +327,8 @@ public class RhybuddHome extends Activity
 						}
 						finally
 						{
-							cacheDB.close();
+							if(cacheDB != null && cacheDB.isOpen())
+								cacheDB.close();
 						}
 
 						// Hide progress
