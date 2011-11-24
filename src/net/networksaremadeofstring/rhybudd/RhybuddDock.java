@@ -5,8 +5,10 @@ import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -19,6 +21,7 @@ import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class RhybuddDock extends Activity
 {
@@ -97,8 +101,27 @@ public class RhybuddDock extends Activity
 		ReportsButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent ReportsIntent = new Intent(RhybuddDock.this, rhestr.class);
-				RhybuddDock.this.startActivity(ReportsIntent);
+				AlertDialog.Builder alertbox = new AlertDialog.Builder(RhybuddDock.this);
+		    	 alertbox.setMessage("Reports are not available yet.\nWould you mind answering a short 3 question survey to shape the reporting feature in Rhybudd?");
+
+		    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
+		    	 {
+		             public void onClick(DialogInterface arg0, int arg1) 
+		             {
+		            	 Toast.makeText(RhybuddDock.this, "Thank you!", Toast.LENGTH_SHORT).show();
+		            	 Intent i = new Intent(Intent.ACTION_VIEW);
+		 	        	i.setData(Uri.parse("http://www.surveymonkey.com/s/QM7CWHC"));
+		 	        	startActivity(i);
+		             }
+		    	 });
+
+		         alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
+		         {
+		             public void onClick(DialogInterface arg0, int arg1) 
+		             {
+		             }
+		         });
+		         alertbox.show();
 			}
         });
 	}

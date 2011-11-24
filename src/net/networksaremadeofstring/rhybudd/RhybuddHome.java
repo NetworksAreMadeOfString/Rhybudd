@@ -25,7 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,6 +45,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RhybuddHome extends Activity 
 {
@@ -89,8 +92,31 @@ public class RhybuddHome extends Activity
 		ReportsButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent ReportsIntent = new Intent(RhybuddHome.this, rhestr.class);
-				RhybuddHome.this.startActivity(ReportsIntent);
+				/*Intent ReportsIntent = new Intent(RhybuddHome.this, rhestr.class);
+				RhybuddHome.this.startActivity(ReportsIntent);*/
+				
+				AlertDialog.Builder alertbox = new AlertDialog.Builder(RhybuddHome.this);
+		    	 alertbox.setMessage("Reports are not available yet.\n\nWould you like to help shape the reporting feature in Rhybudd by answering a short 3 question survey?");
+
+		    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
+		    	 {
+		             public void onClick(DialogInterface arg0, int arg1) 
+		             {
+		            	 Toast.makeText(RhybuddHome.this, "Thank you!", Toast.LENGTH_SHORT).show();
+		            	 Intent i = new Intent(Intent.ACTION_VIEW);
+		 	        	i.setData(Uri.parse("http://www.surveymonkey.com/s/QM7CWHC"));
+		 	        	startActivity(i);
+		             }
+		    	 });
+
+		         alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
+		         {
+		             public void onClick(DialogInterface arg0, int arg1) 
+		             {
+		             }
+		         });
+		         alertbox.show();
+				
 			}
         });
 		
