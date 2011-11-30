@@ -35,7 +35,7 @@
     <string name="searchButton">Search</string>
     <string name="searchLabel">Search</string>
     <string name="searchHintDevice">Device Name</string>
-    <string name="searchVoicePromptDevice">For best results use a short single word to describe the name of the device you are searching for.</string>
+    <string name="searchVoicePromptDevice">For best results use a short single word such as the device name.</string>
     
     
     <string name="deviceDetailsTitle">Device Details</string>

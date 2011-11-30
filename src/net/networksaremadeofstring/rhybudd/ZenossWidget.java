@@ -59,8 +59,8 @@ public class ZenossWidget extends AppWidgetProvider
 
 				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
 				Intent intent = new Intent(context, rhestr.class);
-	            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-	            
+				intent.putExtra("forceRefresh", true);
+	            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	            
 				for (int i=0; i<N; i++) 
 		        {

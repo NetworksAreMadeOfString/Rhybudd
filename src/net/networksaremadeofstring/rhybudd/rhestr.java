@@ -38,6 +38,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -109,7 +110,8 @@ public class rhestr extends Activity
     	{
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
 
-    		if(CheckDB())
+    		Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
+    		if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())
     		{
     			DBGetThread();
     		}
