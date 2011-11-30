@@ -181,9 +181,9 @@ public class rhestr extends Activity
     
     private Boolean CheckDB()
     {
-    	rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
     	try
     	{
+    		rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
     		dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
 	    }
 		catch(Exception e)
