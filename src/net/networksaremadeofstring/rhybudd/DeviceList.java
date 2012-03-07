@@ -173,13 +173,23 @@ public class DeviceList extends Activity
     
     private Boolean CheckDB()
     {
-    	rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    	
     	try
     	{
+    		rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
     		dbResults = rhybuddCache.query("devices",new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
     	}
     	catch(Exception e)
     	{
+    		if(rhybuddCache != null && rhybuddCache.isOpen())
+    		{
+    			rhybuddCache.close();
+    		}
+    		if(dbResults != null && dbResults.isClosed() == false)
+    		{
+    			dbResults.close();
+    		}
+    		
     		return false;
     	}
     	
@@ -189,8 +199,14 @@ public class DeviceList extends Activity
     	}
     	else
     	{
-    		rhybuddCache.close();
-    		dbResults.close();
+    		if(rhybuddCache != null && rhybuddCache.isOpen())
+    		{
+    			rhybuddCache.close();
+    		}
+    		if(dbResults != null &&  dbResults.isClosed() == false)
+    		{
+    			dbResults.close();
+    		}
     		return false;
     	}
     }

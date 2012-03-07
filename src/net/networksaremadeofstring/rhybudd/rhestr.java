@@ -183,11 +183,20 @@ public class rhestr extends Activity
     {
     	try
     	{
-    		rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-    		dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
+			rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+			dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
 	    }
 		catch(Exception e)
 		{
+			if(rhybuddCache != null && rhybuddCache.isOpen())
+    		{
+    			rhybuddCache.close();
+    		}
+    		if(dbResults != null && dbResults.isClosed() == false)
+    		{
+    			dbResults.close();
+    		}
+    		
 			return false;
 		}
     	
@@ -198,8 +207,14 @@ public class rhestr extends Activity
     	}
     	else
     	{
-    		rhybuddCache.close();
-    		dbResults.close();
+    		if(rhybuddCache != null && rhybuddCache.isOpen())
+    		{
+    			rhybuddCache.close();
+    		}
+    		if(dbResults != null &&  dbResults.isClosed() == false)
+    		{
+    			dbResults.close();
+    		}
     		return false;
     	}
     }
@@ -266,15 +281,23 @@ public class rhestr extends Activity
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
-    			
+    			SQLiteDatabase cacheDB = null;
 				try 
 				{
 					if(EventsObject != null)
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 						
-						SQLiteDatabase cacheDB = rhestr.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-						cacheDB.delete("events", null, null);
+						try
+						{
+							cacheDB = rhestr.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+							cacheDB.delete("events", null, null);
+						}
+						catch(Exception e)
+						{
+							if(cacheDB != null && cacheDB.isOpen())
+								cacheDB.close();
+						}
 						
 						for(int i = 0; i < EventCount; i++)
 		    			{
@@ -295,7 +318,10 @@ public class rhestr extends Activity
 								values.put("eventState", CurrentEvent.getString("eventState"));
 								values.put("severity", CurrentEvent.getString("severity"));
 								
-			    				cacheDB.insert("events", null, values);
+								if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isDbLockedByCurrentThread() == false && cacheDB.isOpen() == true)
+								{
+									cacheDB.insert("events", null, values);
+								}
 		    				}
 		    				catch (JSONException e) 
 		    				{
