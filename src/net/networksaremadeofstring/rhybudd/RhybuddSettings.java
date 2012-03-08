@@ -27,6 +27,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PixelFormat;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -51,6 +53,14 @@ public class RhybuddSettings extends Activity
 	private PendingIntent mAlarmSender;
 	@SuppressWarnings("unused")
 	private Boolean firstRun = false;
+	
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
+
 	
 	 /** Called when the activity is first created. */
     @Override
@@ -92,6 +102,7 @@ public class RhybuddSettings extends Activity
         }
         
         setContentView(R.layout.settings_basic);
+        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
         
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);

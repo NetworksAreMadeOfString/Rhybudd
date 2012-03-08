@@ -25,12 +25,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
@@ -50,6 +54,13 @@ public class ViewZenossDevice extends Activity
 	ZenossEventsAdaptor adapter;
 	JSONArray Events = null;
 	private int EventCount = 0;
+	
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
 	
 	/** Called when the activity is first created. */
     @Override
@@ -150,7 +161,7 @@ public class ViewZenossDevice extends Activity
 	    						}
 	    						catch(Exception e)
 	    						{
-	    							e.printStackTrace();
+	    	    					//BugSenseHandler.log("ViewZenossDevice", e);
 	    						}
 	    					}
 
@@ -159,7 +170,7 @@ public class ViewZenossDevice extends Activity
     					}
 	    				catch(Exception e)
     					{
-    						//Already got a placeholder
+    						//BugSenseHandler.log("ViewZenossDevice", e);
     					}
 	    				
     					String Systems = "";
@@ -179,6 +190,7 @@ public class ViewZenossDevice extends Activity
 	    				catch(Exception e)
     					{
     						//Already got a placeholder
+	    					BugSenseHandler.log("ViewZenossDevice", e);
     					}
     					
     					//etc
@@ -192,6 +204,7 @@ public class ViewZenossDevice extends Activity
     			catch(Exception e)
     			{
     				Toast.makeText(ViewZenossDevice.this, "An error was encountered parsing the JSON.", Toast.LENGTH_LONG).show();
+    				BugSenseHandler.log("ViewZenossDevice", e);
     			}
     		}
     	};

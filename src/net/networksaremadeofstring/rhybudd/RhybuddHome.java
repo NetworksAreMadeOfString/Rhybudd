@@ -20,10 +20,12 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
 import java.util.Date;
+
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -31,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,8 +43,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -55,6 +58,14 @@ public class RhybuddHome extends Activity
 	private Runnable updateEvents = null, updateDevices = null, updateDeviceDetails = null;
 	private Boolean OneOff = true;
 
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
+
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		settings = getSharedPreferences("rhybudd", 0);

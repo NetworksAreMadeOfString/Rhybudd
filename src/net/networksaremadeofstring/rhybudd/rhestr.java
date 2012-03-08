@@ -24,6 +24,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.bugsense.trace.BugSenseHandler;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -33,6 +36,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,6 +70,13 @@ public class rhestr extends Activity
 	ZenossEventsAdaptor adapter;
 	Cursor dbResults = null;
 	SQLiteDatabase rhybuddCache = null;
+	
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
 	
 	@Override
 	public Object onRetainNonConfigurationInstance() 
@@ -188,6 +199,7 @@ public class rhestr extends Activity
 	    }
 		catch(Exception e)
 		{
+			BugSenseHandler.log("rhestr", e);
 			if(rhybuddCache != null && rhybuddCache.isOpen())
     		{
     			rhybuddCache.close();
@@ -278,6 +290,7 @@ public class rhestr extends Activity
 				} 
     			catch (Exception e) 
     			{
+    				BugSenseHandler.log("rhestr", e);
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
@@ -326,6 +339,7 @@ public class rhestr extends Activity
 		    				catch (JSONException e) 
 		    				{
 		    					//TODO Handle this better - we dont' need to the the user as it's in the loop but we do lose an entire device because of it
+		    					BugSenseHandler.log("rhestr", e);
 		    				}
 		    			}
 						cacheDB.close();
@@ -339,6 +353,7 @@ public class rhestr extends Activity
 				} 
 				catch (JSONException e) 
 				{
+					BugSenseHandler.log("rhestr", e);
 					totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}

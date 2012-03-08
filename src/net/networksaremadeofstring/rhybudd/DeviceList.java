@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,6 +56,13 @@ public class DeviceList extends Activity
 	ZenossDeviceAdaptor adapter = null;
 	Cursor dbResults = null;
 	SQLiteDatabase rhybuddCache = null;
+	
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
 	
 	@Override
 	public Object onRetainNonConfigurationInstance() 
