@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import com.bugsense.trace.BugSenseHandler;
+
 
 public class launcher extends Activity
 {
@@ -33,6 +35,8 @@ public class launcher extends Activity
 		 super.onCreate(savedInstanceState);
 	     settings = getSharedPreferences("rhybudd", 0);
 	     setContentView(R.layout.main);  
+	     
+	     BugSenseHandler.setup(this, "44a76a8c");		
 	     
 		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("DBCreated", false) == false)
 	     {
