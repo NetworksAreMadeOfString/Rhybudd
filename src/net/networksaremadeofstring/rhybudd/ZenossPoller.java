@@ -22,6 +22,7 @@ package net.networksaremadeofstring.rhybudd;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,6 +35,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 public class ZenossPoller extends Service
 {
@@ -48,7 +50,7 @@ public class ZenossPoller extends Service
 	private Runnable runnable;
 	private int NotificationID = 0;
 	private int failureCount = 0;
-	
+	private Boolean onlyAlertOnProd = false;
 	@Override
 	public void onCreate() 
 	{
@@ -64,7 +66,7 @@ public class ZenossPoller extends Service
 			@SuppressWarnings("unused")
 			public void run() 
 			{ 
-				final int Delay = settings.getInt("BackgroundServiceDelay", 30); 
+				final int Delay = settings.getInt("BackgroundServiceDelay", 30);
 				//Log.i("Delay", Integer.toString(Delay)); 
 				CreateThread(); 
 				//handler.postDelayed(this, Delay * 1000); 
@@ -98,9 +100,12 @@ public class ZenossPoller extends Service
 	{
 		Notification notification = new Notification(R.drawable.stat_sys_warning, "New Zenoss Events!", System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.defaults |= Notification.DEFAULT_SOUND;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+		
+		if(settings.getBoolean("notificationSound", true))
+			notification.defaults |= Notification.DEFAULT_SOUND;
+		
 		if(Severity == 5)
 			notification.ledARGB = 0xffff0000;
 		if(Severity == 4)
@@ -129,6 +134,15 @@ public class ZenossPoller extends Service
     	{  
     		public void run() 
     		{
+    			try
+    			{
+    				onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", false);
+    			}
+    			catch(Exception e)
+    			{
+    				//Do nothing for the moment
+    			}
+    			
     			try 
     			{
     				if(API == null)
@@ -168,12 +182,22 @@ public class ZenossPoller extends Service
 						for(int i = 0; i < EventCount; i++)
 		    			{
 		    				JSONObject CurrentEvent = null;
+		    				String ProdState = null;
 		    				ContentValues values = new ContentValues(2);
 		    				try 
 		    				{
 		    					CurrentEvent = Events.getJSONObject(i);
 		    					
-		    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(CurrentEvent.getJSONObject("device").getString("uid")))
+		    					try
+		    					{
+		    						ProdState = CurrentEvent.getString("prodState");
+		    					}
+		    					catch(Exception e)
+		    					{
+		    						ProdState = null;
+		    					}
+		    					
+		    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(ProdState, CurrentEvent.getJSONObject("device").getString("uid")))
 		    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
 		    					
 		    					values.put("EVID", CurrentEvent.getString("evid"));
@@ -218,15 +242,21 @@ public class ZenossPoller extends Service
     	dataPreload.start();
     }
 
-	private Boolean CheckIfNotify(String UID)
+	private Boolean CheckIfNotify(String prodState, String UID)
 	{
+		//We always return true if the device is production as specified by a 4.1 event JSON prodState
+		if(prodState != null && prodState.equals("Production"))
+		{
+			return true;
+		}
+		
 		SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
 		Cursor dbResults = cacheDB.query("devices",new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
 		
 		if(dbResults.moveToFirst())
 		{
-			String prodState = dbResults.getString(1);
-			if(prodState.equals("Production"))
+			String dbProdState = dbResults.getString(1);
+			if(dbProdState.equals("Production"))
 			{
 				dbResults.close();
 				cacheDB.close();
@@ -236,15 +266,28 @@ public class ZenossPoller extends Service
 			{
 				dbResults.close();
 				cacheDB.close();
-				return false;
+				if(onlyAlertOnProd)
+				{
+					return false;
+				}
+				else
+				{
+					return true;
+				}
 			}
 		}
 		else
 		{
-			//We always return true just in case
 			dbResults.close();
 			cacheDB.close();
-			return true;
+			if(onlyAlertOnProd)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 		}
 		
 	}

@@ -170,7 +170,7 @@ public class ZenossAPIv2
     	dataContents.put("uid", "/zport/dmd/Devices");
     	
     	JSONObject params = new JSONObject();
-        params.put("productionState", new JSONArray("[1000]"));
+        //params.put("productionState", new JSONArray("[1000]"));
         dataContents.put("params", params);
         
     	JSONArray data = new JSONArray();

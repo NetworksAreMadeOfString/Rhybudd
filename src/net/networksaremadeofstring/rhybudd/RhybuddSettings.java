@@ -141,6 +141,9 @@ public class RhybuddSettings extends Activity
         if(settings.getBoolean("onlyProductionAlerts", false) == true)
         	((CheckBox) findViewById(R.id.productionOnlyCheckBox)).setChecked(true);
         
+        if(settings.getBoolean("notificationSound", false) == true)
+        	((CheckBox) findViewById(R.id.notificationSoundCheckBox)).setChecked(true);
+        
         BackgroundServiceDelay.setProgress(settings.getInt("BackgroundServiceDelay", 30));
         TextView DelayLabel = (TextView) findViewById(R.id.DelayLabel);
         if(settings.getInt("BackgroundServiceDelay", 30) < 60)
@@ -236,7 +239,7 @@ public class RhybuddSettings extends Activity
                 CheckBox infoCheckBox = (CheckBox) findViewById(R.id.infoCheckBox);
                 CheckBox debugCheckBox = (CheckBox) findViewById(R.id.debugCheckBox);
                 CheckBox productionOnlyCheckBox = (CheckBox) findViewById(R.id.productionOnlyCheckBox);
-                
+                CheckBox notificationSoundCheckBox = (CheckBox) findViewById(R.id.notificationSoundCheckBox);
                 
             	SharedPreferences.Editor editor = settings.edit();
                 editor.putString("URL", urlET.getText().toString());
@@ -254,6 +257,7 @@ public class RhybuddSettings extends Activity
                 editor.putBoolean("SeverityInfo", infoCheckBox.isChecked());
                 editor.putBoolean("SeverityDebug", debugCheckBox.isChecked());
                 editor.putBoolean("onlyProductionAlerts", productionOnlyCheckBox.isChecked());
+                editor.putBoolean("notificationSound", notificationSoundCheckBox.isChecked());
                 
                 Log.i("checkbox",Boolean.toString(warningCheckBox.isChecked()));
                 editor.commit();

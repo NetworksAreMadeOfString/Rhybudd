@@ -10,6 +10,7 @@
     <string name="eventListTitle">Events List</string>
     
     <string name="productionStateNotificationLabel">Only raise alerts for Production devices</string>
+    <string name="notificationSoundLabel">Notification Sound</string>
     
     <string name="mangeDatabaseTitle">Manage Cache</string>
     <string name="mangeDatabaseDBSizeTitle">Current DB Size:</string>
