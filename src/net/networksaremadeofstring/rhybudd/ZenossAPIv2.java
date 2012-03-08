@@ -355,7 +355,7 @@ public class ZenossAPIv2
     	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	Log.i("ZenossEvents -------------> ", json.toString());
+    	//Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
     

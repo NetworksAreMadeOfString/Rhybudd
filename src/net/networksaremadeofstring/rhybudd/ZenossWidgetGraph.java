@@ -74,7 +74,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 					//Intent intent = new Intent(context, rhestr.class);
 			        //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 	    		        
-					Log.i("GraphWidget","Drawing Graph!");
+					//Log.i("GraphWidget","Drawing Graph!");
 					for (int i=0; i<N; i++) 
 			        {
 						int appWidgetId = appWidgetIds[i];
@@ -179,7 +179,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	private Bitmap RenderBarGraph(int CritCount, int ErrCount, int WarnCount)
 	{
 		
-		Log.i("Counts", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " + Integer.toString(WarnCount));
+		//Log.i("Counts", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " + Integer.toString(WarnCount));
 		Bitmap emptyBmap = Bitmap.createBitmap(290,150, Config.ARGB_8888); 
         
 		int width =  emptyBmap.getWidth();

@@ -121,7 +121,7 @@ public class rhestr extends Activity
     	{
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
 
-    		Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
+    		//Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
     		if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())//
     		{
     			DBGetThread();
@@ -311,7 +311,7 @@ public class rhestr extends Activity
 							cacheDB.close();
 							cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READWRITE);
 							cacheDB.delete("events", null, null);
-							Log.i("delete","Deleted Events");
+							//Log.i("delete","Deleted Events");
 						}
 						catch(Exception e)
 						{
@@ -343,12 +343,12 @@ public class rhestr extends Activity
 									
 									if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isOpen() == true && cacheDB.isReadOnly() == false)
 									{
-										Log.i("insert","Doing an insert");
+										//Log.i("insert","Doing an insert");
 										cacheDB.insert("events", null, values);
 									}
 									else
 									{
-										if(cacheDB == null)
+										/*if(cacheDB == null)
 											Log.e("insert","was null");
 										
 										if(cacheDB.isDbLockedByOtherThreads())
@@ -358,7 +358,7 @@ public class rhestr extends Activity
 											Log.e("insert","Was Read only");
 										
 										if(cacheDB.isOpen())
-											Log.e("insert","was open");
+											Log.e("insert","was open");*/
 									}
 			    				}
 			    				catch (JSONException e) 
@@ -372,7 +372,7 @@ public class rhestr extends Activity
 						}
 						else
 						{
-							Log.e("rhestr","We don't have DB lock");
+							//Log.e("rhestr","We don't have DB lock");
 							totalFailure = true;
 		    				handler.sendEmptyMessage(0);
 						}

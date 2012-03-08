@@ -270,7 +270,7 @@ public class RhybuddSettings extends Activity
                 editor.putBoolean("onlyProductionAlerts", productionOnlyCheckBox.isChecked());
                 editor.putBoolean("notificationSound", notificationSoundCheckBox.isChecked());
                 
-                Log.i("checkbox",Boolean.toString(warningCheckBox.isChecked()));
+                //Log.i("checkbox",Boolean.toString(warningCheckBox.isChecked()));
                 editor.commit();
                 
                 mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);

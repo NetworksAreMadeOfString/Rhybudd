@@ -45,7 +45,7 @@ public class RhybuddDock extends Activity
     {
 		/*callingIntent = super.getIntent();
         DockMode = callingIntent.getIntExtra("EXTRA_DOCK_STATE", 9);
-        Log.e("Dock",Integer.toString(DockMode));*/
+        //Log.e("Dock",Integer.toString(DockMode));*/
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.dock);
