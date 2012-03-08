@@ -122,14 +122,14 @@ public class RhybuddSettings extends Activity
         if(settings.getString("passWord", "--").equals("--") == false)
         	passwordET.setText(settings.getString("passWord",""));
         
-        if(settings.getString("pagerDutyURL", "--").equals("--") == false)
+        /*if(settings.getString("pagerDutyURL", "--").equals("--") == false)
         	pagerDutyURL.setText(settings.getString("pagerDutyURL",""));
         
         if(settings.getString("pagerDutyEmail", "--").equals("--") == false)
         	pagerDutyEmail.setText(settings.getString("pagerDutyEmail",""));
         
         if(settings.getString("pagerDutyPass", "--").equals("--") == false)
-        	pagerDutyPass.setText(settings.getString("pagerDutyPass",""));
+        	pagerDutyPass.setText(settings.getString("pagerDutyPass",""));*/
         
         if(settings.getBoolean("AllowBackgroundService", true) == true)
         	((CheckBox) findViewById(R.id.AllowBackgroundService)).setChecked(true);

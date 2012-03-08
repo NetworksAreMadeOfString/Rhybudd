@@ -122,7 +122,7 @@ public class rhestr extends Activity
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
 
     		Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
-    		if(getIntent().getBooleanExtra("forceRefresh", false) == false )//&& CheckDB()
+    		if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())//
     		{
     			DBGetThread();
     		}
@@ -246,17 +246,20 @@ public class rhestr extends Activity
     	{  
     		public void run() 
     		{
-    			while(dbResults.moveToNext())
+    			if(dbResults != null)
     			{
-    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-														   dbResults.getString(3),
-														   dbResults.getString(4), 
-														   dbResults.getString(5),
-														   dbResults.getString(7)));
+	    			while(dbResults.moveToNext())
+	    			{
+	    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+															   dbResults.getString(3),
+															   dbResults.getString(4), 
+															   dbResults.getString(5),
+															   dbResults.getString(7)));
+	    			}
+	    			
+	    			rhybuddCache.close();
+	        		dbResults.close();
     			}
-    			
-    			rhybuddCache.close();
-        		dbResults.close();
     			handler.sendEmptyMessage(0);
     		}
     	};
