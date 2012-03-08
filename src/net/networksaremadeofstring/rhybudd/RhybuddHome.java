@@ -106,7 +106,8 @@ public class RhybuddHome extends Activity
 				/*Intent ReportsIntent = new Intent(RhybuddHome.this, rhestr.class);
 				RhybuddHome.this.startActivity(ReportsIntent);*/
 				
-				AlertDialog.Builder alertbox = new AlertDialog.Builder(RhybuddHome.this);
+				Toast.makeText(RhybuddHome.this, "Survey is complete. Reports will be in the next feature release!", Toast.LENGTH_LONG).show();
+				/*AlertDialog.Builder alertbox = new AlertDialog.Builder(RhybuddHome.this);
 		    	 alertbox.setMessage("Reports are not available yet.\n\nWould you like to help shape the reporting feature in Rhybudd by answering a short 3 question survey?");
 
 		    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
@@ -126,7 +127,7 @@ public class RhybuddHome extends Activity
 		             {
 		             }
 		         });
-		         alertbox.show();
+		         alertbox.show();*/
 				
 			}
         });

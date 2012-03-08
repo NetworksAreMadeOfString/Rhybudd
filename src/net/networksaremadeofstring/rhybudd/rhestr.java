@@ -371,9 +371,9 @@ public class rhestr extends Activity
     public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
     {
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-    	 alertbox.setMessage("Acknowledge Event?");
+    	 alertbox.setMessage("What would you like to do?");
 
-    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
+    	 alertbox.setPositiveButton("Ack Event", new DialogInterface.OnClickListener() 
     	 {
              public void onClick(DialogInterface arg0, int arg1) 
              {
@@ -401,7 +401,15 @@ public class rhestr extends Activity
              }
     	 });
 
-         alertbox.setNegativeButton("No", new DialogInterface.OnClickListener() 
+    	 alertbox.setNeutralButton("View Event", new DialogInterface.OnClickListener() 
+         {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
+            	 ViewEvent(EventID);
+             }
+         });
+         
+         alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener() 
          {
              public void onClick(DialogInterface arg0, int arg1) 
              {
