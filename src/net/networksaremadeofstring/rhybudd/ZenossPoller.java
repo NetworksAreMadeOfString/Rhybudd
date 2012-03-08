@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2011 - Gareth Llewellyn
+* Copyright (C) 2012 - Gareth Llewellyn
 *
 * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
 *
@@ -51,12 +51,11 @@ public class ZenossPoller extends Service
 	private int NotificationID = 0;
 	private int failureCount = 0;
 	private Boolean onlyAlertOnProd = false;
+	private SQLiteDatabase cacheDB;
 	@Override
 	public void onCreate() 
 	{
 		settings = getSharedPreferences("rhybudd", 0);
-
-		//Log.d("Service", "onCreate");
 		
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
@@ -67,9 +66,7 @@ public class ZenossPoller extends Service
 			public void run() 
 			{ 
 				final int Delay = settings.getInt("BackgroundServiceDelay", 30);
-				//Log.i("Delay", Integer.toString(Delay)); 
 				CreateThread(); 
-				//handler.postDelayed(this, Delay * 1000); 
 			} 
 		}; 
 		runnable.run();
@@ -78,8 +75,6 @@ public class ZenossPoller extends Service
 	@Override
 	public void onDestroy() 
 	{
-		//Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
-		//Log.d("Service", "onDestroy");
 		handler.removeCallbacks(runnable);
 	}
 	
@@ -87,7 +82,6 @@ public class ZenossPoller extends Service
 	public void onStart(Intent intent, int startid) 
 	{
 		//Log.d("Service", "onStart");
-		//SendNotification("Zenoss Poller Background task started.",5);
 	}
 	
 	@Override
@@ -117,10 +111,10 @@ public class ZenossPoller extends Service
 		
 		notification.ledOnMS = 300;
 		notification.ledOffMS = 1000;
-
 		
 		Context context = getApplicationContext();
 		Intent notificationIntent = new Intent(this, rhestr.class);
+		notificationIntent.putExtra("forceRefresh", true);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Rhybudd Notification", EventSummary, contentIntent);
 		mNM.notify(NotificationID++, notification);
@@ -128,20 +122,11 @@ public class ZenossPoller extends Service
 	
 	private void CreateThread()
     {
-		//Log.i("Service","Create Thread Called");
-		
     	dataPreload = new Thread() 
     	{  
     		public void run() 
     		{
-    			try
-    			{
-    				onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", false);
-    			}
-    			catch(Exception e)
-    			{
-    				//Do nothing for the moment
-    			}
+    			onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", false);
     			
     			try 
     			{
@@ -155,12 +140,12 @@ public class ZenossPoller extends Service
 							settings.getBoolean("SeverityDebug", false));
 					
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
+	    			EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 	    			failureCount = 0;
 				} 
     			catch (Exception e) 
     			{
     				failureCount++;
-    				//Log.e("Service", "Failure Count: " + Integer.toString(failureCount));
     				
     				if(failureCount > 10)
     				{
@@ -168,54 +153,120 @@ public class ZenossPoller extends Service
     					stopSelf();
     				}
 				}
+
+    			if(Events != null)
+				{
+    				for(int i = 0; i < EventCount; i++)
+	    			{
+	    				JSONObject CurrentEvent = null;
+	    				String ProdState = null;
+	    				ContentValues values = new ContentValues(2);
+	    				try 
+	    				{
+	    					CurrentEvent = Events.getJSONObject(i);
+	    					
+	    					try
+	    					{
+	    						ProdState = CurrentEvent.getString("prodState");
+	    					}
+	    					catch(Exception e)
+	    					{
+	    						ProdState = null;
+	    					}
+	    					
+	    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(ProdState, CurrentEvent.getJSONObject("device").getString("uid")))
+	    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
+		
+	    				}
+	    				catch (JSONException e) 
+	    				{
+	    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+	    					//SendNotification("Background service failed",5);
+	    					//stopSelf();
+	    					//failureCount++;
+	    				}
+	    			}
+				}
+    			else
+    			{
+    				//Log.e("Service", "EventsObject was null");
+    			}
     			
-    			
-				try 
+				/*try 
 				{
 					if(EventsObject != null)
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 						
-						SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-						cacheDB.delete("events", null, null);
 						
-						for(int i = 0; i < EventCount; i++)
-		    			{
-		    				JSONObject CurrentEvent = null;
-		    				String ProdState = null;
-		    				ContentValues values = new ContentValues(2);
-		    				try 
-		    				{
-		    					CurrentEvent = Events.getJSONObject(i);
-		    					
-		    					try
-		    					{
-		    						ProdState = CurrentEvent.getString("prodState");
-		    					}
-		    					catch(Exception e)
-		    					{
-		    						ProdState = null;
-		    					}
-		    					
-		    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(ProdState, CurrentEvent.getJSONObject("device").getString("uid")))
-		    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
-		    					
-		    					values.put("EVID", CurrentEvent.getString("evid"));
-								values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-								values.put("summary", CurrentEvent.getString("summary"));
-								values.put("eventState", CurrentEvent.getString("eventState"));
-								values.put("severity", CurrentEvent.getString("severity"));
-								
-			    				cacheDB.insert("events", null, values);
-		    				}
-		    				catch (JSONException e) 
-		    				{
-		    					//Log.e("API - Stage 2 - Inner", e.getMessage());
-		    					//SendNotification("Background service failed",5);
-		    					//stopSelf();
-		    					//failureCount++;
-		    				}
-		    			}
+						//SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+						cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
+						
+						Boolean dbLocked = true;
+						for(int i = 0; i < 10; i++)
+						{
+							if(cacheDB.isDbLockedByOtherThreads())
+							{
+								try 
+								{
+									dataPreload.sleep(500);
+								} 
+								catch (InterruptedException e) 
+								{
+									//Do nothing
+								}
+							}
+							else
+							{
+								cacheDB.close();
+								cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READWRITE);
+								dbLocked = false;
+								break;
+							}
+						}
+						
+						if(dbLocked == false && cacheDB.isDbLockedByCurrentThread())
+						{
+							cacheDB.delete("events", null, null);
+							
+							for(int i = 0; i < EventCount; i++)
+			    			{
+			    				JSONObject CurrentEvent = null;
+			    				String ProdState = null;
+			    				ContentValues values = new ContentValues(2);
+			    				try 
+			    				{
+			    					CurrentEvent = Events.getJSONObject(i);
+			    					
+			    					try
+			    					{
+			    						ProdState = CurrentEvent.getString("prodState");
+			    					}
+			    					catch(Exception e)
+			    					{
+			    						ProdState = null;
+			    					}
+			    					
+			    					if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(ProdState, CurrentEvent.getJSONObject("device").getString("uid")))
+			    						SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
+			    					
+			    					values.put("EVID", CurrentEvent.getString("evid"));
+									values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+									values.put("summary", CurrentEvent.getString("summary"));
+									values.put("eventState", CurrentEvent.getString("eventState"));
+									values.put("severity", CurrentEvent.getString("severity"));
+									
+				    				cacheDB.insert("events", null, values);
+			    				}
+			    				catch (JSONException e) 
+			    				{
+			    					//Log.e("API - Stage 2 - Inner", e.getMessage());
+			    					//SendNotification("Background service failed",5);
+			    					//stopSelf();
+			    					//failureCount++;
+			    				}
+			    			}
+						}
 						cacheDB.close();
 						cacheDB = null;
 					}
@@ -223,22 +274,25 @@ public class ZenossPoller extends Service
 					{
 						//Might consider this a full failure?
 						//failureCount++;
+						cacheDB.close();
+						cacheDB = null;
 					}
 				} 
 				catch (JSONException e) 
 				{
 					//SendNotification("Background service failed",5);
 					//stopSelf();
+					cacheDB.close();
+					cacheDB = null;
 					failureCount++;
-				}
+				}*/
 				
 				//At this point it might be a good idea to set stuff we don't need
 				//anymore to null so GC can collect it
-				
+    			Events = null;
 				ZenossPoller.this.stopSelf();
     		}
     	};
-    	
     	dataPreload.start();
     }
 

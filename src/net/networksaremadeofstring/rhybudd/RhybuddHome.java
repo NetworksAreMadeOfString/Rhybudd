@@ -27,9 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,6 +37,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -374,6 +373,9 @@ public class RhybuddHome extends Activity
 
 						// Try again later if the app is still live
 						runnablesHandler.postDelayed(this, 3604000);// 1 hour
+						
+						if(cacheDB.isOpen())
+							cacheDB.close();
 					}
 				};
 				devicesRefreshThread.start();
@@ -427,8 +429,11 @@ public class RhybuddHome extends Activity
 									ContentValues values = new ContentValues(2);
 									try 
 									{
+										
 										CurrentEvent = Events.getJSONObject(i);
-
+										
+										//Log.i("evi",CurrentEvent.getString("evid"));
+										
 										values.put("EVID",CurrentEvent.getString("evid"));
 										values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
 										values.put("summary", CurrentEvent.getString("summary"));

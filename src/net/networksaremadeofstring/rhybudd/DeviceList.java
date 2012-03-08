@@ -184,7 +184,7 @@ public class DeviceList extends Activity
     	
     	try
     	{
-    		rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    		rhybuddCache = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
     		dbResults = rhybuddCache.query("devices",new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
     	}
     	catch(Exception e)

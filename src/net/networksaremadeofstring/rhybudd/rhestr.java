@@ -122,7 +122,7 @@ public class rhestr extends Activity
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
 
     		Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
-    		if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())
+    		if(getIntent().getBooleanExtra("forceRefresh", false) == false )//&& CheckDB()
     		{
     			DBGetThread();
     		}
@@ -194,7 +194,8 @@ public class rhestr extends Activity
     {
     	try
     	{
-			rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+			//rhybuddCache = this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+    		rhybuddCache = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
 			dbResults = rhybuddCache.query("events",new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"},null, null, null, null, null);
 	    }
 		catch(Exception e)
@@ -294,62 +295,94 @@ public class rhestr extends Activity
     				totalFailure = true;
     				handler.sendEmptyMessage(0);
 				}
-    			SQLiteDatabase cacheDB = null;
 				try 
 				{
+					
+					SQLiteDatabase cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
 					if(EventsObject != null)
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 						
 						try
 						{
-							cacheDB = rhestr.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+							cacheDB.close();
+							cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READWRITE);
 							cacheDB.delete("events", null, null);
+							Log.i("delete","Deleted Events");
 						}
 						catch(Exception e)
 						{
-							if(cacheDB != null && cacheDB.isOpen())
+							BugSenseHandler.log("rhestr", e);
+							if(cacheDB != null && cacheDB.isOpen() && !cacheDB.isDbLockedByOtherThreads())
 								cacheDB.close();
 						}
 						
-						for(int i = 0; i < EventCount; i++)
-		    			{
-		    				JSONObject CurrentEvent = null;
-		    				ContentValues values = new ContentValues(2);
-		    				try 
-		    				{
-			    				CurrentEvent = Events.getJSONObject(i);
-			    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
-											    						CurrentEvent.getJSONObject("device").getString("text"),
-											    						CurrentEvent.getString("summary"), 
-											    						CurrentEvent.getString("eventState"),
-											    						CurrentEvent.getString("severity")));
-			    				
-			    				values.put("EVID", CurrentEvent.getString("evid"));
-								values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-								values.put("summary", CurrentEvent.getString("summary"));
-								values.put("eventState", CurrentEvent.getString("eventState"));
-								values.put("severity", CurrentEvent.getString("severity"));
-								
-								if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isDbLockedByCurrentThread() == false && cacheDB.isOpen() == true)
-								{
-									cacheDB.insert("events", null, values);
-								}
-		    				}
-		    				catch (JSONException e) 
-		    				{
-		    					//TODO Handle this better - we dont' need to the the user as it's in the loop but we do lose an entire device because of it
-		    					BugSenseHandler.log("rhestr", e);
-		    				}
-		    			}
-						cacheDB.close();
-						handler.sendEmptyMessage(0);
+						if(true)//hack
+						{
+							for(int i = 0; i < EventCount; i++)
+			    			{
+			    				JSONObject CurrentEvent = null;
+			    				ContentValues values = new ContentValues(2);
+			    				try 
+			    				{
+				    				CurrentEvent = Events.getJSONObject(i);
+				    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+												    						CurrentEvent.getJSONObject("device").getString("text"),
+												    						CurrentEvent.getString("summary"), 
+												    						CurrentEvent.getString("eventState"),
+												    						CurrentEvent.getString("severity")));
+				    				
+				    				values.put("EVID", CurrentEvent.getString("evid"));
+									values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+									values.put("summary", CurrentEvent.getString("summary"));
+									values.put("eventState", CurrentEvent.getString("eventState"));
+									values.put("severity", CurrentEvent.getString("severity"));
+									
+									if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isOpen() == true && cacheDB.isReadOnly() == false)
+									{
+										Log.i("insert","Doing an insert");
+										cacheDB.insert("events", null, values);
+									}
+									else
+									{
+										if(cacheDB == null)
+											Log.e("insert","was null");
+										
+										if(cacheDB.isDbLockedByOtherThreads())
+											Log.e("insert","Locked by other thread");
+										
+										if(cacheDB.isReadOnly())
+											Log.e("insert","Was Read only");
+										
+										if(cacheDB.isOpen())
+											Log.e("insert","was open");
+									}
+			    				}
+			    				catch (JSONException e) 
+			    				{
+			    					//TODO Handle this better - we dont' need to the the user as it's in the loop but we do lose an entire device because of it
+			    					BugSenseHandler.log("rhestr", e);
+			    				}
+			    			}
+							cacheDB.close();
+							handler.sendEmptyMessage(0);
+						}
+						else
+						{
+							Log.e("rhestr","We don't have DB lock");
+							totalFailure = true;
+		    				handler.sendEmptyMessage(0);
+						}
 					}
 					else
 					{
 						totalFailure = true;
 	    				handler.sendEmptyMessage(0);
 					}
+				
+					if(cacheDB.isOpen())
+						cacheDB.close();
+					
 				} 
 				catch (JSONException e) 
 				{
