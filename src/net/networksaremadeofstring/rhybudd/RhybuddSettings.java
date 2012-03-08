@@ -30,6 +30,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -90,7 +91,7 @@ public class RhybuddSettings extends Activity
     		ProcessDatabase.start();
         }
         
-        setContentView(R.layout.settings);
+        setContentView(R.layout.settings_basic);
         
         EditText urlET = (EditText) findViewById(R.id.ZenossURL);
         EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
@@ -223,9 +224,9 @@ public class RhybuddSettings extends Activity
                 EditText nameET = (EditText) findViewById(R.id.ZenossUserName);
                 EditText passwordET = (EditText) findViewById(R.id.ZenossPassword);
                 
-                EditText pagerDutyURL = (EditText) findViewById(R.id.PagerDutyURL);
+                /*EditText pagerDutyURL = (EditText) findViewById(R.id.PagerDutyURL);
                 EditText pagerDutyEmail = (EditText) findViewById(R.id.PagerDutyEmailAddress);
-                EditText pagerDutyPass = (EditText) findViewById(R.id.PagerDutyPassword);
+                EditText pagerDutyPass = (EditText) findViewById(R.id.PagerDutyPassword);*/
                 CheckBox BackgroundService = (CheckBox) findViewById(R.id.AllowBackgroundService);
                 SeekBar BackgroundServiceDelay = (SeekBar) findViewById(R.id.BackgroundServiceDelay);
                 
@@ -241,9 +242,9 @@ public class RhybuddSettings extends Activity
                 editor.putString("URL", urlET.getText().toString());
                 editor.putString("userName", nameET.getText().toString());
                 editor.putString("passWord", passwordET.getText().toString());
-                editor.putString("pagerDutyURL", pagerDutyURL.getText().toString());
+                /*editor.putString("pagerDutyURL", pagerDutyURL.getText().toString());
                 editor.putString("pagerDutyEmail", pagerDutyEmail.getText().toString());
-                editor.putString("pagerDutyPass", pagerDutyPass.getText().toString());
+                editor.putString("pagerDutyPass", pagerDutyPass.getText().toString());*/
                 editor.putBoolean("AllowBackgroundService", BackgroundService.isChecked());
                 editor.putInt("BackgroundServiceDelay", BackgroundServiceDelay.getProgress());
                 
@@ -254,6 +255,7 @@ public class RhybuddSettings extends Activity
                 editor.putBoolean("SeverityDebug", debugCheckBox.isChecked());
                 editor.putBoolean("onlyProductionAlerts", productionOnlyCheckBox.isChecked());
                 
+                Log.i("checkbox",Boolean.toString(warningCheckBox.isChecked()));
                 editor.commit();
                 
                 mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);
