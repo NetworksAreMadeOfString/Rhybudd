@@ -164,7 +164,7 @@ public class ZenossAPIv2
 		
 		JSONObject dataContents = new JSONObject();
     	dataContents.put("start", 0);
-    	dataContents.put("limit", 150);
+    	dataContents.put("limit", 500);
     	dataContents.put("dir", "ASC");
     	dataContents.put("sort", "name");
     	dataContents.put("uid", "/zport/dmd/Devices");
