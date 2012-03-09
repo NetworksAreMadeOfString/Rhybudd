@@ -166,6 +166,9 @@ public class rhestr extends Activity
     			else
     			{
     				UpdateErrorMessage("There was a problem fetching the events list",true);
+    				
+    				if(msg.what == 1)
+    					Toast.makeText(rhestr.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
     			}
     		}
     	};
@@ -200,7 +203,7 @@ public class rhestr extends Activity
 	    }
 		catch(Exception e)
 		{
-			BugSenseHandler.log("rhestr", e);
+			//BugSenseHandler.log("rhestr", e);
 			if(rhybuddCache != null && rhybuddCache.isOpen())
     		{
     			rhybuddCache.close();
@@ -292,6 +295,11 @@ public class rhestr extends Activity
     				
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
 				} 
+    			catch (org.apache.http.conn.ConnectTimeoutException e)
+    			{
+    				totalFailure = true;
+    				handler.sendEmptyMessage(1);
+    			}
     			catch (Exception e) 
     			{
     				BugSenseHandler.log("rhestr", e);
@@ -301,14 +309,15 @@ public class rhestr extends Activity
 				try 
 				{
 					
-					SQLiteDatabase cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
+					SQLiteDatabase cacheDB = null;
 					if(EventsObject != null)
 					{
 						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
 						
 						try
 						{
-							cacheDB.close();
+							//cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
+							//cacheDB.close();
 							cacheDB = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READWRITE);
 							cacheDB.delete("events", null, null);
 							//Log.i("delete","Deleted Events");
@@ -318,6 +327,10 @@ public class rhestr extends Activity
 							BugSenseHandler.log("rhestr", e);
 							if(cacheDB != null && cacheDB.isOpen() && !cacheDB.isDbLockedByOtherThreads())
 								cacheDB.close();
+						}
+						finally
+						{
+							//Do nothing
 						}
 						
 						if(true)//hack
@@ -335,30 +348,21 @@ public class rhestr extends Activity
 												    						CurrentEvent.getString("eventState"),
 												    						CurrentEvent.getString("severity")));
 				    				
-				    				values.put("EVID", CurrentEvent.getString("evid"));
-									values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-									values.put("summary", CurrentEvent.getString("summary"));
-									values.put("eventState", CurrentEvent.getString("eventState"));
-									values.put("severity", CurrentEvent.getString("severity"));
-									
-									if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isOpen() == true && cacheDB.isReadOnly() == false)
+									try
 									{
-										//Log.i("insert","Doing an insert");
-										cacheDB.insert("events", null, values);
+										if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isOpen() == true && cacheDB.isReadOnly() == false)
+										{
+											values.put("EVID", CurrentEvent.getString("evid"));
+											values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
+											values.put("summary", CurrentEvent.getString("summary"));
+											values.put("eventState", CurrentEvent.getString("eventState"));
+											values.put("severity", CurrentEvent.getString("severity"));
+											cacheDB.insert("events", null, values);
+										}
 									}
-									else
+									catch(Exception e)
 									{
-										/*if(cacheDB == null)
-											Log.e("insert","was null");
-										
-										if(cacheDB.isDbLockedByOtherThreads())
-											Log.e("insert","Locked by other thread");
-										
-										if(cacheDB.isReadOnly())
-											Log.e("insert","Was Read only");
-										
-										if(cacheDB.isOpen())
-											Log.e("insert","was open");*/
+										BugSenseHandler.log("rhestr", e);
 									}
 			    				}
 			    				catch (JSONException e) 
@@ -367,7 +371,9 @@ public class rhestr extends Activity
 			    					BugSenseHandler.log("rhestr", e);
 			    				}
 			    			}
-							cacheDB.close();
+							if(cacheDB != null && cacheDB.isOpen())
+								cacheDB.close();
+							
 							handler.sendEmptyMessage(0);
 						}
 						else
@@ -383,7 +389,7 @@ public class rhestr extends Activity
 	    				handler.sendEmptyMessage(0);
 					}
 				
-					if(cacheDB.isOpen())
+					if(cacheDB != null && cacheDB.isOpen())
 						cacheDB.close();
 					
 				} 

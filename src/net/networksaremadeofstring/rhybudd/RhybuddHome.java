@@ -374,7 +374,7 @@ public class RhybuddHome extends Activity
 						// Try again later if the app is still live
 						runnablesHandler.postDelayed(this, 3604000);// 1 hour
 						
-						if(cacheDB.isOpen())
+						if(cacheDB != null && cacheDB.isOpen())
 							cacheDB.close();
 					}
 				};

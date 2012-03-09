@@ -99,7 +99,7 @@ public class ViewZenossDevice extends Activity
     			dialog.dismiss();
     			try
     			{
-    				if(DeviceObject.getJSONObject("result").getBoolean("success") == true)
+    				if(DeviceObject != null && msg.what == 1 && DeviceObject.getJSONObject("result").getBoolean("success") == true)
     				{
     					DeviceDetails = DeviceObject.getJSONObject("result").getJSONObject("data");
     					

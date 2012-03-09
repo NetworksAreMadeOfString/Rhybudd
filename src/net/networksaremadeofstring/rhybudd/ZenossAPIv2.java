@@ -267,7 +267,12 @@ public class ZenossAPIv2
         	SeverityLevels += "1,";
         
         //Remove last comma
-		return this.GetEvents(SeverityLevels.substring(0, SeverityLevels.length() - 1));
+        if(SeverityLevels.length() > 1)
+        {
+        	SeverityLevels = SeverityLevels.substring(0, SeverityLevels.length() - 1);
+        }
+        
+		return this.GetEvents(SeverityLevels);
 	}
 	
     @SuppressWarnings("unchecked")
