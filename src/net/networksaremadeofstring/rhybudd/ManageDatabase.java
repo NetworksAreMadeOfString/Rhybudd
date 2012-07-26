@@ -19,7 +19,10 @@
 
 package net.networksaremadeofstring.rhybudd;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,21 +40,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManageDatabase extends Activity
+public class ManageDatabase extends SherlockActivity
 {
 	//private SharedPreferences settings = null;
 	Thread FlushDBThread;
 	Handler UIUpdate;
-	
+	ActionBar actionbar;
 	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
        // settings = getSharedPreferences("rhybudd", 0);
         
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.manage_database);
-        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
+        actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setHomeButtonEnabled(true);
 
         ((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybuddCache").length()) + "bytes");
         
@@ -140,4 +144,18 @@ public class ManageDatabase extends Activity
         });
         
     }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	            // app icon in action bar clicked; go home
+	            Intent intent = new Intent(this, RhybuddHome.class);
+	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	            startActivity(intent);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
 }

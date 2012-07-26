@@ -1,0 +1,4 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/save_settings" android:title="Save Settings" android:showAsAction="always|withText" android:titleCondensed="Save" android:icon="@drawable/ic_action_save"></item>
+    </menu>

@@ -32,7 +32,10 @@ import java.util.TimeZone;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -40,6 +43,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
@@ -68,8 +72,7 @@ public class ZenossAPIv2
     private int reqCount = 1;
     private boolean LoginSuccessful = false;
     
-	// Constructor logs in to the Zenoss instance (getting the auth cookie)
-    public ZenossAPIv2(String UserName, String Password, String URL) throws Exception 
+    public ZenossAPIv2(String UserName, String Password, String URL, String BAUser, String BAPassword) throws Exception 
     {
     	if(URL.contains("https://"))
     	{
@@ -78,6 +81,14 @@ public class ZenossAPIv2
     	else
     	{
     		httpclient = new DefaultHttpClient();
+    	}
+    	
+    	if(!BAUser.equals("") || !BAPassword.equals(""))
+    	{
+    		Log.i("Auth","We have some auth credentials");
+    		CredentialsProvider credProvider = new BasicCredentialsProvider();
+    	    credProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(BAUser, BAPassword));
+    	    httpclient.setCredentialsProvider(credProvider);
     	}
     	
     	//Log.i("Constructor","Entering constructor");
@@ -100,6 +111,12 @@ public class ZenossAPIv2
         this.ZENOSS_INSTANCE = URL;
         this.ZENOSS_USERNAME = UserName;
         this.ZENOSS_PASSWORD = Password;
+    }
+    
+	// Constructor logs in to the Zenoss instance (getting the auth cookie)
+    public ZenossAPIv2(String UserName, String Password, String URL) throws Exception 
+    {
+    	this(UserName,Password,URL,"", "");
     }
     
     private void PrepareSSLHTTPClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
@@ -283,7 +300,7 @@ public class ZenossAPIv2
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
-    	
+
     	JSONObject dataContents = new JSONObject();
     	dataContents.put("start", 0);
     	dataContents.put("limit", 100);

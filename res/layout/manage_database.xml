@@ -1,10 +1,13 @@
 <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#929ba4">
-	<RelativeLayout android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:id="@+id/HomeHeader" android:background="@drawable/home_title_tile" android:gravity="top" android:layout_height="65px">
-		<TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_alignParentLeft="true" android:id="@+id/HomeHeaderTitle" android:textSize="32dp" android:layout_marginLeft="12dp" android:text="@string/mangeDatabaseTitle"></TextView>
-		<ProgressBar android:layout_width="wrap_content" style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content" android:id="@+id/progressBar1" android:layout_alignBottom="@+id/HomeHeaderTitle" android:layout_alignParentRight="true" android:layout_marginRight="8dp" android:visibility="invisible"></ProgressBar>
-		<TextView android:textSize="10dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/CurrentTaskLabel" android:layout_height="wrap_content" android:layout_alignBottom="@+id/progressBar1" android:layout_toLeftOf="@+id/progressBar1" android:visibility="invisible" android:text="Flushing cache"></TextView>
-	</RelativeLayout>
-	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/HomeHeader" android:layout_alignParentLeft="true" android:id="@+id/sizeLabel" android:text="@string/mangeDatabaseDBSizeTitle"></TextView>
+
+	<TextView
+	    android:id="@+id/sizeLabel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:text="@string/mangeDatabaseDBSizeTitle"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+</TextView>
 	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/sizeLabel" android:layout_alignBottom="@+id/sizeLabel" android:layout_toRightOf="@+id/sizeLabel" android:layout_marginLeft="22dp" android:id="@+id/dbSize" android:text="0bytes"></TextView>
 	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_refresh" android:layout_width="wrap_content" android:layout_below="@+id/sizeLabel" android:layout_alignParentLeft="true" android:id="@+id/refreshCacheImageView" android:layout_marginLeft="10dp" android:layout_marginTop="10dp"></ImageView>
 	<TextView android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/RefreshLabel" android:layout_alignLeft="@+id/RefreshLabel" android:id="@+id/refreshDesc" android:text="@string/refreshDesc" android:textColor="#FFFFFF" android:layout_marginLeft="8dp"></TextView>

@@ -1,7 +1,87 @@
-<RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:paddingBottom="4px" android:paddingTop="4px">
-        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/severity_info" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/SeverityImageView" android:layout_marginLeft="4px" android:layout_marginTop="4px"></ImageView>
-        <TextView android:text="TextView" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/SeverityImageView" android:id="@+id/DeviceName" android:layout_marginLeft="10px" android:textStyle="bold" android:layout_marginTop="4px" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
-        <TextView android:text="TextView" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/SeverityImageView" android:layout_alignParentLeft="true" android:id="@+id/EventSummary" android:layout_marginLeft="4px" android:layout_marginBottom="6px" android:textColor="#FFFFFF" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
-        <ImageView android:src="@drawable/nack" android:id="@+id/AckImage" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_centerVertical="true" android:layout_alignParentRight="true"></ImageView>
-        <ProgressBar style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/inProgressBar" android:indeterminate="true" android:layout_centerVertical="true" android:layout_alignParentRight="true"></ProgressBar>
-    </RelativeLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="4px"
+    android:paddingTop="4px" >
+
+    <ImageView
+        android:id="@+id/AckImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/nack" >
+    </ImageView>
+
+    <ProgressBar
+        android:id="@+id/inProgressBar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:indeterminate="true" >
+    </ProgressBar>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="6dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:id="@+id/SeverityImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/severity_info" />
+
+        <ToggleButton
+            android:id="@+id/cabSelect"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/rhybudd_selector"
+            android:textOn="@string/empty"
+            android:textOff="@string/empty" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/DeviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/inProgressBar"
+        android:layout_toRightOf="@+id/linearLayout1"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="TextView"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/EventSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/DeviceName"
+        android:layout_alignRight="@+id/DeviceName"
+        android:layout_below="@+id/DeviceName"
+        android:layout_marginBottom="8dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="TextView"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#FFFFFF" />
+
+</RelativeLayout>

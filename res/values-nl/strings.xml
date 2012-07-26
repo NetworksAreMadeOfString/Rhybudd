@@ -35,7 +35,7 @@
     <string name="searchLabel">Zoeken</string>
     <string name="searchHintDevice">Apparaatnaam</string>
     <string name="searchVoicePromptDevice">Voor het beste resultaat gebruik maken van een korte enkel woord om de naam van het apparaat dat u zoekt te beschrijven.</string>
-    
+    <string name="empty"></string>
     
     <string name="deviceDetailsTitle">Apparaat Details</string>
     <string name="deviceDetailsOSModelLabel">OS Modeling:</string>

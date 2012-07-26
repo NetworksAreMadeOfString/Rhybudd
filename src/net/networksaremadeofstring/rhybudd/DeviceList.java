@@ -114,15 +114,14 @@ public class DeviceList extends Activity
     	{
     		listOfZenossDevices = new ArrayList<ZenossDevice>();
 
-    		if(CheckDB())
+    		/*if(CheckDB())
     		{
-    			//Log.i("CheckDB","We have data!");
     			DBGetDevices();
     		}
     		else
-    		{
+    		{*/
     			GetDevices();
-    		}
+    		//}
     	}
     	else
     	{

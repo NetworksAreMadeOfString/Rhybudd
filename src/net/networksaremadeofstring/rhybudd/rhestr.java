@@ -122,15 +122,15 @@ public class rhestr extends Activity
     		listOfZenossEvents = new ArrayList<ZenossEvent>();
 
     		//Log.i("Intent",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
-    		if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())//
+    		/*if(getIntent().getBooleanExtra("forceRefresh", false) == false && CheckDB())//
     		{
     			DBGetThread();
     		}
     		else
-    		{
+    		{*/
     			CreateThread();
     			dataPreload.start();
-    		}
+    		//}
     	}
     	else
     	{

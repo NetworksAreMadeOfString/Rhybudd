@@ -20,7 +20,8 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.text.DecimalFormat;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -43,7 +44,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RhybuddSettings extends Activity
+public class RhybuddSettings extends SherlockActivity
 {
 	private SharedPreferences settings = null;
 	ProgressDialog dialog;
@@ -74,7 +75,8 @@ public class RhybuddSettings extends Activity
 
         if(getIntent().getBooleanExtra("firstRun", false))
         {
-        	Thread ProcessDatabase = new Thread() 
+        	RhybuddDatabase rhybuddCache = new RhybuddDatabase(this);
+        	/*Thread ProcessDatabase = new Thread() 
     		{  
     			public void run() 
     			{
@@ -98,7 +100,7 @@ public class RhybuddSettings extends Activity
     			}
     		};
     		
-    		ProcessDatabase.start();
+    		ProcessDatabase.start();*/
         }
         
         setContentView(R.layout.settings_basic);
@@ -121,16 +123,7 @@ public class RhybuddSettings extends Activity
         
         if(settings.getString("passWord", "--").equals("--") == false)
         	passwordET.setText(settings.getString("passWord",""));
-        
-        /*if(settings.getString("pagerDutyURL", "--").equals("--") == false)
-        	pagerDutyURL.setText(settings.getString("pagerDutyURL",""));
-        
-        if(settings.getString("pagerDutyEmail", "--").equals("--") == false)
-        	pagerDutyEmail.setText(settings.getString("pagerDutyEmail",""));
-        
-        if(settings.getString("pagerDutyPass", "--").equals("--") == false)
-        	pagerDutyPass.setText(settings.getString("pagerDutyPass",""));*/
-        
+
         if(settings.getBoolean("AllowBackgroundService", true) == true)
         	((CheckBox) findViewById(R.id.AllowBackgroundService)).setChecked(true);
         
@@ -273,10 +266,10 @@ public class RhybuddSettings extends Activity
                 //Log.i("checkbox",Boolean.toString(warningCheckBox.isChecked()));
                 editor.commit();
                 
-                mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);
-                AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+                //mAlarmSender = PendingIntent.getService(RhybuddSettings.this, 0, new Intent(RhybuddSettings.this, ZenossPoller.class), 0);
+                //AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
                 
-                if(BackgroundService.isChecked())
+                /*if(BackgroundService.isChecked())
                 {
                 	//Stop it first and then start it otherwise it'll never get it's new time
                 	am.cancel(mAlarmSender);
@@ -285,7 +278,13 @@ public class RhybuddSettings extends Activity
                 else
                 {
                     am.cancel(mAlarmSender);
-                }
+                }*/
+                
+                //Start the service (if it isn't already) and tell it that we're starting it with a settings change in mind
+                Intent intent = new Intent(RhybuddSettings.this, ZenossPoller.class);
+                intent.putExtra("settingsUpdate", true);
+        		startService(intent);
+        		
                 CreateThread();
                 peformLogin.start();
             }
@@ -333,5 +332,14 @@ public class RhybuddSettings extends Activity
     		}
     	};
     	
+    }
+    
+    @Override
+    public void onBackPressed() 
+    {
+    	//Return back to the launcher
+    	Intent in = new Intent();
+        setResult(2,in);
+        finish();
     }
 }

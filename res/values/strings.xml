@@ -12,6 +12,9 @@
     <string name="productionStateNotificationLabel">Only raise alerts for Production devices</string>
     <string name="notificationSoundLabel">Notification Sound</string>
     
+    <!-- Initial Settings -->
+    <string name="initialSettings">Additional configuration such as background polling interval etc can be configured later</string>
+    
     <string name="mangeDatabaseTitle">Manage Cache</string>
     <string name="mangeDatabaseDBSizeTitle">Current DB Size:</string>
     <string name="manageCache_RefreshTitle">Refresh Local Cache</string>
@@ -45,7 +48,7 @@
     <string name="deviceDetailsSystemsLabel">Systems:</string>
     <string name="deviceDetailsUptimeLabel">Uptime:</string>
     <string name="deviceDetailsProductionStateLabel">Production State:</string>
-    
+    <string name="empty"></string>
     
     <string name="eventDetailsTitle">Event Details</string>
     <string name="eventDetailsComponentLabel">Component:</string>
