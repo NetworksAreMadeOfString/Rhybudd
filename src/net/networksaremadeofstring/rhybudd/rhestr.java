@@ -135,7 +135,7 @@ public class rhestr extends Activity
     	else
     	{
 	    	UpdateErrorMessage("",false);
-	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	    	adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents,true);
 	        list.setAdapter(adapter);
     	}
 
@@ -155,7 +155,7 @@ public class rhestr extends Activity
     				if(EventCount > 0)
     				{
 	    				UpdateErrorMessage("",false);
-	    				adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents);
+	    				adapter = new ZenossEventsAdaptor(rhestr.this, listOfZenossEvents,true);
 	        	        list.setAdapter(adapter);
     				}
     				else

@@ -59,4 +59,19 @@
     <string name="eventDetailsEventCountLabel">Event Count:</string>
     <string name="eventDetailsAgentLabel">Agent:</string>
     <string name="eventDetailsLogLabel">Log:</string>
+    
+    <!-- Preferences -->
+    <string-array name="entries_list_preference">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+    </string-array>
+    
+    <string-array name="entryvalues_list_preference">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
 </resources>

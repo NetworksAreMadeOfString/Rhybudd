@@ -1,6 +1,6 @@
     <menu xmlns:android="http://schemas.android.com/apk/res/android">
         <item android:id="@+id/Help" android:icon="@drawable/ic_action_info" android:title="@string/homeMenu_Help" android:showAsAction="always"></item>
-        <item android:icon="@drawable/ic_action_pagerduty" android:id="@+id/pagerduty" android:title="@string/homeMenu_PagerDuty" android:titleCondensed="@string/homeMenu_PagerDuty"></item>
+        <item android:id="@+id/settings" android:title="Settings"></item>
         <item android:id="@+id/cache" android:icon="@drawable/ic_action_cache" android:title="@string/homeMenu_ManageDB" android:showAsAction="ifRoom"></item>
         <item android:id="@+id/devices" android:icon="@drawable/ic_action_devices" android:showAsAction="always" android:titleCondensed="Devices" android:title="Devices"></item>
         <item android:id="@+id/refresh" android:icon="@drawable/ic_action_refresh" android:title="Refresh" android:showAsAction="always"></item>

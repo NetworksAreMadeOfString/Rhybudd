@@ -31,13 +31,16 @@ import org.json.JSONObject;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -49,7 +52,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -67,9 +73,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
-	private boolean totalFailure = false;
+	List<Integer> selectedEvents = new ArrayList<Integer>();
+
 	private int EventCount = 0;
-	Thread dataPreload,AckEvent;
+	Thread dataPreload,AckEvent,dataReload;
 	volatile Handler handler, AckEventHandler;
 	ProgressDialog dialog;
 	ListView list;
@@ -78,6 +85,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 	ActionBar actionbar;
 	int requestCode; //Used for evaluating what the settings Activity returned (Should always be 1)
 	RhybuddDatabase rhybuddCache;
+	ActionMode mActionMode;
+	
 	
 	@Override
 	public void onDestroy()
@@ -102,6 +111,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 		
 		actionbar = getSupportActionBar();
 		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		actionbar.setTitle("Events List");
+		actionbar.setSubtitle(settings.getString("URL", ""));
+		//actionbar.setListNavigationCallbacks(adapter, callback)
+		
 		BugSenseHandler.setup(this, "44a76a8c");		
 	     
 		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("credentialsSuccess", false) == false)
@@ -150,6 +163,15 @@ public class RhybuddHome extends SherlockFragmentActivity
     	dataPreload.start();
     }
 	
+	public void Refresh()
+    {
+		dialog = new ProgressDialog(this);
+		dialog.setMessage("Refreshing Events...");
+		dialog.show();
+		rhybuddCache.RefreshEvents();
+		handler.sendEmptyMessageDelayed(1, 1000);
+    }
+	
 	private void finishStart(Boolean firstRun)
 	{
 		Intent intent = new Intent(this, ZenossPoller.class);
@@ -161,6 +183,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		startService(intent);
 		
 		list = (ListView)findViewById(R.id.ZenossEventsList);
+		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		rhybuddCache = new RhybuddDatabase(this);
 		ConfigureHandlers();
 		DBGetThread();
@@ -174,10 +197,69 @@ public class RhybuddHome extends SherlockFragmentActivity
     		{
     			if(msg.what == 0)
     			{
-	    			//UpdateErrorMessage("",false);
     				((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
-	    			adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents);
+    				
+    				OnClickListener listener = new OnClickListener()
+    				{
+						public void onClick(View v) 
+						{
+							//AcknowledgeEvent(listOfZenossEvents.get((Integer)v.getTag()).getEVID().toString(),(Integer) v.getTag(R.integer.EventPositionInList),v.getId());
+							AcknowledgeEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+						}
+					};
+					
+					OnLongClickListener listenerLong = new OnLongClickListener()
+    				{
+						public boolean onLongClick(View v) 
+						{
+							selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
+							//list.setItemChecked(R.integer.EventPositionInList, true);
+							return true;
+						}
+					};
+					
+					OnClickListener addCAB = new OnClickListener()
+    				{
+						public void onClick(View v) 
+						{
+							addToCAB((Integer)v.getTag(R.integer.EventPositionInList));
+						}
+					};
+    				
+	    			adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents,listener,listenerLong,addCAB);
 	        	    list.setAdapter(adapter);
+    			}
+    			else if(msg.what == 1)
+    			{
+    				if(rhybuddCache.hasCacheRefreshed())
+    				{
+    					dialog.setMessage("Refresh Complete!");
+    					this.sendEmptyMessageDelayed(2,1000);
+    				}
+    				else
+    				{
+    					dialog.setMessage("Processing...");
+        				handler.sendEmptyMessageDelayed(1, 1000);
+    				}
+    			}
+    			else if(msg.what == 2)
+    			{
+    				dialog.dismiss();
+    				dbResults = rhybuddCache.getEvents();
+        			
+        			if(dbResults != null)
+        			{
+        				listOfZenossEvents.clear();
+    	    			while(dbResults.moveToNext())
+    	    			{
+    	    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+    															   dbResults.getString(3),
+    															   dbResults.getString(4), 
+    															   dbResults.getString(5),
+    															   dbResults.getString(7)));
+    	    			}
+        			}
+        			handler.sendEmptyMessage(0);
     			}
     			else
     			{
@@ -206,6 +288,128 @@ public class RhybuddHome extends SherlockFragmentActivity
     	 };
     }
 	
+	public void selectForCAB(int id)
+	{
+		if(listOfZenossEvents.get(id).isSelected())
+		{
+			selectedEvents.remove(id);
+			listOfZenossEvents.get(id).SetSelected(false);
+		}
+		else
+		{
+	    	selectedEvents.add(id);
+	    	listOfZenossEvents.get(id).SetSelected(true);
+		}
+		adapter.notifyDataSetChanged();
+		mActionMode = startActionMode(mActionModeCallback);
+	}
+	
+	public void addToCAB(int id)
+	{
+		if(mActionMode != null)
+		{
+			selectedEvents.add(id);
+			listOfZenossEvents.get(id).SetSelected(true);
+			adapter.notifyDataSetChanged();
+			mActionMode.setTitle("Manage "+ selectedEvents.size()+" Events");
+		}
+		else
+		{
+			selectedEvents.add(id);
+	    	listOfZenossEvents.get(id).SetSelected(true);
+	    	adapter.notifyDataSetChanged();
+			mActionMode = startActionMode(mActionModeCallback);
+		}
+	}
+	
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
+	{
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) 
+        {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.events_cab, menu);
+            mode.setTitle("Manage "+ selectedEvents.size()+" Events");
+            mode.setSubtitle("Select multiple events for mass acknowledgement");
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) 
+        {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) 
+        {
+            switch (item.getItemId()) 
+            {
+            
+	            case R.id.Acknowledge:
+	        	{
+	        		for (final Integer i : selectedEvents)
+	            	{
+	        			listOfZenossEvents.get(i).setProgress(true);
+	               	 AckEventHandler.sendEmptyMessage(0);
+	               	 AckEvent = new Thread() 
+	           	    	{  
+	           	    		public void run() 
+	           	    		{
+	           	    			try 
+	           	    			{
+	           	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+	           	    				ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
+	   								listOfZenossEvents.get(i).setProgress(false);
+	   								listOfZenossEvents.get(i).setAcknowledged();
+	   								AckEventHandler.sendEmptyMessage(1);
+	           	    			}
+	           	    			catch (Exception e)
+	           	    			{
+	           	    				AckEventHandler.sendEmptyMessage(99);
+	           	    			}
+	           	    		}
+	           	    	};
+	           	    	AckEvent.start();
+	            	}
+	        		return true;
+	        	}
+	        	
+	            default:
+	            {
+	            	for (Integer i : selectedEvents)
+	            	{
+	            		listOfZenossEvents.get(i).SetSelected(false);
+	            		//list.setItemChecked(i, false);
+	            	}
+	            	selectedEvents.clear();
+		        	adapter.notifyDataSetChanged();
+		            return false;
+	            }
+			}
+        }
+			
+			// Called when the user exits the action mode
+			@Override
+			public void onDestroyActionMode(ActionMode mode) 
+			{
+				for (Integer i : selectedEvents)
+            	{
+            		listOfZenossEvents.get(i).SetSelected(false);
+            		//list.setItemChecked(i, false);
+            	}
+            	selectedEvents.clear();
+	        	adapter.notifyDataSetChanged();
+	        	mActionMode = null;
+			}
+		};
+	
     public boolean onCreateOptionsMenu(Menu menu) 
 	{
 		MenuInflater inflater = getSupportMenuInflater();
@@ -218,11 +422,10 @@ public class RhybuddHome extends SherlockFragmentActivity
     {
         switch (item.getItemId()) 
         {
-	        case R.id.pagerduty:
+	        case R.id.settings:
 	        {
-	        	Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhestrPagerDuty.class);
-	        	//Intent PagerDutyIntent = new Intent(RhybuddHome.this, RhybuddDock.class);
-	        	RhybuddHome.this.startActivity(PagerDutyIntent);
+	        	Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+	        	RhybuddHome.this.startActivity(SettingsIntent);
 	            return true;
 	        }
 	        
@@ -240,263 +443,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 	        	RhybuddHome.this.startActivity(MangeDBIntent);
 	            return true;
 	        }
+	        
+	        case R.id.refresh:
+	        {
+	        	Refresh();
+	        	return true;
+	        }
         }
         return false;
     }
-	
-	private void ConfigureRunnable() 
-	{
-		/*updateDeviceDetails = new Runnable() 
-		{
-			public void run() 
-			{
-				
-				HomeHandler.sendEmptyMessage(100);
-				HomeHandler.sendEmptyMessage(1);
-				Thread devicesDetailsRefreshThread = new Thread() 
-		    	{  
-		    		public void run() 
-		    		{
-		    			try 
-		    			{
-		    				ZenossAPIv2 API = null;
-							JSONObject DeviceObject = null;
-							SQLiteDatabase cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-							Cursor dbResults = null;
-							
-					    	try
-					    	{
-					    		dbResults = cacheDB.query("devices",new String[]{"rhybuddDeviceID","uid"},null, null, null, null, null);
-					    	}
-					    	catch(Exception e)
-					    	{
-					    		throw e;
-					    	}
-					    	
-					    	API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-					    	
-					    	while(dbResults.moveToNext())
-			    			{
-					    		DeviceObject = API.GetDevice(dbResults.getString(1));
-			    			}
-						} 
-		    			catch (Exception e) 
-		    			{
-		    				//TODO We should probably do something about this
-						}
-		    			
-		    			// Hide progress
-						HomeHandler.sendEmptyMessage(99);
-
-						// Try again later if the app is still live
-						runnablesHandler.postDelayed(this, 3604000);// 1 hour
-		    		}
-		    	};
-		    	
-				devicesDetailsRefreshThread.start();
-			}
-		};*/
-		
-		updateDevices = new Runnable() 
-		{
-			public void run() 
-			{
-				// Update the GUI
-				HomeHandler.sendEmptyMessage(100);
-				HomeHandler.sendEmptyMessage(1);
-
-				Thread devicesRefreshThread = new Thread() 
-				{
-					public void run() 
-					{
-						ZenossAPIv2 API = null;
-						JSONObject DeviceObject = null;
-						SQLiteDatabase cacheDB = null;
-						try 
-						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							
-							if(API != null)
-							{
-								DeviceObject = API.GetDevices();
-								int DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
-								cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-								cacheDB.delete("devices", null, null);
-								
-								for(int i = 0; i < DeviceCount; i++)
-								{
-									JSONObject CurrentDevice = null;
-									ContentValues values = new ContentValues(2);
-									
-									try 
-									{
-										CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
-	    		    				
-		    		    				values.put("productionState",CurrentDevice.getString("productionState"));
-		    		    				try
-		    		    				{
-		    		    					values.put("ipAddress", CurrentDevice.getInt("ipAddress"));
-		    		    				}
-		    		    				catch(Exception e)
-		    		    				{
-		    		    					values.put("ipAddress", "0.0.0.0");
-		    		    				}
-										values.put("name", CurrentDevice.getString("name"));
-										values.put("uid", CurrentDevice.getString("uid"));
-										values.put("infoEvents", CurrentDevice.getJSONObject("events").getInt("info"));
-		    	    					values.put("debugEvents", CurrentDevice.getJSONObject("events").getInt("debug"));
-		    	    					values.put("warningEvents", CurrentDevice.getJSONObject("events").getInt("warning"));
-		    	    					values.put("errorEvents", CurrentDevice.getJSONObject("events").getInt("error"));
-		    	    					values.put("criticalEvents", CurrentDevice.getJSONObject("events").getInt("critical"));
-		    	    					
-										cacheDB.insert("devices", null, values);
-		    	    				}
-		    	    				catch (JSONException e) 
-		    	    				{
-		    	    					e.printStackTrace();
-		    	    				}
-								}
-								cacheDB.close();
-							}
-						}
-						catch (ClientProtocolException e1) 
-						{
-							BugSenseHandler.log("updateDevices", e1);
-						} 
-						catch (JSONException e1) 
-						{
-							BugSenseHandler.log("updateDevices", e1);
-						} 
-						catch (IOException e1) 
-						{
-							BugSenseHandler.log("updateDevices", e1);
-						}
-						catch (Exception e1) 
-						{
-							BugSenseHandler.log("updateDevices", e1);
-						}
-						finally
-						{
-							if(cacheDB != null && cacheDB.isOpen())
-								cacheDB.close();
-						}
-
-						// Hide progress
-						HomeHandler.sendEmptyMessage(99);
-
-						// Try again later if the app is still live
-						//runnablesHandler.postDelayed(this, 3604000);// 1 hour
-						try
-						{
-							if(cacheDB != null && cacheDB.isOpen())
-								cacheDB.close();
-						}
-						catch(Exception e)
-						{
-							BugSenseHandler.log("updateDevices", e);
-						}
-					}
-				};
-				devicesRefreshThread.start();
-			}
-		};
-
-		updateEvents = new Runnable() 
-		{
-			public void run() 
-			{
-				// Update the GUI
-				HomeHandler.sendEmptyMessage(100);
-				HomeHandler.sendEmptyMessage(0);
-
-				// Thread
-				Thread eventsRefreshThread = new Thread() 
-				{
-					public void run() 
-					{
-						HomeHandler.sendEmptyMessage(100);
-						HomeHandler.sendEmptyMessage(0);
-						
-						JSONObject EventsObject = null;
-						JSONArray Events = null;
-
-						try 
-						{
-							ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""),settings.getString("passWord", ""),settings.getString("URL", ""));
-
-							EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false));
-							Events = EventsObject.getJSONObject("result").getJSONArray("events");
-						} 
-						catch (Exception e) 
-						{
-							HomeHandler.sendEmptyMessage(0);
-							//e.printStackTrace();
-						}
-
-						try 
-						{
-							if (EventsObject != null) 
-							{
-								int EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-
-								SQLiteDatabase cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache",MODE_PRIVATE, null);
-								cacheDB.delete("events", null, null);
-
-								for (int i = 0; i < EventCount; i++) 
-								{
-									JSONObject CurrentEvent = null;
-									ContentValues values = new ContentValues(2);
-									try 
-									{
-										
-										CurrentEvent = Events.getJSONObject(i);
-										
-										//Log.i("evi",CurrentEvent.getString("evid"));
-										
-										values.put("EVID",CurrentEvent.getString("evid"));
-										values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-										values.put("summary", CurrentEvent.getString("summary"));
-										values.put("eventState", CurrentEvent.getString("eventState"));
-										values.put("severity", CurrentEvent.getString("severity"));
-
-										cacheDB.insert("events", null, values);
-									} 
-									catch (JSONException e) 
-									{
-										// Log.e("API - Stage 2 - Inner",
-										// e.getMessage());
-										//e.printStackTrace();
-										//TODO We should tell the user about this or recover from it as they could miss an alert
-									}
-								}
-								cacheDB.close();
-							}
-						} 
-						catch (Exception e) 
-						{
-							// Log.e("API - Stage 2 - Inner", e.getMessage());
-							//e.printStackTrace();
-							//TODO Total failure is pretty bad - we should tell the user about it
-						}
-						
-						// Hide progress
-						HomeHandler.sendEmptyMessageDelayed(99, 2000);
-
-						runnablesHandler.postDelayed(this, 300000);// 5 mins 300000
-
-						if (OneOff) 
-						{
-							// Kick off the infrastructure refresh now we're
-							// done with the other bit
-							HomeHandler.sendEmptyMessage(98);
-							OneOff = false;
-						}
-					}
-				};
-				eventsRefreshThread.start();
-			}
-		};
-	}
 	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) 
@@ -523,5 +478,56 @@ public class RhybuddHome extends SherlockFragmentActivity
 			SettingsIntent.putExtra("firstRun", true);
 			RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
     	}
+    }
+	
+	public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
+    {
+    	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+    	 alertbox.setMessage("What would you like to do?");
+
+    	 alertbox.setPositiveButton("Ack Event", new DialogInterface.OnClickListener() 
+    	 {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
+            	 listOfZenossEvents.get(Position).setProgress(true);
+            	 AckEventHandler.sendEmptyMessage(0);
+            	 AckEvent = new Thread() 
+        	    	{  
+        	    		public void run() 
+        	    		{
+        	    			try 
+        	    			{
+        	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+        	    				ackEventAPI.AcknowledgeEvent(EventID);
+								listOfZenossEvents.get(Position).setProgress(false);
+								listOfZenossEvents.get(Position).setAcknowledged();
+								AckEventHandler.sendEmptyMessage(1);
+        	    			}
+        	    			catch (Exception e)
+        	    			{
+        	    				AckEventHandler.sendEmptyMessage(99);
+        	    			}
+        	    		}
+        	    	};
+        	    	AckEvent.start();
+             }
+    	 });
+
+    	 alertbox.setNeutralButton("View Event", new DialogInterface.OnClickListener() 
+         {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
+            	 //ViewEvent(EventID);
+             }
+         });
+         
+         alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener() 
+         {
+             public void onClick(DialogInterface arg0, int arg1) 
+             {
+                 //Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
+             }
+         });
+         alertbox.show();
     }
 }

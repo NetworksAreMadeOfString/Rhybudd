@@ -28,7 +28,7 @@ public class ZenossEvent {
 	private String firstTime;
 	private String severity;
 	private Boolean inProgress = false;
-	
+	private Boolean Selected = false;
 	
 	 // Constructor for the Ticket class
     public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity) 
@@ -39,6 +39,16 @@ public class ZenossEvent {
             this.summary = _summary;
             this.eventState = _eventState;
             this.severity = _severity;
+    }
+    
+    public void SetSelected(Boolean _selected)
+    {
+    	this.Selected = _selected;
+    }
+    
+    public boolean isSelected()
+    {
+    	return this.Selected;
     }
     
     public String getEVID()

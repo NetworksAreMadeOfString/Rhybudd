@@ -30,15 +30,20 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 
 
-public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener, OnLongClickListener 
+public class ZenossEventsAdaptor extends BaseAdapter
 {
 	private Context context;
     private List<ZenossEvent> listZenossEvents;
     private Boolean isRhestr = true;
-
+    private OnClickListener listener;
+    private OnLongClickListener listenerLong;
+    private OnClickListener cablistener;
+    
+    
     public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, Boolean _isRhestr) 
     {
         this.context = context;
@@ -46,10 +51,13 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         this.isRhestr = _isRhestr;
     }
     
-    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents) 
+    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, OnClickListener _listener, OnLongClickListener _listenerLong, OnClickListener _cablistener) 
     {
         this.context = context;
         this.listZenossEvents = _listZenossEvents;
+        this.listener = _listener;
+        this.listenerLong = _listenerLong;
+        this.cablistener = _cablistener;
     }
     
     
@@ -121,28 +129,38 @@ public class ZenossEventsAdaptor extends BaseAdapter implements OnClickListener,
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
         }
         
+        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.integer.EventPositionInList,position);
+        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
+        
         //convertView.setTag(Event.getEVID());
         convertView.setTag(R.integer.EventID,Event.getEVID());
         convertView.setTag(R.integer.EventPositionInList,position);
         
-        if(this.isRhestr)
-        {
-	        convertView.setOnClickListener(this);
-	        convertView.setOnLongClickListener(this);
-        }
+        
+        convertView.setClickable(true);
+        
+        if(listener != null)
+        	convertView.setOnClickListener((OnClickListener) listener);
+        
+        if(listenerLong != null)
+        	convertView.setOnLongClickListener((OnLongClickListener) listenerLong);
+        
+        if(cablistener != null)
+        	((ToggleButton) convertView.findViewById(R.id.cabSelect)).setOnClickListener(cablistener);
+        
         return convertView;
 	}
 	
-	@Override
+	/*@Override
 	public void onClick(View v) 
 	{
 		((rhestr)context).AcknowledgeEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
-	}
+	}*/
 	
-	public boolean onLongClick(View v)
+	/*public boolean onLongClick(View v)
 	{
 		((rhestr)context).ViewEvent(v.getTag(R.integer.EventID).toString());
 		return true;
-	}
+	}*/
 
 }

@@ -4,16 +4,18 @@
     android:layout_height="fill_parent"
     android:paddingBottom="4px"
     android:paddingTop="4px" >
-
+
     <ImageView
         android:id="@+id/AckImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
         android:src="@drawable/nack" >
-    </ImageView>
 
+    </ImageView>
+
     <ProgressBar
         android:id="@+id/inProgressBar"
         style="?android:attr/progressBarStyleSmall"
@@ -21,7 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
         android:indeterminate="true" >
+
     </ProgressBar>
 
     <LinearLayout
