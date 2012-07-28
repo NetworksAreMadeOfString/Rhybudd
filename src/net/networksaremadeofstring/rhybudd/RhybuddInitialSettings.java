@@ -7,6 +7,7 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -45,7 +46,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 		dialog.setMessage("Checking Details.....");
 		dialog.setCancelable(false);
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
         
         actionbar = getSupportActionBar();
 		//actionbar.setDisplayHomeAsUpEnabled(true);

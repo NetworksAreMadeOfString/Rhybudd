@@ -21,12 +21,17 @@ package net.networksaremadeofstring.rhybudd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,7 +46,7 @@ import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class ViewZenossEvent extends Activity
+public class ViewZenossEvent extends SherlockActivity
 {
 	ZenossAPIv2 API = null;
 	JSONObject EventObject = null;
@@ -53,6 +58,7 @@ public class ViewZenossEvent extends Activity
 	//private String EventID;
 	Dialog addMessageDialog;
 	String[] LogEntries;
+	ActionBar actionbar;
 	
 	@Override
 	public void onAttachedToWindow() {
@@ -61,22 +67,29 @@ public class ViewZenossEvent extends Activity
 		window.setFormat(PixelFormat.RGBA_8888);
 	}
 	
-	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) 
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+		MenuInflater inflater = getSupportMenuInflater();
+	    inflater.inflate(R.menu.home_menu, menu);
+	    return true;
+    }
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) 
     {
-        super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
-        setContentView(R.layout.view_zenoss_event);
-        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
-        
-        ImageView AddToLogButton = (ImageView) findViewById(R.id.AddToLogImageView);
-        AddToLogButton.setClickable(true);
-        AddToLogButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) 
-			{
-				addMessageDialog = new Dialog(ViewZenossEvent.this);
+        switch (item.getItemId()) 
+        {
+	        /*case android.R.id.home:
+	        {
+	            Intent intent = new Intent(this, RhybuddHome.class);
+	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	            startActivity(intent);
+	            return true;
+	        }*/
+	        
+	        case R.id.AddLog:
+	        {
+	        	addMessageDialog = new Dialog(ViewZenossEvent.this);
 				addMessageDialog.setContentView(R.layout.add_message);
 				addMessageDialog.setTitle("Add Message to Event Log");
 				((Button) addMessageDialog.findViewById(R.id.SaveButton)).setOnClickListener(new OnClickListener() 
@@ -91,9 +104,45 @@ public class ViewZenossEvent extends Activity
 				);
 				
 				addMessageDialog.show();
-			}
-        });
+	        }
+	        
+	        case R.id.escalate:
+	        {
+	        	Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+	        	intent.setType("text/plain");
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
+	        	// Add data to the intent, the receiving app will decide what to do with it.
+	        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Event");
+	        	String EventDetails = "...";
+	        	/*for (ZenossEvent evt : listOfZenossEvents)
+            	{
+	        		Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
+            	}*/
+	        	intent.putExtra(Intent.EXTRA_TEXT, EventDetails);
+	        	
+	        	startActivity(Intent.createChooser(intent, "How would you like to escalate this event?"));
+	        }
+	        
+	        default:
+	        {
+	        	return false;
+	        }
+        }
+    }
+	
+	/** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) 
+    {
+        super.onCreate(savedInstanceState);
+        settings = getSharedPreferences("rhybudd", 0);
+        setContentView(R.layout.view_zenoss_event);
+        
+        actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setHomeButtonEnabled(true);
+        
         firstLoadHandler = new Handler() 
     	{
     		public void handleMessage(Message msg) 

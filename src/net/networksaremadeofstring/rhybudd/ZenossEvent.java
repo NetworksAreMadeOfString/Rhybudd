@@ -29,9 +29,10 @@ public class ZenossEvent {
 	private String severity;
 	private Boolean inProgress = false;
 	private Boolean Selected = false;
+	private String prodState = "Production";
 	
 	 // Constructor for the Ticket class
-    public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity) 
+    public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _prodState) 
     {
             super();
             this.evid = _evid;
@@ -39,10 +40,11 @@ public class ZenossEvent {
             this.summary = _summary;
             this.eventState = _eventState;
             this.severity = _severity;
+            this.prodState = _prodState;
     }
     
     // Constructor for the Ticket class
-    public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _LastTime) 
+    public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _LastTime, String _prodState) 
     {
             super();
             this.evid = _evid;
@@ -51,6 +53,7 @@ public class ZenossEvent {
             this.eventState = _eventState;
             this.severity = _severity;
             this.lastTime = _LastTime;
+            this.prodState = _prodState;
     }
     
     public void SetSelected(Boolean _selected)
@@ -61,6 +64,16 @@ public class ZenossEvent {
     public boolean isSelected()
     {
     	return this.Selected;
+    }
+    
+    public String getProdState()
+    {
+    	return this.prodState;
+    }
+    
+    public Boolean isNew()
+    {
+    	return this.eventState.equals("New");	
     }
     
     public String getEVID()

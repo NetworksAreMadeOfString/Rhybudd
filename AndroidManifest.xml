@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.networksaremadeofstring.rhybudd"
-      android:installLocation="auto" android:versionCode="10" android:versionName="2.4">
+      android:installLocation="auto" android:versionCode="11" android:versionName="2.6">
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="15"/>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
@@ -27,8 +27,6 @@
             </intent-filter>
         </activity>
         
-        <service android:name=".ZenossPoller" />
-        
         <activity android:name=".RhybuddSettings"
 			android:label="@string/app_name">
 		</activity>
@@ -41,7 +39,7 @@
 			android:label="@string/app_name">
 		</activity>
 		
-		<activity android:name="net.networksaremadeofstring.rhybudd.rhestr"
+		<!--<activity android:name="net.networksaremadeofstring.rhybudd.rhestr"
 			android:label="Rhybudd - Zenoss Events List">
 			<intent-filter>
 			     <action android:name="android.intent.action.VIEW" />
@@ -49,7 +47,7 @@
 			     <category android:name="android.intent.category.BROWSABLE" />
 			     <data android:path="/zport/dmd/Events/evconsole*" />
 			 </intent-filter>
-		</activity>
+		</activity>-->
 		
 		<!-- <activity android:name="net.networksaremadeofstring.rhybudd.RhybuddHome"
 			android:label="Rhybudd - Launcher">
@@ -58,7 +56,7 @@
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
 			android:label="Rhybudd - Event Details"
-			android:theme="@android:style/Theme.NoTitleBar">
+			android:uiOptions="splitActionBarWhenNarrow">
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
@@ -81,19 +79,46 @@
 			 </intent-filter>
 		</activity>
 		
-		<activity android:name="net.networksaremadeofstring.rhybudd.Search"
+		<!-- <activity android:name="net.networksaremadeofstring.rhybudd.Search"
 			android:label="Rhybudd - Search">
-		</activity>
+		</activity>-->
 
-		<!-- <activity android:name="Search" android:label="Search" android:theme="@android:style/Theme.NoTitleBar">
+		<activity android:name="Search" android:label="Search" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.SEARCH_LONG_PRESS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data android:name="android.app.searchable" android:resource="@xml/searchable" />
-        </activity> -->
+        </activity>
         
+		
+		<!-- 
+		 ______     __  __     ______   ______     ______     ______    
+		/\  ___\   /\_\_\_\   /\__  _\ /\  == \   /\  __ \   /\  ___\   
+		\ \  __\   \/_/\_\/_  \/_/\ \/ \ \  __<   \ \  __ \  \ \___  \  
+		 \ \_____\   /\_\/\_\    \ \_\  \ \_\ \_\  \ \_\ \_\  \/\_____\ 
+		  \/_____/   \/_/\/_/     \/_/   \/_/ /_/   \/_/\/_/   \/_____/ 
+		          
+		          		                                                        
+		-->
+        <service android:name=".ZenossPoller" />
+        
+        <receiver android:name="ManageUpdate">
+		  <intent-filter>
+		    <action android:name="android.intent.action.PACKAGE_REPLACED" />
+		    <data android:scheme="package"/> 
+		  </intent-filter>
+		</receiver>
+		
+		<!-- 
+		 __     __     __     _____     ______     ______     ______   ______       
+		/\ \  _ \ \   /\ \   /\  __-.  /\  ___\   /\  ___\   /\__  _\ /\  ___\      
+		\ \ \/ ".\ \  \ \ \  \ \ \/\ \ \ \ \__ \  \ \  __\   \/_/\ \/ \ \___  \     
+ 		 \ \__/".~\_\  \ \_\  \ \____-  \ \_____\  \ \_____\    \ \_\  \/\_____\    
+ 		  \/_/   \/_/   \/_/   \/____/   \/_____/   \/_____/     \/_/   \/_____/    
+                                                                            
+		 -->
 		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" 
 			android:label="Rhybudd - Current Event Count">
 		    <intent-filter>

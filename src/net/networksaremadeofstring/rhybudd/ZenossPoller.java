@@ -36,8 +36,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class ZenossPoller extends Service
 {
@@ -52,11 +60,13 @@ public class ZenossPoller extends Service
 	private int failureCount = 0;
 	private Boolean onlyAlertOnProd = false;
 	RhybuddDatabase rhybuddCache = null;
+	Handler handler;
+	Cursor dbResults;
 	int Delay;
 	@Override
 	public void onCreate() 
 	{
-		settings = getSharedPreferences("rhybudd", 0);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		Log.i("ServiceThread","Service Starting");
 		BugSenseHandler.setup(this, "44a76a8c");
 
@@ -67,6 +77,48 @@ public class ZenossPoller extends Service
 			rhybuddCache = new RhybuddDatabase(this);
 		}
 
+		handler = new Handler() 
+    	{
+    		public void handleMessage(Message msg) 
+    		{
+    			if(msg.what == 1)
+    			{
+    				if(rhybuddCache.hasCacheRefreshed())
+    				{
+    					this.sendEmptyMessageDelayed(2,1000);
+    				}
+    				else
+    				{
+        				handler.sendEmptyMessageDelayed(1, 1000);
+    				}
+    			}
+    			else if(msg.what == 2)
+    			{
+    				dbResults = rhybuddCache.getEvents();
+        			
+        			if(dbResults != null)
+        			{
+    	    			while(dbResults.moveToNext())
+    	    			{
+    	    				ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
+									   dbResults.getString(3),
+									   dbResults.getString(4), 
+									   dbResults.getString(5),
+									   dbResults.getString(7),
+									   dbResults.getString(8));
+    	    				
+    	    				if(CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
+								SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+    	    			}
+        			}
+    			}
+    			else
+    			{
+    				//Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
+    			}
+    		}
+    	};
+    	
 		//CheckForEvents(); 
 	}
 
@@ -118,7 +170,7 @@ public class ZenossPoller extends Service
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		Intent Poller = new Intent(this, ZenossPoller.class);
 
-		if(settings.getBoolean("AllowBackgroundService", true))
+		/*if(settings.getBoolean("AllowBackgroundService", true))
 		{
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
@@ -130,13 +182,14 @@ public class ZenossPoller extends Service
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
 			am.cancel(Monitoring);
-		}
+		}*/
 
+		
 		if(settings.getBoolean("refreshCache", true))
 		{
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-			am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, AlarmManager.INTERVAL_HALF_HOUR, CacheRefresh);
+			am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, AlarmManager.INTERVAL_FIFTEEN_MINUTES, CacheRefresh);
 		}
 		else
 		{
@@ -185,7 +238,7 @@ public class ZenossPoller extends Service
 
 	private void CheckForEvents()
 	{
-		dataPreload = new Thread() 
+		/*dataPreload = new Thread() 
 		{  
 			public void run() 
 			{
@@ -201,7 +254,8 @@ public class ZenossPoller extends Service
 							settings.getBoolean("SeverityError", true),
 							settings.getBoolean("SeverityWarning", true),
 							settings.getBoolean("SeverityInfo", false),
-							settings.getBoolean("SeverityDebug", false));
+							settings.getBoolean("SeverityDebug", false),
+							settings.getBoolean("onlyProductionAlerts", true));
 
 					Events = EventsObject.getJSONObject("result").getJSONArray("events");
 					EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
@@ -272,7 +326,7 @@ public class ZenossPoller extends Service
 				Log.i("ServiceThread","stopping");
 			}
 		};
-		dataPreload.start();
+		dataPreload.start();*/
 	}
 
 	private Boolean CheckIfNotify(String prodState, String UID)

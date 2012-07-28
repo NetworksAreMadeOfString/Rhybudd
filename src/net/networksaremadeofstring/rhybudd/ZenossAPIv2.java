@@ -261,10 +261,16 @@ public class ZenossAPIv2
 	
 	public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
 	{
-		return this.GetEvents("5,4,3,2");
+		return this.GetEvents("5,4,3,2",false);
 	}
 	
+	
 	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug) throws JSONException, ClientProtocolException, IOException
+	{
+		return this.GetEvents(Critical,Error,Warning,Info,Debug,false);
+	}
+	
+	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, Boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
 	{
 		String SeverityLevels = "";
         
@@ -289,11 +295,11 @@ public class ZenossAPIv2
         	SeverityLevels = SeverityLevels.substring(0, SeverityLevels.length() - 1);
         }
         
-		return this.GetEvents(SeverityLevels);
+		return this.GetEvents(SeverityLevels,ProductionOnly);
 	}
 	
     @SuppressWarnings("unchecked")
-	private JSONObject GetEvents(String Severity) throws JSONException, ClientProtocolException, IOException
+	private JSONObject GetEvents(String Severity, Boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
     {
     	//Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -303,13 +309,19 @@ public class ZenossAPIv2
 
     	JSONObject dataContents = new JSONObject();
     	dataContents.put("start", 0);
-    	dataContents.put("limit", 100);
+    	dataContents.put("limit", 2000);
     	dataContents.put("dir", "DESC");
     	dataContents.put("sort", "severity");
         
         JSONObject params = new JSONObject();
         params.put("severity", new JSONArray("["+Severity+"]"));
         params.put("eventState", new JSONArray("[0, 1]"));
+        
+        if(ProductionOnly)
+        {
+        	params.put("prodState", new JSONArray("[1000]"));
+        }
+        
         dataContents.put("params", params);
         
         JSONArray data = new JSONArray();

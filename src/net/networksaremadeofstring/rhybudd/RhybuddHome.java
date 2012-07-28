@@ -45,6 +45,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -101,7 +102,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		settings = getSharedPreferences("rhybudd", 0);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		setContentView(R.layout.rhybudd_home);
 		
 		//Clear any notifications
@@ -124,20 +125,18 @@ public class RhybuddHome extends SherlockFragmentActivity
 				  
 				  if(strings[position].equals("Devices"))
 				  {
-					  
+					  Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
+					  RhybuddHome.this.startActivity(DeviceList);
 					  return true;
 				  }
 				  else if(strings[position].equals("Search"))
 				  {
-					  Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
-					  RhybuddHome.this.startActivity(SettingsIntent);
+					  /*Intent intent=new Intent(android.content.Intent.ACTION_SEARCH);
+					  startActivity(Intent.createChooser(intent, "Search Zenoss:"));*/
+					  onSearchRequested();
 					  return true;
 				  }
 				  else if(strings[position].equals("Reports"))
-				  {
-					  return true;
-				  }
-				  else if(strings[position].equals("Settings"))
 				  {
 					  return true;
 				  }
@@ -189,7 +188,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 															   dbResults.getString(3),
 															   dbResults.getString(4), 
 															   dbResults.getString(5),
-															   dbResults.getString(7)));
+															   dbResults.getString(7),
+															   dbResults.getString(8)));
 	    			}
     			}
     			handler.sendEmptyMessage(0);
@@ -221,7 +221,14 @@ public class RhybuddHome extends SherlockFragmentActivity
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		rhybuddCache = new RhybuddDatabase(this);
 		ConfigureHandlers();
-		DBGetThread();
+		if(settings.getBoolean("AllowBackgroundService", false))
+		{
+			DBGetThread();
+		}
+		else
+		{
+			Refresh();
+		}
 	}
 	
 	private void ConfigureHandlers()
@@ -239,7 +246,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 						public void onClick(View v) 
 						{
 							//AcknowledgeEvent(listOfZenossEvents.get((Integer)v.getTag()).getEVID().toString(),(Integer) v.getTag(R.integer.EventPositionInList),v.getId());
-							AcknowledgeEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+							ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
 						}
 					};
 					
@@ -248,7 +255,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 						public boolean onLongClick(View v) 
 						{
 							selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
-							//list.setItemChecked(R.integer.EventPositionInList, true);
 							return true;
 						}
 					};
@@ -291,7 +297,8 @@ public class RhybuddHome extends SherlockFragmentActivity
     															   dbResults.getString(3),
     															   dbResults.getString(4), 
     															   dbResults.getString(5),
-    															   dbResults.getString(7)));
+    															   dbResults.getString(7),
+    															   dbResults.getString(8)));
     	    			}
         			}
         			handler.sendEmptyMessage(0);
@@ -480,7 +487,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 	        case R.id.settings:
 	        {
 	        	Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
-	        	RhybuddHome.this.startActivity(SettingsIntent);
+	        	//RhybuddHome.this.startActivity(SettingsIntent);
+	        	this.startActivityForResult(SettingsIntent, 99);
 	            return true;
 	        }
 	        
@@ -560,31 +568,41 @@ public class RhybuddHome extends SherlockFragmentActivity
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) 
     {
+		
     	//Check what the result was from the Settings Activity
-    	//In theory the Settings activity should perform validation and only finish() if the settings pass validation
-    	if(resultCode == 1)
-    	{
-    		SharedPreferences.Editor editor = settings.edit();
-        	editor.putBoolean("FirstRun", false);
-        	editor.commit();
-        	Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
-        	finishStart(true);
-    	}
-    	else if(resultCode == 2)
-    	{
-    		Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
-    		finish();
-    	}
-    	else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
-    	{
-    		Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
-    		Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
-			SettingsIntent.putExtra("firstRun", true);
-			RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
-    	}
+		if(requestCode == 99)
+		{
+			Intent intent = new Intent(this, ZenossPoller.class);
+	        intent.putExtra("settingsUpdate", true);
+			startService(intent);
+		}
+		else
+		{
+	    	//In theory the Settings activity should perform validation and only finish() if the settings pass validation
+	    	if(resultCode == 1)
+	    	{
+	    		SharedPreferences.Editor editor = settings.edit();
+	        	editor.putBoolean("FirstRun", false);
+	        	editor.commit();
+	        	Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
+	        	finishStart(true);
+	    	}
+	    	else if(resultCode == 2)
+	    	{
+	    		Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
+	    		finish();
+	    	}
+	    	else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
+	    	{
+	    		Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
+	    		Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
+				SettingsIntent.putExtra("firstRun", true);
+				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
+	    	}
+		}
     }
 	
-	public void AcknowledgeEvent(final String EventID, final int Position, final int viewID)
+	public void ManageEvent(final String EventID, final int Position, final int viewID)
     {
     	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
     	 alertbox.setMessage("What would you like to do?");
@@ -621,7 +639,9 @@ public class RhybuddHome extends SherlockFragmentActivity
          {
              public void onClick(DialogInterface arg0, int arg1) 
              {
-            	 //ViewEvent(EventID);
+            	Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
+             	ViewEventIntent.putExtra("EventID", EventID);
+             	RhybuddHome.this.startActivity(ViewEventIntent);
              }
          });
          

@@ -253,11 +253,11 @@ public class rhestr extends Activity
     			{
 	    			while(dbResults.moveToNext())
 	    			{
-	    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+	    				/*listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
 															   dbResults.getString(3),
 															   dbResults.getString(4), 
 															   dbResults.getString(5),
-															   dbResults.getString(7)));
+															   dbResults.getString(7)));*/
 	    			}
 	    			
 	    			rhybuddCache.close();
@@ -342,12 +342,12 @@ public class rhestr extends Activity
 			    				try 
 			    				{
 				    				CurrentEvent = Events.getJSONObject(i);
-				    				listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+				    				/*listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
 												    						CurrentEvent.getJSONObject("device").getString("text"),
 												    						CurrentEvent.getString("summary"), 
 												    						CurrentEvent.getString("eventState"),
 												    						CurrentEvent.getString("severity")));
-				    				
+				    				*/
 									try
 									{
 										if(cacheDB != null && cacheDB.isDbLockedByOtherThreads() == false && cacheDB.isOpen() == true && cacheDB.isReadOnly() == false)

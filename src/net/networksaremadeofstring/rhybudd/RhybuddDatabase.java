@@ -19,6 +19,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class RhybuddDatabase 
@@ -31,12 +32,10 @@ public class RhybuddDatabase
 
 	private static final String DATABASE_NAME = "rhybuddCache";
 	private static final String FTS_VIRTUAL_TABLE = "FTSdictionary";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 4;
 
 	private final RhybuddOpenHelper mDatabaseOpenHelper;
 	private static Boolean finishedRefresh = false;
-
-	//private static final HashMap<String,String> mColumnMap = buildColumnMap();
 
 	/**
 	 * Constructor
@@ -64,16 +63,16 @@ public class RhybuddDatabase
 	{
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
 		builder.setTables("events");
-		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity"}, null, null, null, null, null);
+		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity","prodState"}, null, null, null, null, null);
 		if (cursor == null) 
 		{
 			return null;
 		} 
-		else if (!cursor.moveToFirst()) 
+		/*else if (!cursor.moveToFirst()) 
 		{
 			cursor.close();
 			return null;
-		}
+		}*/
 		return cursor;
 	}
 
@@ -149,7 +148,7 @@ public class RhybuddDatabase
 			try
 			{
 				Log.i("DB onCreate","Creating Tables");
-				mDatabase.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
+				mDatabase.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT)");
 				mDatabase.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
 				//refreshCache();
 			}
@@ -172,14 +171,10 @@ public class RhybuddDatabase
 			{
 				public void run() 
 				{
-					Thread RefreshThread = new Thread() 
-					{
-						public void run() 
-						{
 							ZenossAPIv2 API = null;
 							JSONObject EventsObject = null;
 							JSONArray Events = null;
-							SharedPreferences settings = mHelperContext.getSharedPreferences("rhybudd", 0);
+							SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mHelperContext);
 
 							try 
 							{
@@ -195,7 +190,7 @@ public class RhybuddDatabase
 							{
 								try 
 								{
-									EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false));
+									EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false),settings.getBoolean("onlyProductionAlerts",true));
 
 									Events = EventsObject.getJSONObject("result").getJSONArray("events");
 								} 
@@ -225,11 +220,7 @@ public class RhybuddDatabase
 										ContentValues values = new ContentValues(2);
 										try 
 										{
-
 											CurrentEvent = Events.getJSONObject(i);
-
-											//Log.i("Event",CurrentEvent.toString(3));
-
 											values.put("EVID",CurrentEvent.getString("evid"));
 											values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
 											values.put("summary", CurrentEvent.getString("summary"));
@@ -249,9 +240,6 @@ public class RhybuddDatabase
 
 							finishedRefresh = true;
 						}
-					};
-					RefreshThread.start();
-				}
 			}).start();
 		}
 		/**
@@ -426,10 +414,10 @@ public class RhybuddDatabase
 			}
 			catch(Exception e)
 			{
-				//Oh well
+				e.printStackTrace();
 			}
 
-			db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT)");
+			db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT)");
 			db.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
 			onCreate(db);
 		}

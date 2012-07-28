@@ -268,7 +268,8 @@ public class ViewZenossDevice extends Activity
 												    						CurrentEvent.getJSONObject("device").getString("text"),
 												    						CurrentEvent.getString("summary"), 
 												    						CurrentEvent.getString("eventState"),
-												    						CurrentEvent.getString("severity")));
+												    						CurrentEvent.getString("severity"),
+												    						CurrentEvent.getString("prodState")));
 				    				//Log.i("ForLoop",CurrentEvent.getString("summary"));
 			    				}
 			    				catch (JSONException e) 
