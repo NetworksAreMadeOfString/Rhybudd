@@ -18,18 +18,13 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
-
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -38,15 +33,14 @@ import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PixelFormat;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,9 +50,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 public class RhybuddHome extends SherlockFragmentActivity 
@@ -109,11 +104,51 @@ public class RhybuddHome extends SherlockFragmentActivity
 		settings = getSharedPreferences("rhybudd", 0);
 		setContentView(R.layout.rhybudd_home);
 		
+		//Clear any notifications
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
+		
 		actionbar = getSupportActionBar();
 		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
-		//actionbar.setListNavigationCallbacks(adapter, callback)
+		
+		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionbar_nav, android.R.layout.simple_spinner_dropdown_item);
+		OnNavigationListener mOnNavigationListener = new OnNavigationListener() 
+		{
+			  String[] strings = getResources().getStringArray(R.array.actionbar_nav);
+
+			  @Override
+			  public boolean onNavigationItemSelected(int position, long itemId) 
+			  {
+				  Log.i("onNavigationItemSelected",strings[position]);
+				  
+				  if(strings[position].equals("Devices"))
+				  {
+					  
+					  return true;
+				  }
+				  else if(strings[position].equals("Search"))
+				  {
+					  Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+					  RhybuddHome.this.startActivity(SettingsIntent);
+					  return true;
+				  }
+				  else if(strings[position].equals("Reports"))
+				  {
+					  return true;
+				  }
+				  else if(strings[position].equals("Settings"))
+				  {
+					  return true;
+				  }
+				  else
+				  {
+					  return false;
+				  }
+			  }
+		};
+		
+		actionbar.setListNavigationCallbacks(mSpinnerAdapter, mOnNavigationListener);
 		
 		BugSenseHandler.setup(this, "44a76a8c");		
 	     
@@ -381,6 +416,26 @@ public class RhybuddHome extends SherlockFragmentActivity
 	        		return true;
 	        	}
 	        	
+	            case R.id.escalate:
+		        {
+		        	Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+		        	intent.setType("text/plain");
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+		        	// Add data to the intent, the receiving app will decide what to do with it.
+		        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
+		        	String Events = "Escalated events;\r\n\r\n";
+		        	for (Integer i : selectedEvents)
+	            	{
+		        		Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
+	            		//list.setItemChecked(i, false);
+	            	}
+		        	intent.putExtra(Intent.EXTRA_TEXT, Events);
+		        	
+		        	startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+		        	return true;
+		        }
+	        	
 	            default:
 	            {
 	            	for (Integer i : selectedEvents)
@@ -444,10 +499,59 @@ public class RhybuddHome extends SherlockFragmentActivity
 	            return true;
 	        }
 	        
+	        case R.id.resolveall:
+	        {
+	        	for (final ZenossEvent evt : listOfZenossEvents)
+            	{
+	        		if(!evt.getEventState().equals("Acknowledged"))
+	        		{
+	        			evt.setProgress(true);
+		               	AckEventHandler.sendEmptyMessage(0);
+		               	AckEvent = new Thread() 
+		           	    	{  
+		           	    		public void run() 
+		           	    		{
+		           	    			try 
+		           	    			{
+		           	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+		           	    				ackEventAPI.AcknowledgeEvent(evt.getEVID());
+		           	    				evt.setProgress(false);
+		   								evt.setAcknowledged();
+		   								AckEventHandler.sendEmptyMessage(1);
+		           	    			}
+		           	    			catch (Exception e)
+		           	    			{
+		           	    				AckEventHandler.sendEmptyMessage(99);
+		           	    			}
+		           	    		}
+		           	    	};
+		           	    	AckEvent.start();
+	        		}
+            	}
+	        	return true;
+	        }
 	        case R.id.refresh:
 	        {
 	        	Refresh();
 	        	return true;
+	        }
+	        
+	        case R.id.escalate:
+	        {
+	        	Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+	        	intent.setType("text/plain");
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+	        	// Add data to the intent, the receiving app will decide what to do with it.
+	        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
+	        	String Events = "";
+	        	for (ZenossEvent evt : listOfZenossEvents)
+            	{
+	        		Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
+            	}
+	        	intent.putExtra(Intent.EXTRA_TEXT, Events);
+	        	
+	        	startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
 	        }
         }
         return false;

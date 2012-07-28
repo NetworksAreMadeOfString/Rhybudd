@@ -84,6 +84,9 @@ public class ZenossEventsAdaptor extends BaseAdapter
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.zenoss_event_listitem, null);
         }
+        
+        ((TextView) convertView.findViewById(R.id.dateTime)).setText(Event.getlastTime());
+        
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Event.getDevice());
         

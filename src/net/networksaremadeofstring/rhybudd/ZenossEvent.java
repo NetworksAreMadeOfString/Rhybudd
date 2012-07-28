@@ -41,6 +41,18 @@ public class ZenossEvent {
             this.severity = _severity;
     }
     
+    // Constructor for the Ticket class
+    public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _LastTime) 
+    {
+            super();
+            this.evid = _evid;
+            this.device = _device;
+            this.summary = _summary;
+            this.eventState = _eventState;
+            this.severity = _severity;
+            this.lastTime = _LastTime;
+    }
+    
     public void SetSelected(Boolean _selected)
     {
     	this.Selected = _selected;

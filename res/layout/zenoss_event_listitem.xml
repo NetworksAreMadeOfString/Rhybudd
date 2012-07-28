@@ -1,9 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relativeLayout1"
+<RelativeLayout android:id="@+id/relativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:paddingBottom="4px"
-    android:paddingTop="4px" >
+    android:paddingTop="4px" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ImageView
         android:id="@+id/AckImage"
@@ -56,13 +55,13 @@
             android:textOff="@string/empty" />
 
     </LinearLayout>
-
+
     <TextView
         android:id="@+id/DeviceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/inProgressBar"
+        android:layout_toLeftOf="@+id/dateTime"
         android:layout_toRightOf="@+id/linearLayout1"
         android:shadowColor="#505050"
         android:shadowDx="1"
@@ -71,15 +70,15 @@
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold" />
-
+
     <TextView
         android:id="@+id/EventSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/DeviceName"
-        android:layout_alignRight="@+id/DeviceName"
         android:layout_below="@+id/DeviceName"
         android:layout_marginBottom="8dp"
+        android:layout_toLeftOf="@+id/AckImage"
         android:shadowColor="#505050"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -87,5 +86,19 @@
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/dateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="00:00"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10dp" />
 
 </RelativeLayout>

@@ -100,35 +100,6 @@ public class ZenossPoller extends Service
 		{
 			Log.i("onStartCommand","Received an intent from the settings Activity");
 			PollerCheck();
-			/*AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
-			Intent Poller = new Intent(this, ZenossPoller.class);
-
-			if(settings.getBoolean("AllowBackgroundService", true))
-			{
-				Poller.putExtra("events", true);
-				PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-				am.cancel(Monitoring);
-				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0, ((long) settings.getInt("BackgroundServiceDelay", 30) * 1000), Monitoring);
-			}
-			else
-			{
-				Poller.putExtra("events", true);
-				PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-				am.cancel(Monitoring);
-			}
-
-	    	if(settings.getBoolean("refreshCache", true))
-	    	{
-	    		Poller.putExtra("refreshCache", true);
-	    		PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-	    		am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, AlarmManager.INTERVAL_HALF_HOUR, CacheRefresh);
-	    	}
-	    	else
-	    	{
-	    		Poller.putExtra("refreshCache", true);
-	    		PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-	    		am.cancel(CacheRefresh);
-	    	}*/
 		}
 		else
 		{
@@ -183,7 +154,7 @@ public class ZenossPoller extends Service
 
 	private void SendNotification(String EventSummary,int Severity)
 	{
-		Notification notification = new Notification(R.drawable.stat_sys_warning, "New Zenoss Events!", System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.ic_stat_alert, "New Zenoss Events!", System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
@@ -268,6 +239,7 @@ public class ZenossPoller extends Service
 							}
 							catch(Exception e)
 							{
+								e.printStackTrace();
 								ProdState = null;
 							}
 
