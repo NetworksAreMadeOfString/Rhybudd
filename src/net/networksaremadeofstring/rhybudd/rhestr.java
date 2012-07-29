@@ -43,7 +43,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -194,7 +193,7 @@ public class rhestr extends Activity
     	 };
     }
     
-    private Boolean CheckDB()
+    /*private Boolean CheckDB()
     {
     	try
     	{
@@ -234,7 +233,7 @@ public class rhestr extends Activity
     		}
     		return false;
     	}
-    }
+    }*/
     
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) 

@@ -18,13 +18,10 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-import java.util.List;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.widget.Button;
 
 public class SettingsFragment extends PreferenceActivity 
 {
