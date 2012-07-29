@@ -40,27 +40,27 @@ public class ManageUpdate extends BroadcastReceiver
 		{
 			if (intent.getDataString().contains("net.networksaremadeofstring.rhybudd"))
 			{
-				Log.i("ManangeUpdateBroadcastReceiver","Received Notification of app updated");
+				//Log.i("ManangeUpdateBroadcastReceiver","Received Notification of app updated");
 				   
 				SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(arg0);
 				SharedPreferences oldSettings = arg0.getSharedPreferences("rhybudd", 0);
 				
-				Log.i("ManangeUpdateBroadcastReceiver","Preparing to check settings");
+				//Log.i("ManangeUpdateBroadcastReceiver","Preparing to check settings");
 				
 				if(settings.getString("URL","").equals("") && !oldSettings.getString("URL","").equals(""))
 				{
-					Log.i("ManangeUpdateBroadcastReceiver","Detected the lack of new OR old preferences");
+					//Log.i("ManangeUpdateBroadcastReceiver","Detected the lack of new OR old preferences");
 					
 					try
 					{
-						Log.i("ManangeUpdateBroadcastReceiver","Deleting the old AlarmManager");
+						//Log.i("ManangeUpdateBroadcastReceiver","Deleting the old AlarmManager");
 						PendingIntent mAlarmSender = PendingIntent.getService(arg0, 0, new Intent(arg0, ZenossPoller.class), 0);
 				        AlarmManager am = (AlarmManager) arg0.getSystemService(Activity.ALARM_SERVICE);
 				        am.cancel(mAlarmSender);
 					}
 					catch(Exception e)
 					{
-						Log.e("ManangeUpdateBroadcastReceiver","Failed to kill the alarm manager");
+						//Log.e("ManangeUpdateBroadcastReceiver","Failed to kill the alarm manager");
 						e.printStackTrace();
 						BugSenseHandler.log("UpdateReceiver-mAlarmSender", e);
 					}
@@ -94,7 +94,7 @@ public class ManageUpdate extends BroadcastReceiver
 				}
 				else
 				{
-					Log.i("ManangeUpdateBroadcastReceiver","We found some settings:\r\n" + settings.getString("URL",""));
+					//Log.i("ManangeUpdateBroadcastReceiver","We found some settings:\r\n" + settings.getString("URL",""));
 				}
 			}
 			else

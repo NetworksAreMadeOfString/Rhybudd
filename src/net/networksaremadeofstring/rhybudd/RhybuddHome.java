@@ -50,6 +50,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -88,6 +89,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 		super.onDestroy();
 		try
 		{
+			if(dbResults != null)
+			{
+				dbResults.close();
+			}
+			
 			if(rhybuddCache != null)
 			{
 				rhybuddCache.Close();
@@ -115,8 +121,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 		actionbar = getSupportActionBar();
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
-		//TODO Delete
-		//actionbar.setSubtitle("https://z.networksaremadeofstring.net");
 
 		setContentView(R.layout.rhybudd_home);
 
@@ -135,6 +139,23 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			finishStart(false);
 		}
+		
+		/*((Thread) new Thread(){
+			public void run()
+			{
+				while(true)
+				{
+					Log.i("WhileLoopOfEvil","Running.....");
+					rhybuddCache.RefreshEvents();
+					try {
+						sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();*/
 	}
 
 	public void DBGetThread()
@@ -146,14 +167,13 @@ public class RhybuddHome extends SherlockFragmentActivity
 			{
 				dbResults = rhybuddCache.getEvents();
 
-				if(dbResults != null)
+				if(dbResults != null && dbResults.getCount() > 0)
 				{
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					Date date;
 					String strDate = "";
 					Date today = Calendar.getInstance().getTime();
 					String[] shortMonths = new DateFormatSymbols().getShortMonths();
-					int PicName = 0;
 					while(dbResults.moveToNext())
 					{
 						try 
@@ -175,26 +195,26 @@ public class RhybuddHome extends SherlockFragmentActivity
 								}
 							}
 						} 
-						catch (ParseException e) 
+						catch (Exception e) 
 						{
 							strDate = "";
 						}
-
-						listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-								dbResults.getString(3),
-								dbResults.getString(4), 
-								dbResults.getString(5),
-								dbResults.getString(7),
-								strDate,//dbResults.getString(2)
-								dbResults.getString(8)));
-						/*listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-								   "server" + PicName +".networksaremadeofstring.net",
-								   dbResults.getString(4), 
-								   dbResults.getString(5),
-								   dbResults.getString(7),
-								   strDate,//dbResults.getString(2)
-								   dbResults.getString(8)));
-	    				PicName++;*/
+						
+						
+						try
+						{
+							listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+									dbResults.getString(3),
+									dbResults.getString(4), 
+									dbResults.getString(5),
+									dbResults.getString(7),
+									strDate,//dbResults.getString(2)
+									dbResults.getString(8)));
+						}
+						catch(Exception e)
+						{
+							BugSenseHandler.log("DBGetThread", e);
+						}
 					}
 				}
 				handler.sendEmptyMessage(0);
@@ -224,6 +244,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		if(firstRun)
 		{
 			intent.putExtra("settingsUpdate", true);
+			startService(intent);
 			Refresh();
 		}
 		else
@@ -234,10 +255,18 @@ public class RhybuddHome extends SherlockFragmentActivity
 			}
 			else
 			{
+				Log.i("RhybuddHome","Telling the DB to do a refesh");
 				Refresh();
 			}
 		}
 
+		//TODO Make sure this can be removed
+		//startService(intent);
+	}
+	
+	public void StartService()
+	{
+		Intent intent = new Intent(this, ZenossPoller.class);
 		startService(intent);
 	}
 
@@ -382,6 +411,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 	}
 
+	
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
 		@Override
@@ -410,15 +440,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 			{
 				case R.id.Acknowledge:
 				{
-					/*try
-					{
-						ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-					}
-					catch(Exception e)
-					{
-						BugSenseHandler.log("Acknowledge", e);
-					}*/
-					
 					for (final Integer i : selectedEvents)
 					{
 						listOfZenossEvents.get(i).setProgress(true);
@@ -429,7 +450,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 							{
 								try 
 								{
-									//Used to be ackEventAPI
+									//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 									API.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
 									listOfZenossEvents.get(i).setProgress(false);
 									listOfZenossEvents.get(i).setAcknowledged();
@@ -558,14 +579,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 						{
 							try 
 							{
-								//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-								API.AcknowledgeEvent(evt.getEVID());//ackEventAPI
+								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+								ackEventAPI.AcknowledgeEvent(evt.getEVID());//ackEventAPI
 								evt.setProgress(false);
 								evt.setAcknowledged();
 								AckEventHandler.sendEmptyMessage(1);
 							}
 							catch (Exception e)
 							{
+								e.printStackTrace();
 								AckEventHandler.sendEmptyMessage(99);
 							}
 						}
@@ -661,14 +683,16 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						try 
 						{
-							//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							API.AcknowledgeEvent(EventID);//ackEventAPI
+							ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							ackEventAPI.AcknowledgeEvent(EventID);//ackEventAPI
 							listOfZenossEvents.get(Position).setProgress(false);
 							listOfZenossEvents.get(Position).setAcknowledged();
 							AckEventHandler.sendEmptyMessage(1);
 						}
 						catch (Exception e)
 						{
+							e.printStackTrace();
+							BugSenseHandler.log("Acknowledge", e);
 							AckEventHandler.sendEmptyMessage(99);
 						}
 					}

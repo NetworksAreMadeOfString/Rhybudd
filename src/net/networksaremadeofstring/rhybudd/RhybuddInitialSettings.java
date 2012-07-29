@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -300,12 +301,14 @@ public class RhybuddInitialSettings extends SherlockActivity
 	        
 	        EditText BAUser = (EditText) findViewById(R.id.basicAuthUser);
 	        EditText BAPassword = (EditText) findViewById(R.id.basicAuthPassword);
+	        CheckBox test;
 	        
 	    	SharedPreferences.Editor editor = settings.edit();
 	        editor.putString("URL", urlET.getText().toString());
 	        editor.putString("userName", nameET.getText().toString());
 	        editor.putString("passWord", passwordET.getText().toString());
 	        
+	        editor.putBoolean("httpBasicAuth", ((CheckBox) findViewById(R.id.basicAuthCheckBox)).isChecked());
 	        editor.putString("BAUser", BAUser.getText().toString());
 	        editor.putString("BAPassword", BAPassword.getText().toString());
 	        editor.commit();

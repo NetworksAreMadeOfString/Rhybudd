@@ -2,52 +2,84 @@
     <ScrollView android:id="@+id/scrollView1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-
-   
-        <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:isScrollContainer="true" android:fadeScrollbars="true" android:fadingEdge="vertical" android:scrollbars="vertical" android:layout_height="wrap_content" xmlns:android="http://schemas.android.com/apk/res/android">
-        
-
-        <TextView
-            android:id="@+id/URLLabel"
-            android:layout_width="wrap_content"
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/relativeLayout1"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="6dp"
-            android:shadowColor="#505050"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:text="Zenoss URL:"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:visibility="gone" >
-</TextView>
-        <EditText android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/ZenossURL" android:hint="http://zenoss.url:8080" android:layout_below="@+id/URLLabel" android:layout_width="fill_parent" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:inputType="textUri" android:layout_marginTop="10dp">
-            <requestFocus></requestFocus>
-        </EditText>
-        <EditText android:inputType="textPersonName" android:layout_height="wrap_content" android:id="@+id/ZenossUserName" android:layout_marginLeft="10dp" android:layout_width="fill_parent" android:layout_marginRight="10dp" android:hint="Zenoss User Name" android:layout_below="@+id/ZenossURL" android:layout_marginTop="6dp"></EditText>
-        <EditText android:inputType="textPassword" android:layout_height="wrap_content" android:id="@+id/ZenossPassword" android:layout_width="fill_parent" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_below="@+id/ZenossUserName" android:hint="Zenoss Password"></EditText>
+            android:fadeScrollbars="true"
+            android:fadingEdge="vertical"
+            android:isScrollContainer="true"
+            android:scrollbars="vertical" >
 
+            <TextView
+                android:id="@+id/URLLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"
+                android:shadowColor="#505050"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="Zenoss URL:"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:visibility="gone" >
+            </TextView>
 
+            <EditText
+                android:id="@+id/ZenossURL"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/URLLabel"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:hint="http://zenoss.url:8080"
+                android:inputType="textUri" >
 
+                <requestFocus>
+                </requestFocus>
+            </EditText>
 
+            <EditText
+                android:id="@+id/ZenossUserName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ZenossURL"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="6dp"
+                android:hint="Zenoss User Name"
+                android:inputType="textPersonName" >
+            </EditText>
 
+            <EditText
+                android:id="@+id/ZenossPassword"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ZenossUserName"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:hint="Zenoss Password"
+                android:inputType="textPassword" >
+            </EditText>
 
-        <TextView
-            android:id="@+id/settingsDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/ZenossPassword"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center_horizontal"
-            android:text="@string/initialSettings"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-
-
+            <TextView
+                android:id="@+id/settingsDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ZenossPassword"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="@string/initialSettings"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageView
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -62,28 +94,35 @@
                 android:paddingRight="5dp"
                 android:paddingTop="2dp"
                 android:scaleType="fitXY"
-                android:src="@android:drawable/divider_horizontal_dark" />
-
-
-
-
-
-
+                android:src="@android:drawable/divider_horizontal_dark" /><Button
+            android:id="@+id/SaveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/basicAuthPassword"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="Save Settings &amp; Login" />
+
+            <CheckBox
+                android:id="@+id/basicAuthCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/settingsDesc"
+                android:layout_below="@+id/divider1"
+                android:text="Enable HTTP Basic Auth" />
+
             <EditText
                 android:id="@+id/basicAuthUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/ZenossPassword"
                 android:layout_alignRight="@+id/ZenossPassword"
-                android:layout_below="@+id/divider1"
-                android:layout_marginTop="20dp"
+                android:layout_below="@+id/basicAuthCheckBox"
                 android:ems="10"
-                android:hint="HTTP Basic Auth User" />
-
-
-
-
-
+                android:hint="HTTP Basic Auth User"
+                android:inputType="textNoSuggestions" />
+
             <EditText
                 android:id="@+id/basicAuthPassword"
                 android:layout_width="wrap_content"
@@ -91,20 +130,11 @@
                 android:layout_alignLeft="@+id/basicAuthUser"
                 android:layout_alignRight="@+id/basicAuthUser"
                 android:layout_below="@+id/basicAuthUser"
+                android:layout_marginTop="8dp"
                 android:ems="10"
                 android:hint="HTTP Basic Auth Password"
                 android:inputType="textPassword" />
-
-            <Button
-                android:id="@+id/SaveButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_below="@+id/basicAuthPassword"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="8dp"
-                android:text="Save Settings" />
 
-    </RelativeLayout>
+        </RelativeLayout>
     
     </ScrollView>

@@ -99,21 +99,35 @@ public class ZenossPoller extends Service
 		    				
 		        			Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
 		        			
-		        			if(dbResults != null)
+		        			if(dbResults != null && dbResults.getCount() > 0)
 		        			{
 		    	    			while(dbResults.moveToNext())
 		    	    			{
-		    	    				ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
+		    	    				/*for(String s : dbResults.getColumnNames())
+		    	    				{
+		    	    					Log.v("ZenossPoller",s);
+		    	    				}
+		    	    				Log.v("---","---------------");*/
+		    	    				
+		    	    				try
+		    	    				{
+		    	    					ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
 											   dbResults.getString(3),
 											   dbResults.getString(4), 
 											   dbResults.getString(5),
 											   dbResults.getString(7),
 											   dbResults.getString(8));
 		    	    				
-		    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
+			    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
+			    	    				{
+			    	    					EventCount++;
+											//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+			    	    				}
+		    	    				}
+		    	    				catch(Exception e)
 		    	    				{
-		    	    					EventCount++;
-										//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+		    	    					e.printStackTrace();
+		    	    					BugSenseHandler.log("ZenossPoller", e);
 		    	    				}
 		    	    			}
 		    	    			
