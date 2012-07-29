@@ -56,8 +56,6 @@ public class ZenossWidget extends AppWidgetProvider
     	{
     		public void handleMessage(Message msg) 
     		{
-    			//Log.i("Handler","Msg recieved");
-
 				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
 				Intent intent = new Intent(context, rhestr.class);
 				intent.putExtra("forceRefresh", true);
@@ -161,7 +159,6 @@ public class ZenossWidget extends AppWidgetProvider
 				Events = null;
 				API = null;
 				dataPreload = null;
-				//Log.i("Widget-Thread", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " +  Integer.toString(WarnCount));
     		}
     	};
     }

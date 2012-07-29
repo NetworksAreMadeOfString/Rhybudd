@@ -22,6 +22,7 @@ package net.networksaremadeofstring.rhybudd;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -54,25 +55,37 @@ public class ManageDatabase extends SherlockActivity
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 
-        ((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybuddCache").length()) + " bytes");
+		try
+		{
+			((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybudd3Cache").length()) + " bytes");
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("ManageDatabase", e);
+		}
         
         
         UIUpdate = new Handler() 
         {
 			public void handleMessage(Message msg) 
 			{
-				if(msg.what == 0)
+				try
 				{
-					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
-			    	((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
+					if(msg.what == 0)
+					{
+						((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
+						((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
+					}
+					else
+					{
+						((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
+				    	((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
-			    	((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
+					BugSenseHandler.log("ManageDatabase", e);
 				}
-				
-				((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybuddCache").length()) + "bytes");
 			}
         };
         
@@ -82,7 +95,7 @@ public class ManageDatabase extends SherlockActivity
 			@Override
 			public void onClick(View v) 
 			{
-				Toast.makeText(ManageDatabase.this, "There is no need to manually invoke a cache refresh.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(ManageDatabase.this, "There is no longer any need to manually invoke a cache refresh.", Toast.LENGTH_SHORT).show();
 			}
         });
         
@@ -110,23 +123,23 @@ public class ManageDatabase extends SherlockActivity
 		    	 {
 		             public void onClick(DialogInterface arg0, int arg1) 
 		             {
-		            	 FlushDBThread = new Thread() 
+		            	 ((Thread) new Thread() 
 		        	    	{  
 		        	    		public void run() 
 		        	    		{
-		        	    			
-		        	    			UIUpdate.sendEmptyMessage(0);
-		        	    			/*SQLiteDatabase cacheDB = ManageDatabase.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-		        	    			cacheDB.delete("devices", null, null);
-		        	    			cacheDB.delete("events", null, null);
-		        	    			cacheDB.close();*/
-		        	    			RhybuddDatabase rhybuddCache = new RhybuddDatabase(ManageDatabase.this);
-		        	    			rhybuddCache.FlushDB();
-		        	    			UIUpdate.sendEmptyMessage(1);
+		        	    			try
+		        	    			{
+			        	    			UIUpdate.sendEmptyMessage(0);
+			        	    			RhybuddDatabase rhybuddCache = new RhybuddDatabase(ManageDatabase.this);
+			        	    			rhybuddCache.FlushDB();
+			        	    			UIUpdate.sendEmptyMessage(1);
+		        	    			}
+		        					catch(Exception e)
+		        					{
+		        						BugSenseHandler.log("emptyDBButton", e);
+		        					}
 		        	    		}
-		        	    	};
-		        	    	
-		        	    	FlushDBThread.start();
+		        	    	}).start();
 		             }
 		    	 });
 
@@ -137,9 +150,7 @@ public class ManageDatabase extends SherlockActivity
 		            	 //Do nothing
 		             }
 		         });
-
 		         alertbox.show();
-		    	 
 			}
         });
         
@@ -149,11 +160,16 @@ public class ManageDatabase extends SherlockActivity
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
-	            // app icon in action bar clicked; go home
-	            Intent intent = new Intent(this, RhybuddHome.class);
+	        {
+	            /*Intent intent = new Intent(this, RhybuddHome.class);
 	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	            startActivity(intent);
+	            startActivity(intent);*/
+	        	//No need for crazy intents
+	        	finish();
+	            
 	            return true;
+	        }
+	        
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }

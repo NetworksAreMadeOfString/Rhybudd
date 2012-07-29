@@ -62,13 +62,16 @@ public class ZenossEventsAdaptor extends BaseAdapter
     
     
     @Override
-	public int getCount() {
+	public int getCount() 
+    {
     	 return listZenossEvents.size();
 	}
 	@Override
-	public Object getItem(int position) {
+	public Object getItem(int position) 
+	{
 		return listZenossEvents.get(position);
 	}
+	
 	@Override
 	public long getItemId(int position) 
 	{
@@ -135,6 +138,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.integer.EventPositionInList,position);
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
         
+        //TODO this needs some serious tidying up (like not cheating on R.integer.*
         //convertView.setTag(Event.getEVID());
         convertView.setTag(R.integer.EventID,Event.getEVID());
         convertView.setTag(R.integer.EventPositionInList,position);
@@ -153,17 +157,4 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         return convertView;
 	}
-	
-	/*@Override
-	public void onClick(View v) 
-	{
-		((rhestr)context).AcknowledgeEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
-	}*/
-	
-	/*public boolean onLongClick(View v)
-	{
-		((rhestr)context).ViewEvent(v.getTag(R.integer.EventID).toString());
-		return true;
-	}*/
-
 }

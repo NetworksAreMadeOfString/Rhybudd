@@ -26,26 +26,7 @@ import android.preference.PreferenceManager;
 public class SettingsFragment extends PreferenceActivity 
 {
 	SharedPreferences prefs;
-   /* @Override
-    protected void onCreate(Bundle savedInstanceState) 
-    {
-        super.onCreate(savedInstanceState);
 
-        // Add a button to the header list.
-        if (hasHeaders()) 
-        {
-            Button button = new Button(this);
-            button.setText("Some action");
-            setListFooter(button);
-        }
-    }
-
-    @Override
-    public void onBuildHeaders(List<Header> target) 
-    {
-        loadHeadersFromResource(R.xml.preferences, target);
-    }
-    */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

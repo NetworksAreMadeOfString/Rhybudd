@@ -48,6 +48,9 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,16 +58,16 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+//TODO This needs some serious genericisation to remove all the duplicated code
 public class ZenossAPIv2 
 {
-	private String ZENOSS_INSTANCE = null;
-    private String ZENOSS_USERNAME = null;
-    private String ZENOSS_PASSWORD = null;
+	String ZENOSS_INSTANCE = null;
+    String ZENOSS_USERNAME = null;
+    String ZENOSS_PASSWORD = null;
     
     //These don't get used directly
   	private DefaultHttpClient client;
   	private SingleClientConnManager mgr;
-  	
   	private DefaultHttpClient httpclient;
   	
     @SuppressWarnings("rawtypes")
@@ -91,7 +94,15 @@ public class ZenossAPIv2
     	    httpclient.setCredentialsProvider(credProvider);
     	}
     	
-    	//Log.i("Constructor","Entering constructor");
+    	//Timeout ----------------------------------
+    	HttpParams httpParameters = new BasicHttpParams(); 
+    	int timeoutConnection = 20000;
+    	HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+    	int timeoutSocket = 30000;
+    	HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+    	httpclient.setParams(httpParameters);
+    	//Timeout ----------------------------------
+    	
         HttpPost httpost = new HttpPost(URL + "/zport/acl_users/cookieAuthHelper/login");
 
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -104,6 +115,7 @@ public class ZenossAPIv2
 
         // Response from POST not needed, just the cookie
         HttpResponse response = httpclient.execute(httpost);
+        
         // Consume so we can reuse httpclient
         response.getEntity().consumeContent();
         
@@ -129,7 +141,7 @@ public class ZenossAPIv2
         //Check whether people are self signing or not
         /*if(AllowSelfSigned == true)
         {*/
-        	Log.i("SelfSigned","Allowing Self Signed Certificates");
+        	//Log.i("SelfSigned","Allowing Self Signed Certificates");
 			socketFactory = TrustAllSSLSocketFactory.getDefault();
         /*}
         else
@@ -167,11 +179,8 @@ public class ZenossAPIv2
 			this.LoginSuccessful = false;
 			return false;
 		}
-    	
-		
     }
 	
-	@SuppressWarnings("unchecked")
 	public JSONObject GetDevices() throws JSONException, ClientProtocolException, IOException
 	{
 		HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/device_router");
@@ -201,24 +210,15 @@ public class ZenossAPIv2
         reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	
-    	//Log.i("Execute","Executing with string: " + reqData.toString());
-    	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
-		
-		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
-    	return json;
-        
+    	String rawDevicesJSON = httpclient.execute(httpost, responseHandler);
+		JSONObject json = new JSONObject(rawDevicesJSON);
+    	return json; 
 	}
     
 	@SuppressWarnings("unchecked")
 	public JSONObject AcknowledgeEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
 	{
-		//{"action":"EventsRouter","method":"acknowledge","data":[{"evids":["35f000dd-a069-4129-a11a-215c3cc2ed48"],"excludeIds":{},"selectState":null,"field":"severity","direction":"DESC","params":"{\"severity\":[5,4,3,2],\"eventState\":[0,1]}","asof":1316269924.493517}],"type":"rpc","tid":4}
-		//Log.i("Test:", "Entering AcknowledgeEvent");
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
-
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
     	
@@ -249,13 +249,8 @@ public class ZenossAPIv2
         reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	
-    	//Log.i("Execute","Executing with string: " + reqData.toString());
-    	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
-		
-		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
+    	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
+		JSONObject json = new JSONObject(ackEventReturnJSON);
     	return json;
 	}
 	
@@ -263,7 +258,6 @@ public class ZenossAPIv2
 	{
 		return this.GetEvents("5,4,3,2",false);
 	}
-	
 	
 	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug) throws JSONException, ClientProtocolException, IOException
 	{
@@ -336,19 +330,14 @@ public class ZenossAPIv2
         
         httpost.setEntity(new StringEntity(reqData.toString()));
     	
-    	//Log.i("Execute","Executing with string: " + reqData.toString());
-    	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
-		
-		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
+    	String eventsRawJSON = httpclient.execute(httpost, responseHandler);
+		JSONObject json = new JSONObject(eventsRawJSON);
     	return json;
     }
     
     @SuppressWarnings("unchecked")
 	public JSONObject GetEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
     {
-    	//Log.i("Test:", "Entering GetEvent");
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");

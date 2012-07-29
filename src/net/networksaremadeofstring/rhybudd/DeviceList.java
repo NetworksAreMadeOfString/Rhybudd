@@ -68,12 +68,20 @@ public class DeviceList extends SherlockActivity
 	{
 		super.onDestroy();
 		rhybuddCache.Close();
+		try
+		{
 		if(dialog != null && dialog.isShowing())
 			dialog.dismiss();
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("DeviceList-OnDestroy", e);
+		}
 	}
 	
 	@Override
-	public void onAttachedToWindow() {
+	public void onAttachedToWindow() 
+	{
 		super.onAttachedToWindow();
 		Window window = getWindow();
 		window.setFormat(PixelFormat.RGBA_8888);
@@ -82,9 +90,16 @@ public class DeviceList extends SherlockActivity
 	@Override
 	public Object onRetainNonConfigurationInstance() 
 	{
-		if(dialog != null && dialog.isShowing())
+		try
 		{
-			dialog.dismiss();
+			if(dialog != null && dialog.isShowing())
+			{
+				dialog.dismiss();
+			}
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("DeviceList-onRetainNonConfigurationInstance", e);
 		}
 	
 	    return listOfZenossDevices;
@@ -96,8 +111,11 @@ public class DeviceList extends SherlockActivity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
+        
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+        
         setContentView(R.layout.devicelist);
+        BugSenseHandler.setup(this, "44a76a8c");	
         
         actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
@@ -140,7 +158,15 @@ public class DeviceList extends SherlockActivity
         	}
         };
 
-    	listOfZenossDevices = (List<ZenossDevice>) getLastNonConfigurationInstance();
+        try
+        {
+        	listOfZenossDevices = (List<ZenossDevice>) getLastNonConfigurationInstance();
+        }
+        catch(Exception e)
+		{
+        	listOfZenossDevices = null;
+			BugSenseHandler.log("DeviceList", e);
+		}
     	
     	if(listOfZenossDevices == null || listOfZenossDevices.size() < 1)
     	{
@@ -168,7 +194,22 @@ public class DeviceList extends SherlockActivity
     	{  
     		public void run() 
     		{
-    			dbResults = rhybuddCache.getDevices();
+    			try
+    			{
+    				dbResults = rhybuddCache.getDevices();
+    			}
+    			catch(Exception e)
+    			{
+    				BugSenseHandler.log("DeviceList-DBGetThread", e);
+    				dbResults = null;
+    				Message msg = new Message();
+					Bundle bundle = new Bundle();
+					bundle.putString("exception",e.getMessage());
+					msg.setData(bundle);
+					msg.what = 0;
+					handler.sendMessage(msg);
+    			}
+    			
     			if(dbResults != null)
     			{
     				try
@@ -177,20 +218,47 @@ public class DeviceList extends SherlockActivity
 	    				while(dbResults.moveToNext())
 		    			{
 	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
-	    					events.put("info", dbResults.getInt(5));
-	    					events.put("debug", dbResults.getInt(6));
-	    					events.put("warning", dbResults.getInt(7));
-	    					events.put("error", dbResults.getInt(8));
-	    					events.put("critical", dbResults.getInt(9));
 	    					
-	    					listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-			    					 dbResults.getInt(2), 
-			    					 events,
-			    					 dbResults.getString(3),
-			    					 dbResults.getString(4)));
+	    					//TODO I could do this better in a loop over an array but that's for another time
+	    					//because the columns don't match up properly
+	    					/*
+	    					String[] Array = {"info","debug", "warning","error","critical"};
+	    					for(String s :Array)
+	    					{
+	    						events.put("info", dbResults.getInt(5));
+	    					}*/
+	    					try
+	    					{
+	    						events.put("info", dbResults.getInt(5));
+	    						events.put("debug", dbResults.getInt(6));
+		    					events.put("warning", dbResults.getInt(7));
+		    					events.put("error", dbResults.getInt(8));
+		    					events.put("critical", dbResults.getInt(9));
+	    					}
+	    					catch(Exception e)
+	    					{
+	    						events.put("info", 0);
+	    						events.put("debug", 0);
+		    					events.put("warning", 0);
+		    					events.put("error", 0);
+		    					events.put("critical", 0);
+	    					}
 	    					
-	    					handler.sendEmptyMessageDelayed(1, 500);
+	    					try
+	    					{
+		    					listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+				    					 dbResults.getInt(2), 
+				    					 events,
+				    					 dbResults.getString(3),
+				    					 dbResults.getString(4)));
+	    					}
+	    					catch(Exception e)
+	    					{
+	    						BugSenseHandler.log("DeviceList-CursorLoop", e);
+	    					}
+	    					
 		    			}
+	    				handler.sendEmptyMessageDelayed(1, 500);
     				}
     				catch(Exception e)
     				{
@@ -203,88 +271,15 @@ public class DeviceList extends SherlockActivity
     					handler.sendMessage(msg);
     				}
     			}
+    			else
+    			{
+    				//Nothing the handler is sent in the try catch above
+    			}
     		}
     	};
     	dataLoad.start();
     }
-   
-    /*public void GetDevices()
-    {
-    	dialog = new ProgressDialog(this);
-    	dialog.setTitle("Contacting Zenoss");
-   	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
-   	 	dialog.show();
-    	dataPreload = new Thread() 
-    	{  
-    		public void run() 
-    		{
-    			try 
-    			{
-    				if(API == null)
-    				{
-    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-    				}
-    				
-    				DeviceObject = API.GetDevices();
-    				
-    				try 
-    				{
-    					DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
-    					
-    					//Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
-    					
-    					for(int i = 0; i < DeviceCount; i++)
-    	    			{
-    	    				JSONObject CurrentDevice = null;
-    	    				try 
-    	    				{
-    	    					CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
-    		    				
-    	    					//Log.i("Device", CurrentDevice.toString());
-    	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
-    	    					events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
-    	    					events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
-    	    					events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
-    	    					events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
-    	    					events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));
-    	    					
-    		    				listOfZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
-    		    						CurrentDevice.getInt("ipAddress"), 
-    		    						events,
-    		    						CurrentDevice.getString("name"),
-    		    						CurrentDevice.getString("uid")));
-    		    				
-    		    				//Log.i("ForLoop",CurrentDevice.getString("name"));
-    	    				}
-    	    				catch (JSONException e) 
-    	    				{
-    	    					//TODO We should probably tell the user that something went wrong
-    	    				}
-    	    			}
-    					
-    					firstLoadHandler.sendEmptyMessage(1);
-    				} 
-    				catch (JSONException e) 
-    				{
-    					//TODO We should probably tell the user that something went wrong
-    					firstLoadHandler.sendEmptyMessage(0);
-    				}
-				} 
-    			catch (Exception e) 
-    			{
-    				//TODO We should probably tell the user that something went wrong
-    				//Log.e("API - Stage 1", e.getMessage());
-    				firstLoadHandler.sendEmptyMessage(0);
-				}
-    			
-    			//1 is good
-    			firstLoadHandler.sendEmptyMessage(1);
-    		}
-    	};
-    	
-    	dataPreload.start();
-    }*/
-    
+  
     public void ViewDevice(String UID)
     {
     	Intent ViewDeviceIntent = new Intent(DeviceList.this, ViewZenossDevice.class);

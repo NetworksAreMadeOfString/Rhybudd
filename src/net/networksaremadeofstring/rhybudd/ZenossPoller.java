@@ -46,23 +46,27 @@ public class ZenossPoller extends Service
 	Thread dataPreload;
 	int EventCount = 0;
 	String CriticalList = "";
-	private int NotificationID = 0;
-	private int failureCount = 0;
+	/*private int NotificationID = 0;
+	private int failureCount = 0;*/
 	private Boolean onlyAlertOnProd = true;
 	RhybuddDatabase rhybuddCache = null;
 	Handler handler;
 	Cursor dbResults;
 	int Delay;
+	
 	@Override
 	public void onCreate() 
 	{
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		
 		Log.i("ServiceThread","Service Starting");
+		
 		BugSenseHandler.setup(this, "44a76a8c");
 
 		onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", true);
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
+		
 		if(rhybuddCache == null)
 		{
 			rhybuddCache = new RhybuddDatabase(this);
@@ -87,33 +91,39 @@ public class ZenossPoller extends Service
     			}
     			else if(msg.what == 2)
     			{
-    				//Log.i("handler","2 - Preparing to get events");
-    				
-    				dbResults = rhybuddCache.getEvents();
-        			Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
-        			if(dbResults != null)
-        			{
-    	    			while(dbResults.moveToNext())
-    	    			{
-    	    				ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
-									   dbResults.getString(3),
-									   dbResults.getString(4), 
-									   dbResults.getString(5),
-									   dbResults.getString(7),
-									   dbResults.getString(8));
-    	    				
-    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
-    	    				{
-    	    					EventCount++;
-								//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
-    	    				}
-    	    			}
-    	    			
-    	    			if(EventCount > 0)
-    	    				SendCombinedNotification(EventCount,CriticalList);
-        			}
-        			if(alertsEnabled)
-	    				SendStickyNotification();
+    				((Thread) new Thread()
+    				{
+    					public void run() 
+    					{
+		    				dbResults = rhybuddCache.getEvents();
+		    				
+		        			Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
+		        			
+		        			if(dbResults != null)
+		        			{
+		    	    			while(dbResults.moveToNext())
+		    	    			{
+		    	    				ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
+											   dbResults.getString(3),
+											   dbResults.getString(4), 
+											   dbResults.getString(5),
+											   dbResults.getString(7),
+											   dbResults.getString(8));
+		    	    				
+		    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
+		    	    				{
+		    	    					EventCount++;
+										//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+		    	    				}
+		    	    			}
+		    	    			
+		    	    			if(EventCount > 0)
+		    	    				SendCombinedNotification(EventCount,CriticalList);
+		        			}
+		        			if(alertsEnabled)
+			    				SendStickyNotification();
+    					}
+    				}).start();
     			}
     			else
     			{
@@ -121,14 +131,35 @@ public class ZenossPoller extends Service
     			}
     		}
     	};
-    	
+    	//TODO Find out why this was here
 		//CheckForEvents(); 
 	}
 
 	@Override
 	public void onDestroy() 
 	{
-		rhybuddCache.Close();
+		if(mNM != null)
+		{
+			try
+			{
+				mNM.cancel(20);
+			}
+			catch(Exception e)
+			{
+				BugSenseHandler.log("ZenossPoller", e);
+			}
+		}
+		if(rhybuddCache != null)
+		{
+			try
+			{
+				rhybuddCache.Close();
+			}
+			catch(Exception e)
+			{
+				BugSenseHandler.log("ZenossPoller", e);
+			}
+		}
 	}
 
 	@Override
@@ -178,7 +209,15 @@ public class ZenossPoller extends Service
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
 			am.cancel(Monitoring);
-			am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0,  Long.parseLong(settings.getString("BackgroundServiceDelay", "60")) * 1000, Monitoring);
+			try
+			{
+				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0,  Long.parseLong(settings.getString("BackgroundServiceDelay", "60")) * 1000, Monitoring);
+			}
+			catch(Exception e)
+			{
+				BugSenseHandler.log("ZenossPoller", e);
+				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0,  60000, Monitoring);
+			}
 		}
 		else
 		{
@@ -223,7 +262,16 @@ public class ZenossPoller extends Service
 		notificationIntent.putExtra("forceRefresh", true);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		Calendar date = Calendar.getInstance();
-		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time was " + date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE), contentIntent);
+		String strDate = "";
+		if(date.get(Calendar.MINUTE) < 10)
+		{
+			strDate = Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + ":0" + Integer.toString(date.get(Calendar.MINUTE));
+		}
+		else
+		{
+			strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
+		}
+		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time was " + strDate, contentIntent);
 		mNM.notify(20, notification);
 	}
 	
@@ -288,103 +336,21 @@ public class ZenossPoller extends Service
 	{
 		EventCount = 0;
 		CriticalList = "";
-		rhybuddCache.RefreshEvents();
-		handler.sendEmptyMessageDelayed(1, 1000);
-		/*dataPreload = new Thread() 
-		{  
-			public void run() 
-			{
-				Log.i("ServiceThread","Thread Started");
-				onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", false);
-
-				try 
-				{
-					if(API == null)
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-
-					EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true),
-							settings.getBoolean("SeverityError", true),
-							settings.getBoolean("SeverityWarning", true),
-							settings.getBoolean("SeverityInfo", false),
-							settings.getBoolean("SeverityDebug", false),
-							settings.getBoolean("onlyProductionAlerts", true));
-
-					Events = EventsObject.getJSONObject("result").getJSONArray("events");
-					EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-					failureCount = 0;
-					
-					//Log.i("Events",Events.toString(3));
-				} 
-				catch (Exception e) 
-				{
-					Log.i("ServiceThread","Exception encountered; " + e.getMessage());
-					failureCount++;
-
-					if(failureCount > 10)
-					{
-						SendNotification("Background poller couldn't connect. Stopping. \r\nLaunch Rhybudd to restart poller.",5);
-						stopSelf();
-					}
-				}
-				Log.i("ServiceThread","API Call finsihed");
-				
-				if(Events != null)
-				{
-					for(int i = 0; i < EventCount; i++)
-					{
-						JSONObject CurrentEvent = null;
-						String ProdState = null;
-						ContentValues values = new ContentValues(2);
-						try 
-						{
-							CurrentEvent = Events.getJSONObject(i);
-
-							try
-							{
-								ProdState = CurrentEvent.getString("prodState");
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-								ProdState = null;
-							}
-
-							if(CurrentEvent.getString("eventState").equals("New") && CheckIfNotify(ProdState, CurrentEvent.getJSONObject("device").getString("uid")))
-								SendNotification(CurrentEvent.getString("summary"),Integer.parseInt(CurrentEvent.getString("severity")));
-
-						}
-						catch (JSONException j) 
-						{
-							Log.i("ServiceThread","Exception encountered; " + j.getMessage());
-							BugSenseHandler.log("PollerEventsLoop", j);
-						}
-						catch (Exception e)
-						{
-							Log.i("ServiceThread","Exception encountered; " + e.getMessage());
-							BugSenseHandler.log("PollerEventsLoop", e);
-						}
-					}
-				}
-				else
-				{
-					Log.e("Service", "EventsObject was null");
-				}
-
-				//At this point it might be a good idea to set stuff we don't need
-				//anymore to null so GC can collect it
-				Events = null;
-				//ZenossPoller.this.stopSelf();
-
-				Log.i("ServiceThread","stopping");
-			}
-		};
-		dataPreload.start();*/
+		try
+		{
+			rhybuddCache.RefreshEvents();
+			handler.sendEmptyMessageDelayed(1, 1000);
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("ZenossPoller", e);
+		}
 	}
 
 	private Boolean CheckIfNotify(String prodState, String UID)
 	{
 		//We always return true if the device is production as specified by a 4.1 event JSON prodState
-		if(prodState != null && prodState.equals("Production"))
+		if(prodState != null && prodState.toLowerCase().equals("production"))
 		{
 			return true;
 		}

@@ -86,7 +86,17 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onDestroy()
 	{
 		super.onDestroy();
-		rhybuddCache.Close();
+		try
+		{
+			if(rhybuddCache != null)
+			{
+				rhybuddCache.Close();
+			}
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("RhybuddHome-onDestroy", e);
+		}
 	}
 
 	@Override
@@ -115,7 +125,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		BugSenseHandler.setup(this, "44a76a8c");		
 
-		if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("credentialsSuccess", false) == false)
+		if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
 		{
 			Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
 			SettingsIntent.putExtra("firstRun", true);
@@ -589,12 +599,17 @@ public class RhybuddHome extends SherlockFragmentActivity
 			else if(resultCode == 2)
 			{
 				Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
+				
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putString("URL", "");
+				editor.commit();
+				
 				finish();
 			}
 			else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
 			{
 				Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
-				Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
+				Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
 				SettingsIntent.putExtra("firstRun", true);
 				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
 			}
