@@ -1,0 +1,5 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/settings" android:title="Settings" android:icon="@drawable/ic_action_settings" android:showAsAction="always|withText"></item>
+    <item android:id="@+id/devices" android:icon="@drawable/ic_action_devices" android:title="Infrastructure" android:titleCondensed="Devices" android:showAsAction="always|withText"></item> 
+    </menu>

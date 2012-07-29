@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2011 - Gareth Llewellyn
+* Copyright (C) 2012 - Gareth Llewellyn
 *
 * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
 *
@@ -21,32 +21,31 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.json.JSONException;
 import org.json.JSONObject;
-import android.app.Activity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.bugsense.trace.BugSenseHandler;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PixelFormat;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
+import android.preference.PreferenceManager;
 import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class DeviceList extends Activity
+public class DeviceList extends SherlockActivity
 {
 	ZenossAPIv2 API = null;
 	JSONObject DeviceObject = null;
 	JSONObject EventDetails = null;
-	private SharedPreferences settings = null;
+	SharedPreferences settings = null;
 	Handler firstLoadHandler;
 	ProgressDialog dialog;
 	Thread dataPreload;
@@ -55,7 +54,23 @@ public class DeviceList extends Activity
 	ListView list;
 	ZenossDeviceAdaptor adapter = null;
 	Cursor dbResults = null;
-	SQLiteDatabase rhybuddCache = null;
+	//SQLiteDatabase rhybuddCache = null;
+	
+	
+	//new
+	Handler handler;
+	ActionBar actionbar;
+	RhybuddDatabase rhybuddCache;
+	Thread dataLoad;
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		rhybuddCache.Close();
+		if(dialog != null && dialog.isShowing())
+			dialog.dismiss();
+	}
 	
 	@Override
 	public void onAttachedToWindow() {
@@ -81,144 +96,119 @@ public class DeviceList extends Activity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.devicelist);
-        ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
+        
+        actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setHomeButtonEnabled(true);
+        
         list = (ListView)findViewById(R.id.ZenossDeviceList);
         
-        firstLoadHandler = new Handler() 
-    	{
-    		public void handleMessage(Message msg) 
-    		{
-    			if(dialog != null)
+        rhybuddCache = new RhybuddDatabase(this);
+        
+        BugSenseHandler.setup(this, "44a76a8c");
+        
+        handler = new Handler()
+        {
+        	public void handleMessage(Message msg)
+        	{
+        		if(msg.what == 0)
+        		{
+        			Toast.makeText(DeviceList.this, "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+        		}
+        		else if(msg.what == 1)
+    			{
+    				if(rhybuddCache.hasCacheRefreshed())
+    				{
+    					dialog.setMessage("Refresh Complete!");
+    					this.sendEmptyMessageDelayed(2,1000);
+    				}
+    				else
+    				{
+    					dialog.setMessage("Processing...");
+        				handler.sendEmptyMessageDelayed(1, 1000);
+    				}
+    			}
+    			else if(msg.what == 2)
+    			{
     				dialog.dismiss();
-    			
-    			if(listOfZenossDevices.size() > 0)
-    			{
-    				UpdateErrorMessage("",false);
-					adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
-	    	        list.setAdapter(adapter);
+    				adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
+    		        list.setAdapter(adapter);
+    		        ((TextView) findViewById(R.id.ServerCountLabel)).setText("Monitoring " + DeviceCount + " servers");
     			}
-    			else
-    			{
-    				UpdateErrorMessage("There are no devices in the list",false);
-    			}
-    		}
-    	};
-    	
-    	
+        	}
+        };
+
     	listOfZenossDevices = (List<ZenossDevice>) getLastNonConfigurationInstance();
     	
     	if(listOfZenossDevices == null || listOfZenossDevices.size() < 1)
     	{
     		listOfZenossDevices = new ArrayList<ZenossDevice>();
-
-    		/*if(CheckDB())
-    		{
-    			DBGetDevices();
-    		}
-    		else
-    		{*/
-    			GetDevices();
-    		//}
+    		DBGetThread();
     	}
     	else
     	{
-	    	UpdateErrorMessage("",false);
-	    	adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
-	        list.setAdapter(adapter);
+    		adapter = new ZenossDeviceAdaptor(DeviceList.this, listOfZenossDevices);
+    		list.setAdapter(adapter);
     	}
-    	
-    	
-    	
-    	ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
-        refreshButton.setClickable(true);
-        refreshButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				listOfZenossDevices.clear();
-	        	list.setAdapter(null);
-	        	GetDevices();
-			}
-        });
-        
     }
     
-    public void DBGetDevices()
+    
+    public void DBGetThread()
     {
-    	dataPreload = new Thread() 
+    	dialog = new ProgressDialog(this);
+    	dialog.setTitle("Contacting Zenoss");
+   	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
+   	 	dialog.setCancelable(false);
+   	 	dialog.show();
+   	 	
+    	listOfZenossDevices.clear();
+    	dataLoad = new Thread() 
     	{  
     		public void run() 
     		{
-    			//Log.i("DBGetDevices",Integer.toString(dbResults.getCount()));
-    			
-    			while(dbResults.moveToNext())
+    			dbResults = rhybuddCache.getDevices();
+    			if(dbResults != null)
     			{
-    				HashMap<String, Integer> events = new HashMap<String, Integer>();
-					events.put("info", dbResults.getInt(5));
-					events.put("debug", dbResults.getInt(6));
-					events.put("warning", dbResults.getInt(7));
-					events.put("error", dbResults.getInt(8));
-					events.put("critical", dbResults.getInt(9));
-					
-    				listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-									    					 dbResults.getInt(2), 
-									    					 events,
-									    					 dbResults.getString(3),
-									    					 dbResults.getString(4)));
+    				try
+    				{
+    					DeviceCount = dbResults.getCount();
+	    				while(dbResults.moveToNext())
+		    			{
+	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
+	    					events.put("info", dbResults.getInt(5));
+	    					events.put("debug", dbResults.getInt(6));
+	    					events.put("warning", dbResults.getInt(7));
+	    					events.put("error", dbResults.getInt(8));
+	    					events.put("critical", dbResults.getInt(9));
+	    					
+	    					listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+			    					 dbResults.getInt(2), 
+			    					 events,
+			    					 dbResults.getString(3),
+			    					 dbResults.getString(4)));
+	    					
+	    					handler.sendEmptyMessageDelayed(1, 500);
+		    			}
+    				}
+    				catch(Exception e)
+    				{
+    					BugSenseHandler.log("DeviceList", e);
+    					Message msg = new Message();
+    					Bundle bundle = new Bundle();
+    					bundle.putString("exception",e.getMessage());
+    					msg.setData(bundle);
+    					msg.what = 0;
+    					handler.sendMessage(msg);
+    				}
     			}
-    			
-    			rhybuddCache.close();
-        		dbResults.close();
-        		//Log.i("DBGetThread",Integer.toString(listOfZenossDevices.size()));
-        		firstLoadHandler.sendEmptyMessage(0);
     		}
     	};
-    	dataPreload.start();
+    	dataLoad.start();
     }
-    
-    private Boolean CheckDB()
-    {
-    	
-    	try
-    	{
-    		rhybuddCache = SQLiteDatabase.openDatabase("/data/data/net.networksaremadeofstring.rhybudd/databases/rhybuddCache", null, SQLiteDatabase.OPEN_READONLY);
-    		dbResults = rhybuddCache.query("devices",new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
-    	}
-    	catch(Exception e)
-    	{
-    		if(rhybuddCache != null && rhybuddCache.isOpen())
-    		{
-    			rhybuddCache.close();
-    		}
-    		if(dbResults != null && dbResults.isClosed() == false)
-    		{
-    			dbResults.close();
-    		}
-    		
-    		return false;
-    	}
-    	
-    	if(dbResults.getCount() != 0)
-    	{
-    		return true;
-    	}
-    	else
-    	{
-    		if(rhybuddCache != null && rhybuddCache.isOpen())
-    		{
-    			rhybuddCache.close();
-    		}
-    		if(dbResults != null &&  dbResults.isClosed() == false)
-    		{
-    			dbResults.close();
-    		}
-    		return false;
-    	}
-    }
-    
-    public void GetDevices()
+   
+    /*public void GetDevices()
     {
     	dialog = new ProgressDialog(this);
     	dialog.setTitle("Contacting Zenoss");
@@ -293,26 +283,7 @@ public class DeviceList extends Activity
     	};
     	
     	dataPreload.start();
-    }
-    
-    public void UpdateErrorMessage(String MessageText,boolean Critical)
-	{
-		TextView ErrorMessage = (TextView) findViewById(R.id.MessageText);
-		if(MessageText.length() == 0)
-		{
-			ErrorMessage.setHeight(0);
-		}
-		else
-		{
-			
-			ErrorMessage.setHeight(24);
-			ErrorMessage.setTextColor(-16711936);
-			ErrorMessage.setText(MessageText);
-			
-			if(Critical)
-				ErrorMessage.setTextColor(-65536);
-		}
-	}
+    }*/
     
     public void ViewDevice(String UID)
     {

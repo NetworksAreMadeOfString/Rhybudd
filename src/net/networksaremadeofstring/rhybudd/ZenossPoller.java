@@ -19,6 +19,11 @@
 package net.networksaremadeofstring.rhybudd;
 
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +32,7 @@ import com.bugsense.trace.BugSenseHandler;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -55,10 +61,11 @@ public class ZenossPoller extends Service
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
 	Thread dataPreload;
-	private int EventCount = 0;
+	int EventCount = 0;
+	String CriticalList = "";
 	private int NotificationID = 0;
 	private int failureCount = 0;
-	private Boolean onlyAlertOnProd = false;
+	private Boolean onlyAlertOnProd = true;
 	RhybuddDatabase rhybuddCache = null;
 	Handler handler;
 	Cursor dbResults;
@@ -70,6 +77,7 @@ public class ZenossPoller extends Service
 		Log.i("ServiceThread","Service Starting");
 		BugSenseHandler.setup(this, "44a76a8c");
 
+		onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", true);
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		if(rhybuddCache == null)
@@ -85,17 +93,21 @@ public class ZenossPoller extends Service
     			{
     				if(rhybuddCache.hasCacheRefreshed())
     				{
+    					//Log.i("handler","Cache has refreshed, sending delayed message");
     					this.sendEmptyMessageDelayed(2,1000);
     				}
     				else
     				{
+    					//Log.i("handler","Cache hasn't refreshed, sending delayed message");
         				handler.sendEmptyMessageDelayed(1, 1000);
     				}
     			}
     			else if(msg.what == 2)
     			{
+    				//Log.i("handler","2 - Preparing to get events");
+    				
     				dbResults = rhybuddCache.getEvents();
-        			
+        			Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
         			if(dbResults != null)
         			{
     	    			while(dbResults.moveToNext())
@@ -107,10 +119,18 @@ public class ZenossPoller extends Service
 									   dbResults.getString(7),
 									   dbResults.getString(8));
     	    				
-    	    				if(CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
-								SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
+    	    				{
+    	    					EventCount++;
+								//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
+    	    				}
     	    			}
+    	    			
+    	    			if(EventCount > 0)
+    	    				SendCombinedNotification(EventCount,CriticalList);
         			}
+        			if(alertsEnabled)
+	    				SendStickyNotification();
     			}
     			else
     			{
@@ -126,7 +146,6 @@ public class ZenossPoller extends Service
 	public void onDestroy() 
 	{
 		rhybuddCache.Close();
-		//handler.removeCallbacks(runnable);
 	}
 
 	@Override
@@ -145,7 +164,7 @@ public class ZenossPoller extends Service
 		}
 		else if(intent != null && intent.getBooleanExtra("refreshCache", false))
 		{
-			Log.i("onStartCommand","Received an intent from to refresh the cache");
+			Log.i("onStartCommand","Received an intent to refresh the cache");
 			rhybuddCache.RefreshCache();
 		}
 		else if(intent != null && intent.getBooleanExtra("settingsUpdate", false))
@@ -156,7 +175,6 @@ public class ZenossPoller extends Service
 		else
 		{
 			Log.i("onStartCommand","I got started for no particular reason. I should probably do a refresh");
-			//rhybuddCache.RefreshCache();
 			PollerCheck();
 		}
 
@@ -170,29 +188,36 @@ public class ZenossPoller extends Service
 		AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
 		Intent Poller = new Intent(this, ZenossPoller.class);
 
-		/*if(settings.getBoolean("AllowBackgroundService", true))
+		if(settings.getBoolean("AllowBackgroundService", true))
 		{
+			Log.i("PollerCheck","Background scanning enabled!");
+			SendStickyNotification();
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
 			am.cancel(Monitoring);
-			am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0, ((long) settings.getInt("BackgroundServiceDelay", 30) * 1000), Monitoring);
+			am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0,  Long.parseLong(settings.getString("BackgroundServiceDelay", "60")) * 1000, Monitoring);
 		}
 		else
 		{
+			Log.i("PollerCheck","Background scanning disabled!");
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
 			am.cancel(Monitoring);
-		}*/
+			mNM.cancel(20);
+		}
 
 		
 		if(settings.getBoolean("refreshCache", true))
 		{
+			Log.i("PollerCheck","Background cache refresh enabled!");
+			
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
-			am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 1000, AlarmManager.INTERVAL_FIFTEEN_MINUTES, CacheRefresh);
+			am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 10000, AlarmManager.INTERVAL_HOUR, CacheRefresh);
 		}
 		else
 		{
+			Log.i("PollerCheck","Background cache refresh disabled!");
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
 			am.cancel(CacheRefresh);
@@ -205,13 +230,53 @@ public class ZenossPoller extends Service
 		return null;
 	}
 
+	private void SendStickyNotification()
+	{
+		Notification notification = new Notification(R.drawable.ic_stat_polling, "Rhybudd is polling for events", System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		Context context = getApplicationContext();
+		Intent notificationIntent = new Intent(this, RhybuddHome.class);
+		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		notificationIntent.putExtra("forceRefresh", true);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		Calendar date = Calendar.getInstance();
+		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time was " + date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE), contentIntent);
+		mNM.notify(20, notification);
+	}
+	
+	private void SendCombinedNotification(int EventCount, String Summary)
+	{
+		Notification notification = new Notification(R.drawable.ic_stat_alert, Integer.toString(EventCount) + " new Zenoss Events!", System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notification.defaults |= Notification.DEFAULT_VIBRATE;
+		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+		notification.flags |= Notification.FLAG_INSISTENT;
+		
+		if(settings.getBoolean("notificationSound", true))
+			notification.defaults |= Notification.DEFAULT_SOUND;
+
+		notification.ledARGB = 0xffff0000;
+
+		notification.ledOnMS = 300;
+		notification.ledOffMS = 1000;
+
+		Context context = getApplicationContext();
+		Intent notificationIntent = new Intent(this, RhybuddHome.class);
+		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		notificationIntent.putExtra("forceRefresh", true);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, Integer.toString(EventCount) + " Zenoss Events", "Click to launch Rhybudd", contentIntent);
+		mNM.notify(43523, notification);//NotificationID++ 
+	}
+	
 	private void SendNotification(String EventSummary,int Severity)
 	{
 		Notification notification = new Notification(R.drawable.ic_stat_alert, "New Zenoss Events!", System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-
+		notification.flags |= Notification.FLAG_INSISTENT;
+		
 		if(settings.getBoolean("notificationSound", true))
 			notification.defaults |= Notification.DEFAULT_SOUND;
 
@@ -233,11 +298,15 @@ public class ZenossPoller extends Service
 		notificationIntent.putExtra("forceRefresh", true);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Rhybudd Notification", EventSummary, contentIntent);
-		mNM.notify(43523453, notification);//NotificationID++
+		mNM.notify(43523, notification);//NotificationID++ 
 	}
 
 	private void CheckForEvents()
 	{
+		EventCount = 0;
+		CriticalList = "";
+		rhybuddCache.RefreshEvents();
+		handler.sendEmptyMessageDelayed(1, 1000);
 		/*dataPreload = new Thread() 
 		{  
 			public void run() 
@@ -336,23 +405,19 @@ public class ZenossPoller extends Service
 		{
 			return true;
 		}
-
-		SQLiteDatabase cacheDB = ZenossPoller.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-		Cursor dbResults = cacheDB.query("devices",new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
-
+		
+		Cursor dbResults = rhybuddCache.getDevice(UID);
 		if(dbResults.moveToFirst())
 		{
 			String dbProdState = dbResults.getString(1);
 			if(dbProdState.equals("Production"))
 			{
 				dbResults.close();
-				cacheDB.close();
 				return true;
 			}
 			else
 			{
 				dbResults.close();
-				cacheDB.close();
 				if(onlyAlertOnProd)
 				{
 					return false;
@@ -366,7 +431,6 @@ public class ZenossPoller extends Service
 		else
 		{
 			dbResults.close();
-			cacheDB.close();
 			if(onlyAlertOnProd)
 			{
 				return false;

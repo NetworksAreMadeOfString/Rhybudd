@@ -57,7 +57,7 @@ public class ManageDatabase extends SherlockActivity
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 
-        ((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybuddCache").length()) + "bytes");
+        ((TextView) findViewById(R.id.dbSize)).setText(Long.toString(ManageDatabase.this.getDatabasePath("rhybuddCache").length()) + " bytes");
         
         
         UIUpdate = new Handler() 
@@ -108,7 +108,7 @@ public class ManageDatabase extends SherlockActivity
 			{
 				 AlertDialog.Builder alertbox = new AlertDialog.Builder(ManageDatabase.this);
 				 alertbox.setTitle("Confirmation");
-		    	 alertbox.setMessage("Are you sure you want to flush all local caches?");
+		    	 alertbox.setMessage("Are you sure you want to flush all local caches?\r\nThis can have bizarre consequences.");
 		    	 alertbox.setPositiveButton("Yes", new DialogInterface.OnClickListener() 
 		    	 {
 		             public void onClick(DialogInterface arg0, int arg1) 
@@ -117,11 +117,14 @@ public class ManageDatabase extends SherlockActivity
 		        	    	{  
 		        	    		public void run() 
 		        	    		{
+		        	    			
 		        	    			UIUpdate.sendEmptyMessage(0);
-		        	    			SQLiteDatabase cacheDB = ManageDatabase.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+		        	    			/*SQLiteDatabase cacheDB = ManageDatabase.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
 		        	    			cacheDB.delete("devices", null, null);
 		        	    			cacheDB.delete("events", null, null);
-		        	    			cacheDB.close();
+		        	    			cacheDB.close();*/
+		        	    			RhybuddDatabase rhybuddCache = new RhybuddDatabase(ManageDatabase.this);
+		        	    			rhybuddCache.FlushDB();
 		        	    			UIUpdate.sendEmptyMessage(1);
 		        	    		}
 		        	    	};

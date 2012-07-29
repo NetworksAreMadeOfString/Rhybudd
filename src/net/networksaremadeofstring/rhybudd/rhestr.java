@@ -42,6 +42,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,7 +96,7 @@ public class rhestr extends Activity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.eventlist);
         ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));

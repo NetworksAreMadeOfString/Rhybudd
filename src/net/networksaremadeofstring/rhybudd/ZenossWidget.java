@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 public class ZenossWidget extends AppWidgetProvider 
@@ -49,7 +50,7 @@ public class ZenossWidget extends AppWidgetProvider
         final int N = appWidgetIds.length;
         
         if(settings == null)
-			settings = context.getSharedPreferences("rhybudd", 0);
+			settings = PreferenceManager.getDefaultSharedPreferences(context);
         
         handler = new Handler() 
     	{

@@ -55,7 +55,6 @@
             android:textOff="@string/empty" />
 
     </LinearLayout>
-
     <TextView
         android:id="@+id/DeviceName"
         android:layout_width="wrap_content"
@@ -63,6 +62,9 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/dateTime"
         android:layout_toRightOf="@+id/linearLayout1"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:maxLines="1"
         android:shadowColor="#505050"
         android:shadowDx="1"
         android:shadowDy="1"
@@ -86,13 +88,14 @@
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#FFFFFF" />
-
+
     <TextView
         android:id="@+id/dateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="6dp"
         android:shadowColor="#505050"
         android:shadowDx="1"
         android:shadowDy="1"

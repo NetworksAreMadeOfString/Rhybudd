@@ -34,6 +34,7 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,7 +68,7 @@ public class ViewZenossDevice extends Activity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
         
         setContentView(R.layout.view_zenoss_device);
         

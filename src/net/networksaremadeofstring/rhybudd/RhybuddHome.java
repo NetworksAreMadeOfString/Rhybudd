@@ -1,24 +1,29 @@
 /*
-* Copyright (C) 2011 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2011 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package net.networksaremadeofstring.rhybudd;
 
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,6 +51,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -63,15 +69,13 @@ public class RhybuddHome extends SherlockFragmentActivity
 	Handler HomeHandler = null, runnablesHandler = null;
 	Runnable updateEvents = null, updateDevices = null, updateDeviceDetails = null;
 	Boolean OneOff = true;
-	
+
 	//New
 	ZenossAPIv2 API = null;
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	List<Integer> selectedEvents = new ArrayList<Integer>();
-
-	private int EventCount = 0;
 	Thread dataPreload,AckEvent,dataReload;
 	volatile Handler handler, AckEventHandler;
 	ProgressDialog dialog;
@@ -82,15 +86,14 @@ public class RhybuddHome extends SherlockFragmentActivity
 	int requestCode; //Used for evaluating what the settings Activity returned (Should always be 1)
 	RhybuddDatabase rhybuddCache;
 	ActionMode mActionMode;
-	
-	
+
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
 		rhybuddCache.Close();
 	}
-	
+
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
@@ -98,238 +101,226 @@ public class RhybuddHome extends SherlockFragmentActivity
 		window.setFormat(PixelFormat.RGBA_8888);
 	}
 
-	
+
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
+
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		setContentView(R.layout.rhybudd_home);
-		
-		//Clear any notifications
-		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-		
 		actionbar = getSupportActionBar();
-		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
-		
-		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionbar_nav, android.R.layout.simple_spinner_dropdown_item);
-		OnNavigationListener mOnNavigationListener = new OnNavigationListener() 
-		{
-			  String[] strings = getResources().getStringArray(R.array.actionbar_nav);
+		//TODO Delete
+		//actionbar.setSubtitle("https://z.networksaremadeofstring.net");
 
-			  @Override
-			  public boolean onNavigationItemSelected(int position, long itemId) 
-			  {
-				  Log.i("onNavigationItemSelected",strings[position]);
-				  
-				  if(strings[position].equals("Devices"))
-				  {
-					  Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
-					  RhybuddHome.this.startActivity(DeviceList);
-					  return true;
-				  }
-				  else if(strings[position].equals("Search"))
-				  {
-					  /*Intent intent=new Intent(android.content.Intent.ACTION_SEARCH);
-					  startActivity(Intent.createChooser(intent, "Search Zenoss:"));*/
-					  onSearchRequested();
-					  return true;
-				  }
-				  else if(strings[position].equals("Reports"))
-				  {
-					  return true;
-				  }
-				  else
-				  {
-					  return false;
-				  }
-			  }
-		};
-		
-		actionbar.setListNavigationCallbacks(mSpinnerAdapter, mOnNavigationListener);
-		
+		setContentView(R.layout.rhybudd_home);
+
+		//Clear any notifications
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
+
 		BugSenseHandler.setup(this, "44a76a8c");		
-	     
-		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("credentialsSuccess", false) == false)
-	     {
+
+		if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("credentialsSuccess", false) == false)
+		{
 			Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
 			SettingsIntent.putExtra("firstRun", true);
 			RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
-	     }
-	     else
-	     {
-	    	 if(getIntent().hasCategory(Intent.CATEGORY_DESK_DOCK) || getIntent().hasCategory("android.intent.category.HE_DESK_DOCK") || getIntent().hasCategory("android.intent.category.LE_DESK_DOCK"))
-	    	 {
-	    		 Intent RhybuddDockIntent = new Intent(RhybuddHome.this, RhybuddDock.class);
-	    		 RhybuddHome.this.startActivity(RhybuddDockIntent);
-	    		 finish();
-	    	 } 
-	    	 else
-	    	 {
-	    		 finishStart(false);
-	    	 }
-	     }
+		}
+		else
+		{
+			finishStart(false);
+		}
 	}
-	
+
 	public void DBGetThread()
-    {
-    	dataPreload = new Thread() 
-    	{  
-    		public void run() 
-    		{
-    			dbResults = rhybuddCache.getEvents();
-    			
-    			if(dbResults != null)
-    			{
-	    			while(dbResults.moveToNext())
-	    			{
-	    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-															   dbResults.getString(3),
-															   dbResults.getString(4), 
-															   dbResults.getString(5),
-															   dbResults.getString(7),
-															   dbResults.getString(8)));
-	    			}
-    			}
-    			handler.sendEmptyMessage(0);
-    		}
-    	};
-    	dataPreload.start();
-    }
-	
+	{
+		listOfZenossEvents.clear();
+		dataPreload = new Thread() 
+		{  
+			public void run() 
+			{
+				dbResults = rhybuddCache.getEvents();
+
+				if(dbResults != null)
+				{
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					Date date;
+					String strDate = "";
+					Date today = Calendar.getInstance().getTime();
+					String[] shortMonths = new DateFormatSymbols().getShortMonths();
+					int PicName = 0;
+					while(dbResults.moveToNext())
+					{
+						try 
+						{
+							date = sdf.parse(dbResults.getString(2));
+							if(date.getDate() < today.getDate())
+							{
+								strDate = date.getDate() + " " + shortMonths[date.getMonth()];
+							}
+							else
+							{
+								if(date.getMinutes() < 10)
+								{
+									strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
+								}
+								else
+								{
+									strDate = date.getHours() + ":" + date.getMinutes();
+								}
+							}
+
+						} 
+						catch (ParseException e) 
+						{
+							strDate = "";
+						}
+
+						listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+								dbResults.getString(3),
+								dbResults.getString(4), 
+								dbResults.getString(5),
+								dbResults.getString(7),
+								strDate,//dbResults.getString(2)
+								dbResults.getString(8)));
+						/*listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+								   "server" + PicName +".networksaremadeofstring.net",
+								   dbResults.getString(4), 
+								   dbResults.getString(5),
+								   dbResults.getString(7),
+								   strDate,//dbResults.getString(2)
+								   dbResults.getString(8)));
+	    				PicName++;*/
+					}
+				}
+				handler.sendEmptyMessage(0);
+			}
+		};
+		dataPreload.start();
+	}
+
 	public void Refresh()
-    {
+	{
 		dialog = new ProgressDialog(this);
 		dialog.setMessage("Refreshing Events...");
+		dialog.setCancelable(false);
 		dialog.show();
 		rhybuddCache.RefreshEvents();
 		handler.sendEmptyMessageDelayed(1, 1000);
-    }
-	
+	}
+
 	private void finishStart(Boolean firstRun)
 	{
 		Intent intent = new Intent(this, ZenossPoller.class);
-		if(firstRun)
-		{
-            intent.putExtra("settingsUpdate", true);
-		}
-		
-		startService(intent);
-		
 		list = (ListView)findViewById(R.id.ZenossEventsList);
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		rhybuddCache = new RhybuddDatabase(this);
 		ConfigureHandlers();
-		if(settings.getBoolean("AllowBackgroundService", false))
+
+		if(firstRun)
 		{
-			DBGetThread();
+			intent.putExtra("settingsUpdate", true);
+			Refresh();
 		}
 		else
 		{
-			Refresh();
+			if(settings.getBoolean("AllowBackgroundService", false))
+			{
+				DBGetThread();
+			}
+			else
+			{
+				Refresh();
+			}
 		}
+
+		startService(intent);
 	}
-	
+
 	private void ConfigureHandlers()
-    {
-    	handler = new Handler() 
-    	{
-    		public void handleMessage(Message msg) 
-    		{
-    			if(msg.what == 0)
-    			{
-    				((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
-    				
-    				OnClickListener listener = new OnClickListener()
-    				{
+	{
+		handler = new Handler() 
+		{
+			public void handleMessage(Message msg) 
+			{
+				if(msg.what == 0)
+				{
+					((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
+
+					OnClickListener listener = new OnClickListener()
+					{
 						public void onClick(View v) 
 						{
 							//AcknowledgeEvent(listOfZenossEvents.get((Integer)v.getTag()).getEVID().toString(),(Integer) v.getTag(R.integer.EventPositionInList),v.getId());
 							ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
 						}
 					};
-					
+
 					OnLongClickListener listenerLong = new OnLongClickListener()
-    				{
+					{
 						public boolean onLongClick(View v) 
 						{
 							selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
 							return true;
 						}
 					};
-					
+
 					OnClickListener addCAB = new OnClickListener()
-    				{
+					{
 						public void onClick(View v) 
 						{
 							addToCAB((Integer)v.getTag(R.integer.EventPositionInList));
 						}
 					};
-    				
-	    			adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents,listener,listenerLong,addCAB);
-	        	    list.setAdapter(adapter);
-    			}
-    			else if(msg.what == 1)
-    			{
-    				if(rhybuddCache.hasCacheRefreshed())
-    				{
-    					dialog.setMessage("Refresh Complete!");
-    					this.sendEmptyMessageDelayed(2,1000);
-    				}
-    				else
-    				{
-    					dialog.setMessage("Processing...");
-        				handler.sendEmptyMessageDelayed(1, 1000);
-    				}
-    			}
-    			else if(msg.what == 2)
-    			{
-    				dialog.dismiss();
-    				dbResults = rhybuddCache.getEvents();
-        			
-        			if(dbResults != null)
-        			{
-        				listOfZenossEvents.clear();
-    	    			while(dbResults.moveToNext())
-    	    			{
-    	    				listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-    															   dbResults.getString(3),
-    															   dbResults.getString(4), 
-    															   dbResults.getString(5),
-    															   dbResults.getString(7),
-    															   dbResults.getString(8)));
-    	    			}
-        			}
-        			handler.sendEmptyMessage(0);
-    			}
-    			else
-    			{
-    				Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
-    			}
-    		}
-    	};
-    	
-    	AckEventHandler = new Handler() 
-    	 {
-    		public void handleMessage(Message msg) 
-    		{
-    			if(msg.what == 0)
-    			{
-    				adapter.notifyDataSetChanged();
-    			}
-    			else if(msg.what == 1)
-    			{
-    				adapter.notifyDataSetChanged();
-    			}
-    			else
-    			{
-    				Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
-    			}
-    		}
-    	 };
-    }
-	
+
+					adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents,listener,listenerLong,addCAB);
+					list.setAdapter(adapter);
+				}
+				else if(msg.what == 1)
+				{
+					if(rhybuddCache.hasCacheRefreshed())
+					{
+						dialog.setMessage("Refresh Complete!");
+						this.sendEmptyMessageDelayed(2,1000);
+					}
+					else
+					{
+						dialog.setMessage("Processing...");
+						handler.sendEmptyMessageDelayed(1, 1000);
+					}
+				}
+				else if(msg.what == 2)
+				{
+					dialog.dismiss();
+					DBGetThread();
+				}
+				else
+				{
+					Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
+				}
+			}
+		};
+
+		AckEventHandler = new Handler() 
+		{
+			public void handleMessage(Message msg) 
+			{
+				if(msg.what == 0)
+				{
+					adapter.notifyDataSetChanged();
+				}
+				else if(msg.what == 1)
+				{
+					adapter.notifyDataSetChanged();
+				}
+				else
+				{
+					Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+				}
+			}
+		};
+	}
+
 	public void selectForCAB(int id)
 	{
 		if(listOfZenossEvents.get(id).isSelected())
@@ -339,13 +330,13 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 		else
 		{
-	    	selectedEvents.add(id);
-	    	listOfZenossEvents.get(id).SetSelected(true);
+			selectedEvents.add(id);
+			listOfZenossEvents.get(id).SetSelected(true);
 		}
 		adapter.notifyDataSetChanged();
 		mActionMode = startActionMode(mActionModeCallback);
 	}
-	
+
 	public void addToCAB(int id)
 	{
 		if(mActionMode != null)
@@ -358,300 +349,321 @@ public class RhybuddHome extends SherlockFragmentActivity
 		else
 		{
 			selectedEvents.add(id);
-	    	listOfZenossEvents.get(id).SetSelected(true);
-	    	adapter.notifyDataSetChanged();
+			listOfZenossEvents.get(id).SetSelected(true);
+			adapter.notifyDataSetChanged();
 			mActionMode = startActionMode(mActionModeCallback);
 		}
 	}
-	
+
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
 
-        // Called when the action mode is created; startActionMode() was called
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) 
-        {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.events_cab, menu);
-            mode.setTitle("Manage "+ selectedEvents.size()+" Events");
-            mode.setSubtitle("Select multiple events for mass acknowledgement");
-            return true;
-        }
+		// Called when the action mode is created; startActionMode() was called
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) 
+		{
+			// Inflate a menu resource providing context menu items
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.events_cab, menu);
+			mode.setTitle("Manage "+ selectedEvents.size()+" Events");
+			mode.setSubtitle("Select multiple events for mass acknowledgement");
+			return true;
+		}
 
-        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) 
-        {
-            return false; // Return false if nothing is done
-        }
+		// Called each time the action mode is shown. Always called after onCreateActionMode, but
+		// may be called multiple times if the mode is invalidated.
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) 
+		{
+			return false; // Return false if nothing is done
+		}
 
-        // Called when the user selects a contextual menu item
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) 
-        {
-            switch (item.getItemId()) 
-            {
-            
-	            case R.id.Acknowledge:
-	        	{
-	        		for (final Integer i : selectedEvents)
-	            	{
-	        			listOfZenossEvents.get(i).setProgress(true);
-	               	 AckEventHandler.sendEmptyMessage(0);
-	               	 AckEvent = new Thread() 
-	           	    	{  
-	           	    		public void run() 
-	           	    		{
-	           	    			try 
-	           	    			{
-	           	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-	           	    				ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
-	   								listOfZenossEvents.get(i).setProgress(false);
-	   								listOfZenossEvents.get(i).setAcknowledged();
-	   								AckEventHandler.sendEmptyMessage(1);
-	           	    			}
-	           	    			catch (Exception e)
-	           	    			{
-	           	    				AckEventHandler.sendEmptyMessage(99);
-	           	    			}
-	           	    		}
-	           	    	};
-	           	    	AckEvent.start();
-	            	}
-	        		return true;
-	        	}
-	        	
-	            case R.id.escalate:
-		        {
-		        	Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-		        	intent.setType("text/plain");
-		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		// Called when the user selects a contextual menu item
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) 
+		{
+			switch (item.getItemId()) 
+			{
 
-		        	// Add data to the intent, the receiving app will decide what to do with it.
-		        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
-		        	String Events = "Escalated events;\r\n\r\n";
-		        	for (Integer i : selectedEvents)
-	            	{
-		        		Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
-	            		//list.setItemChecked(i, false);
-	            	}
-		        	intent.putExtra(Intent.EXTRA_TEXT, Events);
-		        	
-		        	startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-		        	return true;
-		        }
-	        	
-	            default:
-	            {
-	            	for (Integer i : selectedEvents)
-	            	{
-	            		listOfZenossEvents.get(i).SetSelected(false);
-	            		//list.setItemChecked(i, false);
-	            	}
-	            	selectedEvents.clear();
-		        	adapter.notifyDataSetChanged();
-		            return false;
-	            }
+			case R.id.Acknowledge:
+			{
+				for (final Integer i : selectedEvents)
+				{
+					listOfZenossEvents.get(i).setProgress(true);
+					AckEventHandler.sendEmptyMessage(0);
+					AckEvent = new Thread() 
+					{  
+						public void run() 
+						{
+							try 
+							{
+								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+								ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
+								listOfZenossEvents.get(i).setProgress(false);
+								listOfZenossEvents.get(i).setAcknowledged();
+								AckEventHandler.sendEmptyMessage(1);
+							}
+							catch (Exception e)
+							{
+								AckEventHandler.sendEmptyMessage(99);
+							}
+						}
+					};
+					AckEvent.start();
+				}
+				return true;
 			}
-        }
-			
-			// Called when the user exits the action mode
-			@Override
-			public void onDestroyActionMode(ActionMode mode) 
+
+			case R.id.escalate:
+			{
+				Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+				// Add data to the intent, the receiving app will decide what to do with it.
+				intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
+				String Events = "Escalated events;\r\n\r\n";
+				for (Integer i : selectedEvents)
+				{
+					Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
+					//list.setItemChecked(i, false);
+				}
+				intent.putExtra(Intent.EXTRA_TEXT, Events);
+
+				startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+				return true;
+			}
+
+			default:
 			{
 				for (Integer i : selectedEvents)
-            	{
-            		listOfZenossEvents.get(i).SetSelected(false);
-            		//list.setItemChecked(i, false);
-            	}
-            	selectedEvents.clear();
-	        	adapter.notifyDataSetChanged();
-	        	mActionMode = null;
+				{
+					listOfZenossEvents.get(i).SetSelected(false);
+					//list.setItemChecked(i, false);
+				}
+				selectedEvents.clear();
+				adapter.notifyDataSetChanged();
+				return false;
 			}
-		};
-	
-    public boolean onCreateOptionsMenu(Menu menu) 
+			}
+		}
+
+		// Called when the user exits the action mode
+		@Override
+		public void onDestroyActionMode(ActionMode mode) 
+		{
+			for (Integer i : selectedEvents)
+			{
+				listOfZenossEvents.get(i).SetSelected(false);
+				//list.setItemChecked(i, false);
+			}
+			selectedEvents.clear();
+			adapter.notifyDataSetChanged();
+			mActionMode = null;
+		}
+	};
+
+	public boolean onCreateOptionsMenu(Menu menu) 
 	{
 		MenuInflater inflater = getSupportMenuInflater();
-	    inflater.inflate(R.menu.home_menu, menu);
-	    return true;
-    }
-	
-	@Override
-    public boolean onOptionsItemSelected(MenuItem item) 
-    {
-        switch (item.getItemId()) 
-        {
-	        case R.id.settings:
-	        {
-	        	Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
-	        	//RhybuddHome.this.startActivity(SettingsIntent);
-	        	this.startActivityForResult(SettingsIntent, 99);
-	            return true;
-	        }
-	        
-	        case R.id.Help:
-	        {
-	        	Intent i = new Intent(Intent.ACTION_VIEW);
-	        	i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
-	        	startActivity(i);
-	        	return true;
-	        }
-	        
-	        case R.id.cache:
-	        {
-	        	Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
-	        	RhybuddHome.this.startActivity(MangeDBIntent);
-	            return true;
-	        }
-	        
-	        case R.id.resolveall:
-	        {
-	        	for (final ZenossEvent evt : listOfZenossEvents)
-            	{
-	        		if(!evt.getEventState().equals("Acknowledged"))
-	        		{
-	        			evt.setProgress(true);
-		               	AckEventHandler.sendEmptyMessage(0);
-		               	AckEvent = new Thread() 
-		           	    	{  
-		           	    		public void run() 
-		           	    		{
-		           	    			try 
-		           	    			{
-		           	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-		           	    				ackEventAPI.AcknowledgeEvent(evt.getEVID());
-		           	    				evt.setProgress(false);
-		   								evt.setAcknowledged();
-		   								AckEventHandler.sendEmptyMessage(1);
-		           	    			}
-		           	    			catch (Exception e)
-		           	    			{
-		           	    				AckEventHandler.sendEmptyMessage(99);
-		           	    			}
-		           	    		}
-		           	    	};
-		           	    	AckEvent.start();
-	        		}
-            	}
-	        	return true;
-	        }
-	        case R.id.refresh:
-	        {
-	        	Refresh();
-	        	return true;
-	        }
-	        
-	        case R.id.escalate:
-	        {
-	        	Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-	        	intent.setType("text/plain");
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		inflater.inflate(R.menu.home_menu, menu);
+		return true;
+	}
 
-	        	// Add data to the intent, the receiving app will decide what to do with it.
-	        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
-	        	String Events = "";
-	        	for (ZenossEvent evt : listOfZenossEvents)
-            	{
-	        		Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
-            	}
-	        	intent.putExtra(Intent.EXTRA_TEXT, Events);
-	        	
-	        	startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-	        }
-        }
-        return false;
-    }
-	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
-    {
-		
-    	//Check what the result was from the Settings Activity
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+		switch (item.getItemId()) 
+		{
+		case R.id.settings:
+		{
+			Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+			//RhybuddHome.this.startActivity(SettingsIntent);
+			this.startActivityForResult(SettingsIntent, 99);
+			return true;
+		}
+
+		case R.id.Help:
+		{
+			Intent i = new Intent(Intent.ACTION_VIEW);
+			i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
+			startActivity(i);
+			return true;
+		}
+
+		case R.id.devices:
+		{
+			Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
+			RhybuddHome.this.startActivity(DeviceList);
+			return true;
+		}
+
+		case R.id.search:
+		{
+			onSearchRequested();
+			return true;
+		}
+
+		case R.id.cache:
+		{
+			Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
+			RhybuddHome.this.startActivity(MangeDBIntent);
+			return true;
+		}
+
+		case R.id.resolveall:
+		{
+			for (final ZenossEvent evt : listOfZenossEvents)
+			{
+				if(!evt.getEventState().equals("Acknowledged"))
+				{
+					evt.setProgress(true);
+					AckEventHandler.sendEmptyMessage(0);
+					AckEvent = new Thread() 
+					{  
+						public void run() 
+						{
+							try 
+							{
+								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+								ackEventAPI.AcknowledgeEvent(evt.getEVID());
+								evt.setProgress(false);
+								evt.setAcknowledged();
+								AckEventHandler.sendEmptyMessage(1);
+							}
+							catch (Exception e)
+							{
+								AckEventHandler.sendEmptyMessage(99);
+							}
+						}
+					};
+					AckEvent.start();
+				}
+			}
+			return true;
+		}
+		case R.id.refresh:
+		{
+			Refresh();
+			return true;
+		}
+
+		case R.id.escalate:
+		{
+			Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+			intent.setType("text/plain");
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+			// Add data to the intent, the receiving app will decide what to do with it.
+			intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
+			String Events = "";
+			for (ZenossEvent evt : listOfZenossEvents)
+			{
+				Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
+			}
+			intent.putExtra(Intent.EXTRA_TEXT, Events);
+
+			startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+		}
+		}
+		return false;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+
+		//Check what the result was from the Settings Activity
 		if(requestCode == 99)
 		{
 			Intent intent = new Intent(this, ZenossPoller.class);
-	        intent.putExtra("settingsUpdate", true);
+			intent.putExtra("settingsUpdate", true);
 			startService(intent);
 		}
 		else
 		{
-	    	//In theory the Settings activity should perform validation and only finish() if the settings pass validation
-	    	if(resultCode == 1)
-	    	{
-	    		SharedPreferences.Editor editor = settings.edit();
-	        	editor.putBoolean("FirstRun", false);
-	        	editor.commit();
-	        	Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
-	        	finishStart(true);
-	    	}
-	    	else if(resultCode == 2)
-	    	{
-	    		Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
-	    		finish();
-	    	}
-	    	else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
-	    	{
-	    		Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
-	    		Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
+			//In theory the Settings activity should perform validation and only finish() if the settings pass validation
+			if(resultCode == 1)
+			{
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("FirstRun", false);
+				editor.commit();
+				Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
+				finishStart(true);
+			}
+			else if(resultCode == 2)
+			{
+				Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
+				finish();
+			}
+			else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
+			{
+				Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
+				Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddSettings.class);
 				SettingsIntent.putExtra("firstRun", true);
 				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
-	    	}
+			}
 		}
-    }
-	
+	}
+
 	public void ManageEvent(final String EventID, final int Position, final int viewID)
-    {
-    	 AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-    	 alertbox.setMessage("What would you like to do?");
+	{
+		AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+		alertbox.setMessage("What would you like to do?");
 
-    	 alertbox.setPositiveButton("Ack Event", new DialogInterface.OnClickListener() 
-    	 {
-             public void onClick(DialogInterface arg0, int arg1) 
-             {
-            	 listOfZenossEvents.get(Position).setProgress(true);
-            	 AckEventHandler.sendEmptyMessage(0);
-            	 AckEvent = new Thread() 
-        	    	{  
-        	    		public void run() 
-        	    		{
-        	    			try 
-        	    			{
-        	    				ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-        	    				ackEventAPI.AcknowledgeEvent(EventID);
-								listOfZenossEvents.get(Position).setProgress(false);
-								listOfZenossEvents.get(Position).setAcknowledged();
-								AckEventHandler.sendEmptyMessage(1);
-        	    			}
-        	    			catch (Exception e)
-        	    			{
-        	    				AckEventHandler.sendEmptyMessage(99);
-        	    			}
-        	    		}
-        	    	};
-        	    	AckEvent.start();
-             }
-    	 });
+		alertbox.setPositiveButton("Ack Event", new DialogInterface.OnClickListener() 
+		{
+			public void onClick(DialogInterface arg0, int arg1) 
+			{
+				listOfZenossEvents.get(Position).setProgress(true);
+				AckEventHandler.sendEmptyMessage(0);
+				AckEvent = new Thread() 
+				{  
+					public void run() 
+					{
+						try 
+						{
+							ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							ackEventAPI.AcknowledgeEvent(EventID);
+							listOfZenossEvents.get(Position).setProgress(false);
+							listOfZenossEvents.get(Position).setAcknowledged();
+							AckEventHandler.sendEmptyMessage(1);
+						}
+						catch (Exception e)
+						{
+							AckEventHandler.sendEmptyMessage(99);
+						}
+					}
+				};
+				AckEvent.start();
+			}
+		});
 
-    	 alertbox.setNeutralButton("View Event", new DialogInterface.OnClickListener() 
-         {
-             public void onClick(DialogInterface arg0, int arg1) 
-             {
-            	Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
-             	ViewEventIntent.putExtra("EventID", EventID);
-             	RhybuddHome.this.startActivity(ViewEventIntent);
-             }
-         });
-         
-         alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener() 
-         {
-             public void onClick(DialogInterface arg0, int arg1) 
-             {
-                 //Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
-             }
-         });
-         alertbox.show();
-    }
+		alertbox.setNeutralButton("View Event", new DialogInterface.OnClickListener() 
+		{
+			public void onClick(DialogInterface arg0, int arg1) 
+			{
+				Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
+				ViewEventIntent.putExtra("EventID", EventID);
+				ViewEventIntent.putExtra("Count", listOfZenossEvents.get(Position).getCount());
+				ViewEventIntent.putExtra("Device", listOfZenossEvents.get(Position).getDevice());
+				ViewEventIntent.putExtra("EventState", listOfZenossEvents.get(Position).getEventState());
+				ViewEventIntent.putExtra("FirstTime", listOfZenossEvents.get(Position).getfirstTime());
+				ViewEventIntent.putExtra("LastTime", listOfZenossEvents.get(Position).getlastTime());
+				ViewEventIntent.putExtra("Severity", listOfZenossEvents.get(Position).getSeverity());
+				ViewEventIntent.putExtra("Summary", listOfZenossEvents.get(Position).getSummary());
+
+				RhybuddHome.this.startActivity(ViewEventIntent);
+			}
+		});
+
+		alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener() 
+		{
+			public void onClick(DialogInterface arg0, int arg1) 
+			{
+				//Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
+			}
+		});
+		alertbox.show();
+	}
 }

@@ -39,6 +39,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -57,7 +58,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
         if(settings == null)
-			settings = context.getSharedPreferences("rhybudd", 0);
+			settings = PreferenceManager.getDefaultSharedPreferences(context);
         
         ProcessEvents();
         

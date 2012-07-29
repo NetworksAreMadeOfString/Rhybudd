@@ -35,6 +35,8 @@ import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -70,7 +72,7 @@ public class ViewZenossEvent extends SherlockActivity
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{
 		MenuInflater inflater = getSupportMenuInflater();
-	    inflater.inflate(R.menu.home_menu, menu);
+	    inflater.inflate(R.menu.view_event, menu);
 	    return true;
     }
 	
@@ -79,13 +81,11 @@ public class ViewZenossEvent extends SherlockActivity
     {
         switch (item.getItemId()) 
         {
-	        /*case android.R.id.home:
+	        case android.R.id.home:
 	        {
-	            Intent intent = new Intent(this, RhybuddHome.class);
-	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	            startActivity(intent);
+	        	finish();
 	            return true;
-	        }*/
+	        }
 	        
 	        case R.id.AddLog:
 	        {
@@ -104,6 +104,7 @@ public class ViewZenossEvent extends SherlockActivity
 				);
 				
 				addMessageDialog.show();
+				return true;
 	        }
 	        
 	        case R.id.escalate:
@@ -113,12 +114,12 @@ public class ViewZenossEvent extends SherlockActivity
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
 	        	// Add data to the intent, the receiving app will decide what to do with it.
-	        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Event");
-	        	String EventDetails = "...";
-	        	/*for (ZenossEvent evt : listOfZenossEvents)
-            	{
-	        		Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
-            	}*/
+	        	intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Event on " + getIntent().getStringExtra("Device"));
+	        	String EventDetails = 
+	    		getIntent().getStringExtra("Summary") + "\r\r\n" +
+	    		getIntent().getStringExtra("LastTime") + "\r\r\n" +
+	    		"Count: " + getIntent().getIntExtra("Count",0);
+	    		
 	        	intent.putExtra(Intent.EXTRA_TEXT, EventDetails);
 	        	
 	        	startActivity(Intent.createChooser(intent, "How would you like to escalate this event?"));
@@ -136,13 +137,18 @@ public class ViewZenossEvent extends SherlockActivity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("rhybudd", 0);
         setContentView(R.layout.view_zenoss_event);
         
         actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
         
+		((TextView) findViewById(R.id.EventTitle)).setText(getIntent().getStringExtra("Device"));
+		((TextView) findViewById(R.id.Summary)).setText(getIntent().getStringExtra("Summary"));
+		((TextView) findViewById(R.id.LastTime)).setText(getIntent().getStringExtra("LastTime"));
+		((TextView) findViewById(R.id.EventCount)).setText(Integer.toString(getIntent().getIntExtra("Count",0)));
+		
         firstLoadHandler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
@@ -152,6 +158,7 @@ public class ViewZenossEvent extends SherlockActivity
     			{
     				if(EventObject.getJSONObject("result").getBoolean("success") == true)
     				{
+    					Log.i("Event",EventObject.toString(3));
     					
     					TextView Title = (TextView) findViewById(R.id.EventTitle);
     					TextView Component = (TextView) findViewById(R.id.Componant);
@@ -265,6 +272,8 @@ public class ViewZenossEvent extends SherlockActivity
     			catch(Exception e)
     			{
     				Toast.makeText(ViewZenossEvent.this, "An error was encountered parsing the JSON.", Toast.LENGTH_LONG).show();
+    				//TODO Put in a bugsense call
+    				e.printStackTrace();
     			}
     		}
     	};

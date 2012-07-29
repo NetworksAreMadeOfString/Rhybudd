@@ -1,23 +1,41 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.http.client.ClientProtocolException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.app.Activity;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
+
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -25,46 +43,261 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class RhybuddDock extends Activity
+public class RhybuddDock extends SherlockFragmentActivity
 {
 	private Handler GaugeHandler = null, runnablesHandler = null;
 	private Runnable updateEvents = null, updateDevices = null;
-	private SharedPreferences settings = null;
+	SharedPreferences settings = null;
 	int EventCount = 0, DeviceCount = 0;
 	public Intent callingIntent;
     public Integer DockMode;
     
+    //New
+    ZenossAPIv2 API = null;
+	JSONObject EventsObject = null;
+	JSONArray Events = null;
+	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	List<Integer> selectedEvents = new ArrayList<Integer>();
+	Thread dataPreload,AckEvent,dataReload;
+	volatile Handler handler, AckEventHandler;
+	ProgressDialog dialog;
+	ListView list;
+	ZenossEventsAdaptor adapter;
+	Cursor dbResults = null;
+    ActionBar actionbar;
+    RhybuddDatabase rhybuddCache;
+    
+    @Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		rhybuddCache.Close();
+	}
+
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Window window = getWindow();
+		window.setFormat(PixelFormat.RGBA_8888);
+	}
+	
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
-		/*callingIntent = super.getIntent();
-        DockMode = callingIntent.getIntExtra("EXTRA_DOCK_STATE", 9);
-        //Log.e("Dock",Integer.toString(DockMode));*/
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.dock);
-        settings = getSharedPreferences("rhybudd", 0);
-
+        actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setHomeButtonEnabled(true);
+        actionbar.setTitle("Rhybudd Dock");
+        //actionbar.setSubtitle("Find Stat");
+        
+        rhybuddCache = new RhybuddDatabase(this);
+        
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
+        list = (ListView)findViewById(R.id.ZenossEventsList);
+        
         ConfigureHandler();
         //Draw some empty graphs
         GaugeHandler.sendEmptyMessage(1);
         GaugeHandler.sendEmptyMessage(2);
         
+        
+        
         //Let's populate those graphs
         ConfigureRunnable();
-        updateEvents.run();
-        updateDevices.run();
+        //updateEvents.run();
+        //updateDevices.run();
         
-        ConfigureImageViews();
+        //ConfigureImageViews();
+        
+        
+        if(settings.getBoolean("AllowBackgroundService", false))
+        {
+        	handler.sendEmptyMessageDelayed(1, 1000);
+        }
+        else
+        {
+        	rhybuddCache.RefreshEvents();
+    		handler.sendEmptyMessageDelayed(1, 1000);
+        }
+        
+        
+        Thread DevicesCountThread = new Thread() 
+    	{  
+    		public void run() 
+    		{
+    			Cursor devicesCursor = rhybuddCache.getDevices();
+    			if(devicesCursor != null)
+    			{
+    				try
+    				{
+    					DeviceCount = devicesCursor.getCount();
+    					GaugeHandler.sendEmptyMessage(2);
+    				}
+    				catch(Exception e)
+    				{
+    					BugSenseHandler.log("DeviceList", e);
+    				}
+    			}
+    		}
+    	};
+    	DevicesCountThread.start();
     }
 	
-	private void ConfigureImageViews()
+
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
+		MenuInflater inflater = getSupportMenuInflater();
+	    inflater.inflate(R.menu.dock, menu);
+	    return true;
+    }
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) 
+    {
+        switch (item.getItemId()) 
+        {
+        
+        case android.R.id.home:
+        {
+        	finish();
+            return true;
+        }
+        
+        case R.id.settings:
+		{
+			Intent SettingsIntent = new Intent(RhybuddDock.this, SettingsFragment.class);
+			//RhybuddHome.this.startActivity(SettingsIntent);
+			this.startActivityForResult(SettingsIntent, 99);
+			return true;
+		}
+
+		case R.id.Help:
+		{
+			Intent i = new Intent(Intent.ACTION_VIEW);
+			i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
+			startActivity(i);
+			return true;
+		}
+
+		case R.id.devices:
+		{
+			Intent DeviceList = new Intent(RhybuddDock.this, DeviceList.class);
+			RhybuddDock.this.startActivity(DeviceList);
+			return true;
+		}
+
+		case R.id.search:
+		{
+			onSearchRequested();
+			return true;
+		}
+	        
+	        default:
+	        {
+	        	return false;
+	        }
+        }
+    }
+	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+		if(requestCode == 99)
+		{
+			Intent intent = new Intent(this, ZenossPoller.class);
+			intent.putExtra("settingsUpdate", true);
+			startService(intent);
+		}
+	}
+	
+	
+	public void DBGetThread()
+	{
+		listOfZenossEvents.clear();
+		dataPreload = new Thread() 
+		{  
+			public void run() 
+			{
+				dbResults = rhybuddCache.getEvents();
+
+				if(dbResults != null)
+				{
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					Date date;
+					String strDate = "";
+					Date today = Calendar.getInstance().getTime();
+					String[] shortMonths = new DateFormatSymbols().getShortMonths();
+					int PicName = 0;
+					
+					//Update the graph
+					EventCount = dbResults.getCount();
+					GaugeHandler.sendEmptyMessage(1);
+					
+					while(dbResults.moveToNext())
+					{
+						try 
+						{
+							date = sdf.parse(dbResults.getString(2));
+							if(date.getDate() < today.getDate())
+							{
+								strDate = date.getDate() + " " + shortMonths[date.getMonth()];
+							}
+							else
+							{
+								if(date.getMinutes() < 10)
+								{
+									strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
+								}
+								else
+								{
+									strDate = date.getHours() + ":" + date.getMinutes();
+								}
+							}
+
+						} 
+						catch (ParseException e) 
+						{
+							strDate = "";
+						}
+
+						listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+								dbResults.getString(3),
+								dbResults.getString(4), 
+								dbResults.getString(5),
+								dbResults.getString(7),
+								strDate,//dbResults.getString(2)
+								dbResults.getString(8)));
+					}
+				}
+				handler.sendEmptyMessage(0);
+			}
+		};
+		dataPreload.start();
+	}
+	
+	
+	
+	
+	
+	
+	
+	/*private void ConfigureImageViews()
 	{
 		ImageView ExitDockButton = (ImageView) findViewById(R.id.ExitDockImageView);
         ExitDockButton.setClickable(true);
@@ -124,9 +357,45 @@ public class RhybuddDock extends Activity
 		         alertbox.show();
 			}
         });
-	}
+	}*/
 	
-	private void ConfigureHandler() {
+	private void ConfigureHandler() 
+	{
+		
+		handler = new Handler() 
+		{
+			public void handleMessage(Message msg) 
+			{
+				if(msg.what == 0)
+				{
+					//((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
+					
+					adapter = new ZenossEventsAdaptor(RhybuddDock.this, listOfZenossEvents,false);
+					list.setAdapter(adapter);
+				}
+				else if(msg.what == 1)
+				{
+					if(rhybuddCache.hasCacheRefreshed())
+					{
+						this.sendEmptyMessageDelayed(2,1000);
+					}
+					else
+					{
+						handler.sendEmptyMessageDelayed(1, 1000);
+					}
+				}
+				else if(msg.what == 2)
+				{
+					DBGetThread();
+					handler.sendEmptyMessageDelayed(1, 120000);
+				}
+				else
+				{
+					//Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
+				}
+			}
+		};
+		
 		runnablesHandler = new Handler();
 
 		GaugeHandler = new Handler() {
@@ -152,7 +421,7 @@ public class RhybuddDock extends Activity
 		final Paint paint = new Paint();
 
 		paint.setStyle(Paint.Style.FILL); 
-		paint.setColor(R.color.DarkBlue);
+		paint.setColor(getResources().getColor(R.color.DarkBlue));
 		paint.setAntiAlias(true);
 		DeviceCanvas.drawOval(new RectF(1, 1, 199, 199), paint);
 		
@@ -191,7 +460,7 @@ public class RhybuddDock extends Activity
 		final Paint paint = new Paint();
 
 		paint.setStyle(Paint.Style.FILL); 
-		paint.setColor(R.color.DarkBlue);
+		paint.setColor(getResources().getColor(R.color.DarkBlue));
 		paint.setAntiAlias(true);
 		EventsCanvas.drawOval(new RectF(1, 1, 199, 199), paint);
 		
@@ -340,7 +609,7 @@ public class RhybuddDock extends Activity
 	
 	private void ConfigureRunnable() 
 	{
-		updateDevices = new Runnable() 
+		/*updateDevices = new Runnable() 
 		{
 			public void run() 
 			{
@@ -419,6 +688,6 @@ public class RhybuddDock extends Activity
 				
 				eventsRefreshThread.start();
 			}
-		};
+		};*/
 	}
 }

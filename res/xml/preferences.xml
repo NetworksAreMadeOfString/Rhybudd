@@ -69,7 +69,12 @@
                 android:summary="Query for (and alert on) Debug Events" 
                 android:defaultValue="false"
                 />
-
+		<CheckBoxPreference
+                android:key="onlyProductionEvents"
+                android:title="Production Only"
+                android:summary="Only query for production devices." 
+                android:defaultValue="true"
+                />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="Alert Filtering">

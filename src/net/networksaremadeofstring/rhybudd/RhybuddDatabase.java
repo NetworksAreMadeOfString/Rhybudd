@@ -32,7 +32,7 @@ public class RhybuddDatabase
 
 	private static final String DATABASE_NAME = "rhybuddCache";
 	private static final String FTS_VIRTUAL_TABLE = "FTSdictionary";
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 
 	private final RhybuddOpenHelper mDatabaseOpenHelper;
 	private static Boolean finishedRefresh = false;
@@ -54,11 +54,40 @@ public class RhybuddDatabase
 		return this.finishedRefresh;
 	}
 
+	public void FlushDB()
+	{
+		mDatabaseOpenHelper.FlushDB();
+	}
+	
 	public void GetDBLock()
 	{
 		mDatabaseOpenHelper.getWritableDatabase();
 	}
+	
+	public Cursor getDevice(String UID)
+	{
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("devices");
+		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
+		if (cursor == null) 
+		{
+			return null;
+		} 
+		return cursor;
+	}
 
+	public Cursor getDevices()
+	{
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("devices");
+		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
+		if (cursor == null) 
+		{
+			return null;
+		} 
+		return cursor;
+	}
+	
 	public Cursor getEvents() 
 	{
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
@@ -68,11 +97,6 @@ public class RhybuddDatabase
 		{
 			return null;
 		} 
-		/*else if (!cursor.moveToFirst()) 
-		{
-			cursor.close();
-			return null;
-		}*/
 		return cursor;
 	}
 
@@ -148,7 +172,7 @@ public class RhybuddDatabase
 			try
 			{
 				Log.i("DB onCreate","Creating Tables");
-				mDatabase.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT)");
+				mDatabase.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT, \"ownerid\" TEXT)");
 				mDatabase.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
 				//refreshCache();
 			}
@@ -162,6 +186,11 @@ public class RhybuddDatabase
 			}
 		}
 
+		private void FlushDB()
+		{
+			mDatabase.delete("events", null, null);
+			mDatabase.delete("devices", null, null);
+		}
 
 		private void refreshEvents()
 		{
@@ -190,7 +219,7 @@ public class RhybuddDatabase
 							{
 								try 
 								{
-									EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false),settings.getBoolean("onlyProductionAlerts",true));
+									EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false),settings.getBoolean("onlyProductionEvents",true));
 
 									Events = EventsObject.getJSONObject("result").getJSONArray("events");
 								} 
@@ -226,8 +255,14 @@ public class RhybuddDatabase
 											values.put("summary", CurrentEvent.getString("summary"));
 											values.put("eventState", CurrentEvent.getString("eventState"));
 											values.put("severity", CurrentEvent.getString("severity"));
-
-											mDatabase.insert("events", null, values);
+											
+											values.put("count", CurrentEvent.getString("count"));
+											values.put("firstTime", CurrentEvent.getString("firstTime"));
+											values.put("lastTime", CurrentEvent.getString("lastTime"));
+											values.put("ownerid", CurrentEvent.getString("ownerid"));
+											values.put("prodState", CurrentEvent.getString("prodState"));
+											
+											mDatabase.insertWithOnConflict("events", null, values, SQLiteDatabase.CONFLICT_IGNORE);
 										} 
 										catch (JSONException e) 
 										{
@@ -253,13 +288,9 @@ public class RhybuddDatabase
 			{
 				public void run() 
 				{
-					Thread RefreshThread = new Thread() 
-					{
-						public void run() 
-						{
 							ZenossAPIv2 API = null;
 							JSONObject DeviceObject = null;
-							SharedPreferences settings = mHelperContext.getSharedPreferences("rhybudd", 0);
+							SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mHelperContext);
 							try 
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
@@ -280,6 +311,7 @@ public class RhybuddDatabase
 										{
 											CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
 
+											Log.e("CurrentDevice",CurrentDevice.toString(3)+"\r\n\r\n\r\n\r\n\r\n\r\n");
 											values.put("productionState",CurrentDevice.getString("productionState"));
 											try
 											{
@@ -324,9 +356,18 @@ public class RhybuddDatabase
 								BugSenseHandler.log("updateDevices", e1);
 							}
 
-
+							if(settings.getBoolean("AllowBackgroundService", true))
+							{
+								//No need to do anything with events the alarm checker will do that
+								finishedRefresh = true;
+							}
+							else
+							{
+								refreshEvents();
+							}
+							
 							//Events -----------------------------------------------------------------
-							JSONObject EventsObject = null;
+							/*JSONObject EventsObject = null;
 							JSONArray Events = null;
 
 							try 
@@ -381,26 +422,12 @@ public class RhybuddDatabase
 									}
 								}
 							}
-
+							*/
 							finishedRefresh = true;
-						}
-					};
-					RefreshThread.start();
 				}
 			}).start();
+			
 		}
-
-		/**
-		 * Add a word to the dictionary.
-		 * @return rowId or -1 if failed
-		 */
-		/*public long addWord(String word, String definition) {
-			 ContentValues initialValues = new ContentValues();
-			 initialValues.put(KEY_WORD, word);
-			 initialValues.put(KEY_DEFINITION, definition);
-
-			 return mDatabase.insert(FTS_VIRTUAL_TABLE, null, initialValues);
-		 }*/
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
@@ -417,7 +444,7 @@ public class RhybuddDatabase
 				e.printStackTrace();
 			}
 
-			db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT)");
+			db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT, \"ownerid\" TEXT)");
 			db.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
 			onCreate(db);
 		}

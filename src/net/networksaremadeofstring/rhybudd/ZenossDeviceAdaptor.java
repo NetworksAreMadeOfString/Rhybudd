@@ -63,7 +63,7 @@ public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener,
         if (convertView == null) 
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.zenoss_device_listitem, null);
+            convertView = inflater.inflate(R.layout.zenoss_device_listitem3, null);
         }
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Device.getname());

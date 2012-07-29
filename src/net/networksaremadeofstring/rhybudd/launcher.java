@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+
 import com.bugsense.trace.BugSenseHandler;
 
 
@@ -33,7 +35,7 @@ public class launcher extends Activity
 	 public void onCreate(Bundle savedInstanceState) 
 	 {
 		 super.onCreate(savedInstanceState);
-	     settings = getSharedPreferences("rhybudd", 0);
+	     settings = PreferenceManager.getDefaultSharedPreferences(this);
 	     setContentView(R.layout.main);  
 	     
 	     BugSenseHandler.setup(this, "44a76a8c");		

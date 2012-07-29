@@ -33,6 +33,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -71,7 +72,7 @@ public class RhybuddSettings extends SherlockActivity
 		dialog.setMessage("Checking Details.....");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        settings = getSharedPreferences("rhybudd", 0);
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(getIntent().getBooleanExtra("firstRun", false))
         {
