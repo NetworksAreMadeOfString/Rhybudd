@@ -1,21 +1,21 @@
 /*
-* Copyright (C) 2012 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2012 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package net.networksaremadeofstring.rhybudd;
 
 import java.text.DateFormatSymbols;
@@ -120,7 +120,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		setContentView(R.layout.rhybudd_home);
 
-		//Clear any notifications
+		//Clear any notifications event notifications 
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 
 		BugSenseHandler.setup(this, "44a76a8c");		
@@ -174,7 +174,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 									strDate = date.getHours() + ":" + date.getMinutes();
 								}
 							}
-
 						} 
 						catch (ParseException e) 
 						{
@@ -256,8 +255,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						public void onClick(View v) 
 						{
-							//AcknowledgeEvent(listOfZenossEvents.get((Integer)v.getTag()).getEVID().toString(),(Integer) v.getTag(R.integer.EventPositionInList),v.getId());
-							ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+							try
+							{
+								ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+							}
+							catch(Exception e)
+							{
+								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
+								BugSenseHandler.log("EventListOnclick", e);
+							}
 						}
 					};
 
@@ -265,7 +271,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						public boolean onLongClick(View v) 
 						{
-							selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
+							try
+							{
+								selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
+							}
+							catch(Exception e)
+							{
+								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
+								BugSenseHandler.log("RhybuddHome-onDestroy", e);
+							}
 							return true;
 						}
 					};
@@ -274,7 +288,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						public void onClick(View v) 
 						{
-							addToCAB((Integer)v.getTag(R.integer.EventPositionInList));
+							try
+							{
+								addToCAB((Integer)v.getTag(R.integer.EventPositionInList));
+							}
+							catch(Exception e)
+							{
+								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
+								BugSenseHandler.log("RhybuddHome-onDestroy", e);
+							}
 						}
 					};
 
@@ -362,12 +384,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
-
-		// Called when the action mode is created; startActionMode() was called
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) 
 		{
-			// Inflate a menu resource providing context menu items
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.events_cab, menu);
 			mode.setTitle("Manage "+ selectedEvents.size()+" Events");
@@ -389,67 +408,76 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			switch (item.getItemId()) 
 			{
-
-			case R.id.Acknowledge:
-			{
-				for (final Integer i : selectedEvents)
+				case R.id.Acknowledge:
 				{
-					listOfZenossEvents.get(i).setProgress(true);
-					AckEventHandler.sendEmptyMessage(0);
-					AckEvent = new Thread() 
-					{  
-						public void run() 
-						{
-							try 
+					/*try
+					{
+						ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					}
+					catch(Exception e)
+					{
+						BugSenseHandler.log("Acknowledge", e);
+					}*/
+					
+					for (final Integer i : selectedEvents)
+					{
+						listOfZenossEvents.get(i).setProgress(true);
+						AckEventHandler.sendEmptyMessage(0);
+						AckEvent = new Thread() 
+						{  
+							public void run() 
 							{
-								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-								ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
-								listOfZenossEvents.get(i).setProgress(false);
-								listOfZenossEvents.get(i).setAcknowledged();
-								AckEventHandler.sendEmptyMessage(1);
+								try 
+								{
+									//Used to be ackEventAPI
+									API.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
+									listOfZenossEvents.get(i).setProgress(false);
+									listOfZenossEvents.get(i).setAcknowledged();
+									AckEventHandler.sendEmptyMessage(1);
+								}
+								catch (Exception e)
+								{
+									AckEventHandler.sendEmptyMessage(99);
+									BugSenseHandler.log("Acknowledge", e);
+								}
 							}
-							catch (Exception e)
-							{
-								AckEventHandler.sendEmptyMessage(99);
-							}
-						}
-					};
-					AckEvent.start();
+						};
+						AckEvent.start();
+					}
+					return true;
 				}
-				return true;
-			}
-
-			case R.id.escalate:
-			{
-				Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-				intent.setType("text/plain");
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-				// Add data to the intent, the receiving app will decide what to do with it.
-				intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
-				String Events = "Escalated events;\r\n\r\n";
-				for (Integer i : selectedEvents)
+	
+				case R.id.escalate:
 				{
-					Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
-					//list.setItemChecked(i, false);
+					Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+					intent.setType("text/plain");
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+	
+					// Add data to the intent, the receiving app will decide what to do with it.
+					intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
+					String Events = "Escalated events;\r\n\r\n";
+					for (Integer i : selectedEvents)
+					{
+						Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
+						//list.setItemChecked(i, false);
+					}
+					intent.putExtra(Intent.EXTRA_TEXT, Events);
+	
+					startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+					return true;
 				}
-				intent.putExtra(Intent.EXTRA_TEXT, Events);
-
-				startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-				return true;
-			}
-
-			default:
-			{
-				for (Integer i : selectedEvents)
+	
+				default:
 				{
-					listOfZenossEvents.get(i).SetSelected(false);
-					//list.setItemChecked(i, false);
+					for (Integer i : selectedEvents)
+					{
+						listOfZenossEvents.get(i).SetSelected(false);
+						//list.setItemChecked(i, false);
+					}
+					selectedEvents.clear();
+					adapter.notifyDataSetChanged();
+					return false;
 				}
-				selectedEvents.clear();
-				adapter.notifyDataSetChanged();
-				return false;
-			}
 			}
 		}
 
@@ -530,8 +558,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 						{
 							try 
 							{
-								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-								ackEventAPI.AcknowledgeEvent(evt.getEVID());
+								//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+								API.AcknowledgeEvent(evt.getEVID());//ackEventAPI
 								evt.setProgress(false);
 								evt.setAcknowledged();
 								AckEventHandler.sendEmptyMessage(1);
@@ -599,11 +627,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 			else if(resultCode == 2)
 			{
 				Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
-				
+
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putString("URL", "");
 				editor.commit();
-				
+
 				finish();
 			}
 			else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
@@ -633,8 +661,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						try 
 						{
-							ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							ackEventAPI.AcknowledgeEvent(EventID);
+							//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							API.AcknowledgeEvent(EventID);//ackEventAPI
 							listOfZenossEvents.get(Position).setProgress(false);
 							listOfZenossEvents.get(Position).setAcknowledged();
 							AckEventHandler.sendEmptyMessage(1);
@@ -654,14 +682,22 @@ public class RhybuddHome extends SherlockFragmentActivity
 			public void onClick(DialogInterface arg0, int arg1) 
 			{
 				Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
-				ViewEventIntent.putExtra("EventID", EventID);
-				ViewEventIntent.putExtra("Count", listOfZenossEvents.get(Position).getCount());
-				ViewEventIntent.putExtra("Device", listOfZenossEvents.get(Position).getDevice());
-				ViewEventIntent.putExtra("EventState", listOfZenossEvents.get(Position).getEventState());
-				ViewEventIntent.putExtra("FirstTime", listOfZenossEvents.get(Position).getfirstTime());
-				ViewEventIntent.putExtra("LastTime", listOfZenossEvents.get(Position).getlastTime());
-				ViewEventIntent.putExtra("Severity", listOfZenossEvents.get(Position).getSeverity());
-				ViewEventIntent.putExtra("Summary", listOfZenossEvents.get(Position).getSummary());
+				//This shouldn't fail but no harm in being safe
+				try
+				{
+					ViewEventIntent.putExtra("EventID", EventID);
+					ViewEventIntent.putExtra("Count", listOfZenossEvents.get(Position).getCount());
+					ViewEventIntent.putExtra("Device", listOfZenossEvents.get(Position).getDevice());
+					ViewEventIntent.putExtra("EventState", listOfZenossEvents.get(Position).getEventState());
+					ViewEventIntent.putExtra("FirstTime", listOfZenossEvents.get(Position).getfirstTime());
+					ViewEventIntent.putExtra("LastTime", listOfZenossEvents.get(Position).getlastTime());
+					ViewEventIntent.putExtra("Severity", listOfZenossEvents.get(Position).getSeverity());
+					ViewEventIntent.putExtra("Summary", listOfZenossEvents.get(Position).getSummary());
+				}
+				catch(Exception e)
+				{
+					
+				}
 
 				RhybuddHome.this.startActivity(ViewEventIntent);
 			}
