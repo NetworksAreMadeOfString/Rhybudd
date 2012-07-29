@@ -2,19 +2,17 @@
 
     <PreferenceCategory android:title="Background Polling">
 
-        <SwitchPreference
+        <CheckBoxPreference
                 android:key="refreshCache"
                 android:title="Cache Refresh"
-                android:summaryOn="Checks Zenoss every ~30minutes to update the local database"
-                android:summaryOff="Refreshing of the local cache is disabled"
+                android:summary="Checks Zenoss every ~30minutes to update the local database"
                 android:defaultValue="true"
                 />
         
-        <SwitchPreference
+        <CheckBoxPreference
                 android:key="AllowBackgroundService"
                 android:title="Events Alerting"
-                android:summaryOn="Checks Zenoss for new events and raises notifications based on filters below" 
-                android:summaryOff="Checking Zenoss for new events is disabled. You will not receive any alerts."
+                android:summary="Checks Zenoss for new events and raises notifications based on filters below" 
                 android:defaultValue="true"
                 />
         
