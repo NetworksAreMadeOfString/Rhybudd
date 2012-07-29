@@ -1,8 +1,0 @@
-
-    <menu xmlns:android="http://schemas.android.com/apk/res/android">
-        <item android:id="@+id/infrastructure" android:icon="@drawable/ic_menu_infrastructure" android:title="@string/homeMenu_Infrastructure" android:titleCondensed="@string/homeMenu_Infrastructure"></item>
-        <item android:id="@+id/Help" android:icon="@drawable/ic_menu_help" android:title="@string/homeMenu_Help"></item>
-        <item android:icon="@drawable/ic_menu_settings" android:id="@+id/settings" android:title="@string/homeMenu_Settings" android:titleCondensed="@string/homeMenu_Settings"></item>
-        <item android:id="@+id/refresh" android:icon="@drawable/ic_menu_refresh" android:title="@string/homeMenu_Refresh" android:titleCondensed="@string/homeMenu_Refresh"></item>
-        
-    </menu>

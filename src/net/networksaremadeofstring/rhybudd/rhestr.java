@@ -97,11 +97,11 @@ public class rhestr extends Activity
         super.onCreate(savedInstanceState);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.eventlist);
+        //setContentView(R.layout.eventlist);
         ((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
         list = (ListView)findViewById(R.id.ZenossEventsList);
         
-        ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
+        /*ImageView refreshButton = (ImageView) findViewById(R.id.RefreshViewImage);
         refreshButton.setClickable(true);
         refreshButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -111,7 +111,7 @@ public class rhestr extends Activity
 	        	CreateThread();
 	        	dataPreload.start();
 			}
-        });
+        });*/
         
     	ConfigureHandlers();
     	
@@ -239,7 +239,7 @@ public class rhestr extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.rhestr_menu, menu);
+	   /* inflater.inflate(R.menu.rhestr_menu, menu);*/
 	    return true;
 	}
     
@@ -473,12 +473,12 @@ public class rhestr extends Activity
 	            return true;
 	        }
 	        
-	        case R.id.infrastructure:
+	       /* case R.id.infrastructure:
 	        {
 	        	Intent DeviceListIntent = new Intent(rhestr.this, DeviceList.class);
 	        	rhestr.this.startActivity(DeviceListIntent);
 	            return true;
-	        }
+	        }*/
 	        
 	        case R.id.Help:
 	        {
@@ -502,7 +502,7 @@ public class rhestr extends Activity
     
     public void UpdateErrorMessage(String MessageText,boolean Critical)
 	{
-		TextView ErrorMessage = (TextView) findViewById(R.id.MessageText);
+		/*TextView ErrorMessage = (TextView) findViewById(R.id.MessageText);
 		if(MessageText.length() == 0)
 		{
 			ErrorMessage.setHeight(0);
@@ -515,6 +515,6 @@ public class rhestr extends Activity
 			
 			if(Critical)
 				ErrorMessage.setTextColor(-65536);
-		}
+		}*/
 	}
 }
