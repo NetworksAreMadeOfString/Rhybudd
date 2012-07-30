@@ -18,18 +18,17 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
 import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -125,6 +124,7 @@ public class DeviceList extends SherlockActivity
         actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
+		actionbar.setTitle("Infrastructure");
         
         list = (ListView)findViewById(R.id.ZenossDeviceList);
         
@@ -142,16 +142,8 @@ public class DeviceList extends SherlockActivity
         		}
         		else if(msg.what == 1)
     			{
-    				if(rhybuddCache.hasCacheRefreshed())
-    				{
-    					dialog.setMessage("Refresh Complete!");
-    					this.sendEmptyMessageDelayed(2,1000);
-    				}
-    				else
-    				{
-    					dialog.setMessage("Processing...");
-        				handler.sendEmptyMessageDelayed(1, 1000);
-    				}
+					dialog.setMessage("Refresh Complete!");
+					this.sendEmptyMessageDelayed(2,1000);
     			}
     			else if(msg.what == 2)
     			{
@@ -199,74 +191,6 @@ public class DeviceList extends SherlockActivity
     	{  
     		public void run() 
     		{
-    			/*try
-    			{
-    				dbResults = rhybuddCache.getDevices();
-    			}
-    			catch(Exception e)
-    			{
-    				BugSenseHandler.log("DeviceList-DBGetThread", e);
-    				dbResults = null;
-    				Message msg = new Message();
-					Bundle bundle = new Bundle();
-					bundle.putString("exception",e.getMessage());
-					msg.setData(bundle);
-					msg.what = 0;
-					handler.sendMessage(msg);
-    			}
-    			
-    			if(dbResults != null)
-    			{
-    				try
-    				{
-    					DeviceCount = dbResults.getCount();
-	    				while(dbResults.moveToNext())
-		    			{
-	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
-	    					try
-	    					{
-	    						events.put("info", dbResults.getInt(5));
-	    						events.put("debug", dbResults.getInt(6));
-		    					events.put("warning", dbResults.getInt(7));
-		    					events.put("error", dbResults.getInt(8));
-		    					events.put("critical", dbResults.getInt(9));
-	    					}
-	    					catch(Exception e)
-	    					{
-	    						events.put("info", 0);
-	    						events.put("debug", 0);
-		    					events.put("warning", 0);
-		    					events.put("error", 0);
-		    					events.put("critical", 0);
-	    					}
-	    					
-	    					try
-	    					{
-		    					listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-				    					 dbResults.getInt(2), 
-				    					 events,
-				    					 dbResults.getString(3),
-				    					 dbResults.getString(4)));
-	    					}
-	    					catch(Exception e)
-	    					{
-	    						BugSenseHandler.log("DeviceList-CursorLoop", e);
-	    					}
-	    					
-		    			}
-	    				handler.sendEmptyMessageDelayed(1, 500);
-    				}
-    				catch(Exception e)
-    				{
-    					BugSenseHandler.log("DeviceList", e);
-    					Message msg = new Message();
-    					Bundle bundle = new Bundle();
-    					bundle.putString("exception",e.getMessage());
-    					msg.setData(bundle);
-    					msg.what = 0;
-    					handler.sendMessage(msg);
-    				}
-    			}*/
     			try
     			{
     				listOfZenossDevices = rhybuddCache.GetRhybuddDevices();
@@ -279,6 +203,7 @@ public class DeviceList extends SherlockActivity
     			
     			if(listOfZenossDevices!= null && listOfZenossDevices.size() > 0)
     			{
+    				DeviceCount = listOfZenossDevices.size();
     				Log.i("DeviceList","Found DB Data!");
     				handler.sendEmptyMessage(2);
     			}
@@ -295,7 +220,8 @@ public class DeviceList extends SherlockActivity
 						
 						if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
 						{
-							handler.sendEmptyMessage(2);
+							DeviceCount = listOfZenossDevices.size();
+							handler.sendEmptyMessage(1);
 							rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
 						}
 						else
@@ -331,4 +257,38 @@ public class DeviceList extends SherlockActivity
     	ViewDeviceIntent.putExtra("UID", UID);
     	DeviceList.this.startActivity(ViewDeviceIntent);
     }
+    
+    public boolean onCreateOptionsMenu(Menu menu) 
+	{
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.devices, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{
+		switch (item.getItemId()) 
+		{
+			case android.R.id.home:
+	        {
+	        	finish();
+	            return true;
+	        }
+	        
+			case R.id.search:
+			{
+				onSearchRequested();
+				return true;
+			}
+			
+			case R.id.refresh:
+			{
+				DBGetThread();
+				return true;
+			}
+
+		}
+		return false;
+	}
 }

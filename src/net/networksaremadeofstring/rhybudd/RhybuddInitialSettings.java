@@ -18,6 +18,8 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
+import java.util.List;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -76,7 +78,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     	{
     		public void handleMessage(Message msg) 
     		{
-    			if(msg.what == 0 && API != null && API.getLoggedInStatus() == true)
+    			if(msg.what == 0 && API != null)// && API.getLoggedInStatus() == true
     			{
     				SharedPreferences.Editor editor = settings.edit();
     				editor.putBoolean("credentialsSuccess", true);
@@ -95,17 +97,79 @@ public class RhybuddInitialSettings extends SherlockActivity
     				try
     				{
 	        			rhybuddCache = new RhybuddDatabase(RhybuddInitialSettings.this);
-	        			rhybuddCache.RefreshCache();
-	        			handler.sendEmptyMessageDelayed(1, 1000);
+	        			((Thread) new Thread(){
+	        				public void run()
+	        				{
+	        					//Events
+	        					try
+	        					{
+		        					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+		        					if(API != null)
+		    						{
+		        						List<ZenossEvent> listOfZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+		    									settings.getBoolean("SeverityError", true),
+		    									settings.getBoolean("SeverityWarning", true),
+		    									settings.getBoolean("SeverityInfo", false),
+		    									settings.getBoolean("SeverityDebug", false),
+		    									settings.getBoolean("onlyProductionEvents", true));
+	
+		    							if(listOfZenossEvents!= null && listOfZenossEvents.size() > 0)
+		    							{
+		    								rhybuddCache.UpdateRhybuddEvents(listOfZenossEvents);
+		    								handler.sendEmptyMessage(1);
+		    							}
+		    							else
+		    							{
+		    								Log.e("initialSettings","There was a problem processing the GetRhybuddEvents call");
+		    								//HandleException(java.net.ConnectException, "Initialising the API Failed. An error message has been logged.");
+		    							}
+		    						}
+		        					else
+		        					{
+		        						//TODO Bundle an error
+		        						//handler.sendEmptyMessage(2);
+		        					}
+	        					}
+	        					catch(Exception e)
+	        					{
+	        						HandleException(e, "Initialising the API Failed. An error message has been logged.");
+	        					}
+	        					
+	        					//Devices
+	        					try
+	        					{
+		        					List<ZenossDevice> listOfZenossDevices = API.GetRhybuddDevices();
+		    						
+		    						if(listOfZenossDevices != null)
+		    						{
+		    							handler.sendEmptyMessage(3);
+		    							handler.sendEmptyMessageDelayed(2, 1500);
+		    							rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
+		    						}
+		    						else
+		    						{
+		    							//TODO Bundle an error
+		    						}
+	        					}
+	        					catch(Exception e)
+	        					{
+	        						e.printStackTrace();
+	        						HandleException(e, "Caching devices as failed. An error message has been logged.");
+	        					}
+	        					
+	        				}
+	        			}).start();
     				}
     				catch(Exception e)
     				{
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
+    					HandleException(e, "Initialising the Database failed. An error message has been logged.");
     				}
     			}
     			else if(msg.what == 1)
     			{
-    				if(rhybuddCache.hasCacheRefreshed())
+    				dialog.setMessage("Events Cached! Now caching Devices.\r\nPlease wait...");
+    				/*if(rhybuddCache.hasCacheRefreshed())
     				{
     					try
     					{
@@ -142,7 +206,7 @@ public class RhybuddInitialSettings extends SherlockActivity
         					Toast.makeText(RhybuddInitialSettings.this, "Performing initial cache.\r\nPlease wait..." + ellipsis, Toast.LENGTH_SHORT).show();
         					handler.sendEmptyMessageDelayed(1, 2000);
         				}
-    				}
+    				}*/
     			}
     			else if (msg.what == 2)
     			{
@@ -159,6 +223,10 @@ public class RhybuddInitialSettings extends SherlockActivity
     				Intent in = new Intent();
         	        setResult(1,in);
         	        finish();
+    			}
+    			else if(msg.what == 3)
+    			{
+    				dialog.setMessage("Caching complete!\r\nVerifying.");
     			}
     			else if(msg.what == 99)
     			{
@@ -245,13 +313,6 @@ public class RhybuddInitialSettings extends SherlockActivity
 	    			}
 	    			catch(Exception e)
 	    			{
-	    				/*BugSenseHandler.log("InitialSettings-peformLogin", e);
-	    				//e.printStackTrace();
-	    				bundle.putString("error", "Attempting to login to the API failed;\r\n"+e.getMessage());
-	    				Message.obtain();
-						msg.what = 99;
-						msg.setData(bundle);
-						handler.sendMessage(msg);*/
 	    				HandleException(e,"Attempting to login to the API failed;\r\n"+e.getMessage());
 	    			}
 				} 
@@ -266,25 +327,12 @@ public class RhybuddInitialSettings extends SherlockActivity
     			catch(org.apache.http.conn.ConnectTimeoutException cte)
     			{
     				Log.e("Timeout","Hit here");
-    				/*BugSenseHandler.log("InitialSettings-peformLogin", cte);
-    				bundle.putString("error", "Timed out connecting to your Zenoss instance (20 seconds)");
-    				Message.obtain();
-					msg.what = 99;
-					msg.setData(bundle);
-					handler.sendMessage(msg);*/
     				HandleException(cte, "Timed out connecting to your Zenoss instance (20 seconds)");
     			}
     			catch (Exception e) 
     			{
     				Log.e("Exception","Hit here");
 					e.printStackTrace();
-					/*BugSenseHandler.log("InitialSettings-peformLogin", e);
-					
-					bundle.putString("error", e.getMessage());
-					Message.obtain();
-					msg.what = 99;
-					msg.setData(bundle);
-					handler.sendMessage(msg);*/
 					API = null;
 					HandleException(e, "");
 				}
@@ -301,7 +349,6 @@ public class RhybuddInitialSettings extends SherlockActivity
 	        
 	        EditText BAUser = (EditText) findViewById(R.id.basicAuthUser);
 	        EditText BAPassword = (EditText) findViewById(R.id.basicAuthPassword);
-	        CheckBox test;
 	        
 	    	SharedPreferences.Editor editor = settings.edit();
 	        editor.putString("URL", urlET.getText().toString());
@@ -318,15 +365,6 @@ public class RhybuddInitialSettings extends SherlockActivity
     	}
     	catch(Exception e)
     	{
-    		/*Message msg = new Message();
-			Bundle bundle = new Bundle();
-    		BugSenseHandler.log("InitialSettings-doSave", e);
-    		Message.obtain();
-			//e.printStackTrace();
-			bundle.putString("error", "Attempting to save your credentials to local storage failed;\r\n"+e.getMessage());
-			msg.setData(bundle);
-			msg.what = 99;
-			handler.sendMessage(msg);*/
     		HandleException(e,"Attempting to save your credentials to local storage failed;\r\n"+e.getMessage());
     	}
 	}

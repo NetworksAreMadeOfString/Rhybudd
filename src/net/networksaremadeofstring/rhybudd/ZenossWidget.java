@@ -103,7 +103,18 @@ public class ZenossWidget extends AppWidgetProvider
     					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
     				}
     				
-    				EventsObject = API.GetEvents();
+    				try
+    				{
+    					EventsObject = API.GetEvents(true,true,true,true,true, true,false);
+    					if(EventsObject == null)
+    					{
+    						EventsObject = API.GetEvents(true,true,true,true,true,true,true);
+    					}
+    				}
+    				catch(Exception e)
+    				{
+    					
+    				}
     				
 	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
 				} 

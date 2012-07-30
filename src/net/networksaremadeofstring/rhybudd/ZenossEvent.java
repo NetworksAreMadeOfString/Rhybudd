@@ -18,18 +18,25 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-public class ZenossEvent {
-	private String evid;
-	private int Count;
-	private String lastTime;
-	private String device;
-	private String summary;
-	private String eventState;
-	private String firstTime;
-	private String severity;
+public class ZenossEvent 
+{
+	private String evid = "01234567890ABCDEF";
+	private int Count = 0;
+	private String lastTime = "1983-09-20 01:00:00";
+	private String device = "unknown";
+	private String summary = "unknown";
+	private String eventState = "unacknowledged";
+	private String firstTime = "1983-09-20 01:00:00";
+	private String severity = "debug";
 	private Boolean inProgress = false;
 	private Boolean Selected = false;
 	private String prodState = "Production";
+	private String ownerID = "unknown";
+	private String component_text = "unknown";
+	private String component_uid = "unknown";
+	private String eventClass = "unknown";
+	
+
 	
 	 // Constructor for the Ticket class
     public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _prodState) 
@@ -56,6 +63,26 @@ public class ZenossEvent {
             this.prodState = _prodState;
     }
     
+    //Ultimate constructor of ultimate destiny
+    public ZenossEvent(String evid, int count, String prodState, String firstTime, String severity, String component_text, String component_uid,
+    					String summary, String eventState,  String device, String eventClass, String lastTime, String ownerid) 
+    {
+	    super();
+	    this.evid = evid;
+	    this.Count = count;
+	    this.prodState = prodState;
+	    this.firstTime = firstTime;
+	    this.severity = severity;
+	    this.component_text = component_text;
+	    this.component_uid = component_uid;
+	    this.summary = summary;
+	    this.eventState = eventState;
+	    this.device = device;
+	    this.eventClass = eventClass;
+	    this.lastTime = lastTime;
+	    this.ownerID = ownerid;
+    }
+    
     public void SetSelected(Boolean _selected)
     {
     	this.Selected = _selected;
@@ -65,7 +92,34 @@ public class ZenossEvent {
     {
     	return this.Selected;
     }
-    
+	
+	public String getComponentText()
+    {
+    	return this.component_text;
+    }
+	public void setComponentText(String CompText)
+    {
+    	this.component_text = CompText;
+    }
+	
+	public String getComponentUID()
+    {
+    	return this.component_uid;
+    }
+	public void setComponentUID(String CompUID)
+    {
+    	this.component_uid = CompUID;
+    }
+	
+	public String geteventClass()
+    {
+    	return this.eventClass;
+    }
+	public void seteventClass(String eventClass)
+    {
+    	this.eventClass = eventClass;
+    }
+	
     public String getProdState()
     {
     	return this.prodState;
@@ -104,6 +158,16 @@ public class ZenossEvent {
     public String getlastTime()
     {
     	return this.lastTime;
+    }
+    
+    public String getownerID()
+    {
+    	return this.ownerID;
+    }
+    
+    public void setownerID(String OwnerID)
+    {
+    	this.ownerID = OwnerID;
     }
     
     public String getDevice()

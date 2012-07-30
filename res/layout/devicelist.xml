@@ -4,13 +4,14 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_gradient_2" >
-
+
         <ListView
             android:id="@+id/ZenossDeviceList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_above="@+id/StatsHolder"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:cacheColorHint="#929ba4"
             android:fadingEdge="vertical"
             android:fastScrollEnabled="true"

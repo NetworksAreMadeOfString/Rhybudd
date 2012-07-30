@@ -57,6 +57,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentValues;
 import android.util.Log;
 
 //TODO This needs some serious genericisation to remove all the duplicated code
@@ -169,14 +170,12 @@ public class ZenossAPIv2
 		//on whether my cookie is valid appears to be waaaay too complicated
     	try 
     	{
-			this.GetEvents();
-			//Log.i("CheckLoggedIn", "Success");
+			this.GetEvents("5",true,false);
 			this.LoginSuccessful = true;
 			return true;
 		} 
     	catch (Exception e) 
     	{
-			//Log.e("CheckLoggedIn", e.getMessage());
 			this.LoginSuccessful = false;
 			return false;
 		}
@@ -188,8 +187,10 @@ public class ZenossAPIv2
 		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
 		JSONObject devices = this.GetDevices();
 
+		Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
 
+		//Log.i("GetRhybuddDevices",Integer.toString(DeviceCount));
 		//Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
 
 		for(int i = 0; i < DeviceCount; i++)
@@ -201,14 +202,88 @@ public class ZenossAPIv2
 				
 				//TODO: More try/catch
 				HashMap<String, Integer> events = new HashMap<String, Integer>();
-				events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
+				try
+				{
+					events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
+				}
+				catch(JSONException j)
+				{
+					events.put("info", CurrentDevice.getJSONObject("events").getJSONObject("info").getInt("count"));
+				}
+				catch(Exception e)
+				{
+					events.put("info",0);
+				}
+				
+				try
+				{
+					events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
+				}
+				catch(JSONException j)
+				{
+					events.put("debug", CurrentDevice.getJSONObject("events").getJSONObject("debug").getInt("count"));
+				}
+				catch(Exception e)
+				{
+					events.put("debug",0);
+				}
+				
+				try
+				{
+					events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
+				}
+				catch(JSONException j)
+				{
+					events.put("critical", CurrentDevice.getJSONObject("events").getJSONObject("critical").getInt("count"));
+				}
+				catch(Exception e)
+				{
+					events.put("critical",0);
+				}
+				
+				try
+				{
+					events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
+				}
+				catch(JSONException j)
+				{
+					events.put("warning", CurrentDevice.getJSONObject("events").getJSONObject("warning").getInt("count"));
+				}
+				catch(Exception e)
+				{
+					events.put("warning",0);
+				}
+				
+				try
+				{
+					events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));
+				}
+				catch(JSONException j)
+				{
+					events.put("error", CurrentDevice.getJSONObject("events").getJSONObject("error").getInt("count"));
+				}
+				catch(Exception e)
+				{
+					events.put("error",0);
+				}
+				
+				/*events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
 				events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
 				events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
 				events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
-				events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));
-
+				events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));*/
+				int IPAddress = 0;
+				try
+				{
+					IPAddress = CurrentDevice.getInt("ipAddress");
+				}
+				catch(JSONException j)
+				{
+					IPAddress = 0;
+				}
+				
 				ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
-						CurrentDevice.getInt("ipAddress"),
+						IPAddress,
 						events,
 						CurrentDevice.getString("name"),
 						CurrentDevice.getString("uid")));
@@ -268,8 +343,8 @@ public class ZenossAPIv2
     	JSONObject dataContents = new JSONObject();
     	dataContents.put("excludeIds", new JSONObject());
     	dataContents.put("selectState", null);
-    	dataContents.put("direction", "DESC");
-    	dataContents.put("field", "severity");
+    	//dataContents.put("direction", "DESC");
+    	//dataContents.put("field", "severity");
     	dataContents.put("asof", (System.currentTimeMillis()/1000));
     	
     	JSONArray evids = new JSONArray();
@@ -294,10 +369,88 @@ public class ZenossAPIv2
         httpost.setEntity(new StringEntity(reqData.toString()));
     	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
 		JSONObject json = new JSONObject(ackEventReturnJSON);
+		Log.i("AcknowledgeEvent",json.toString(2));
     	return json;
 	}
 	
-	public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
+	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
+	{
+		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
+		
+		JSONObject jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,false);
+		
+		Log.i("GetRhybuddEvents",jsonEvents.toString(3));
+		JSONArray Events = null;
+		try
+		{
+			//Log.i("GetRhybuddEvents","Trying to get the list of events");
+			Events = jsonEvents.getJSONObject("result").getJSONArray("events");
+			//Log.i("GetRhybuddEvents","Done!");
+		}
+		catch(JSONException e)
+		{
+			try
+			{
+				jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,true);
+				Events = jsonEvents.getJSONObject("result").getJSONArray("events");
+				//Log.i("GetRhybuddEvents-Retry",jsonEvents.toString(3));
+			}
+			catch(Exception e1)
+			{
+				return null;
+			}
+		}
+		catch(Exception e1)
+		{
+			e1.printStackTrace();
+			return null;
+		}
+		
+		int EventCount = jsonEvents.getJSONObject("result").getInt("totalCount");
+		
+		//Log.i("GetRhybuddEvents","Iterating over " + EventCount + " events:" + jsonEvents.toString(2));
+		for(int i = 0; i < EventCount; i++)
+		{
+			JSONObject CurrentEvent = null;
+			try 
+			{
+				CurrentEvent = Events.getJSONObject(i);
+				
+				//Log.w("EventLoop",CurrentEvent.toString(3));
+				
+				listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+													CurrentEvent.getInt("count"),
+													CurrentEvent.getString("prodState"),
+													CurrentEvent.getString("firstTime"),
+													CurrentEvent.getString("severity"),
+													CurrentEvent.getJSONObject("component").getString("text"),
+													CurrentEvent.getJSONObject("component").getString("uid"),
+													CurrentEvent.getString("summary"), 
+													CurrentEvent.getString("eventState"),
+													CurrentEvent.getJSONObject("device").getString("text"),
+													CurrentEvent.getJSONObject("eventClass").getString("text"),
+													CurrentEvent.getString("lastTime"),
+													CurrentEvent.getString("ownerid")));
+			}
+			catch(Exception e)
+			{
+				//TODO Do something
+				return null;
+			}
+		}
+		
+		//Log.i("GetRhybuddEvents","Done");
+		if(listofZenossEvents.size() > 0)
+		{
+			return listofZenossEvents;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/*public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
 	{
 		return this.GetEvents("5,4,3,2",false);
 	}
@@ -305,9 +458,9 @@ public class ZenossAPIv2
 	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug) throws JSONException, ClientProtocolException, IOException
 	{
 		return this.GetEvents(Critical,Error,Warning,Info,Debug,false);
-	}
+	}*/
 	
-	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, Boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
+	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
 	{
 		String SeverityLevels = "";
         
@@ -332,11 +485,11 @@ public class ZenossAPIv2
         	SeverityLevels = SeverityLevels.substring(0, SeverityLevels.length() - 1);
         }
         
-		return this.GetEvents(SeverityLevels,ProductionOnly);
+		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41);
 	}
 	
     @SuppressWarnings("unchecked")
-	private JSONObject GetEvents(String Severity, Boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
+	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
     {
     	//Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -350,6 +503,13 @@ public class ZenossAPIv2
     	dataContents.put("dir", "DESC");
     	dataContents.put("sort", "severity");
         
+    	//4.1 stuff
+    	if(Zenoss41)
+    	{
+    		dataContents.put("keys", new JSONArray("[evid,count,prodState,firstTime,severity,component,summary,eventState,device,eventClass,lastTime,ownerid]"));
+    	}
+    	//4.1 stuff
+    	
         JSONObject params = new JSONObject();
         params.put("severity", new JSONArray("["+Severity+"]"));
         params.put("eventState", new JSONArray("[0, 1]"));

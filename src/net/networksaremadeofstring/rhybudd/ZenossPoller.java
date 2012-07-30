@@ -17,8 +17,14 @@
 * this program. If not, see <http://www.gnu.org/licenses/>
 */
 package net.networksaremadeofstring.rhybudd;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.AlarmManager;
@@ -30,6 +36,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -51,8 +58,10 @@ public class ZenossPoller extends Service
 	private Boolean onlyAlertOnProd = true;
 	RhybuddDatabase rhybuddCache = null;
 	Handler handler;
+	Handler eventsHandler;
 	Cursor dbResults;
 	int Delay;
+	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	
 	@Override
 	public void onCreate() 
@@ -62,8 +71,7 @@ public class ZenossPoller extends Service
 		Log.i("ServiceThread","Service Starting");
 		
 		BugSenseHandler.setup(this, "44a76a8c");
-
-		onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", true);
+		
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
@@ -72,7 +80,44 @@ public class ZenossPoller extends Service
 			rhybuddCache = new RhybuddDatabase(this);
 		}
 
-		handler = new Handler() 
+		eventsHandler = new Handler() 
+    	{
+    		public void handleMessage(Message msg) 
+    		{
+    			if(msg.what == 1)
+    			{
+    				onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", true);
+    				
+    				Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
+    				if(listOfZenossEvents != null && listOfZenossEvents.size() > 0)
+    				{
+    					for(ZenossEvent event : listOfZenossEvents)
+    					{
+    						if(alertsEnabled && event.isNew() && CheckIfNotify(event.getProdState(), event.getDevice()))
+    	    				{
+    	    					EventCount++;
+    	    				}
+    					}
+    					
+    					if(EventCount > 0)
+    	    				SendCombinedNotification(EventCount,CriticalList);
+    				}
+    				else
+        			{
+    					//TODO Warning
+        			}
+    				
+    				if(alertsEnabled)
+        				SendStickyNotification();
+    			}
+    			else if(msg.what == 999)
+    			{
+    				
+    			}
+    		}
+    	};
+		
+		/*handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
@@ -103,11 +148,6 @@ public class ZenossPoller extends Service
 		        			{
 		    	    			while(dbResults.moveToNext())
 		    	    			{
-		    	    				/*for(String s : dbResults.getColumnNames())
-		    	    				{
-		    	    					Log.v("ZenossPoller",s);
-		    	    				}
-		    	    				Log.v("---","---------------");*/
 		    	    				
 		    	    				try
 		    	    				{
@@ -144,7 +184,7 @@ public class ZenossPoller extends Service
     				//Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
     			}
     		}
-    	};
+    	};*/
     	//TODO Find out why this was here
 		//CheckForEvents(); 
 	}
@@ -193,7 +233,8 @@ public class ZenossPoller extends Service
 		else if(intent != null && intent.getBooleanExtra("refreshCache", false))
 		{
 			Log.i("onStartCommand","Received an intent to refresh the cache");
-			rhybuddCache.RefreshCache();
+			
+			RefreshCache();
 		}
 		else if(intent != null && intent.getBooleanExtra("settingsUpdate", false))
 		{
@@ -285,7 +326,7 @@ public class ZenossPoller extends Service
 		{
 			strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
 		}
-		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time was " + strDate, contentIntent);
+		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time: " + strDate, contentIntent);
 		mNM.notify(20, notification);
 	}
 	
@@ -346,19 +387,111 @@ public class ZenossPoller extends Service
 		mNM.notify(43523, notification);//NotificationID++ 
 	}
 
+	private void RefreshCache()
+	{
+		((Thread) new Thread(){
+			public void run()
+			{
+				try 
+				{
+					if(API == null)
+						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					
+					List<ZenossDevice> listOfZenossDevices = API.GetRhybuddDevices();
+					
+					if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
+					{
+						rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
+					}
+					else
+					{
+						//TODO Send Warning
+						/*Message msg = new Message();
+    					Bundle bundle = new Bundle();
+    					bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
+    					msg.setData(bundle);
+    					msg.what = 0;
+    					handler.sendMessage(msg);*/
+					}
+					
+				} 
+				catch (Exception e) 
+				{
+					//TODO Send Warning
+					BugSenseHandler.log("DeviceList", e);
+					/*Message msg = new Message();
+					Bundle bundle = new Bundle();
+					bundle.putString("exception",e.getMessage());
+					msg.setData(bundle);
+					msg.what = 0;
+					handler.sendMessage(msg);*/
+				}
+			}
+		}).start();
+	}
+	
 	private void CheckForEvents()
 	{
 		EventCount = 0;
-		CriticalList = "";
-		try
-		{
-			rhybuddCache.RefreshEvents();
-			handler.sendEmptyMessageDelayed(1, 1000);
-		}
-		catch(Exception e)
-		{
-			BugSenseHandler.log("ZenossPoller", e);
-		}
+		((Thread) new Thread(){
+			public void run()
+			{
+				if(listOfZenossEvents != null)
+					listOfZenossEvents.clear();
+				
+				try
+				{
+    				if(API == null)
+    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+				}
+				catch(Exception e)
+				{
+					API = null;
+					e.printStackTrace();
+				}
+    				
+				try 
+				{
+					if(API != null)
+					{
+						listOfZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+								settings.getBoolean("SeverityError", true),
+								settings.getBoolean("SeverityWarning", true),
+								settings.getBoolean("SeverityInfo", false),
+								settings.getBoolean("SeverityDebug", false),
+								settings.getBoolean("onlyProductionEvents", true));
+						
+						if(listOfZenossEvents!= null && listOfZenossEvents.size() > 0)
+						{
+							eventsHandler.sendEmptyMessage(1);
+							rhybuddCache.UpdateRhybuddEvents(listOfZenossEvents);
+						}
+					}
+					else
+					{
+						//TODO API Problems
+					}
+				} 
+				catch (ClientProtocolException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				catch (JSONException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch(Exception e)
+				{
+					
+				}
+			}
+		}).start();
 	}
 
 	private Boolean CheckIfNotify(String prodState, String UID)
@@ -369,18 +502,15 @@ public class ZenossPoller extends Service
 			return true;
 		}
 		
-		Cursor dbResults = rhybuddCache.getDevice(UID);
-		if(dbResults.moveToFirst())
+		ZenossDevice thisDevice = rhybuddCache.getDevice(UID);
+		if(thisDevice != null)
 		{
-			String dbProdState = dbResults.getString(1);
-			if(dbProdState.equals("Production"))
+			if(thisDevice.getproductionState().equals("Production"))
 			{
-				dbResults.close();
 				return true;
 			}
 			else
 			{
-				dbResults.close();
 				if(onlyAlertOnProd)
 				{
 					return false;
@@ -393,7 +523,6 @@ public class ZenossPoller extends Service
 		}
 		else
 		{
-			dbResults.close();
 			if(onlyAlertOnProd)
 			{
 				return false;

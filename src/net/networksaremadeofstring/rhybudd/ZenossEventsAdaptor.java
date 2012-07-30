@@ -18,6 +18,10 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
@@ -43,6 +47,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
     private OnLongClickListener listenerLong;
     private OnClickListener cablistener;
     
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	Date date;
+	String strDate = "";
+	Date today = Calendar.getInstance().getTime();
+	String[] shortMonths = new DateFormatSymbols().getShortMonths();
     
     public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, Boolean _isRhestr) 
     {
@@ -88,7 +97,31 @@ public class ZenossEventsAdaptor extends BaseAdapter
             convertView = inflater.inflate(R.layout.zenoss_event_listitem, null);
         }
         
-        ((TextView) convertView.findViewById(R.id.dateTime)).setText(Event.getlastTime());
+        try 
+		{
+			date = sdf.parse(Event.getlastTime());
+			if(date.getDate() < today.getDate())
+			{
+				strDate = date.getDate() + " " + shortMonths[date.getMonth()];
+			}
+			else
+			{
+				if(date.getMinutes() < 10)
+				{
+					strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
+				}
+				else
+				{
+					strDate = date.getHours() + ":" + date.getMinutes();
+				}
+			}
+		} 
+		catch (Exception e) 
+		{
+			strDate = "";
+		}
+        
+        ((TextView) convertView.findViewById(R.id.dateTime)).setText(strDate);
         
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Event.getDevice());

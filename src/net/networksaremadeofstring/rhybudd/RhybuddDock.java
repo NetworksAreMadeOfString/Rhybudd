@@ -123,12 +123,12 @@ public class RhybuddDock extends SherlockFragmentActivity
 		}
 		else
 		{
-			rhybuddCache.RefreshEvents();
-			handler.sendEmptyMessageDelayed(1, 1000);
+			//rhybuddCache.RefreshEvents();
+			//handler.sendEmptyMessageDelayed(1, 1000);
 		}
 
 
-		((Thread) new Thread() 
+		/*((Thread) new Thread() 
 		{  
 			public void run() 
 			{
@@ -146,7 +146,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 					}
 				}
 			}
-		}).start();
+		}).start();*/
 	}
 
 
@@ -219,7 +219,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 
 	public void DBGetThread()
 	{
-		listOfZenossEvents.clear();
+		/*listOfZenossEvents.clear();
 		dataPreload = new Thread() 
 		{  
 			public void run() 
@@ -299,7 +299,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 				handler.sendEmptyMessage(0);
 			}
 		};
-		dataPreload.start();
+		dataPreload.start();*/
 	}
 
 	private void ConfigureHandler() 
@@ -315,14 +315,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 				}
 				else if(msg.what == 1)
 				{
-					if(rhybuddCache.hasCacheRefreshed())
-					{
-						this.sendEmptyMessageDelayed(2,1000);
-					}
-					else
-					{
-						handler.sendEmptyMessageDelayed(1, 1000);
-					}
+					this.sendEmptyMessageDelayed(2,1000);
 				}
 				else if(msg.what == 2)
 				{

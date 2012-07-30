@@ -19,7 +19,11 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,11 +59,10 @@ public class RhybuddDatabase
 	public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;
 
 	private static final String DATABASE_NAME = "rhybudd3Cache";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 8;
 
-	private final RhybuddOpenHelper mDatabaseOpenHelper;
-	private static Boolean finishedRefresh = false;
-	static Context context;
+	private RhybuddOpenHelper mDatabaseOpenHelper;
+	Context context;
 
 	/**
 	 * Constructor
@@ -73,22 +76,17 @@ public class RhybuddDatabase
 		this.context = _context;
 	}
 
-	public Boolean hasCacheRefreshed()
-	{
-		return this.finishedRefresh;
-	}
-
 	public void FlushDB()
 	{
 		mDatabaseOpenHelper.FlushDB();
 	}
 
-	public void GetDBLock()
+	/*public void GetDBLock()
 	{
 		mDatabaseOpenHelper.getWritableDatabase();
-	}
+	}*/
 
-	public Cursor getDevice(String UID)
+	/*public Cursor getDevice(String UID)
 	{
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
 		builder.setTables("devices");
@@ -122,11 +120,123 @@ public class RhybuddDatabase
 			return null;
 		} 
 		return cursor;
-	}
+	}*/
 	
+	public ZenossDevice getDevice(String UID)
+	{
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("devices");
+		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
+		if (cursor == null) 
+		{
+			cursor.close();
+			return null;
+		}
+		else
+		{
+			
+			if(cursor.moveToFirst())
+			{
+				HashMap<String, Integer> events = new HashMap<String, Integer>();
+				try
+				{
+					events.put("info", cursor.getInt(5));
+					events.put("debug", cursor.getInt(6));
+					events.put("warning", cursor.getInt(7));
+					events.put("error", cursor.getInt(8));
+					events.put("critical", cursor.getInt(9));
+				}
+				catch(Exception e)
+				{
+					events.put("info", 0);
+					events.put("debug", 0);
+					events.put("warning", 0);
+					events.put("error", 0);
+					events.put("critical", 0);
+				}
+				
+				try
+				{
+					cursor.close();
+					return new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4));
+				}
+				catch(Exception e)
+				{
+					cursor.close();
+					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+					return null;
+				}
+			}
+			else
+			{
+				cursor.close();
+				return null;
+			}
+		}
+	}
+	public List<ZenossEvent> GetRhybuddEvents()
+	{
+		List<ZenossEvent> ZenossEvents = new ArrayList<ZenossEvent>();
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("events");
+		Cursor dbResults = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"evid",
+																								"count",
+																								"prodState",
+																								"firstTime",
+																								"severity",
+																								"component_text",
+																								"component_uid",
+																								"summary",
+																								"eventState",
+																								"device",
+																								"eventClass",
+																								"lastTime",
+																								"ownerid"}, 
+																								null, null, null, null, null);
+	
+		
+		if(dbResults != null && dbResults.getCount() > 0)
+		{
+			while(dbResults.moveToNext())
+			{
+				try
+				{
+					ZenossEvents.add(new ZenossEvent(dbResults.getString(0),
+							dbResults.getInt(1),
+							dbResults.getString(2), 
+							dbResults.getString(3),
+							dbResults.getString(4),
+							dbResults.getString(5),
+							dbResults.getString(6),
+							dbResults.getString(7),
+							dbResults.getString(8),
+							dbResults.getString(9),
+							dbResults.getString(10),
+							dbResults.getString(11),
+							dbResults.getString(12)));
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("DBGetThread", e);
+				}
+				
+			}
+			dbResults.close();
+			return ZenossEvents;
+		}
+		else
+		{
+			return null;
+		}
+	}
+		
+		
 	public List<ZenossDevice> GetRhybuddDevices()
 	{
-		Cursor dbResults = getDevices();
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("devices");
+		Cursor dbResults = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
+		
 		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
 		if(dbResults.getCount() > 0)
 		{
@@ -180,28 +290,43 @@ public class RhybuddDatabase
 		{
 			public void run()
 			{
-				mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
-				Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
+				try
+				{
+					//mDatabaseOpenHelper.getWritableDatabase();
+					mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
+					Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
+					//mDatabaseOpenHelper.close();
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("UpdateRhybuddDevices", e);
+				}
 			}
 		}).start();
 
 	}
-
-	//----------------------------------------------------------------------------------------------------------------------
-	public boolean blockingRefreshEvents()
-	{
-		return mDatabaseOpenHelper.blockingRefreshEvents();
-	}
-	//----------------------------------------------------------------------------------------------------------------------
 	
-	public void RefreshEvents()
+	public void UpdateRhybuddEvents(final List<ZenossEvent> ZenossEvents)
 	{
-		mDatabaseOpenHelper.refreshEvents();
-	}
+		Log.i("UpdateRhybudddEvents","Recieved a request to update the Events table");
+		((Thread) new Thread()
+		{
+			public void run()
+			{
+				try
+				{
+					//mDatabaseOpenHelper.getWritableDatabase();
+					mDatabaseOpenHelper.UpdateRhybuddEvents(ZenossEvents);
+					Log.i("UpdateRhybuddDevices","Finished updating the Events table");
+					//mDatabaseOpenHelper.close();
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("UpdateRhybudddEvents", e);
+				}
+			}
+		}).start();
 
-	public void RefreshCache()
-	{
-		mDatabaseOpenHelper.refreshCache();
 	}
 
 	public void Close()
@@ -209,7 +334,7 @@ public class RhybuddDatabase
 		mDatabaseOpenHelper.close();
 	}
 
-	private static void SendWarningNotification(String Summary)
+	/*private static void SendWarningNotification(String Summary)
 	{
 		NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification(R.drawable.ic_stat_alert, "Rhybudd Database Issues", System.currentTimeMillis());
@@ -222,7 +347,7 @@ public class RhybuddDatabase
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Database / Polling Errors",Summary, contentIntent);
 		mNM.notify(999, notification);//NotificationID++ 
-	}
+	}*/
 
 	private static class RhybuddOpenHelper extends SQLiteOpenHelper 
 	{
@@ -252,21 +377,43 @@ public class RhybuddDatabase
 			try
 			{
 				Log.i("DB onCreate","Creating Tables");
-				mDatabase.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT, \"ownerid\" TEXT)");
-				mDatabase.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
-				//refreshCache();
+
+				mDatabase.execSQL("CREATE TABLE \"events\" (\"evid\" TEXT PRIMARY KEY  NOT NULL, " +
+						"\"count\" INTEGER, " +
+						"\"prodState\" TEXT, " +
+						"\"firstTime\" TEXT, " +
+						"\"severity\" TEXT, " +
+						"\"component_text\" TEXT, " +
+						"\"component_uid\" TEXT, " +
+						"\"summary\" TEXT, " +
+						"\"eventState\" TEXT, " +
+						"\"device\" TEXT, " +
+						"\"eventClass\" TEXT, " +
+						"\"lastTime\" TEXT, " +
+						"\"ownerid\" TEXT)");
+				
+				mDatabase.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL," +
+						"\"productionState\" TEXT," +
+						"\"ipAddress\" INTEGER," +
+						"\"name\" TEXT," +
+						"\"uid\" TEXT, " +
+						"\"infoEvents\" INTEGER DEFAULT (0) ," +
+						"\"debugEvents\" INTEGER DEFAULT (0) ," +
+						"\"warningEvents\" INTEGER DEFAULT (0) ," +
+						"\"errorEvents\" INTEGER DEFAULT (0) ," +
+						"\"criticalEvents\" INTEGER DEFAULT (0) )");
 			}
 			catch(SQLiteException s)
 			{
 				BugSenseHandler.log("Database-onCreate", s);
 				//s.printStackTrace();
-				SendWarningNotification(s.getMessage());
+				//SendWarningNotification(s.getMessage());
 			}
 			catch(Exception e)
 			{
 				BugSenseHandler.log("Database-onCreate", e);
 				//e.printStackTrace();
-				SendWarningNotification(e.getMessage());
+				//SendWarningNotification(e.getMessage());
 			}
 		}
 
@@ -274,356 +421,141 @@ public class RhybuddDatabase
 		{
 			try
 			{
+				mDatabase.beginTransaction();
 				mDatabase.delete("events", null, null);
 				mDatabase.delete("devices", null, null);
+				mDatabase.setTransactionSuccessful();
 			}
 			catch(Exception e)
 			{
 				BugSenseHandler.log("Database-Flush", e);
 			}
-		}
-
-		private boolean blockingRefreshEvents()
-		{
-			ZenossAPIv2 API = null;
-			JSONObject EventsObject = null;
-			JSONArray Events = null;
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mHelperContext);
-
-			try 
+			finally
 			{
-				API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-
-				if(API != null)
-				{
-					try 
-					{
-						EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false),settings.getBoolean("onlyProductionEvents",true));
-
-						Events = EventsObject.getJSONObject("result").getJSONArray("events");
-					} 
-					catch (Exception e) 
-					{
-						BugSenseHandler.log("updateEvents", e);
-					}
-
-					if (EventsObject != null) 
-					{
-						
-						int EventCount = 0;
-						try
-						{
-							mDatabase.beginTransaction();
-							
-							EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-							
-							mDatabase.delete("events", null, null);
-							
-							for (int i = 0; i < EventCount; i++) 
-							{
-								JSONObject CurrentEvent = null;
-								ContentValues values = new ContentValues(2);
-								try 
-								{
-									CurrentEvent = Events.getJSONObject(i);
-									values.put("EVID",CurrentEvent.getString("evid"));
-									values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-									values.put("summary", CurrentEvent.getString("summary"));
-									values.put("eventState", CurrentEvent.getString("eventState"));
-									values.put("severity", CurrentEvent.getString("severity"));
-
-									values.put("count", CurrentEvent.getString("count"));
-									values.put("firstTime", CurrentEvent.getString("firstTime"));
-									values.put("lastTime", CurrentEvent.getString("lastTime"));
-									values.put("ownerid", CurrentEvent.getString("ownerid"));
-									values.put("prodState", CurrentEvent.getString("prodState"));
-
-									mDatabase.insertWithOnConflict("events", null, values, SQLiteDatabase.CONFLICT_IGNORE);
-								} 
-								catch (JSONException e) 
-								{
-									BugSenseHandler.log("updateEvents-DBLoop", e);
-									//TODO We should tell the user about this or recover from it as they could miss an alert
-								}
-							}
-						}
-						catch(Exception e)
-						{
-							mDatabase.endTransaction();
-							BugSenseHandler.log("updateEvents", e);
-							e.printStackTrace();
-							return false;
-						}
-						
-						mDatabase.setTransactionSuccessful();
-						mDatabase.endTransaction();
-					}
-					else
-					{
-						return false;
-					}
-				}
-			} 
-			catch (Exception e1) 
-			{
-				BugSenseHandler.log("Database-refreshEvents", e1);
-				SendWarningNotification(e1.getMessage());
-				return false;
+				mDatabase.endTransaction();
 			}
-			
-			return true;
 		}
-		
-		private synchronized void refreshEvents()
-		{
-			finishedRefresh = false;
-
-			new Thread(new Runnable() 
-			{
-				public void run() 
-				{
-					/*ZenossAPIv2 API = null;
-					JSONObject EventsObject = null;
-					JSONArray Events = null;
-					SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mHelperContext);
-
-					try 
-					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-
-						if(API != null)
-						{
-							try 
-							{
-								EventsObject = API.GetEvents(settings.getBoolean("SeverityCritical", true), settings.getBoolean("SeverityError", true),settings.getBoolean("SeverityWarning", true),settings.getBoolean("SeverityInfo",false), settings.getBoolean("SeverityDebug",false),settings.getBoolean("onlyProductionEvents",true));
-
-								Events = EventsObject.getJSONObject("result").getJSONArray("events");
-							} 
-							catch (Exception e) 
-							{
-								BugSenseHandler.log("updateEvents", e);
-							}
-
-							if (EventsObject != null) 
-							{
-								
-								int EventCount = 0;
-								try
-								{
-									mDatabase.beginTransaction();
-									
-									EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-									
-									mDatabase.delete("events", null, null);
-									
-									for (int i = 0; i < EventCount; i++) 
-									{
-										JSONObject CurrentEvent = null;
-										ContentValues values = new ContentValues(2);
-										try 
-										{
-											CurrentEvent = Events.getJSONObject(i);
-											values.put("EVID",CurrentEvent.getString("evid"));
-											values.put("device", CurrentEvent.getJSONObject("device").getString("text"));
-											values.put("summary", CurrentEvent.getString("summary"));
-											values.put("eventState", CurrentEvent.getString("eventState"));
-											values.put("severity", CurrentEvent.getString("severity"));
-
-											values.put("count", CurrentEvent.getString("count"));
-											values.put("firstTime", CurrentEvent.getString("firstTime"));
-											values.put("lastTime", CurrentEvent.getString("lastTime"));
-											values.put("ownerid", CurrentEvent.getString("ownerid"));
-											values.put("prodState", CurrentEvent.getString("prodState"));
-
-											mDatabase.insertWithOnConflict("events", null, values, SQLiteDatabase.CONFLICT_IGNORE);
-										} 
-										catch (JSONException e) 
-										{
-											BugSenseHandler.log("updateEvents-DBLoop", e);
-											//TODO We should tell the user about this or recover from it as they could miss an alert
-										}
-									}
-								}
-								catch(Exception e)
-								{
-									mDatabase.endTransaction();
-									BugSenseHandler.log("updateEvents", e);
-									e.printStackTrace();
-								}
-								
-								mDatabase.setTransactionSuccessful();
-								mDatabase.endTransaction();
-							}
-						}
-					} 
-					catch (Exception e1) 
-					{
-						BugSenseHandler.log("Database-refreshEvents", e1);
-						SendWarningNotification(e1.getMessage());
-					}
-					finishedRefresh = true;*/
-					finishedRefresh = blockingRefreshEvents();
-				}
-			}).start();
-		}
-
 		
 		private void UpdateRhybuddDevices(List<ZenossDevice> ZenossDevices)
 		{
 			int DeviceCount = ZenossDevices.size();
-			//cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-			mDatabase.beginTransaction();
-			mDatabase.delete("devices", null, null);
-
-			for(int i = 0; i < DeviceCount; i++)
+			try
 			{
-				ZenossDevice CurrentDevice = null;
-				ContentValues values = new ContentValues(2);
-
-				try 
+				mDatabase.beginTransaction();
+				mDatabase.delete("devices", null, null);
+	
+				for(int i = 0; i < DeviceCount; i++)
 				{
-					CurrentDevice = ZenossDevices.get(i);
-					values.put("productionState",CurrentDevice.getproductionState());
-					values.put("ipAddress", CurrentDevice.getipAddress());
-					values.put("name", CurrentDevice.getname());
-					values.put("uid", CurrentDevice.getuid());
-					
-					HashMap<String, Integer> events = CurrentDevice.getevents();
-					
-					values.put("infoEvents", events.get("info"));
-					values.put("debugEvents", events.get("debug"));
-					values.put("warningEvents", events.get("warning"));
-					values.put("errorEvents", events.get("error"));
-					values.put("criticalEvents", events.get("critical"));
-
-					mDatabase.insert("devices", null, values);
-				}
-				catch (Exception e) 
-				{
-					e.printStackTrace();
-					//This could get a little excessive
-					//BugSenseHandler.log("Database-refreshDevices", e);
-				}
-			}
-			mDatabase.setTransactionSuccessful();
-			mDatabase.endTransaction();
-		}
-		
-		/**
-		 * Starts a thread to load the database table with words
-		 */
-		private void refreshCache() 
-		{
-			finishedRefresh = false;
-
-			new Thread(new Runnable() 
-			{
-				public void run() 
-				{
-					ZenossAPIv2 API = null;
-					JSONObject DeviceObject = null;
-					SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mHelperContext);
+					ZenossDevice CurrentDevice = null;
+					ContentValues values = new ContentValues(2);
+	
 					try 
 					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-
-						if(API != null)
-						{
-							DeviceObject = API.GetDevices();
-							int DeviceCount = DeviceObject.getJSONObject("result").getInt("totalCount");
-							//cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-							mDatabase.beginTransaction();
-							mDatabase.delete("devices", null, null);
-
-							for(int i = 0; i < DeviceCount; i++)
-							{
-								JSONObject CurrentDevice = null;
-								ContentValues values = new ContentValues(2);
-
-								try 
-								{
-									CurrentDevice = DeviceObject.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
-
-									//Log.e("CurrentDevice",CurrentDevice.toString(3)+"\r\n\r\n\r\n\r\n\r\n\r\n");
-									values.put("productionState",CurrentDevice.getString("productionState"));
-									try
-									{
-										values.put("ipAddress", CurrentDevice.getInt("ipAddress"));
-									}
-									catch(Exception e)
-									{
-										values.put("ipAddress", "0.0.0.0");
-									}
-									
-									//TODO Lots more catching here
-									values.put("name", CurrentDevice.getString("name"));
-									try
-									{
-										values.put("uid", CurrentDevice.getString("uid"));
-									}
-									catch(Exception e)
-									{
-										//values.put("uid", CurrentDevice.getString("uid"));
-									}
-									
-									values.put("infoEvents", CurrentDevice.getJSONObject("events").getInt("info"));
-									values.put("debugEvents", CurrentDevice.getJSONObject("events").getInt("debug"));
-									values.put("warningEvents", CurrentDevice.getJSONObject("events").getInt("warning"));
-									values.put("errorEvents", CurrentDevice.getJSONObject("events").getInt("error"));
-									values.put("criticalEvents", CurrentDevice.getJSONObject("events").getInt("critical"));
-
-									mDatabase.insert("devices", null, values);
-								}
-								catch (JSONException e) 
-								{
-									e.printStackTrace();
-									//This could get a little excessive
-									//BugSenseHandler.log("Database-refreshDevices", e);
-								}
-							}
-							mDatabase.setTransactionSuccessful();
-							//mDatabase.close();
-						}
+						CurrentDevice = ZenossDevices.get(i);
+						values.put("productionState",CurrentDevice.getproductionState());
+						values.put("ipAddress", CurrentDevice.getipAddress());
+						values.put("name", CurrentDevice.getname());
+						values.put("uid", CurrentDevice.getuid());
+						
+						HashMap<String, Integer> events = CurrentDevice.getevents();
+						
+						values.put("infoEvents", events.get("info"));
+						values.put("debugEvents", events.get("debug"));
+						values.put("warningEvents", events.get("warning"));
+						values.put("errorEvents", events.get("error"));
+						values.put("criticalEvents", events.get("critical"));
+	
+						mDatabase.insert("devices", null, values);
 					}
-					catch (ClientProtocolException e1) 
+					catch (Exception e) 
 					{
-						BugSenseHandler.log("updateDevices", e1);
-					} 
-					catch (JSONException e1) 
-					{
-						BugSenseHandler.log("updateDevices", e1);
-					} 
-					catch (IOException e1) 
-					{
-						BugSenseHandler.log("updateDevices", e1);
+						e.printStackTrace();
+						//This could get a little excessive
+						//BugSenseHandler.log("Database-refreshDevices", e);
 					}
-					catch (Exception e1) 
-					{
-						BugSenseHandler.log("updateDevices", e1);
-					}
-					
-					mDatabase.endTransaction();
-					
-					if(settings.getBoolean("AllowBackgroundService", true))
-					{
-						//No need to do anything with events the alarm checker will do that
-						finishedRefresh = true;
-					}
-					else
-					{
-						refreshEvents();
-					}
-					//finishedRefresh = true;
 				}
-			}).start();
-
+				mDatabase.setTransactionSuccessful();
+			}
+			catch(Exception e)
+			{
+				//TODO Do something
+			}
+			finally
+			{
+				mDatabase.endTransaction();
+			}
 		}
-
+		
+		private void UpdateRhybuddEvents(List<ZenossEvent> ZenossEvents)
+		{
+			int EventCount = ZenossEvents.size();
+			try
+			{
+				mDatabase.beginTransaction();
+				mDatabase.delete("events", null, null);
+	
+				for(int i = 0; i < EventCount; i++)
+				{
+					ZenossEvent CurrentEvent = null;
+					ContentValues values = new ContentValues(2);
+	
+					try 
+					{
+						CurrentEvent = ZenossEvents.get(i);
+						values.put("evid",CurrentEvent.getEVID());
+						values.put("count", CurrentEvent.getCount());
+						values.put("prodState", CurrentEvent.getProdState());
+						values.put("firstTime", CurrentEvent.getfirstTime());
+						values.put("severity", CurrentEvent.getSeverity());
+						values.put("component_text", CurrentEvent.getComponentText());
+						values.put("component_uid", CurrentEvent.getComponentUID());
+						values.put("summary", CurrentEvent.getSummary());
+						values.put("eventState", CurrentEvent.getEventState());
+						values.put("device", CurrentEvent.getDevice());
+						values.put("eventClass", CurrentEvent.geteventClass());
+						values.put("lastTime", CurrentEvent.getlastTime());
+						values.put("ownerid", CurrentEvent.getownerID());
+						Log.i("DB","Writing " + CurrentEvent.getEVID() + " to the DB");
+						/*mDatabase.execSQL("CREATE TABLE \"events\" (\"evid\" TEXT PRIMARY KEY  NOT NULL, " +
+						"\"count\" INTEGER, " +
+						"\"prodState\" TEXT, " +
+						"\"firstTime\" TEXT, " +
+						"\"severity\" TEXT, " +
+						"\"component_text\" TEXT, " +
+						"\"component_uid\" TEXT, " +
+						"\"summary\" TEXT, " +
+						"\"eventState\" TEXT, " +
+						"\"device\" TEXT, " +
+						"\"eventClass\" TEXT, " +
+						"\"lastTime\" TEXT, " +
+						"\"ownerid\" TEXT)");*/
+						
+						mDatabase.insert("events", null, values);
+						Log.i("DB","Done writing " + CurrentEvent.getEVID() + " to the DB");
+					}
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+						//This could get a little excessive
+						//BugSenseHandler.log("Database-refreshDevices", e);
+					}
+				}
+				mDatabase.setTransactionSuccessful();
+			}
+			catch(Exception e)
+			{
+				//TODO Do something
+			}
+			finally
+			{
+				mDatabase.endTransaction();
+			}
+		}
+		
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
 		{
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
-			//db.execSQL("DROP TABLE IF EXISTS " + FTS_VIRTUAL_TABLE);
 			try
 			{
 				db.execSQL("DROP TABLE IF EXISTS events");
@@ -634,8 +566,27 @@ public class RhybuddDatabase
 				e.printStackTrace();
 			}
 
-			db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , \"Count\" INTEGER, \"lastTime\" TEXT, \"device\" TEXT, \"summary\" TEXT, \"eventState\" TEXT, \"firstTime\" TEXT, \"severity\" TEXT, \"prodState\" TEXT, \"ownerid\" TEXT)");
-			db.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,\"productionState\" TEXT,\"ipAddress\" INTEGER,\"name\" TEXT,\"uid\" TEXT, \"infoEvents\" INTEGER DEFAULT (0) ,\"debugEvents\" INTEGER DEFAULT (0) ,\"warningEvents\" INTEGER DEFAULT (0) ,\"errorEvents\" INTEGER DEFAULT (0) ,\"criticalEvents\" INTEGER DEFAULT (0) )");
+			//Since we call onCreate() there's no need for this to be here (in future we'll do an alter)
+			/*db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , " +
+					"\"Count\" INTEGER, \"lastTime\" TEXT, " +
+					"\"device\" TEXT, \"summary\" TEXT, " +
+					"\"eventState\" TEXT, " +
+					"\"firstTime\" TEXT, " +
+					"\"severity\" TEXT, " +
+					"\"prodState\" TEXT, " +
+					"\"ownerid\" TEXT)");
+			
+			db.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL," +
+					"\"productionState\" TEXT," +
+					"\"ipAddress\" INTEGER," +
+					"\"name\" TEXT," +
+					"\"uid\" TEXT, " +
+					"\"infoEvents\" INTEGER DEFAULT (0) ," +
+					"\"debugEvents\" INTEGER DEFAULT (0) ," +
+					"\"warningEvents\" INTEGER DEFAULT (0) ," +
+					"\"errorEvents\" INTEGER DEFAULT (0) ," +
+					"\"criticalEvents\" INTEGER DEFAULT (0) )");*/
+			
 			onCreate(db);
 		}
 	}

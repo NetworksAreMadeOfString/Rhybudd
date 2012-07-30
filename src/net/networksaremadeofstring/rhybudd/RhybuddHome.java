@@ -18,6 +18,7 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -93,7 +97,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 			{
 				dbResults.close();
 			}
-			
+
 			if(rhybuddCache != null)
 			{
 				rhybuddCache.Close();
@@ -139,7 +143,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			finishStart(false);
 		}
-		
+
 		/*((Thread) new Thread(){
 			public void run()
 			{
@@ -165,59 +169,81 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{  
 			public void run() 
 			{
-				dbResults = rhybuddCache.getEvents();
+				List<ZenossEvent> tempZenossEvents = null;
 
-				if(dbResults != null && dbResults.getCount() > 0)
+				try
 				{
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-					Date date;
-					String strDate = "";
-					Date today = Calendar.getInstance().getTime();
-					String[] shortMonths = new DateFormatSymbols().getShortMonths();
-					while(dbResults.moveToNext())
+					tempZenossEvents = rhybuddCache.GetRhybuddEvents();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					tempZenossEvents.clear();
+				}
+
+				if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
+				{
+					listOfZenossEvents = tempZenossEvents;
+
+					Log.i("DeviceList","Found DB Data!");
+					handler.sendEmptyMessage(1);
+				}
+				else
+				{
+					Log.i("DeviceList","No DB data found, querying API directly");
+					handler.sendEmptyMessage(2);
+
+					if(tempZenossEvents != null)
+						tempZenossEvents.clear();
+
+					try
 					{
-						try 
+						if(API == null)
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					}
+					catch(Exception e)
+					{
+						API = null;
+						e.printStackTrace();
+					}
+
+					try 
+					{
+						if(API != null)
 						{
-							date = sdf.parse(dbResults.getString(2));
-							if(date.getDate() < today.getDate())
+							tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+									settings.getBoolean("SeverityError", true),
+									settings.getBoolean("SeverityWarning", true),
+									settings.getBoolean("SeverityInfo", false),
+									settings.getBoolean("SeverityDebug", false),
+									settings.getBoolean("onlyProductionEvents", true));
+
+							if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
 							{
-								strDate = date.getDate() + " " + shortMonths[date.getMonth()];
+								listOfZenossEvents = tempZenossEvents;
+								handler.sendEmptyMessage(1);
 							}
-							else
-							{
-								if(date.getMinutes() < 10)
-								{
-									strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
-								}
-								else
-								{
-									strDate = date.getHours() + ":" + date.getMinutes();
-								}
-							}
-						} 
-						catch (Exception e) 
-						{
-							strDate = "";
 						}
-						
-						
-						try
-						{
-							listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-									dbResults.getString(3),
-									dbResults.getString(4), 
-									dbResults.getString(5),
-									dbResults.getString(7),
-									strDate,//dbResults.getString(2)
-									dbResults.getString(8)));
-						}
-						catch(Exception e)
-						{
-							BugSenseHandler.log("DBGetThread", e);
-						}
+					} 
+					catch (ClientProtocolException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					catch (JSONException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch(Exception e)
+					{
+
 					}
 				}
-				handler.sendEmptyMessage(0);
 			}
 		};
 		dataPreload.start();
@@ -225,12 +251,72 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 	public void Refresh()
 	{
+		Log.i("RhybuddHOMe","Performing a Direct API Refresh");
 		dialog = new ProgressDialog(this);
 		dialog.setMessage("Refreshing Events...");
 		dialog.setCancelable(false);
 		dialog.show();
-		rhybuddCache.RefreshEvents();
-		handler.sendEmptyMessageDelayed(1, 1000);
+		//rhybuddCache.RefreshEvents();
+		//handler.sendEmptyMessageDelayed(1, 1000);
+
+		((Thread) new Thread(){
+			public void run()
+			{
+				List<ZenossEvent> tempZenossEvents = null;
+
+				try
+				{
+					if(API == null)
+						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+				}
+				catch(Exception e)
+				{
+					API = null;
+					e.printStackTrace();
+				}
+
+				try 
+				{
+					if(API != null)
+					{
+						tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+								settings.getBoolean("SeverityError", true),
+								settings.getBoolean("SeverityWarning", true),
+								settings.getBoolean("SeverityInfo", false),
+								settings.getBoolean("SeverityDebug", false),
+								settings.getBoolean("onlyProductionEvents", true));
+
+						if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
+						{
+							listOfZenossEvents = tempZenossEvents;
+							handler.sendEmptyMessage(1);
+						}
+						else
+						{
+							handler.sendEmptyMessage(999);
+						}
+					}
+				} 
+				catch (ClientProtocolException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				catch (JSONException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch(Exception e)
+				{
+
+				}
+			}
+		}).start();
 	}
 
 	private void finishStart(Boolean firstRun)
@@ -255,14 +341,15 @@ public class RhybuddHome extends SherlockFragmentActivity
 			}
 			else
 			{
-				Log.i("RhybuddHome","Telling the DB to do a refesh");
+				Log.i("RhybuddHome","Doing a direct call to the API");
+				//startService(intent);
 				Refresh();
 			}
 			//TODO Check we don't need this anymore
-			//startService(intent);
+			startService(intent);
 		}
 	}
-	
+
 	private void ConfigureHandlers()
 	{
 		handler = new Handler() 
@@ -271,7 +358,26 @@ public class RhybuddHome extends SherlockFragmentActivity
 			{
 				if(msg.what == 0)
 				{
-					((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
+					try
+					{
+						if(dialog != null && dialog.isShowing())
+						{
+							dialog.dismiss();
+						}
+					}
+					catch(NullPointerException npe)
+					{
+						//Sigh
+					}
+
+					try
+					{
+						((ProgressBar) findViewById(R.id.backgroundWorkingProgressBar)).setVisibility(4);
+					}
+					catch(NullPointerException npe)
+					{
+						//Sigh
+					}
 
 					OnClickListener listener = new OnClickListener()
 					{
@@ -327,24 +433,39 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else if(msg.what == 1)
 				{
-					if(rhybuddCache.hasCacheRefreshed())
+					try
 					{
-						dialog.setMessage("Refresh Complete!");
-						this.sendEmptyMessageDelayed(2,1000);
+						if(dialog != null && dialog.isShowing())
+							dialog.setMessage("Refresh Complete!");
 					}
-					else
+					catch(NullPointerException npe)
 					{
-						dialog.setMessage("Processing...");
-						handler.sendEmptyMessageDelayed(1, 1000);
+						//Sigh
 					}
+					this.sendEmptyMessageDelayed(0,1000);
 				}
 				else if(msg.what == 2)
 				{
-					dialog.dismiss();
-					DBGetThread();
+					/*dialog.dismiss();
+					DBGetThread();*/
+					if(dialog != null && dialog.isShowing())
+					{
+						dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+					}
+					else
+					{
+						dialog = new ProgressDialog(RhybuddHome.this);
+						dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+						dialog.setCancelable(false);
+						dialog.show();
+					}
 				}
 				else
 				{
+					if(dialog != null && dialog.isShowing())
+					{
+						dialog.dismiss();
+					}
 					Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
 				}
 			}
@@ -404,7 +525,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 	}
 
-	
+
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
 		@Override
@@ -431,67 +552,67 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			switch (item.getItemId()) 
 			{
-				case R.id.Acknowledge:
+			case R.id.Acknowledge:
+			{
+				for (final Integer i : selectedEvents)
 				{
-					for (final Integer i : selectedEvents)
-					{
-						listOfZenossEvents.get(i).setProgress(true);
-						AckEventHandler.sendEmptyMessage(0);
-						AckEvent = new Thread() 
-						{  
-							public void run() 
+					listOfZenossEvents.get(i).setProgress(true);
+					AckEventHandler.sendEmptyMessage(0);
+					AckEvent = new Thread() 
+					{  
+						public void run() 
+						{
+							try 
 							{
-								try 
-								{
-									ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-									ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
-									listOfZenossEvents.get(i).setProgress(false);
-									listOfZenossEvents.get(i).setAcknowledged();
-									AckEventHandler.sendEmptyMessage(1);
-								}
-								catch (Exception e)
-								{
-									AckEventHandler.sendEmptyMessage(99);
-									BugSenseHandler.log("Acknowledge", e);
-								}
+								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+								ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
+								listOfZenossEvents.get(i).setProgress(false);
+								listOfZenossEvents.get(i).setAcknowledged();
+								AckEventHandler.sendEmptyMessage(1);
 							}
-						};
-						AckEvent.start();
-					}
-					return true;
+							catch (Exception e)
+							{
+								AckEventHandler.sendEmptyMessage(99);
+								BugSenseHandler.log("Acknowledge", e);
+							}
+						}
+					};
+					AckEvent.start();
 				}
-	
-				case R.id.escalate:
+				return true;
+			}
+
+			case R.id.escalate:
+			{
+				Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+				// Add data to the intent, the receiving app will decide what to do with it.
+				intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
+				String Events = "Escalated events;\r\n\r\n";
+				for (Integer i : selectedEvents)
 				{
-					Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-					intent.setType("text/plain");
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-	
-					// Add data to the intent, the receiving app will decide what to do with it.
-					intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ selectedEvents.size() +" Zenoss Events");
-					String Events = "Escalated events;\r\n\r\n";
-					for (Integer i : selectedEvents)
-					{
-						Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
-						//list.setItemChecked(i, false);
-					}
-					intent.putExtra(Intent.EXTRA_TEXT, Events);
-	
-					startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-					return true;
+					Events += listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary() + "\r\n\r\n";
+					//list.setItemChecked(i, false);
 				}
-	
-				default:
+				intent.putExtra(Intent.EXTRA_TEXT, Events);
+
+				startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+				return true;
+			}
+
+			default:
+			{
+				for (Integer i : selectedEvents)
 				{
-					for (Integer i : selectedEvents)
-					{
-						listOfZenossEvents.get(i).SetSelected(false);
-						//list.setItemChecked(i, false);
-					}
-					selectedEvents.clear();
-					adapter.notifyDataSetChanged();
-					return false;
+					listOfZenossEvents.get(i).SetSelected(false);
+					//list.setItemChecked(i, false);
 				}
+				selectedEvents.clear();
+				adapter.notifyDataSetChanged();
+				return false;
+			}
 			}
 		}
 
@@ -713,7 +834,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				catch(Exception e)
 				{
-					
+
 				}
 
 				RhybuddHome.this.startActivity(ViewEventIntent);
