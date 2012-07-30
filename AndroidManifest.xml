@@ -10,7 +10,8 @@
         <activity android:name=".RhybuddHome"
                   android:label="@string/app_name"
                   android:uiOptions="splitActionBarWhenNarrow"
-                  uiOptions="splitActionBarWhenNarrow">
+                  uiOptions="splitActionBarWhenNarrow"
+                  android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -26,6 +26,7 @@ import java.security.UnrecoverableKeyException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -180,6 +181,48 @@ public class ZenossAPIv2
 			return false;
 		}
     }
+	
+	
+	public List<ZenossDevice> GetRhybuddDevices() throws JSONException, ClientProtocolException, IOException
+	{
+		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
+		JSONObject devices = this.GetDevices();
+
+		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
+
+		//Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
+
+		for(int i = 0; i < DeviceCount; i++)
+		{
+			JSONObject CurrentDevice = null;
+			try
+			{
+				CurrentDevice = devices.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
+				
+				//TODO: More try/catch
+				HashMap<String, Integer> events = new HashMap<String, Integer>();
+				events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
+				events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
+				events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
+				events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
+				events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));
+
+				ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
+						CurrentDevice.getInt("ipAddress"),
+						events,
+						CurrentDevice.getString("name"),
+						CurrentDevice.getString("uid")));
+
+				//Log.i("ForLoop",CurrentDevice.getString("name"));
+			}
+			catch (JSONException e)
+			{
+				//TODO We should probably tell the user that something went wrong
+			}
+		}
+		
+		return ZenossDevices;
+	}
 	
 	public JSONObject GetDevices() throws JSONException, ClientProtocolException, IOException
 	{

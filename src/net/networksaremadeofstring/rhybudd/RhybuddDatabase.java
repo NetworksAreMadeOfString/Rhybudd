@@ -19,6 +19,9 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
@@ -119,6 +122,69 @@ public class RhybuddDatabase
 			return null;
 		} 
 		return cursor;
+	}
+	
+	public List<ZenossDevice> GetRhybuddDevices()
+	{
+		Cursor dbResults = getDevices();
+		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
+		if(dbResults.getCount() > 0)
+		{
+			while(dbResults.moveToNext())
+			{
+				HashMap<String, Integer> events = new HashMap<String, Integer>();
+				try
+				{
+					events.put("info", dbResults.getInt(5));
+					events.put("debug", dbResults.getInt(6));
+					events.put("warning", dbResults.getInt(7));
+					events.put("error", dbResults.getInt(8));
+					events.put("critical", dbResults.getInt(9));
+				}
+				catch(Exception e)
+				{
+					events.put("info", 0);
+					events.put("debug", 0);
+					events.put("warning", 0);
+					events.put("error", 0);
+					events.put("critical", 0);
+				}
+				
+				try
+				{
+					ZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+	    					 dbResults.getInt(2), 
+	    					 events,
+	    					 dbResults.getString(3),
+	    					 dbResults.getString(4)));
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+				}
+				
+			}
+			dbResults.close();
+			return ZenossDevices;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public void UpdateRhybuddDevices(final List<ZenossDevice> ZenossDevices)
+	{
+		Log.i("UpdateRhybuddDevices","Recieved a request to update the Devices table");
+		((Thread) new Thread()
+		{
+			public void run()
+			{
+				mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
+				Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
+			}
+		}).start();
+
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -401,6 +467,48 @@ public class RhybuddDatabase
 			}).start();
 		}
 
+		
+		private void UpdateRhybuddDevices(List<ZenossDevice> ZenossDevices)
+		{
+			int DeviceCount = ZenossDevices.size();
+			//cacheDB = RhybuddHome.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
+			mDatabase.beginTransaction();
+			mDatabase.delete("devices", null, null);
+
+			for(int i = 0; i < DeviceCount; i++)
+			{
+				ZenossDevice CurrentDevice = null;
+				ContentValues values = new ContentValues(2);
+
+				try 
+				{
+					CurrentDevice = ZenossDevices.get(i);
+					values.put("productionState",CurrentDevice.getproductionState());
+					values.put("ipAddress", CurrentDevice.getipAddress());
+					values.put("name", CurrentDevice.getname());
+					values.put("uid", CurrentDevice.getuid());
+					
+					HashMap<String, Integer> events = CurrentDevice.getevents();
+					
+					values.put("infoEvents", events.get("info"));
+					values.put("debugEvents", events.get("debug"));
+					values.put("warningEvents", events.get("warning"));
+					values.put("errorEvents", events.get("error"));
+					values.put("criticalEvents", events.get("critical"));
+
+					mDatabase.insert("devices", null, values);
+				}
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					//This could get a little excessive
+					//BugSenseHandler.log("Database-refreshDevices", e);
+				}
+			}
+			mDatabase.setTransactionSuccessful();
+			mDatabase.endTransaction();
+		}
+		
 		/**
 		 * Starts a thread to load the database table with words
 		 */

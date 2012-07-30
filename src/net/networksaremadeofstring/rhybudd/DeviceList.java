@@ -18,9 +18,13 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -35,6 +39,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -194,7 +199,7 @@ public class DeviceList extends SherlockActivity
     	{  
     		public void run() 
     		{
-    			try
+    			/*try
     			{
     				dbResults = rhybuddCache.getDevices();
     			}
@@ -218,15 +223,6 @@ public class DeviceList extends SherlockActivity
 	    				while(dbResults.moveToNext())
 		    			{
 	    					HashMap<String, Integer> events = new HashMap<String, Integer>();
-	    					
-	    					//TODO I could do this better in a loop over an array but that's for another time
-	    					//because the columns don't match up properly
-	    					/*
-	    					String[] Array = {"info","debug", "warning","error","critical"};
-	    					for(String s :Array)
-	    					{
-	    						events.put("info", dbResults.getInt(5));
-	    					}*/
 	    					try
 	    					{
 	    						events.put("info", dbResults.getInt(5));
@@ -270,10 +266,59 @@ public class DeviceList extends SherlockActivity
     					msg.what = 0;
     					handler.sendMessage(msg);
     				}
+    			}*/
+    			try
+    			{
+    				listOfZenossDevices = rhybuddCache.GetRhybuddDevices();
+    			}
+    			catch(Exception e)
+    			{
+    				e.printStackTrace();
+    				listOfZenossDevices.clear();
+    			}
+    			
+    			if(listOfZenossDevices!= null && listOfZenossDevices.size() > 0)
+    			{
+    				Log.i("DeviceList","Found DB Data!");
+    				handler.sendEmptyMessage(2);
     			}
     			else
     			{
-    				//Nothing the handler is sent in the try catch above
+    				Log.i("DeviceList","No DB data found, querying API directly");
+    				if(listOfZenossDevices != null)
+    					listOfZenossDevices.clear();
+    				
+    				try 
+    				{
+    					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						listOfZenossDevices = API.GetRhybuddDevices();
+						
+						if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
+						{
+							handler.sendEmptyMessage(2);
+							rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
+						}
+						else
+						{
+							Message msg = new Message();
+	    					Bundle bundle = new Bundle();
+	    					bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
+	    					msg.setData(bundle);
+	    					msg.what = 0;
+	    					handler.sendMessage(msg);
+						}
+						
+					} 
+    				catch (Exception e) 
+					{
+    					BugSenseHandler.log("DeviceList", e);
+    					Message msg = new Message();
+    					Bundle bundle = new Bundle();
+    					bundle.putString("exception",e.getMessage());
+    					msg.setData(bundle);
+    					msg.what = 0;
+    					handler.sendMessage(msg);
+					}
     			}
     		}
     	};

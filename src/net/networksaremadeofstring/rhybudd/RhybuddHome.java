@@ -258,18 +258,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 				Log.i("RhybuddHome","Telling the DB to do a refesh");
 				Refresh();
 			}
+			//TODO Check we don't need this anymore
+			//startService(intent);
 		}
-
-		//TODO Make sure this can be removed
-		//startService(intent);
 	}
 	
-	public void StartService()
-	{
-		Intent intent = new Intent(this, ZenossPoller.class);
-		startService(intent);
-	}
-
 	private void ConfigureHandlers()
 	{
 		handler = new Handler() 
@@ -450,8 +443,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 							{
 								try 
 								{
-									//ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-									API.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
+									ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+									ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
 									listOfZenossEvents.get(i).setProgress(false);
 									listOfZenossEvents.get(i).setAcknowledged();
 									AckEventHandler.sendEmptyMessage(1);
