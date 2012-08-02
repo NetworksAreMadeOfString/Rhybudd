@@ -102,6 +102,7 @@ public class ZenossPoller extends Service
     				Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
     				if(listOfZenossEvents != null && listOfZenossEvents.size() > 0)
     				{
+    					EventCount = 0;
     					for(ZenossEvent event : listOfZenossEvents)
     					{
     						if(alertsEnabled && event.isNew() && CheckIfNotify(event.getProdState(), event.getDevice()))
@@ -115,7 +116,7 @@ public class ZenossPoller extends Service
     				}
     				else
         			{
-    					//TODO Possibly warn if null (something went wrong) ignore if 0 (all is good)
+    					//TODO Possibly warn if null (something went wrong) ignore if 0 (all is good (lucky oncall person!))
         			}
     				
     				if(alertsEnabled)
@@ -178,6 +179,9 @@ public class ZenossPoller extends Service
 		}
 		else if(intent != null && intent.getBooleanExtra("settingsUpdate", false))
 		{
+			//Refresh our reference to the settings just in case something changed
+			settings = PreferenceManager.getDefaultSharedPreferences(this);
+			
 			Log.i("onStartCommand","Received an intent from the settings Activity");
 			PollerCheck();
 		}

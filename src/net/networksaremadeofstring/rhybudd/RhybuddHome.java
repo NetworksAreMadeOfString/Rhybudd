@@ -233,25 +233,37 @@ public class RhybuddHome extends SherlockFragmentActivity
 								listOfZenossEvents = tempZenossEvents;
 								handler.sendEmptyMessage(1);
 							}
+							else
+							{
+								handler.sendEmptyMessage(999);
+							}
+						}
+						else
+						{
+							handler.sendEmptyMessage(999);
 						}
 					} 
 					catch (ClientProtocolException e) 
 					{
-						// TODO Auto-generated catch block
+						// TODO Send a proper message
 						e.printStackTrace();
+						handler.sendEmptyMessage(999);
 					} 
 					catch (JSONException e) 
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} catch (IOException e) 
+						handler.sendEmptyMessage(999);
+					} 
+					catch (IOException e) 
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						handler.sendEmptyMessage(999);
 					}
 					catch(Exception e)
 					{
-
+						handler.sendEmptyMessage(999);
 					}
 				}
 			}
@@ -309,19 +321,23 @@ public class RhybuddHome extends SherlockFragmentActivity
 				{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					handler.sendEmptyMessage(999);
 				} 
 				catch (JSONException e) 
 				{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (IOException e) 
+					handler.sendEmptyMessage(999);
+				} 
+				catch (IOException e) 
 				{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					handler.sendEmptyMessage(999);
 				}
 				catch(Exception e)
 				{
-
+					handler.sendEmptyMessage(999);
 				}
 			}
 		}).start();
@@ -465,6 +481,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 						dialog.setCancelable(false);
 						dialog.show();
 					}
+				}
+				else if(msg.what == 3 || msg.what == 999)
+				{
+					dialog.setMessage("An error was encountered. Please check your settings and try again.");
+					dialog.setCancelable(true);
 				}
 				else
 				{
@@ -753,6 +774,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 		//Check what the result was from the Settings Activity
 		if(requestCode == 99)
 		{
+			//Refresh the settings
+			settings = PreferenceManager.getDefaultSharedPreferences(this);
+			
 			Intent intent = new Intent(this, ZenossPoller.class);
 			intent.putExtra("settingsUpdate", true);
 			startService(intent);

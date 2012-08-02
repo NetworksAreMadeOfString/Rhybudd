@@ -18,9 +18,13 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -46,9 +50,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class RhybuddDock extends SherlockFragmentActivity
 {
@@ -63,6 +69,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	List<ZenossEvent> tempZenossEvents = null;
 	List<Integer> selectedEvents = new ArrayList<Integer>();
 	Thread dataPreload,AckEvent,dataReload;
 	Handler handler, AckEventHandler;
@@ -110,7 +117,10 @@ public class RhybuddDock extends SherlockFragmentActivity
 		GaugeHandler.sendEmptyMessage(1);
 		GaugeHandler.sendEmptyMessage(2);
 
-		if(settings.getBoolean("AllowBackgroundService", false))
+		//We're docked we can use as much battery as we like
+		Refresh();
+
+		/*if(settings.getBoolean("AllowBackgroundService", false))
 		{
 			handler.sendEmptyMessageDelayed(1, 1000);
 		}
@@ -118,28 +128,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 		{
 			//rhybuddCache.RefreshEvents();
 			//handler.sendEmptyMessageDelayed(1, 1000);
-		}
-
-
-		/*((Thread) new Thread() 
-		{  
-			public void run() 
-			{
-				Cursor devicesCursor = rhybuddCache.getDevices();
-				if(devicesCursor != null)
-				{
-					try
-					{
-						DeviceCount = devicesCursor.getCount();
-						GaugeHandler.sendEmptyMessage(2);
-					}
-					catch(Exception e)
-					{
-						BugSenseHandler.log("RhybuddDock", e);
-					}
-				}
-			}
-		}).start();*/
+		}*/
 	}
 
 
@@ -210,89 +199,86 @@ public class RhybuddDock extends SherlockFragmentActivity
 	}
 
 
-	public void DBGetThread()
+	public void Refresh()
 	{
-		/*listOfZenossEvents.clear();
-		dataPreload = new Thread() 
-		{  
-			public void run() 
+		Log.i("RhybuddDock","Performing a Direct API Refresh");
+
+		((Thread) new Thread(){
+			public void run()
 			{
 				try
 				{
-					dbResults = rhybuddCache.getEvents();
+					if(API == null)
+						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("RhybuddDock", e);
-					dbResults = null;
+					API = null;
+					e.printStackTrace();
 				}
 
-				if(dbResults != null)
+				try 
 				{
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-					Date date;
-					String strDate = "";
-					Date today = Calendar.getInstance().getTime();
-					String[] shortMonths = new DateFormatSymbols().getShortMonths();
-					int ExceptionCount = 0;
-
-					//Update the graph
-					EventCount = dbResults.getCount();
-					GaugeHandler.sendEmptyMessage(1);
-
-					while(dbResults.moveToNext())
+					if(API != null)
 					{
-						try 
+						tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+								settings.getBoolean("SeverityError", true),
+								settings.getBoolean("SeverityWarning", true),
+								settings.getBoolean("SeverityInfo", false),
+								settings.getBoolean("SeverityDebug", false),
+								settings.getBoolean("onlyProductionEvents", true));
+
+						if(tempZenossEvents!= null)
 						{
-							date = sdf.parse(dbResults.getString(2));
-							if(date.getDate() < today.getDate())
+							EventCount = tempZenossEvents.size();
+							GaugeHandler.sendEmptyMessage(1);
+
+							//The first time this will have ran it'll be null
+							if(adapter == null)
 							{
-								strDate = date.getDate() + " " + shortMonths[date.getMonth()];
+								Log.i("APIThread","Sending 0");
+								handler.sendEmptyMessage(0);
 							}
 							else
 							{
-								if(date.getMinutes() < 10)
-								{
-									strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
-								}
-								else
-								{
-									strDate = date.getHours() + ":" + date.getMinutes();
-								}
-							}
-
-						} 
-						catch (ParseException e) 
-						{
-							strDate = "";
+								Log.i("APIThread","Sending 0");
+								handler.sendEmptyMessage(1);
+							}	
 						}
-
-						try
+						else
 						{
-							listOfZenossEvents.add(new ZenossEvent(dbResults.getString(0),
-									dbResults.getString(3),
-									dbResults.getString(4), 
-									dbResults.getString(5),
-									dbResults.getString(7),
-									strDate,//dbResults.getString(2)
-									dbResults.getString(8)));
-						}
-						catch(Exception e)
-						{
-							ExceptionCount++;
-
-							if(ExceptionCount > 10)
-							{
-								BugSenseHandler.log("RhybuddDock", e);
-								ExceptionCount = 0;
-							}
+							//Do nothing
+							//handler.sendEmptyMessage(999);
 						}
 					}
+					else
+					{
+						handler.sendEmptyMessage(999);
+					}
+				} 
+				catch (ClientProtocolException e) 
+				{
+					e.printStackTrace();
+					handler.sendEmptyMessage(999);
+				} 
+				catch (JSONException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					handler.sendEmptyMessage(999);
+				} 
+				catch (IOException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					handler.sendEmptyMessage(999);
 				}
-				handler.sendEmptyMessage(0);
+				catch(Exception e)
+				{
+					handler.sendEmptyMessage(999);
+				}
 			}
-		};
-		dataPreload.start();*/
+		}).start();
 	}
 
 	private void ConfigureHandler() 
@@ -303,26 +289,32 @@ public class RhybuddDock extends SherlockFragmentActivity
 			{
 				if(msg.what == 0)
 				{
+					listOfZenossEvents = tempZenossEvents;
+					tempZenossEvents = null;
 					adapter = new ZenossEventsAdaptor(RhybuddDock.this, listOfZenossEvents,false);
 					list.setAdapter(adapter);
 				}
 				else if(msg.what == 1)
 				{
-					this.sendEmptyMessageDelayed(2,1000);
+					listOfZenossEvents = tempZenossEvents;
+					adapter.notifyDataSetChanged();
+					this.sendEmptyMessageDelayed(2,10000);
+					tempZenossEvents = null;
 				}
 				else if(msg.what == 2)
 				{
-					DBGetThread();
-					handler.sendEmptyMessageDelayed(1, 120000);
+					Log.i("Handler","Calling Refresh again!");
+					Refresh();
 				}
 				else
 				{
-					//Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
+					Toast.makeText(RhybuddDock.this, "An error occured.", Toast.LENGTH_LONG).show();
 				}
 			}
 		};
 
-		GaugeHandler = new Handler() {
+		GaugeHandler = new Handler() 
+		{
 			public void handleMessage(Message msg) 
 			{
 				if(msg.what == 1)
