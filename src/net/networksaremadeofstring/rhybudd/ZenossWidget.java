@@ -18,6 +18,11 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +36,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ZenossWidget extends AppWidgetProvider 
@@ -38,12 +44,14 @@ public class ZenossWidget extends AppWidgetProvider
 
 	ZenossAPIv2 API = null;
 	private SharedPreferences settings = null;
-	JSONObject EventsObject = null;
-	JSONArray Events = null;
+	/*JSONObject EventsObject = null;
+	JSONArray Events = null;*/
 	private int EventCount = 0;
 	Thread dataPreload;
 	volatile Handler handler = null;
 	private int CritCount = 0, ErrCount = 0, WarnCount = 0;
+	List<ZenossEvent> tempZenossEvents = new ArrayList<ZenossEvent>();
+	RhybuddDatabase rhybuddCache;
 	
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
@@ -52,12 +60,21 @@ public class ZenossWidget extends AppWidgetProvider
         if(settings == null)
 			settings = PreferenceManager.getDefaultSharedPreferences(context);
         
+        try
+        {
+        	rhybuddCache = new RhybuddDatabase(context);
+        }
+        catch(Exception e)
+        {
+        	//Bugsense
+        }
+        
         handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
 				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
-				Intent intent = new Intent(context, rhestr.class);
+				Intent intent = new Intent(context, RhybuddHome.class);
 				intent.putExtra("forceRefresh", true);
 	            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	            
@@ -80,13 +97,97 @@ public class ZenossWidget extends AppWidgetProvider
     		}
     	};
     	
-    	CreateThread();
-    	dataPreload.start();
+    	Refresh();
     }
     
-    private void CreateThread()
+    private void Refresh()
     {
-    	dataPreload = new Thread() 
+    	CritCount = 0;
+    	ErrCount = 0;
+    	WarnCount = 0;
+    	
+    	((Thread) new Thread() 
+		{  
+			public void run() 
+			{
+				try
+				{
+					tempZenossEvents = rhybuddCache.GetRhybuddEvents();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					//tempZenossEvents.clear();
+					tempZenossEvents = null;
+				}
+
+				if(tempZenossEvents!= null)
+				{
+					Log.i("DeviceList","Found DB Data!");
+					handler.sendEmptyMessage(1);
+				}
+				else
+				{
+					Log.i("Widget","No DB data found, querying API directly");
+					//handler.sendEmptyMessage(2);
+					try
+					{
+						if(API == null)
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						
+						try 
+						{
+							if(API != null)
+							{
+								tempZenossEvents = API.GetRhybuddEvents(true,
+										true,
+										true,
+										false,
+										false,
+										true);
+							}
+							else
+							{
+								tempZenossEvents = null;
+								handler.sendEmptyMessage(999);
+							}
+						}
+						catch(Exception e)
+						{
+							handler.sendEmptyMessage(999);
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
+				if(tempZenossEvents != null)
+				{
+					EventCount = tempZenossEvents.size();
+					
+					for(int i = 0; i < EventCount; i++)
+	    			{
+	    				if(tempZenossEvents.get(i).getSeverity().equals("5"))
+	    					CritCount++;
+	    				
+	    				if(tempZenossEvents.get(i).getSeverity().equals("4"))
+	    					ErrCount++;
+	    				
+	    				if(tempZenossEvents.get(i).getSeverity().equals("3"))
+	    					WarnCount++;
+	    			}
+					tempZenossEvents = null;
+					API = null;
+				}
+				
+				//No matter what send an update
+				handler.sendEmptyMessage(0);
+			}
+		}).start();
+    	
+    	/*dataPreload = new Thread() 
     	{  
     		public void run() 
     		{
@@ -171,6 +272,6 @@ public class ZenossWidget extends AppWidgetProvider
 				API = null;
 				dataPreload = null;
     		}
-    	};
+    	};*/
     }
 }
