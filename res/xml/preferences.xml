@@ -121,9 +121,10 @@
             <EditTextPreference
                 android:key="passWord"
                 android:title="Zenoss Password"
-                android:dialogTitle="Zenoss Password" />
+                android:dialogTitle="Zenoss Password"
+                android:inputType="textPassword"/>
             
-            <PreferenceCategory android:title="Background Polling">
+            <PreferenceCategory android:title="HTTP Basic Authentication">
 	            <CheckBoxPreference
 	                    android:key="httpBasicAuth"
 	                    android:title="HTTP Basic Auth"
