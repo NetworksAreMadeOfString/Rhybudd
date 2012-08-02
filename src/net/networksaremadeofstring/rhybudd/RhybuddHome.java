@@ -62,6 +62,7 @@ import android.view.View.OnLongClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class RhybuddHome extends SherlockFragmentActivity 
 {
@@ -110,10 +111,19 @@ public class RhybuddHome extends SherlockFragmentActivity
 	}
 
 	@Override
-	public void onAttachedToWindow() {
+	public void onAttachedToWindow() 
+	{
 		super.onAttachedToWindow();
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
+		
+		try
+		{
+			Window window = getWindow();
+			window.setFormat(PixelFormat.RGBA_8888);
+		}
+		catch(Exception e)
+		{
+			//TODO Do something although I doubt this will ever happen
+		}
 	}
 
 
@@ -256,8 +266,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 		dialog.setMessage("Refreshing Events...");
 		dialog.setCancelable(false);
 		dialog.show();
-		//rhybuddCache.RefreshEvents();
-		//handler.sendEmptyMessageDelayed(1, 1000);
 
 		((Thread) new Thread(){
 			public void run()
@@ -342,10 +350,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 			else
 			{
 				Log.i("RhybuddHome","Doing a direct call to the API");
-				//startService(intent);
 				Refresh();
 			}
-			//TODO Check we don't need this anymore
+			
+			//TODO Check if we don't need this anymore
 			startService(intent);
 		}
 	}
@@ -446,8 +454,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else if(msg.what == 2)
 				{
-					/*dialog.dismiss();
-					DBGetThread();*/
 					if(dialog != null && dialog.isShowing())
 					{
 						dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
@@ -507,6 +513,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 		mActionMode = startActionMode(mActionModeCallback);
 	}
 
+	//TODO Prevent the cab number from increasing / repeatedly adding to selectedEvents
+	// of already selected items
 	public void addToCAB(int id)
 	{
 		if(mActionMode != null)

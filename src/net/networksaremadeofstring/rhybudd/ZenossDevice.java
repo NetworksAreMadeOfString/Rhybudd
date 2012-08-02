@@ -28,6 +28,25 @@ public class ZenossDevice
 	private String name;
 	private String uid;
 	
+	//Not yet used
+	/*private String firstSeen;
+	private String lastChanged;
+	private String lastCollected;
+	private String memory;
+	private String systems;
+	private String groups;
+	private String location;
+	private String tagNumber;
+	private String serialNumber;
+	private String rackSlot;
+	private String osModel;
+	private String links;
+	private String comments;
+	private String snmpSysName;
+	private String snmpLocation;
+	private String snmpContact;
+	private String snmpAgent;*/
+	
 	public ZenossDevice(String _productionState, int _ipAddress, HashMap<String, Integer> _events, String _name, String _uid)
 	{
 		 super();

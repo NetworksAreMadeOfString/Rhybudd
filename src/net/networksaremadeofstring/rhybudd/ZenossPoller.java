@@ -35,8 +35,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -53,15 +51,27 @@ public class ZenossPoller extends Service
 	Thread dataPreload;
 	int EventCount = 0;
 	String CriticalList = "";
-	/*private int NotificationID = 0;
-	private int failureCount = 0;*/
 	private Boolean onlyAlertOnProd = true;
 	RhybuddDatabase rhybuddCache = null;
 	Handler handler;
 	Handler eventsHandler;
-	Cursor dbResults;
 	int Delay;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	
+	@Override
+	public void onLowMemory()
+	{
+		//These could be quite large
+		EventsObject = null;
+		Events = null;
+		CriticalList = "";
+		
+		if(listOfZenossEvents != null)
+			listOfZenossEvents.clear();
+		
+		//Maybe
+		//API = null;
+	}
 	
 	@Override
 	public void onCreate() 
@@ -77,6 +87,7 @@ public class ZenossPoller extends Service
 		
 		if(rhybuddCache == null)
 		{
+			//XXX Main thread safe?
 			rhybuddCache = new RhybuddDatabase(this);
 		}
 
@@ -104,7 +115,7 @@ public class ZenossPoller extends Service
     				}
     				else
         			{
-    					//TODO Warning
+    					//TODO Possibly warn if null (something went wrong) ignore if 0 (all is good)
         			}
     				
     				if(alertsEnabled)
@@ -112,81 +123,10 @@ public class ZenossPoller extends Service
     			}
     			else if(msg.what == 999)
     			{
-    				
+    				//TODO All manner of bad happened
     			}
     		}
     	};
-		
-		/*handler = new Handler() 
-    	{
-    		public void handleMessage(Message msg) 
-    		{
-    			if(msg.what == 1)
-    			{
-    				if(rhybuddCache.hasCacheRefreshed())
-    				{
-    					//Log.i("handler","Cache has refreshed, sending delayed message");
-    					this.sendEmptyMessageDelayed(2,1000);
-    				}
-    				else
-    				{
-    					//Log.i("handler","Cache hasn't refreshed, sending delayed message");
-        				handler.sendEmptyMessageDelayed(1, 1000);
-    				}
-    			}
-    			else if(msg.what == 2)
-    			{
-    				((Thread) new Thread()
-    				{
-    					public void run() 
-    					{
-		    				dbResults = rhybuddCache.getEvents();
-		    				
-		        			Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
-		        			
-		        			if(dbResults != null && dbResults.getCount() > 0)
-		        			{
-		    	    			while(dbResults.moveToNext())
-		    	    			{
-		    	    				
-		    	    				try
-		    	    				{
-		    	    					ZenossEvent CurrentEvent = new ZenossEvent(dbResults.getString(0),
-											   dbResults.getString(3),
-											   dbResults.getString(4), 
-											   dbResults.getString(5),
-											   dbResults.getString(7),
-											   dbResults.getString(8));
-		    	    				
-			    	    				if(alertsEnabled && CurrentEvent.isNew() && CheckIfNotify(CurrentEvent.getProdState(), CurrentEvent.getDevice()))
-			    	    				{
-			    	    					EventCount++;
-											//SendNotification(CurrentEvent.getSummary(),Integer.parseInt(CurrentEvent.getSeverity()));
-			    	    				}
-		    	    				}
-		    	    				catch(Exception e)
-		    	    				{
-		    	    					e.printStackTrace();
-		    	    					BugSenseHandler.log("ZenossPoller", e);
-		    	    				}
-		    	    			}
-		    	    			
-		    	    			if(EventCount > 0)
-		    	    				SendCombinedNotification(EventCount,CriticalList);
-		        			}
-		        			if(alertsEnabled)
-			    				SendStickyNotification();
-    					}
-    				}).start();
-    			}
-    			else
-    			{
-    				//Toast.makeText(RhybuddHome.this, "Timed out communicating with host. Please check protocol, hostname and port.", Toast.LENGTH_LONG).show();
-    			}
-    		}
-    	};*/
-    	//TODO Find out why this was here
-		//CheckForEvents(); 
 	}
 
 	@Override

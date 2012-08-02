@@ -28,21 +28,12 @@ public class SettingsFragment extends PreferenceActivity
 	SharedPreferences prefs;
 
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+	{
         super.onCreate(savedInstanceState);
-
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //boolean autoStart = prefs.getBoolean("pref_boot_startup", true);
-        
-        // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
     }
-	
-	/*@Override
-	public void onContentChanged ()
-	{
-		if(prefs.getBoolean(key, defValue))
-	}*/
 }

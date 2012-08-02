@@ -57,6 +57,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import android.content.ContentValues;
 import android.util.Log;
 
@@ -190,9 +192,6 @@ public class ZenossAPIv2
 		Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
 
-		//Log.i("GetRhybuddDevices",Integer.toString(DeviceCount));
-		//Log.i("log", Integer.toString(DeviceObject.getJSONObject("result").getInt("totalCount")) + " - " + Integer.toString(DeviceObject.getJSONObject("result").getJSONArray("devices").length()));
-
 		for(int i = 0; i < DeviceCount; i++)
 		{
 			JSONObject CurrentDevice = null;
@@ -200,7 +199,6 @@ public class ZenossAPIv2
 			{
 				CurrentDevice = devices.getJSONObject("result").getJSONArray("devices").getJSONObject(i);
 				
-				//TODO: More try/catch
 				HashMap<String, Integer> events = new HashMap<String, Integer>();
 				try
 				{
@@ -273,6 +271,7 @@ public class ZenossAPIv2
 				events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
 				events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));*/
 				int IPAddress = 0;
+				
 				try
 				{
 					IPAddress = CurrentDevice.getInt("ipAddress");
@@ -282,17 +281,22 @@ public class ZenossAPIv2
 					IPAddress = 0;
 				}
 				
+				//TODO Things could still go wrong here
 				ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
 						IPAddress,
 						events,
 						CurrentDevice.getString("name"),
 						CurrentDevice.getString("uid")));
-
-				//Log.i("ForLoop",CurrentDevice.getString("name"));
 			}
-			catch (JSONException e)
+			catch (JSONException j)
 			{
-				//TODO We should probably tell the user that something went wrong
+				BugSenseHandler.log("GetRhybuddDevices", j);
+				//Keep going
+				//throw j;
+			}
+			catch (Exception e)
+			{
+				BugSenseHandler.log("GetRhybuddDevices", e);
 			}
 		}
 		
@@ -377,38 +381,50 @@ public class ZenossAPIv2
 	{
 		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
 		
+		//FIXME Makes a valid call to the API but this breaks on 4.x ( JIRA #ZEN-2812 )
 		JSONObject jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,false);
 		
-		Log.i("GetRhybuddEvents",jsonEvents.toString(3));
+		//Log.i("GetRhybuddEvents",jsonEvents.toString(3));
 		JSONArray Events = null;
 		try
 		{
-			//Log.i("GetRhybuddEvents","Trying to get the list of events");
 			Events = jsonEvents.getJSONObject("result").getJSONArray("events");
-			//Log.i("GetRhybuddEvents","Done!");
 		}
 		catch(JSONException e)
 		{
 			try
 			{
+				//FIXME If we got an exception it may be because of JIRA #ZEN-2812
 				jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,true);
 				Events = jsonEvents.getJSONObject("result").getJSONArray("events");
-				//Log.i("GetRhybuddEvents-Retry",jsonEvents.toString(3));
 			}
 			catch(Exception e1)
 			{
+				BugSenseHandler.log("GetRhybuddEvents", e1);
+				//Nope something bad happened
 				return null;
 			}
 		}
 		catch(Exception e1)
 		{
+			BugSenseHandler.log("GetRhybuddEvents", e1);
 			e1.printStackTrace();
 			return null;
 		}
 		
-		int EventCount = jsonEvents.getJSONObject("result").getInt("totalCount");
+		int EventCount = 0;
 		
-		//Log.i("GetRhybuddEvents","Iterating over " + EventCount + " events:" + jsonEvents.toString(2));
+		try
+		{
+			if(jsonEvents != null)
+				EventCount = jsonEvents.getJSONObject("result").getInt("totalCount");
+		}
+		catch(Exception e)
+		{
+			EventCount = 0;
+		}
+
+		//If EventCount is 0 this will never process
 		for(int i = 0; i < EventCount; i++)
 		{
 			JSONObject CurrentEvent = null;
@@ -416,8 +432,7 @@ public class ZenossAPIv2
 			{
 				CurrentEvent = Events.getJSONObject(i);
 				
-				//Log.w("EventLoop",CurrentEvent.toString(3));
-				
+				//TODO Lots more error catching
 				listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
 													CurrentEvent.getInt("count"),
 													CurrentEvent.getString("prodState"),
@@ -439,7 +454,6 @@ public class ZenossAPIv2
 			}
 		}
 		
-		//Log.i("GetRhybuddEvents","Done");
 		if(listofZenossEvents.size() > 0)
 		{
 			return listofZenossEvents;
@@ -503,7 +517,7 @@ public class ZenossAPIv2
     	dataContents.put("dir", "DESC");
     	dataContents.put("sort", "severity");
         
-    	//4.1 stuff
+    	//4.1 stuff Jira #ZEN-2812
     	if(Zenoss41)
     	{
     		dataContents.put("keys", new JSONArray("[evid,count,prodState,firstTime,severity,component,summary,eventState,device,eventClass,lastTime,ownerid]"));
@@ -565,48 +579,41 @@ public class ZenossAPIv2
         dataContents.put("params", params);*/
         
         JSONArray data = new JSONArray();
-        data.put(dataContents);
+        	data.put(dataContents);
         
         JSONObject reqData = new JSONObject();
-        reqData.put("action", "EventsRouter");
-        reqData.put("method", "detail");
-        reqData.put("data", data);
-        reqData.put("type", "rpc");
-        reqData.put("tid", String.valueOf(this.reqCount++));
+	        reqData.put("action", "EventsRouter");
+	        reqData.put("method", "detail");
+	        reqData.put("data", data);
+	        reqData.put("type", "rpc");
+	        reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	
-    	//Log.i("Execute","Executing with string: " + reqData.toString());
     	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
-		
 		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
     
     @SuppressWarnings("unchecked")
 	public Boolean AddEventLog(String _EventID, String Message) throws JSONException, ClientProtocolException, IOException
     {
-    	//Log.i("Test:", "Entering GetEvent");
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
-
-    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
-    	httpost.setHeader("Accept", "application/json");
+	    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+	    	httpost.setHeader("Accept", "application/json");
     	
     	JSONObject dataContents = new JSONObject();
-    	dataContents.put("evid",_EventID);
-    	dataContents.put("message", Message);
+	    	dataContents.put("evid",_EventID);
+	    	dataContents.put("message", Message);
         
         JSONArray data = new JSONArray();
-        data.put(dataContents);
+        	data.put(dataContents);
         
         JSONObject reqData = new JSONObject();
-        reqData.put("action", "EventsRouter");
-        reqData.put("method", "write_log");
-        reqData.put("data", data);
-        reqData.put("type", "rpc");
-        reqData.put("tid", String.valueOf(this.reqCount++));
+	        reqData.put("action", "EventsRouter");
+	        reqData.put("method", "write_log");
+	        reqData.put("data", data);
+	        reqData.put("type", "rpc");
+	        reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
     	String test = httpclient.execute(httpost, responseHandler);
@@ -618,44 +625,44 @@ public class ZenossAPIv2
     
     
     @SuppressWarnings("unchecked")
-   	public JSONObject GetEventsHistory() throws JSONException, ClientProtocolException, IOException
-       {
-       	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
-
-       	httpost.addHeader("Content-type", "application/json; charset=utf-8");
-       	httpost.setHeader("Accept", "application/json");
+    public JSONObject GetEventsHistory() throws JSONException, ClientProtocolException, IOException
+    {
+		HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+			httpost.addHeader("Content-type", "application/json; charset=utf-8");
+			httpost.setHeader("Accept", "application/json");
        	
        	JSONObject dataContents = new JSONObject();
-       	dataContents.put("start", 0);
-       	dataContents.put("limit", 100);
-       	dataContents.put("dir", "DESC");
-       	dataContents.put("sort", "severity");
+	       	dataContents.put("start", 0);
+	       	dataContents.put("limit", 100);
+	       	dataContents.put("dir", "DESC");
+	       	dataContents.put("sort", "severity");
            
        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK);
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String DefaultDate = sdf.format(new Date(System.currentTimeMillis() - 28800000)).toString();
-       JSONObject params = new JSONObject();
-       params.put("severity", new JSONArray("[5,4,3]"));
-       params.put("eventState", new JSONArray("[0, 1]"));
-       params.put("lastTime", DefaultDate);
-       dataContents.put("params", params);
+		
+		JSONObject params = new JSONObject();
+			params.put("severity", new JSONArray("[5,4,3]"));
+			params.put("eventState", new JSONArray("[0, 1]"));
+			params.put("lastTime", DefaultDate);
+			dataContents.put("params", params);
        
        JSONArray data = new JSONArray();
-       data.put(dataContents);
+       	data.put(dataContents);
        
        JSONObject reqData = new JSONObject();
-       reqData.put("action", "EventsRouter");
-       reqData.put("method", "queryHistory");
-       reqData.put("data", data);
-       reqData.put("type", "rpc");
-       reqData.put("tid", String.valueOf(this.reqCount++));
-       
+	       reqData.put("action", "EventsRouter");
+	       reqData.put("method", "queryHistory");
+	       reqData.put("data", data);
+	       reqData.put("type", "rpc");
+	       reqData.put("tid", String.valueOf(this.reqCount++));
+	       
        httpost.setEntity(new StringEntity(reqData.toString()));
        	
-       	String test = httpclient.execute(httpost, responseHandler);
+       String test = httpclient.execute(httpost, responseHandler);
    		
-   		JSONObject json = new JSONObject(test);
-       	return json;
+       JSONObject json = new JSONObject(test);
+		return json;
        }
     
     @SuppressWarnings("unchecked")
@@ -665,23 +672,22 @@ public class ZenossAPIv2
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
-    	
-    	
+
     	JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
     	JSONArray data = new JSONArray();
         
         JSONObject dataObject = new JSONObject();
-        dataObject.put("uid", UID);
-        dataObject.put("keys", keys);
+	        dataObject.put("uid", UID);
+	        dataObject.put("keys", keys);
         
         data.put(dataObject);
         
         JSONObject reqData = new JSONObject();
-        reqData.put("action", "DeviceRouter");
-        reqData.put("method", "getInfo");
-        reqData.put("data", data);
-        reqData.put("type", "rpc");
-        reqData.put("tid", String.valueOf(this.reqCount++));
+	        reqData.put("action", "DeviceRouter");
+	        reqData.put("method", "getInfo");
+	        reqData.put("data", data);
+	        reqData.put("type", "rpc");
+	        reqData.put("tid", String.valueOf(this.reqCount++));
         
         JSONArray Wrapper = new JSONArray();
         Wrapper.put(reqData);
@@ -690,7 +696,6 @@ public class ZenossAPIv2
     	String test = httpclient.execute(httpost, responseHandler);
 		
 		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossDevice -------------> ", json.toString());
     	return json;
     }
     
@@ -724,13 +729,9 @@ public class ZenossAPIv2
         Wrapper.put(reqData);
         httpost.setEntity(new StringEntity(Wrapper.toString()));
     	
-    	//Log.i("Execute","Executing with string: " + Wrapper.toString());
     	String test = httpclient.execute(httpost, responseHandler);
-    	//Log.i("Test:", test);
 		
 		JSONObject json = new JSONObject(test);
-    	//Log.i("ZenossEvents -------------> ", json.toString());
     	return json;
     }
-    
 }

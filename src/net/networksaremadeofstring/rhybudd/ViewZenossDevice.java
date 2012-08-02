@@ -85,7 +85,7 @@ public class ViewZenossDevice extends Activity
 				}
 				catch(Exception e)
 				{
-					//TODO Anything
+					BugSenseHandler.log("ViewZenossDevice", e);
 				}
 				
 				if(EventCount > 0 && msg.what == 1)
@@ -111,7 +111,9 @@ public class ViewZenossDevice extends Activity
 		{
 			public void handleMessage(Message msg) 
 			{
-				dialog.dismiss();
+				if(dialog != null)
+					dialog.dismiss();
+				
 				try
 				{
 					if(DeviceObject != null && msg.what == 1 && DeviceObject.getJSONObject("result").getBoolean("success") == true)

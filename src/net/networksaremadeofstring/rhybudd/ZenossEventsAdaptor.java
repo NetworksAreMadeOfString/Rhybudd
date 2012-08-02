@@ -75,6 +75,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
     {
     	 return listZenossEvents.size();
 	}
+    
 	@Override
 	public Object getItem(int position) 
 	{

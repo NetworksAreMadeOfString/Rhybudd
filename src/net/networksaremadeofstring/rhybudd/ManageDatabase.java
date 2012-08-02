@@ -40,7 +40,6 @@ import android.widget.Toast;
 
 public class ManageDatabase extends SherlockActivity
 {
-	//private SharedPreferences settings = null;
 	Thread FlushDBThread;
 	Handler UIUpdate;
 	ActionBar actionbar;
@@ -48,7 +47,6 @@ public class ManageDatabase extends SherlockActivity
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
-       // settings = getSharedPreferences("rhybudd", 0);
         
         setContentView(R.layout.manage_database);
         actionbar = getSupportActionBar();
@@ -161,9 +159,6 @@ public class ManageDatabase extends SherlockActivity
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
 	        {
-	            /*Intent intent = new Intent(this, RhybuddHome.class);
-	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	            startActivity(intent);*/
 	        	//No need for crazy intents
 	        	finish();
 	            

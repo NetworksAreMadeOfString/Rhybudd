@@ -32,7 +32,8 @@ import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
-public class TrustAllSSLSocketFactory extends SSLSocketFactory {
+public class TrustAllSSLSocketFactory extends SSLSocketFactory 
+{
 	private javax.net.ssl.SSLSocketFactory factory;
 
 	public TrustAllSSLSocketFactory() throws KeyManagementException,NoSuchAlgorithmException, KeyStoreException,UnrecoverableKeyException 

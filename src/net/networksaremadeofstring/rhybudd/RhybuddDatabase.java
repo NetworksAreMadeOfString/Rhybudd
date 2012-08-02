@@ -53,10 +53,8 @@ import android.util.Log;
 public class RhybuddDatabase 
 {
 	private static final String TAG = "RhybuddDatabase";
-
-	//The columns we'll include in the dictionary table
-	public static final String KEY_WORD = SearchManager.SUGGEST_COLUMN_TEXT_1;
-	public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;
+	/*public static final String KEY_WORD = SearchManager.SUGGEST_COLUMN_TEXT_1;
+	public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;*/
 
 	private static final String DATABASE_NAME = "rhybudd3Cache";
 	private static final int DATABASE_VERSION = 8;
@@ -129,15 +127,16 @@ public class RhybuddDatabase
 		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
 		if (cursor == null) 
 		{
-			cursor.close();
+			//cursor.close();
 			return null;
 		}
 		else
 		{
-			
 			if(cursor.moveToFirst())
 			{
 				HashMap<String, Integer> events = new HashMap<String, Integer>();
+				
+				//TODO This could do with being a bit more granular
 				try
 				{
 					events.put("info", cursor.getInt(5));
@@ -157,12 +156,13 @@ public class RhybuddDatabase
 				
 				try
 				{
-					cursor.close();
+					if(cursor != null)
+						cursor.close();
+					
 					return new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4));
 				}
 				catch(Exception e)
 				{
-					cursor.close();
 					BugSenseHandler.log("DB-GetRhybuddDevices", e);
 					return null;
 				}
@@ -274,7 +274,10 @@ public class RhybuddDatabase
 				}
 				
 			}
-			dbResults.close();
+			
+			if(dbResults != null)
+				dbResults.close();
+			
 			return ZenossDevices;
 		}
 		else
@@ -292,10 +295,8 @@ public class RhybuddDatabase
 			{
 				try
 				{
-					//mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
 					Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
-					//mDatabaseOpenHelper.close();
 				}
 				catch(Exception e)
 				{
@@ -315,10 +316,8 @@ public class RhybuddDatabase
 			{
 				try
 				{
-					//mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddEvents(ZenossEvents);
 					Log.i("UpdateRhybuddDevices","Finished updating the Events table");
-					//mDatabaseOpenHelper.close();
 				}
 				catch(Exception e)
 				{
@@ -333,21 +332,6 @@ public class RhybuddDatabase
 	{
 		mDatabaseOpenHelper.close();
 	}
-
-	/*private static void SendWarningNotification(String Summary)
-	{
-		NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(R.drawable.ic_stat_alert, "Rhybudd Database Issues", System.currentTimeMillis());
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-
-		Intent notificationIntent = new Intent(context, RhybuddHome.class);
-		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		notificationIntent.putExtra("forceRefresh", true);
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, "Database / Polling Errors",Summary, contentIntent);
-		mNM.notify(999, notification);//NotificationID++ 
-	}*/
 
 	private static class RhybuddOpenHelper extends SQLiteOpenHelper 
 	{
@@ -364,15 +348,14 @@ public class RhybuddDatabase
 		@Override
 		public void onOpen(SQLiteDatabase db) 
 		{
-			Log.i("RhybuddOpenHelper","onOpen");
-
+			//Log.i("RhybuddOpenHelper","onOpen");
 			mDatabase = db;
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) 
 		{
-			Log.i("RhybuddOpenHelper","onCreate");
+			//Log.i("RhybuddOpenHelper","onCreate");
 			mDatabase = db;
 			try
 			{
@@ -407,13 +390,11 @@ public class RhybuddDatabase
 			{
 				BugSenseHandler.log("Database-onCreate", s);
 				//s.printStackTrace();
-				//SendWarningNotification(s.getMessage());
 			}
 			catch(Exception e)
 			{
 				BugSenseHandler.log("Database-onCreate", e);
 				//e.printStackTrace();
-				//SendWarningNotification(e.getMessage());
 			}
 		}
 
@@ -438,7 +419,11 @@ public class RhybuddDatabase
 		
 		private void UpdateRhybuddDevices(List<ZenossDevice> ZenossDevices)
 		{
-			int DeviceCount = ZenossDevices.size();
+			int DeviceCount = 0;
+			
+			if(ZenossDevices != null)
+				DeviceCount = ZenossDevices.size();
+			
 			try
 			{
 				mDatabase.beginTransaction();
@@ -470,15 +455,17 @@ public class RhybuddDatabase
 					catch (Exception e) 
 					{
 						e.printStackTrace();
+						
 						//This could get a little excessive
-						//BugSenseHandler.log("Database-refreshDevices", e);
+						BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
 					}
 				}
 				mDatabase.setTransactionSuccessful();
 			}
 			catch(Exception e)
 			{
-				//TODO Do something
+				//This could get a little excessive
+				BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
 			}
 			finally
 			{
@@ -488,7 +475,11 @@ public class RhybuddDatabase
 		
 		private void UpdateRhybuddEvents(List<ZenossEvent> ZenossEvents)
 		{
-			int EventCount = ZenossEvents.size();
+			int EventCount = 0;
+			
+			if(ZenossEvents != null)
+				ZenossEvents.size();
+			
 			try
 			{
 				mDatabase.beginTransaction();
@@ -515,36 +506,25 @@ public class RhybuddDatabase
 						values.put("eventClass", CurrentEvent.geteventClass());
 						values.put("lastTime", CurrentEvent.getlastTime());
 						values.put("ownerid", CurrentEvent.getownerID());
-						Log.i("DB","Writing " + CurrentEvent.getEVID() + " to the DB");
-						/*mDatabase.execSQL("CREATE TABLE \"events\" (\"evid\" TEXT PRIMARY KEY  NOT NULL, " +
-						"\"count\" INTEGER, " +
-						"\"prodState\" TEXT, " +
-						"\"firstTime\" TEXT, " +
-						"\"severity\" TEXT, " +
-						"\"component_text\" TEXT, " +
-						"\"component_uid\" TEXT, " +
-						"\"summary\" TEXT, " +
-						"\"eventState\" TEXT, " +
-						"\"device\" TEXT, " +
-						"\"eventClass\" TEXT, " +
-						"\"lastTime\" TEXT, " +
-						"\"ownerid\" TEXT)");*/
-						
+					
+						//Log.i("DB","Writing " + CurrentEvent.getEVID() + " to the DB");
+
 						mDatabase.insert("events", null, values);
-						Log.i("DB","Done writing " + CurrentEvent.getEVID() + " to the DB");
+						//Log.i("DB","Done writing " + CurrentEvent.getEVID() + " to the DB");
 					}
 					catch (Exception e) 
 					{
 						e.printStackTrace();
 						//This could get a little excessive
-						//BugSenseHandler.log("Database-refreshDevices", e);
+						BugSenseHandler.log("Database-refreshDevices", e);
 					}
 				}
 				mDatabase.setTransactionSuccessful();
 			}
 			catch(Exception e)
 			{
-				//TODO Do something
+				//This could get a little excessive
+				BugSenseHandler.log("Database-refreshDevices", e);
 			}
 			finally
 			{
@@ -563,29 +543,9 @@ public class RhybuddDatabase
 			}
 			catch(Exception e)
 			{
+				BugSenseHandler.log("Database-onUpgrade", e);
 				e.printStackTrace();
 			}
-
-			//Since we call onCreate() there's no need for this to be here (in future we'll do an alter)
-			/*db.execSQL("CREATE TABLE \"events\" (\"EVID\" TEXT PRIMARY KEY  NOT NULL  UNIQUE , " +
-					"\"Count\" INTEGER, \"lastTime\" TEXT, " +
-					"\"device\" TEXT, \"summary\" TEXT, " +
-					"\"eventState\" TEXT, " +
-					"\"firstTime\" TEXT, " +
-					"\"severity\" TEXT, " +
-					"\"prodState\" TEXT, " +
-					"\"ownerid\" TEXT)");
-			
-			db.execSQL("CREATE TABLE \"devices\" (\"rhybuddDeviceID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL," +
-					"\"productionState\" TEXT," +
-					"\"ipAddress\" INTEGER," +
-					"\"name\" TEXT," +
-					"\"uid\" TEXT, " +
-					"\"infoEvents\" INTEGER DEFAULT (0) ," +
-					"\"debugEvents\" INTEGER DEFAULT (0) ," +
-					"\"warningEvents\" INTEGER DEFAULT (0) ," +
-					"\"errorEvents\" INTEGER DEFAULT (0) ," +
-					"\"criticalEvents\" INTEGER DEFAULT (0) )");*/
 			
 			onCreate(db);
 		}

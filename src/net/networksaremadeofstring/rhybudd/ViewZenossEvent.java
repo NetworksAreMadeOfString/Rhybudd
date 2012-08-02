@@ -57,7 +57,6 @@ public class ViewZenossEvent extends SherlockActivity
 	Handler firstLoadHandler, addLogMessageHandler;
 	ProgressDialog dialog,addMessageProgressDialog;
 	Thread dataPreload, addLogMessageThread;
-	//private String EventID;
 	Dialog addMessageDialog;
 	String[] LogEntries;
 	ActionBar actionbar;
@@ -135,7 +134,7 @@ public class ViewZenossEvent extends SherlockActivity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("rhybudd", 0);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		setContentView(R.layout.view_zenoss_event);
 
 		try
@@ -288,9 +287,17 @@ public class ViewZenossEvent extends SherlockActivity
 						}
 						catch(Exception e)
 						{
-							//e.printStackTrace();
+							BugSenseHandler.log("ViewZenossEvent-LogEntries", e);
+							
 							String[] LogEntries = {"No log entries could be found"};
-							((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
+							try
+							{
+								((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
+							}
+							catch(Exception e1)
+							{
+								BugSenseHandler.log("ViewZenossEvent-LogEntries", e1);
+							}
 						}
 					}
 					else
