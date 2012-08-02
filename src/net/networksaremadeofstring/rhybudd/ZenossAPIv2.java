@@ -571,7 +571,9 @@ public class ZenossAPIv2
     	evids.put(_EventID);
     	dataContents.put("evids", evids);*/
     	dataContents.put("evid",_EventID);
-    	dataContents.put("history", false);
+    	
+    	//Disabled for 4.1 compatibility
+    	//dataContents.put("history", false);
     	
         /*JSONObject params = new JSONObject();
         params.put("severity", new JSONArray("[5, 4, 3, 2]"));

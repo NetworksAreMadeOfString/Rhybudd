@@ -170,8 +170,7 @@ public class ViewZenossEvent extends SherlockActivity
 				{
 					if(EventObject.getJSONObject("result").getBoolean("success") == true)
 					{
-						Log.i("Event",EventObject.toString(3));
-
+						//Log.i("Event",EventObject.toString(3));
 						TextView Title = (TextView) findViewById(R.id.EventTitle);
 						TextView Component = (TextView) findViewById(R.id.Componant);
 						TextView EventClass = (TextView) findViewById(R.id.EventClass);
@@ -252,7 +251,7 @@ public class ViewZenossEvent extends SherlockActivity
 						{
 							((TextView) findViewById(R.id.Agent)).setText("unknown");
 						}
-
+						
 						try
 						{
 							JSONArray Log = EventDetails.getJSONArray("log");
@@ -302,8 +301,9 @@ public class ViewZenossEvent extends SherlockActivity
 					}
 					else
 					{
+						Log.e("ViewEvent",EventObject.toString(3));
 						Toast.makeText(ViewZenossEvent.this, "There was an error loading the Event details", Toast.LENGTH_LONG).show();
-						finish();
+						//finish();
 					}
 				}
 				catch(Exception e)
