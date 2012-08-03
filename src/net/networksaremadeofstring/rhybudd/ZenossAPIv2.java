@@ -53,6 +53,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -547,7 +548,13 @@ public class ZenossAPIv2
         
         httpost.setEntity(new StringEntity(reqData.toString()));
     	
-    	String eventsRawJSON = httpclient.execute(httpost, responseHandler);
+        
+    	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String eventsRawJSON = EntityUtils.toString(response.getEntity());
+        Log.i("GetEvents",eventsRawJSON);
+        response.getEntity().consumeContent();
+        
 		JSONObject json = new JSONObject(eventsRawJSON);
     	return json;
     }
@@ -591,7 +598,11 @@ public class ZenossAPIv2
 	        reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	String test = httpclient.execute(httpost, responseHandler);
+    	//String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        
 		JSONObject json = new JSONObject(test);
     	return json;
     }
@@ -618,8 +629,11 @@ public class ZenossAPIv2
 	        reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	String test = httpclient.execute(httpost, responseHandler);
-		
+    	//String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        
 		JSONObject json = new JSONObject(test);
 
     	return json.getJSONObject("result").getBoolean("success");
@@ -695,7 +709,10 @@ public class ZenossAPIv2
         Wrapper.put(reqData);
         httpost.setEntity(new StringEntity(Wrapper.toString()));
     	
-    	String test = httpclient.execute(httpost, responseHandler);
+    	//String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
 		
 		JSONObject json = new JSONObject(test);
     	return json;
@@ -731,7 +748,10 @@ public class ZenossAPIv2
         Wrapper.put(reqData);
         httpost.setEntity(new StringEntity(Wrapper.toString()));
     	
-    	String test = httpclient.execute(httpost, responseHandler);
+    	//String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
 		
 		JSONObject json = new JSONObject(test);
     	return json;

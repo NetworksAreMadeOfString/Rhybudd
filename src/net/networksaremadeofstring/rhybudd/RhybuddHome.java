@@ -484,6 +484,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else if(msg.what == 3 || msg.what == 999)
 				{
+					//TODO Dismiss this dialog and launch another with a cancel and a settings button
 					dialog.setMessage("An error was encountered. Please check your settings and try again.");
 					dialog.setCancelable(true);
 				}
