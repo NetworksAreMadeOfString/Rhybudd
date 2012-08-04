@@ -319,10 +319,14 @@ public class ZenossPoller extends Service
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-		notification.flags |= Notification.FLAG_INSISTENT;
+		
+		
 		
 		if(settings.getBoolean("notificationSound", true))
 		{
+			if(settings.getBoolean("notificationSoundInsistent", false))
+				notification.flags |= Notification.FLAG_INSISTENT;
+			
 			if(settings.getString("notificationSoundChoice", "").equals(""))
 			{
 				notification.defaults |= Notification.DEFAULT_SOUND;

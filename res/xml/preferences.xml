@@ -101,6 +101,14 @@
 		    android:summary="Choose the Zenoss Event alert sound." 
 		    android:dependency="notificationSound"
 		    />
+		
+		<CheckBoxPreference
+                android:key="notificationSoundInsistent"
+                android:title="Enable Insistent Audio"
+                android:summary="Loop notification sound till the event is acknowledged" 
+                android:defaultValue="false"
+                android:dependency="notificationSound"
+                />
     </PreferenceCategory>
     
     

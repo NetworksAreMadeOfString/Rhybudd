@@ -133,7 +133,17 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onConfigurationChanged(Configuration newConfig) 
 	{
 		super.onConfigurationChanged(newConfig);
-		setContentView(R.layout.rhybudd_home);
+		//setContentView(R.layout.rhybudd_home);
+		Log.i("onConfigurationChanged","Now sending handler");
+		
+		/*if(handler != null)
+		{
+			handler.sendEmptyMessage(0);
+		}
+		else
+		{
+			Log.e("onConfigurationChanged","handler was null");
+		}*/
 	}
 
 	public void onCreate(Bundle savedInstanceState) 
