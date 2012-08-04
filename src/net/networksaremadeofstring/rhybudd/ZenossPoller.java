@@ -527,6 +527,10 @@ public class ZenossPoller extends Service
 				{
 					
 				}
+				finally
+				{
+					EventsRefreshInProgress = false;
+				}
 			}
 		}).start();
 	}

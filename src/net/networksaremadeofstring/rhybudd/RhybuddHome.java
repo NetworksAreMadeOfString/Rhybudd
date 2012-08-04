@@ -149,25 +149,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-
-
-		//TODO Delete this
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-		.detectDiskReads()
-		.detectDiskWrites()
-		.detectNetwork()   // or .detectAll() for all detectable problems
-		.penaltyLog()
-		.build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-		.detectLeakedSqlLiteObjects()
-		.penaltyLog()
-		.penaltyDeath()
-		.build());
-		//TODO Delete this
-
-
-
+		
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		
 		actionbar = getSupportActionBar();
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
