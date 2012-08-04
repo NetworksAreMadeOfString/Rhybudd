@@ -53,6 +53,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 	ActionBar actionbar;
 	RhybuddDatabase rhybuddCache;
 	String ellipsis = ".";
+	
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
@@ -63,10 +64,12 @@ public class RhybuddInitialSettings extends SherlockActivity
 	@Override
     public void onCreate(Bundle savedInstanceState) 
     {
+		super.onCreate(savedInstanceState);
+		
     	dialog = new ProgressDialog(this);
 		dialog.setMessage("Checking Details.....");
 		dialog.setCancelable(false);
-        super.onCreate(savedInstanceState);
+        
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         
         actionbar = getSupportActionBar();
@@ -103,7 +106,16 @@ public class RhybuddInitialSettings extends SherlockActivity
 	        					//Events
 	        					try
 	        					{
-		        					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+		        					//ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+	        						if(settings.getBoolean("httpBasicAuth", false))
+	        						{
+	        							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+	        						}
+	        						else
+	        						{
+	        							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+	        						}
+	        						
 		        					if(API != null)
 		    						{
 		        						List<ZenossEvent> listOfZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
@@ -121,13 +133,12 @@ public class RhybuddInitialSettings extends SherlockActivity
 		    							else
 		    							{
 		    								Log.e("initialSettings","There was a problem processing the GetRhybuddEvents call");
-		    								//HandleException(java.net.ConnectException, "Initialising the API Failed. An error message has been logged.");
+		    								HandleException(null, "Initialising the API Failed. An error message has been logged.");
 		    							}
 		    						}
 		        					else
 		        					{
-		        						//TODO Bundle an error
-		        						//handler.sendEmptyMessage(2);
+		        						HandleException(null, "Initialising the API Failed. An error message has been logged.");
 		        					}
 	        					}
 	        					catch(Exception e)
@@ -169,44 +180,6 @@ public class RhybuddInitialSettings extends SherlockActivity
     			else if(msg.what == 1)
     			{
     				dialog.setMessage("Events Cached! Now caching Devices.\r\nPlease wait...");
-    				/*if(rhybuddCache.hasCacheRefreshed())
-    				{
-    					try
-    					{
-    						rhybuddCache.Close();
-    					}
-    					catch(Exception e)
-    					{
-    						BugSenseHandler.log("InitialSettings", e);
-    					}
-    					
-    					try
-    					{
-    						dialog.setMessage("Caching Complete!");
-    					}
-    					catch(Exception e)
-        				{
-        					BugSenseHandler.log("InitialSettings", e);
-        					Toast.makeText(RhybuddInitialSettings.this, "Caching Complete!", Toast.LENGTH_SHORT).show();
-        				}
-    					
-    					this.sendEmptyMessageDelayed(2,1000);
-    				}
-    				else
-    				{
-    					ellipsis += ".";
-    					try
-    					{
-    						dialog.setMessage("Performing initial cache.\r\nPlease wait..." + ellipsis);
-    						handler.sendEmptyMessageDelayed(1, 1000);
-    					}
-    					catch(Exception e)
-        				{
-        					BugSenseHandler.log("InitialSettings", e);
-        					Toast.makeText(RhybuddInitialSettings.this, "Performing initial cache.\r\nPlease wait..." + ellipsis, Toast.LENGTH_SHORT).show();
-        					handler.sendEmptyMessageDelayed(1, 2000);
-        				}
-    				}*/
     			}
     			else if (msg.what == 2)
     			{
@@ -373,15 +346,20 @@ public class RhybuddInitialSettings extends SherlockActivity
 	{
 		Bundle bundle = new Bundle();
 		Message msg = new Message();
-		e.printStackTrace();
-		((Thread) new Thread(){
-			public void run() 
-    		{
-				BugSenseHandler.log("InitialSettings", e);
-    		}
-		}).start();
 		
-		if(e.getMessage() != null && OverrideMessage.equals(""))
+		if(e != null)
+		{
+			e.printStackTrace();
+			
+			((Thread) new Thread(){
+				public void run() 
+	    		{
+					BugSenseHandler.log("InitialSettings", e);
+	    		}
+			}).start();
+		}
+		
+		if(e != null && e.getMessage() != null && OverrideMessage.equals(""))
 		{
 			bundle.putString("error", e.getMessage());
 		}

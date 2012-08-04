@@ -809,7 +809,7 @@ public class ZenossAPIv2
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-		
+		Log.e("GetDeviceEvents",test);
 		JSONObject json = new JSONObject(test);
     	return json;
     }

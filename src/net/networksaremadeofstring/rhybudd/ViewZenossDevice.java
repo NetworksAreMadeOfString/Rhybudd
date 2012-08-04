@@ -25,9 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
@@ -35,13 +37,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class ViewZenossDevice extends Activity
+public class ViewZenossDevice extends SherlockActivity
 {
 	ZenossAPIv2 API = null;
 	JSONObject DeviceObject = null, EventsObject = null;
@@ -55,7 +58,7 @@ public class ViewZenossDevice extends Activity
 	ZenossEventsAdaptor adapter;
 	JSONArray Events = null;
 	private int EventCount = 0;
-
+	ActionBar actionbar; 
 	@Override
 	public void onAttachedToWindow() 
 	{
@@ -71,8 +74,12 @@ public class ViewZenossDevice extends Activity
 		super.onCreate(savedInstanceState);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-		setContentView(R.layout.view_zenoss_device);
+		setContentView(R.layout.view_zenoss_device3);
 
+		actionbar = getSupportActionBar();
+		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setHomeButtonEnabled(true);
+		
 		list = (ListView)findViewById(R.id.ZenossEventsList);
 
 		eventsHandler = new Handler()
@@ -81,7 +88,7 @@ public class ViewZenossDevice extends Activity
 			{
 				try
 				{
-					((ProgressBar) findViewById(R.id.eventsProgressBar)).setVisibility(4);
+					//((ProgressBar) findViewById(R.id.eventsProgressBar)).setVisibility(4);
 				}
 				catch(Exception e)
 				{
@@ -118,33 +125,44 @@ public class ViewZenossDevice extends Activity
 				{
 					if(DeviceObject != null && msg.what == 1 && DeviceObject.getJSONObject("result").getBoolean("success") == true)
 					{
+						Log.i("DeviceDetails",DeviceObject.toString());
 						DeviceDetails = DeviceObject.getJSONObject("result").getJSONObject("data");
 
 						try
 						{
-							((TextView) findViewById(R.id.Title)).setText(DeviceDetails.getString("snmpSysName").toUpperCase());
+							((TextView) findViewById(R.id.deviceID)).setText(DeviceDetails.getString("snmpSysName").toUpperCase());
 						}
 						catch(Exception e)
 						{
-							((TextView) findViewById(R.id.Title)).setText("No Name - Details");
+							((TextView) findViewById(R.id.deviceID)).setText("No Name - Details");
 						}
 
 						try
 						{
-							((TextView) findViewById(R.id.lastCollected)).setText(DeviceDetails.getString("lastCollected"));
+							((TextView) findViewById(R.id.modelTime)).setText(DeviceDetails.getString("lastCollected"));
 						}
 						catch(Exception e)
 						{
-							((TextView) findViewById(R.id.lastCollected)).setText("-----");
+							((TextView) findViewById(R.id.modelTime)).setText("Unknown");
 						}
+						
+						try
+						{
+							((TextView) findViewById(R.id.firstSeen)).setText(DeviceDetails.getString("firstSeen"));
+						}
+						catch(Exception e)
+						{
+							((TextView) findViewById(R.id.firstSeen)).setText("");
+						}
+						
 
 						try
 						{
-							((TextView) findViewById(R.id.osModel)).setText(DeviceDetails.getJSONObject("osModel").getString("name"));
+							((TextView) findViewById(R.id.location)).setText(DeviceDetails.getString("snmpLocation"));
 						}
 						catch(Exception e)
 						{
-							((TextView) findViewById(R.id.osModel)).setText("Unknown OS");
+							((TextView) findViewById(R.id.location)).setText("Unknown Location");
 						}
 
 						try
@@ -159,6 +177,15 @@ public class ViewZenossDevice extends Activity
 						try
 						{
 							((TextView) findViewById(R.id.productionState)).setText(DeviceDetails.getString("productionState"));
+						}
+						catch(Exception e)
+						{
+							//Already got a placeholder
+						}
+						
+						try
+						{
+							((TextView) findViewById(R.id.memorySwap)).setText(DeviceDetails.getJSONObject("memory").getString("ram") + " / " + DeviceDetails.getJSONObject("memory").getString("swap"));
 						}
 						catch(Exception e)
 						{
@@ -215,11 +242,12 @@ public class ViewZenossDevice extends Activity
 					else
 					{
 						Toast.makeText(ViewZenossDevice.this, "There was an error loading the Device details", Toast.LENGTH_LONG).show();
-						finish();
+						//finish();
 					}
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					Toast.makeText(ViewZenossDevice.this, "An error was encountered parsing the JSON.", Toast.LENGTH_LONG).show();
 					BugSenseHandler.log("ViewZenossDevice", e);
 				}
@@ -252,6 +280,7 @@ public class ViewZenossDevice extends Activity
 				} 
 				catch (Exception e) 
 				{
+					e.printStackTrace();
 					BugSenseHandler.log("updateDevices-dataPreload", e);
 					firstLoadHandler.sendEmptyMessage(0);
 				}
@@ -270,7 +299,14 @@ public class ViewZenossDevice extends Activity
 				{
 					if(API == null)
 					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						if(settings.getBoolean("httpBasicAuth", false))
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
 					}
 
 					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"));
@@ -298,7 +334,7 @@ public class ViewZenossDevice extends Activity
 								}
 								catch (JSONException e) 
 								{
-									//Log.e("API - Stage 2 - Inner", e.getMessage());
+									Log.e("API - Stage 2 - Inner", e.getMessage());
 								}
 							}
 
@@ -306,21 +342,39 @@ public class ViewZenossDevice extends Activity
 						}
 						else
 						{
-							eventsHandler.sendEmptyMessage(0);
+							Log.i("eventsLoad","Had a problem; EventsObject was null");
+							//eventsHandler.sendEmptyMessage(0);
 						}
 					} 
 					catch (JSONException e) 
 					{
+						e.printStackTrace();
 						eventsHandler.sendEmptyMessage(0);
 					}
 				} 
 				catch (Exception e) 
 				{
-					//Log.e("API - Stage 1", e.getMessage());
+					Log.e("API - Stage 1", e.getMessage());
 					eventsHandler.sendEmptyMessage(0);
 				}
 			}
 		};
 		eventsLoad.start();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	        {
+	        	//No need for crazy intents
+	        	finish();
+	            
+	            return true;
+	        }
+	        
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 }

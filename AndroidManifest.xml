@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.networksaremadeofstring.rhybudd"
-      android:installLocation="auto" android:versionCode="11" android:versionName="2.6">
+      android:installLocation="auto" android:versionCode="11" android:versionName="2.8">
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="16"/>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
@@ -76,8 +76,7 @@
 		</activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
-			android:label="Rhybudd - Device Details"
-			android:theme="@android:style/Theme.NoTitleBar">
+			android:label="Rhybudd - Device Details">
 			<intent-filter>
 			     <action android:name="android.intent.action.VIEW" />
 			     <category android:name="android.intent.category.DEFAULT" />

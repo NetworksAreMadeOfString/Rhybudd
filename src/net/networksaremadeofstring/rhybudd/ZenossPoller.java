@@ -62,6 +62,7 @@ public class ZenossPoller extends Service
 	int Delay;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	boolean EventsRefreshInProgress = false;
+	Notification stickyNotification;
 	
 	@Override
 	public void onLowMemory()
@@ -284,8 +285,15 @@ public class ZenossPoller extends Service
 
 	private void SendStickyNotification()
 	{
-		Notification notification = new Notification(R.drawable.ic_stat_polling, "Rhybudd is polling for events", System.currentTimeMillis());
-		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		if(stickyNotification == null)
+			stickyNotification = new Notification(R.drawable.ic_stat_polling, "Rhybudd is polling for events", System.currentTimeMillis());
+		
+		stickyNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+		stickyNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
+		
+		if(Build.VERSION.SDK_INT > 16)
+			stickyNotification.flags |= Notification.PRIORITY_LOW;
+		
 		Context context = getApplicationContext();
 		Intent notificationIntent = new Intent(this, RhybuddHome.class);
 		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -301,8 +309,8 @@ public class ZenossPoller extends Service
 		{
 			strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
 		}
-		notification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time: " + strDate, contentIntent);
-		mNM.notify(20, notification);
+		stickyNotification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time: " + strDate, contentIntent);
+		mNM.notify(20, stickyNotification);
 	}
 	
 	private void SendCombinedNotification(int EventCount, String Summary)

@@ -117,7 +117,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onAttachedToWindow() 
 	{
 		super.onAttachedToWindow();
-		
+
 		try
 		{
 			Window window = getWindow();
@@ -132,38 +132,38 @@ public class RhybuddHome extends SherlockFragmentActivity
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) 
 	{
-	    super.onConfigurationChanged(newConfig);
-	    setContentView(R.layout.rhybudd_home);
+		super.onConfigurationChanged(newConfig);
+		setContentView(R.layout.rhybudd_home);
 	}
 
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 
-		
+
 		//TODO Delete this
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-        .detectDiskReads()
-        .detectDiskWrites()
-        .detectNetwork()   // or .detectAll() for all detectable problems
-        .penaltyLog()
-        .build());
-StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .penaltyLog()
-        .penaltyDeath()
-        .build());
+		.detectDiskReads()
+		.detectDiskWrites()
+		.detectNetwork()   // or .detectAll() for all detectable problems
+		.penaltyLog()
+		.build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+		.detectLeakedSqlLiteObjects()
+		.penaltyLog()
+		.penaltyDeath()
+		.build());
 		//TODO Delete this
-		
-		
-		
+
+
+
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		actionbar = getSupportActionBar();
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
 
 		setContentView(R.layout.rhybudd_home);
-		
+
 		//Clear any notifications event notifications 
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 
@@ -231,7 +231,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 							}
 						}
-							
+
 					}
 					catch(Exception e)
 					{
@@ -302,11 +302,11 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 			{
 				dialog = new ProgressDialog(this);
 			}
-			
+
 			dialog.setTitle("Querying Zenoss Directly");
 			dialog.setMessage("Refreshing Events...");
 			dialog.setCancelable(false);
-			
+
 			if(!dialog.isShowing())
 				dialog.show();
 		}
@@ -408,7 +408,8 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 		{
 			intent.putExtra("settingsUpdate", true);
 			startService(intent);
-			Refresh();
+			//Refresh();
+			DBGetThread();
 		}
 		else
 		{
@@ -422,7 +423,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				Log.i("RhybuddHome","Doing a direct call to the API");
 				Refresh();
 			}
-			
+
 			//TODO Check if we don't need this anymore
 			startService(intent);
 		}
@@ -540,24 +541,24 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				{
 					if(dialog != null && dialog.isShowing())
 						dialog.dismiss();
-					
+
 					AlertDialog.Builder builder = new AlertDialog.Builder(RhybuddHome.this);
 					builder.setMessage("An error was encountered. Please check your settings and try again.")
-					       .setCancelable(false)
-					       .setPositiveButton("Edit Settings", new DialogInterface.OnClickListener() {
-					           public void onClick(DialogInterface dialog, int id) 
-					           {
-					        	   	Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
-					   				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
-					   				alertDialog.cancel();
-					           }
-					       })
-					       .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-					           public void onClick(DialogInterface dialog, int id) 
-					           {
-					        	   alertDialog.cancel();
-					           }
-					       });
+					.setCancelable(false)
+					.setPositiveButton("Edit Settings", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) 
+						{
+							Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+							startActivityForResult(SettingsIntent, 99);
+							alertDialog.cancel();
+						}
+					})
+					.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) 
+						{
+							alertDialog.cancel();
+						}
+					});
 					alertDialog = builder.create();
 					alertDialog.show();
 				}
@@ -592,6 +593,24 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 					}
 					adapter.notifyDataSetChanged();
 				}
+				else if(msg.what == 2)
+				{
+					/*for (ZenossEvent evt : listOfZenossEvents)
+					{
+						if(!evt.getEventState().equals("Acknowledged"))
+						{
+							evt.setProgress(false);
+							evt.setAcknowledged();	
+						}
+					}*/
+					
+					for (Integer i : selectedEvents)
+					{
+						listOfZenossEvents.get(i).setProgress(false);
+						listOfZenossEvents.get(i).setAcknowledged();
+					}
+					adapter.notifyDataSetChanged();
+				}
 				else if(msg.what == 99)
 				{
 					for (ZenossEvent evt : listOfZenossEvents)
@@ -606,7 +625,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				}
 				else
 				{
-					
+
 					Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -703,12 +722,12 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 			case R.id.Acknowledge:
 			{
 				final List<String> EventIDs = new ArrayList<String>();
-				
+
 				for (final Integer i : selectedEvents)
 				{
 					listOfZenossEvents.get(i).setProgress(true);
 					EventIDs.add(listOfZenossEvents.get(i).getEVID());
-					
+
 					/*AckEvent = new Thread() 
 					{  
 						public void run() 
@@ -731,7 +750,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 					AckEvent.start();*/
 				}
 				AckEventHandler.sendEmptyMessage(0);
-				
+
 				AckEvent = new Thread() 
 				{  
 					public void run() 
@@ -748,9 +767,9 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 								ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 							}
 							ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
-							
+
 							//TODO Check it actually succeeded
-							AckEventHandler.sendEmptyMessage(1);
+							AckEventHandler.sendEmptyMessage(2);
 						}
 						catch (Exception e)
 						{
@@ -863,8 +882,8 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 		case R.id.resolveall:
 		{
 			final List<String> EventIDs = new ArrayList<String>();
-			
-			
+
+
 			for (ZenossEvent evt : listOfZenossEvents)
 			{
 				if(!evt.getEventState().equals("Acknowledged"))
@@ -874,9 +893,9 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 					EventIDs.add(evt.getEVID());	
 				}
 			}
-			
+
 			AckEventHandler.sendEmptyMessage(0);
-			
+
 			AckEvent = new Thread() 
 			{  
 				public void run() 
@@ -893,7 +912,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 							ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 						}
 						ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
-						
+
 						//TODO Check it actually succeeded
 						AckEventHandler.sendEmptyMessage(1);
 					}
@@ -905,7 +924,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				}
 			};
 			AckEvent.start();
-			
+
 			return true;
 		}
 		case R.id.refresh:
@@ -944,7 +963,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 		{
 			//Refresh the settings
 			settings = PreferenceManager.getDefaultSharedPreferences(this);
-			
+
 			Intent intent = new Intent(this, ZenossPoller.class);
 			intent.putExtra("settingsUpdate", true);
 			startService(intent);
