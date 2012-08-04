@@ -58,7 +58,6 @@ public class DeviceList extends SherlockActivity
 	ListView list;
 	ZenossDeviceAdaptor adapter = null;
 	Cursor dbResults = null;
-	//SQLiteDatabase rhybuddCache = null;
 	
 	
 	//new

@@ -148,7 +148,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         	SeverityImage.setImageResource(R.drawable.severity_info);
         
         if(Event.getSeverity().equals("1"))
-        	SeverityImage.setImageResource(R.drawable.severity_info); //Technically debug
+        	SeverityImage.setImageResource(R.drawable.severity_debug);
         
         if(Event.getEventState().equals("Acknowledged"))
         {

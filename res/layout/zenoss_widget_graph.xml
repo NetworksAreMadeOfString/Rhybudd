@@ -1,4 +1,28 @@
 <RelativeLayout android:id="@+id/relativeLayout1" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent" android:layout_width="fill_parent">
-<ImageView android:id="@+id/graphCanvas" android:layout_centerInParent="true" android:background="@drawable/widget_background" android:layout_height="150dp" android:layout_width="290dp" android:src="@drawable/graph_placeholder"></ImageView>
-<TextView android:textSize="8dp" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/Graphlabel" android:textColor="#FFFFFF" android:layout_height="wrap_content" android:layout_alignTop="@+id/graphCanvas" android:layout_alignRight="@+id/graphCanvas" android:layout_marginTop="2dp" android:layout_marginRight="3dp" android:text="@string/widget_GraphTitle"></TextView>
+
+<ImageView
+    android:id="@+id/graphCanvas"
+    android:layout_width="290dp"
+    android:layout_height="150dp"
+    android:layout_centerInParent="true"
+    android:background="@drawable/widget_background"
+    android:src="@drawable/graph_placeholder" >
+
+</ImageView>
+
+<TextView
+    android:id="@+id/Graphlabel"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/graphCanvas"
+    android:layout_centerHorizontal="true"
+    android:shadowColor="@color/DarkBlue"
+    android:shadowDx="1"
+    android:shadowDy="1"
+    android:shadowRadius="1"
+    android:text="@string/widget_GraphTitle"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:textColor="#FFFFFF"
+    android:textSize="12dp" />
+
 </RelativeLayout>

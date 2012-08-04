@@ -70,7 +70,7 @@ public class RhybuddDatabase
 	{
 		Log.i("RhybuddDatabase","constructor");
 		mDatabaseOpenHelper = new RhybuddOpenHelper(_context);
-		mDatabaseOpenHelper.getWritableDatabase();
+		//mDatabaseOpenHelper.getWritableDatabase();
 		this.context = _context;
 	}
 
@@ -78,47 +78,6 @@ public class RhybuddDatabase
 	{
 		mDatabaseOpenHelper.FlushDB();
 	}
-
-	/*public void GetDBLock()
-	{
-		mDatabaseOpenHelper.getWritableDatabase();
-	}*/
-
-	/*public Cursor getDevice(String UID)
-	{
-		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-		builder.setTables("devices");
-		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
-		if (cursor == null) 
-		{
-			return null;
-		} 
-		return cursor;
-	}
-
-	public Cursor getDevices()
-	{
-		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-		builder.setTables("devices");
-		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},null, null, null, null, null);
-		if (cursor == null) 
-		{
-			return null;
-		} 
-		return cursor;
-	}
-
-	public Cursor getEvents() 
-	{
-		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-		builder.setTables("events");
-		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"EVID","Count","lastTime","device","summary","eventState","firstTime","severity","prodState"}, null, null, null, null, null);
-		if (cursor == null) 
-		{
-			return null;
-		} 
-		return cursor;
-	}*/
 	
 	public ZenossDevice getDevice(String UID)
 	{
@@ -127,6 +86,7 @@ public class RhybuddDatabase
 		Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","uid","name"},"uid = '"+UID+"'", null, null, null, null);
 		if (cursor == null) 
 		{
+			mDatabaseOpenHelper.close();
 			//cursor.close();
 			return null;
 		}
@@ -159,17 +119,27 @@ public class RhybuddDatabase
 					if(cursor != null)
 						cursor.close();
 					
-					return new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4));
+					
+					ZenossDevice returnDevice = new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4));
+					cursor.close();
+					mDatabaseOpenHelper.close();
+					return returnDevice;
 				}
 				catch(Exception e)
 				{
 					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+					if(cursor != null)
+						cursor.close();
+					
+					mDatabaseOpenHelper.close();
+					
 					return null;
 				}
 			}
 			else
 			{
 				cursor.close();
+				mDatabaseOpenHelper.close();
 				return null;
 			}
 		}
@@ -178,24 +148,34 @@ public class RhybuddDatabase
 	{
 		List<ZenossEvent> ZenossEvents = new ArrayList<ZenossEvent>();
 		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-		builder.setTables("events");
-		Cursor dbResults = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"evid",
-																								"count",
-																								"prodState",
-																								"firstTime",
-																								"severity",
-																								"component_text",
-																								"component_uid",
-																								"summary",
-																								"eventState",
-																								"device",
-																								"eventClass",
-																								"lastTime",
-																								"ownerid"}, 
-																								null, null, null, null, null);
-	
+		Cursor dbResults = null;
+		try
+		{
+			
+			builder.setTables("events");
+			dbResults = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"evid",
+																									"count",
+																									"prodState",
+																									"firstTime",
+																									"severity",
+																									"component_text",
+																									"component_uid",
+																									"summary",
+																									"eventState",
+																									"device",
+																									"eventClass",
+																									"lastTime",
+																									"ownerid"}, 
+																									null, null, null, null, null);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			dbResults.close();
+			dbResults = null;
+		}
 		
-		if(dbResults != null && dbResults.getCount() > 0)
+		if(dbResults != null && !dbResults.isClosed() && dbResults.getCount() > 0 )
 		{
 			while(dbResults.moveToNext())
 			{
@@ -217,15 +197,19 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("DBGetThread", e);
-				}
-				
+					BugSenseHandler.log("GetRhybuddEvents", e);
+				}	
 			}
 			dbResults.close();
+			mDatabaseOpenHelper.close();
 			return ZenossEvents;
 		}
 		else
 		{
+			if(dbResults != null)
+				dbResults.close();
+			
+			mDatabaseOpenHelper.close();
 			return null;
 		}
 	}
@@ -272,16 +256,82 @@ public class RhybuddDatabase
 				{
 					BugSenseHandler.log("DB-GetRhybuddDevices", e);
 				}
-				
 			}
 			
 			if(dbResults != null)
 				dbResults.close();
 			
+			mDatabaseOpenHelper.close();
 			return ZenossDevices;
 		}
 		else
 		{
+			if(dbResults != null)
+				dbResults.close();
+			
+			mDatabaseOpenHelper.close();
+			return null;
+		}
+	}
+	
+	
+	public List<ZenossDevice> SearchRhybuddDevices(String Query)
+	{
+		String Filter = "name like \"%"+Query.replaceAll(" ", "%")+"%\"";
+		
+		SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+		builder.setTables("devices");
+		Cursor dbResults = builder.query(mDatabaseOpenHelper.getReadableDatabase(),new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},Filter, null, null, null, null);
+		
+		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
+		if(dbResults.getCount() > 0)
+		{
+			while(dbResults.moveToNext())
+			{
+				HashMap<String, Integer> events = new HashMap<String, Integer>();
+				try
+				{
+					events.put("info", dbResults.getInt(5));
+					events.put("debug", dbResults.getInt(6));
+					events.put("warning", dbResults.getInt(7));
+					events.put("error", dbResults.getInt(8));
+					events.put("critical", dbResults.getInt(9));
+				}
+				catch(Exception e)
+				{
+					events.put("info", 0);
+					events.put("debug", 0);
+					events.put("warning", 0);
+					events.put("error", 0);
+					events.put("critical", 0);
+				}
+				
+				try
+				{
+					ZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+	    					 dbResults.getInt(2), 
+	    					 events,
+	    					 dbResults.getString(3),
+	    					 dbResults.getString(4)));
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+				}
+			}
+			
+			if(dbResults != null)
+				dbResults.close();
+			
+			mDatabaseOpenHelper.close();
+			return ZenossDevices;
+		}
+		else
+		{
+			if(dbResults != null)
+				dbResults.close();
+			
+			mDatabaseOpenHelper.close();
 			return null;
 		}
 	}
@@ -295,12 +345,17 @@ public class RhybuddDatabase
 			{
 				try
 				{
+					mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
 					Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
 				}
 				catch(Exception e)
 				{
 					BugSenseHandler.log("UpdateRhybuddDevices", e);
+				}
+				finally
+				{
+					mDatabaseOpenHelper.close();
 				}
 			}
 		}).start();
@@ -316,12 +371,20 @@ public class RhybuddDatabase
 			{
 				try
 				{
+					mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddEvents(ZenossEvents);
-					Log.i("UpdateRhybuddDevices","Finished updating the Events table");
+					Log.i("UpdateRhybuddEvents","Finished updating the Events table");
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					BugSenseHandler.log("UpdateRhybudddEvents", e);
+				}
+				finally
+				{
+					//Closing the DB
+					mDatabaseOpenHelper.close();
+					Log.i("UpdateRhybuddEvents","Update events table finally");
 				}
 			}
 		}).start();
@@ -333,6 +396,7 @@ public class RhybuddDatabase
 		mDatabaseOpenHelper.close();
 	}
 
+	
 	private static class RhybuddOpenHelper extends SQLiteOpenHelper 
 	{
 		private final Context mHelperContext;
@@ -478,7 +542,7 @@ public class RhybuddDatabase
 			int EventCount = 0;
 			
 			if(ZenossEvents != null)
-				ZenossEvents.size();
+				EventCount = ZenossEvents.size();
 			
 			try
 			{
@@ -516,7 +580,7 @@ public class RhybuddDatabase
 					{
 						e.printStackTrace();
 						//This could get a little excessive
-						BugSenseHandler.log("Database-refreshDevices", e);
+						BugSenseHandler.log("Database-refreshEvents", e);
 					}
 				}
 				mDatabase.setTransactionSuccessful();

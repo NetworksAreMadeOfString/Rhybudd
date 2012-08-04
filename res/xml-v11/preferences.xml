@@ -2,14 +2,14 @@
 
     <PreferenceCategory android:title="Background Polling">
 
-        <CheckBoxPreference
+        <SwitchPreference
                 android:key="refreshCache"
                 android:title="Cache Refresh"
                 android:summary="Checks Zenoss every ~30minutes to update the local database"
                 android:defaultValue="true"
                 />
         
-        <CheckBoxPreference
+        <SwitchPreference
                 android:key="AllowBackgroundService"
                 android:title="Events Alerting"
                 android:summary="Checks Zenoss for new events and raises notifications based on filters below" 
@@ -72,13 +72,13 @@
 		<CheckBoxPreference
                 android:key="onlyProductionEvents"
                 android:title="Production Only Querying"
-                android:summary="Only query for and display production events." 
+                android:summary="Only query for and list production events." 
                 android:defaultValue="true"
                 />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="Alert Filtering">
-        <CheckBoxPreference
+        <SwitchPreference
                 android:key="onlyProductionAlerts"
                 android:title="Production Only Alerting"
                 android:summary="Only raise an alert for production level events." 
@@ -86,9 +86,9 @@
                 android:dependency="AllowBackgroundService"
                 />
         
-		<CheckBoxPreference
+		<SwitchPreference
                 android:key="notificationSound"
-                android:title="Enable Audible Alerts"
+                android:title="Audible Alerts"
                 android:summary="When raising an Event alert use sound." 
                 android:defaultValue="true"
                 android:dependency="AllowBackgroundService"
@@ -97,8 +97,8 @@
 		<RingtonePreference 
 		    android:key="notificationSoundChoice"
 		    android:title="Notification Sound"
-		    android:ringtoneType="all"
 		    android:summary="Choose the Zenoss Event alert sound." 
+		    android:ringtoneType="all"
 		    android:dependency="notificationSound"
 		    />
     </PreferenceCategory>
@@ -133,7 +133,7 @@
                 android:inputType="textPassword"/>
             
             <PreferenceCategory android:title="HTTP Basic Authentication">
-	            <CheckBoxPreference
+	            <SwitchPreference
 	                    android:key="httpBasicAuth"
 	                    android:title="HTTP Basic Auth"
 	                    android:defaultValue="false"

@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -40,6 +41,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
@@ -48,6 +50,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -72,7 +75,7 @@ public class ZenossAPIv2
     
     //These don't get used directly
   	private DefaultHttpClient client;
-  	private SingleClientConnManager mgr;
+  	private ThreadSafeClientConnManager mgr;
   	private DefaultHttpClient httpclient;
   	
     @SuppressWarnings("rawtypes")
@@ -88,7 +91,8 @@ public class ZenossAPIv2
     	}
     	else
     	{
-    		httpclient = new DefaultHttpClient();
+    		this.PrepareHTTPClient();
+    		//httpclient = new DefaultHttpClient();
     	}
     	
     	if(!BAUser.equals("") || !BAPassword.equals(""))
@@ -133,6 +137,7 @@ public class ZenossAPIv2
 	// Constructor logs in to the Zenoss instance (getting the auth cookie)
     public ZenossAPIv2(String UserName, String Password, String URL) throws Exception 
     {
+    	//Test
     	this(UserName,Password,URL,"", "");
     }
     
@@ -156,10 +161,21 @@ public class ZenossAPIv2
         }*/
         
         registry.register(new Scheme("https", socketFactory, 443));
-        mgr = new SingleClientConnManager(client.getParams(), registry); 
-
+        //mgr = new SingleClientConnManager(client.getParams(), registry); 
+        mgr = new ThreadSafeClientConnManager(client.getParams(), registry); 
         httpclient = new DefaultHttpClient(mgr, client.getParams());
 	}
+    
+    private void PrepareHTTPClient()
+    {
+    	HttpParams params = new BasicHttpParams();
+    	client = new DefaultHttpClient(); 
+        SchemeRegistry registry = new SchemeRegistry();
+        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+
+        mgr = new ThreadSafeClientConnManager(params, registry);
+        httpclient = new DefaultHttpClient(mgr, client.getParams());
+    }
     
     public boolean getLoggedInStatus()
     {
@@ -378,6 +394,47 @@ public class ZenossAPIv2
     	return json;
 	}
 	
+	public JSONObject AcknowledgeEvents(List<String> EventIDs) throws JSONException, ClientProtocolException, IOException
+	{
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+    	
+    	JSONObject dataContents = new JSONObject();
+    	dataContents.put("excludeIds", new JSONObject());
+    	dataContents.put("selectState", null);
+    	dataContents.put("asof", (System.currentTimeMillis()/1000));
+    	
+    	JSONArray evids = new JSONArray();
+    	for(String EventID : EventIDs)
+    	{
+    		evids.put(EventID);
+    	}
+    	
+    	dataContents.put("evids", evids);
+    	
+        JSONObject params = new JSONObject();
+        params.put("severity", new JSONArray("[5, 4, 3, 2]"));
+        params.put("eventState", new JSONArray("[0, 1]"));
+        dataContents.put("params", params);
+        
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "acknowledge");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        httpost.setEntity(new StringEntity(reqData.toString()));
+    	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
+		JSONObject json = new JSONObject(ackEventReturnJSON);
+		Log.i("AcknowledgeEvent",json.toString(2));
+    	return json;
+	}
+	
 	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
 	{
 		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
@@ -552,7 +609,7 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        Log.i("GetEvents",eventsRawJSON);
+        //Log.i("GetEvents",eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);

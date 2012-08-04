@@ -29,16 +29,20 @@ import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class ZenossPoller extends Service
@@ -57,6 +61,7 @@ public class ZenossPoller extends Service
 	Handler eventsHandler;
 	int Delay;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	boolean EventsRefreshInProgress = false;
 	
 	@Override
 	public void onLowMemory()
@@ -85,11 +90,11 @@ public class ZenossPoller extends Service
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
-		if(rhybuddCache == null)
+		/*if(rhybuddCache == null)
 		{
 			//XXX Main thread safe?
 			rhybuddCache = new RhybuddDatabase(this);
-		}
+		}*/
 
 		eventsHandler = new Handler() 
     	{
@@ -112,7 +117,16 @@ public class ZenossPoller extends Service
     					}
     					
     					if(EventCount > 0)
-    	    				SendCombinedNotification(EventCount,CriticalList);
+    					{
+    						/*if(Build.VERSION.SDK_INT > 16)
+    						{
+    							SendInboxStyleNotification(EventCount);
+    						}
+    						else
+    						{*/
+    							SendCombinedNotification(EventCount,CriticalList);
+    						//}
+    					}
     				}
     				else
         			{
@@ -126,10 +140,24 @@ public class ZenossPoller extends Service
     			{
     				//TODO All manner of bad happened
     			}
+    			EventsRefreshInProgress = false;
     		}
     	};
 	}
 
+	/*public void SendInboxStyleNotification(int EventCount)
+	{
+		Builder test = new Notification.Builder(this)
+        .setContentTitle("5 New mails from ")
+        .setContentText("Something")
+        .setSmallIcon(R.drawable.ic_stat_alert)
+     .addLine("More Errors")
+     .addLine("More Errors")
+     .setContentTitle("New Zenoss Events ")
+     .setSummaryText("+3 more")
+     .build();	         
+	}*/
+	
 	@Override
 	public void onDestroy() 
 	{
@@ -144,7 +172,7 @@ public class ZenossPoller extends Service
 				BugSenseHandler.log("ZenossPoller", e);
 			}
 		}
-		if(rhybuddCache != null)
+		/*if(rhybuddCache != null)
 		{
 			try
 			{
@@ -154,7 +182,7 @@ public class ZenossPoller extends Service
 			{
 				BugSenseHandler.log("ZenossPoller", e);
 			}
-		}
+		}*/
 	}
 
 	@Override
@@ -166,6 +194,9 @@ public class ZenossPoller extends Service
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
+		//Just in case
+		SendStickyNotification();
+		
 		if(intent != null && intent.getBooleanExtra("events", false))
 		{
 			Log.i("onStartCommand","Received an intent to check for events");
@@ -185,11 +216,11 @@ public class ZenossPoller extends Service
 			Log.i("onStartCommand","Received an intent from the settings Activity");
 			PollerCheck();
 		}
-		else
+		/*else
 		{
 			Log.i("onStartCommand","I got started for no particular reason. I should probably do a refresh");
 			PollerCheck();
-		}
+		}*/
 
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
@@ -283,7 +314,23 @@ public class ZenossPoller extends Service
 		notification.flags |= Notification.FLAG_INSISTENT;
 		
 		if(settings.getBoolean("notificationSound", true))
-			notification.defaults |= Notification.DEFAULT_SOUND;
+		{
+			if(settings.getString("notificationSoundChoice", "").equals(""))
+			{
+				notification.defaults |= Notification.DEFAULT_SOUND;
+			}
+			else
+			{
+				try
+				{
+					notification.sound = Uri.parse(settings.getString("notificationSoundChoice", ""));
+				}
+				catch(Exception e)
+				{
+					notification.defaults |= Notification.DEFAULT_SOUND;
+				}
+			}
+		}
 
 		notification.ledARGB = 0xffff0000;
 
@@ -339,12 +386,22 @@ public class ZenossPoller extends Service
 				try 
 				{
 					if(API == null)
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					{
+						if(settings.getBoolean("httpBasicAuth", false))
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
+					}
 					
 					List<ZenossDevice> listOfZenossDevices = API.GetRhybuddDevices();
 					
 					if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
 					{
+						rhybuddCache = new RhybuddDatabase(ZenossPoller.this);
 						rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
 					}
 					else
@@ -376,6 +433,14 @@ public class ZenossPoller extends Service
 	
 	private void CheckForEvents()
 	{
+		if(EventsRefreshInProgress)
+		{
+			Log.i("CheckForEvents","Lock flag in place, skipping this iteration");
+			return;
+		}
+		//Flag must have been false let's set it!
+		EventsRefreshInProgress = true;
+		
 		EventCount = 0;
 		((Thread) new Thread(){
 			public void run()
@@ -386,7 +451,16 @@ public class ZenossPoller extends Service
 				try
 				{
     				if(API == null)
-    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+    				{
+    					if(settings.getBoolean("httpBasicAuth", false))
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
+    				}
 				}
 				catch(Exception e)
 				{
@@ -408,7 +482,14 @@ public class ZenossPoller extends Service
 						if(listOfZenossEvents!= null && listOfZenossEvents.size() > 0)
 						{
 							eventsHandler.sendEmptyMessage(1);
+							
+							if(rhybuddCache == null)
+							{
+								//XXX Main thread safe?
+								rhybuddCache = new RhybuddDatabase(ZenossPoller.this);
+							}
 							rhybuddCache.UpdateRhybuddEvents(listOfZenossEvents);
+							//rhybuddCache.Close();
 						}
 					}
 					else

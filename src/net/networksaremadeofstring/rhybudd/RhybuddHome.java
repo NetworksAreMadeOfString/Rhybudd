@@ -47,12 +47,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -80,6 +82,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	Thread dataPreload,AckEvent,dataReload;
 	volatile Handler handler, AckEventHandler;
 	ProgressDialog dialog;
+	AlertDialog alertDialog;
 	ListView list;
 	ZenossEventsAdaptor adapter;
 	Cursor dbResults = null;
@@ -126,18 +129,41 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 	}
 
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) 
+	{
+	    super.onConfigurationChanged(newConfig);
+	    setContentView(R.layout.rhybudd_home);
+	}
 
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 
+		
+		//TODO Delete this
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+        .detectDiskReads()
+        .detectDiskWrites()
+        .detectNetwork()   // or .detectAll() for all detectable problems
+        .penaltyLog()
+        .build());
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .penaltyLog()
+        .penaltyDeath()
+        .build());
+		//TODO Delete this
+		
+		
+		
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		actionbar = getSupportActionBar();
 		actionbar.setTitle("Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
 
 		setContentView(R.layout.rhybudd_home);
-
+		
 		//Clear any notifications event notifications 
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 
@@ -153,23 +179,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			finishStart(false);
 		}
-
-		/*((Thread) new Thread(){
-			public void run()
-			{
-				while(true)
-				{
-					Log.i("WhileLoopOfEvil","Running.....");
-					rhybuddCache.RefreshEvents();
-					try {
-						sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();*/
 	}
 
 	public void DBGetThread()
@@ -188,7 +197,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 				catch(Exception e)
 				{
 					e.printStackTrace();
-					tempZenossEvents.clear();
+					if(tempZenossEvents != null)
+						tempZenossEvents.clear();
 				}
 
 				if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
@@ -206,10 +216,22 @@ public class RhybuddHome extends SherlockFragmentActivity
 					if(tempZenossEvents != null)
 						tempZenossEvents.clear();
 
-					try
+					//Can we get away with just calling refresh now?
+					Refresh();
+					/*try
 					{
 						if(API == null)
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						{
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
+						}
+							
 					}
 					catch(Exception e)
 					{
@@ -264,7 +286,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 					catch(Exception e)
 					{
 						handler.sendEmptyMessage(999);
-					}
+					}*/
 				}
 			}
 		};
@@ -274,10 +296,25 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void Refresh()
 	{
 		Log.i("RhybuddHOMe","Performing a Direct API Refresh");
-		dialog = new ProgressDialog(this);
-		dialog.setMessage("Refreshing Events...");
-		dialog.setCancelable(false);
-		dialog.show();
+		try
+		{
+			if(dialog == null || !dialog.isShowing())
+			{
+				dialog = new ProgressDialog(this);
+			}
+			
+			dialog.setTitle("Querying Zenoss Directly");
+			dialog.setMessage("Refreshing Events...");
+			dialog.setCancelable(false);
+			
+			if(!dialog.isShowing())
+				dialog.show();
+		}
+		catch(Exception e)
+		{
+			//TODO Handle this and tell the user
+			Log.i("RhybuddHOMe","Error launching Dialog window");
+		}
 
 		((Thread) new Thread(){
 			public void run()
@@ -287,7 +324,16 @@ public class RhybuddHome extends SherlockFragmentActivity
 				try
 				{
 					if(API == null)
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					{
+						if(settings.getBoolean("httpBasicAuth", false))
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
+					}
 				}
 				catch(Exception e)
 				{
@@ -313,30 +359,37 @@ public class RhybuddHome extends SherlockFragmentActivity
 						}
 						else
 						{
+							// TODO Send a proper message
 							handler.sendEmptyMessage(999);
 						}
+					}
+					else
+					{
+						// TODO Send a proper message
+						handler.sendEmptyMessage(999);
 					}
 				} 
 				catch (ClientProtocolException e) 
 				{
-					// TODO Auto-generated catch block
+					// TODO Send a proper message
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				} 
 				catch (JSONException e) 
 				{
-					// TODO Auto-generated catch block
+					// TODO Send a proper message
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				} 
 				catch (IOException e) 
 				{
-					// TODO Auto-generated catch block
+					// TODO Send a proper message
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				}
 				catch(Exception e)
 				{
+					// TODO Send a proper message
 					handler.sendEmptyMessage(999);
 				}
 			}
@@ -361,6 +414,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			if(settings.getBoolean("AllowBackgroundService", false))
 			{
+				Log.i("RhybuddHome","Background polling is enabled so querying the DB");
 				DBGetThread();
 			}
 			else
@@ -484,9 +538,28 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else if(msg.what == 3 || msg.what == 999)
 				{
-					//TODO Dismiss this dialog and launch another with a cancel and a settings button
-					dialog.setMessage("An error was encountered. Please check your settings and try again.");
-					dialog.setCancelable(true);
+					if(dialog != null && dialog.isShowing())
+						dialog.dismiss();
+					
+					AlertDialog.Builder builder = new AlertDialog.Builder(RhybuddHome.this);
+					builder.setMessage("An error was encountered. Please check your settings and try again.")
+					       .setCancelable(false)
+					       .setPositiveButton("Edit Settings", new DialogInterface.OnClickListener() {
+					           public void onClick(DialogInterface dialog, int id) 
+					           {
+					        	   	Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
+					   				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
+					   				alertDialog.cancel();
+					           }
+					       })
+					       .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+					           public void onClick(DialogInterface dialog, int id) 
+					           {
+					        	   alertDialog.cancel();
+					           }
+					       });
+					alertDialog = builder.create();
+					alertDialog.show();
 				}
 				else
 				{
@@ -509,10 +582,31 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else if(msg.what == 1)
 				{
+					for (ZenossEvent evt : listOfZenossEvents)
+					{
+						if(!evt.getEventState().equals("Acknowledged"))
+						{
+							evt.setProgress(false);
+							evt.setAcknowledged();	
+						}
+					}
 					adapter.notifyDataSetChanged();
+				}
+				else if(msg.what == 99)
+				{
+					for (ZenossEvent evt : listOfZenossEvents)
+					{
+						if(!evt.getEventState().equals("Acknowledged"))
+						{
+							evt.setProgress(false);
+						}
+					}
+					adapter.notifyDataSetChanged();
+					Toast.makeText(getApplicationContext(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
 				}
 				else
 				{
+					
 					Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -539,19 +633,43 @@ public class RhybuddHome extends SherlockFragmentActivity
 	// of already selected items
 	public void addToCAB(int id)
 	{
-		if(mActionMode != null)
+		if(selectedEvents.contains(id))
 		{
-			selectedEvents.add(id);
-			listOfZenossEvents.get(id).SetSelected(true);
-			adapter.notifyDataSetChanged();
-			mActionMode.setTitle("Manage "+ selectedEvents.size()+" Events");
+			try
+			{
+				selectedEvents.remove(id);
+				listOfZenossEvents.get(id).SetSelected(false);
+				adapter.notifyDataSetChanged();
+				mActionMode.setTitle("Manage "+ selectedEvents.size()+" Events");
+			}
+			catch(Exception e)
+			{
+				BugSenseHandler.log("addToCAB", e);
+			}
 		}
 		else
 		{
-			selectedEvents.add(id);
-			listOfZenossEvents.get(id).SetSelected(true);
-			adapter.notifyDataSetChanged();
-			mActionMode = startActionMode(mActionModeCallback);
+			try
+			{
+				if(mActionMode != null)
+				{
+					selectedEvents.add(id);
+					listOfZenossEvents.get(id).SetSelected(true);
+					adapter.notifyDataSetChanged();
+					mActionMode.setTitle("Manage "+ selectedEvents.size()+" Events");
+				}
+				else
+				{
+					selectedEvents.add(id);
+					listOfZenossEvents.get(id).SetSelected(true);
+					adapter.notifyDataSetChanged();
+					mActionMode = startActionMode(mActionModeCallback);
+				}
+			}
+			catch(Exception e)
+			{
+				BugSenseHandler.log("addToCAB", e);
+			}
 		}
 	}
 
@@ -584,11 +702,14 @@ public class RhybuddHome extends SherlockFragmentActivity
 			{
 			case R.id.Acknowledge:
 			{
+				final List<String> EventIDs = new ArrayList<String>();
+				
 				for (final Integer i : selectedEvents)
 				{
 					listOfZenossEvents.get(i).setProgress(true);
-					AckEventHandler.sendEmptyMessage(0);
-					AckEvent = new Thread() 
+					EventIDs.add(listOfZenossEvents.get(i).getEVID());
+					
+					/*AckEvent = new Thread() 
 					{  
 						public void run() 
 						{
@@ -607,8 +728,39 @@ public class RhybuddHome extends SherlockFragmentActivity
 							}
 						}
 					};
-					AckEvent.start();
+					AckEvent.start();*/
 				}
+				AckEventHandler.sendEmptyMessage(0);
+				
+				AckEvent = new Thread() 
+				{  
+					public void run() 
+					{
+						try 
+						{
+							ZenossAPIv2 ackEventAPI;
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
+							ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
+							
+							//TODO Check it actually succeeded
+							AckEventHandler.sendEmptyMessage(1);
+						}
+						catch (Exception e)
+						{
+							BugSenseHandler.log("CABAcknowledge", e);
+							e.printStackTrace();
+							AckEventHandler.sendEmptyMessage(99);
+						}
+					}
+				};
+				AckEvent.start();
 				return true;
 			}
 
@@ -676,7 +828,6 @@ public class RhybuddHome extends SherlockFragmentActivity
 		case R.id.settings:
 		{
 			Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
-			//RhybuddHome.this.startActivity(SettingsIntent);
 			this.startActivityForResult(SettingsIntent, 99);
 			return true;
 		}
@@ -711,34 +862,50 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		case R.id.resolveall:
 		{
-			for (final ZenossEvent evt : listOfZenossEvents)
+			final List<String> EventIDs = new ArrayList<String>();
+			
+			
+			for (ZenossEvent evt : listOfZenossEvents)
 			{
 				if(!evt.getEventState().equals("Acknowledged"))
 				{
 					evt.setProgress(true);
 					AckEventHandler.sendEmptyMessage(0);
-					AckEvent = new Thread() 
-					{  
-						public void run() 
-						{
-							try 
-							{
-								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-								ackEventAPI.AcknowledgeEvent(evt.getEVID());//ackEventAPI
-								evt.setProgress(false);
-								evt.setAcknowledged();
-								AckEventHandler.sendEmptyMessage(1);
-							}
-							catch (Exception e)
-							{
-								e.printStackTrace();
-								AckEventHandler.sendEmptyMessage(99);
-							}
-						}
-					};
-					AckEvent.start();
+					EventIDs.add(evt.getEVID());	
 				}
 			}
+			
+			AckEventHandler.sendEmptyMessage(0);
+			
+			AckEvent = new Thread() 
+			{  
+				public void run() 
+				{
+					try 
+					{
+						ZenossAPIv2 ackEventAPI;
+						if(settings.getBoolean("httpBasicAuth", false))
+						{
+							ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
+						ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
+						
+						//TODO Check it actually succeeded
+						AckEventHandler.sendEmptyMessage(1);
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+						AckEventHandler.sendEmptyMessage(99);
+					}
+				}
+			};
+			AckEvent.start();
+			
 			return true;
 		}
 		case R.id.refresh:

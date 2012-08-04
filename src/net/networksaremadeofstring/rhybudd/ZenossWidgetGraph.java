@@ -19,6 +19,9 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,12 +39,14 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 public class ZenossWidgetGraph extends AppWidgetProvider
 {
@@ -54,13 +59,26 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 	Thread dataPreload;
 	volatile Handler handler = null;
 	int HighestCount = 0;
+	List<ZenossEvent> tempZenossEvents = new ArrayList<ZenossEvent>();
+	RhybuddDatabase rhybuddCache;
 	
 	public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
         if(settings == null)
 			settings = PreferenceManager.getDefaultSharedPreferences(context);
         
-        ProcessEvents();
+        
+        
+        try
+        {
+        	rhybuddCache = new RhybuddDatabase(context);
+        }
+        catch(Exception e)
+        {
+        	//Bugsense
+        }
+        
+        Refresh();
         
         handler = new Handler() 
     	{
@@ -74,7 +92,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 			        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget_graph);
 					//Intent intent = new Intent(context, rhestr.class);
 			        //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-	    		        
+			        
 					//Log.i("GraphWidget","Drawing Graph!");
 					for (int i=0; i<N; i++) 
 			        {
@@ -87,8 +105,112 @@ public class ZenossWidgetGraph extends AppWidgetProvider
     	};
     }
 	
+	private void Refresh()
+    {
+    	CritCount = 0;
+    	ErrCount = 0;
+    	WarnCount = 0;
+    	
+    	((Thread) new Thread() 
+		{  
+			public void run() 
+			{
+				try
+				{
+					tempZenossEvents = rhybuddCache.GetRhybuddEvents();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					//tempZenossEvents.clear();
+					tempZenossEvents = null;
+				}
+
+				if(tempZenossEvents!= null)
+				{
+					Log.i("CountWidget","Found DB Data!");
+					handler.sendEmptyMessage(1);
+				}
+				else
+				{
+					Log.i("CountWidget","No DB data found, querying API directly");
+					//handler.sendEmptyMessage(2);
+					try
+					{
+						if(API == null)
+						{
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
+						}
+						
+						try 
+						{
+							if(API != null)
+							{
+								tempZenossEvents = API.GetRhybuddEvents(true,
+										true,
+										true,
+										false,
+										false,
+										true);
+							}
+							else
+							{
+								tempZenossEvents = null;
+								handler.sendEmptyMessage(999);
+							}
+						}
+						catch(Exception e)
+						{
+							handler.sendEmptyMessage(999);
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
+				if(tempZenossEvents != null)
+				{
+					EventCount = tempZenossEvents.size();
+					
+					for(int i = 0; i < EventCount; i++)
+	    			{
+	    				if(tempZenossEvents.get(i).getSeverity().equals("5"))
+	    					CritCount++;
+	    				
+	    				if(tempZenossEvents.get(i).getSeverity().equals("4"))
+	    					ErrCount++;
+	    				
+	    				if(tempZenossEvents.get(i).getSeverity().equals("3"))
+	    					WarnCount++;
+	    			}
+					tempZenossEvents = null;
+					API = null;
+				}
+				
+				//No matter what send an update
+				//handler.sendEmptyMessage(0);
+				Message Msg = new Message();
+				Bundle data = new Bundle();
+				data.putInt("CritCount", CritCount);
+				data.putInt("ErrCount", ErrCount);
+				data.putInt("WarnCount", WarnCount);
+				Msg.setData(data);
+				Msg.what = 1;
+				handler.sendMessage(Msg);
+			}
+		}).start();
+    }
 	
-	private void ProcessEvents()
+	/*private void ProcessEvents()
 	{
 		dataPreload = new Thread() 
     	{  
@@ -175,7 +297,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
     	
     	
     	dataPreload.start();
-	}
+	}*/
 	
 	private Bitmap RenderBarGraph(int CritCount, int ErrCount, int WarnCount)
 	{
@@ -220,19 +342,22 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 		
 		double divisor = 148 / (double)Max;
 
+		paint.setAlpha(128);
+		
 		Rect rect = new Rect(32, (int)(148 - (divisor * CritCount)), 64, 148);  
-		paint.setColor(Color.RED ); 
+		paint.setColor(Color.argb(200, 208, 0, 0)); //red
 		
 		if(CritCount > 0)
 			canvas.drawRect(new RectF(rect), paint);
 		
 		rect = new Rect(128, (int)(148 - (divisor * ErrCount)), 160, 148);  
-		paint.setColor(Color.rgb(255, 102, 0));
+		paint.setColor(Color.argb(200,255, 102, 0));//orange
+		
 		if(ErrCount > 0)
 			canvas.drawRect(new RectF(rect), paint);
 		
 		rect = new Rect(224, (int)(148 - (divisor * WarnCount)), 256, 148);  
-		paint.setColor(Color.YELLOW ); 
+		paint.setColor(Color.argb(200, 255, 224, 57) ); //yellow
 		if(WarnCount > 0)
 			canvas.drawRect(new RectF(rect), paint);
 		

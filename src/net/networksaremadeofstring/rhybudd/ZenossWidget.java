@@ -123,17 +123,26 @@ public class ZenossWidget extends AppWidgetProvider
 
 				if(tempZenossEvents!= null)
 				{
-					Log.i("DeviceList","Found DB Data!");
+					Log.i("CountWidget","Found DB Data!");
 					handler.sendEmptyMessage(1);
 				}
 				else
 				{
-					Log.i("Widget","No DB data found, querying API directly");
+					Log.i("CountWidget","No DB data found, querying API directly");
 					//handler.sendEmptyMessage(2);
 					try
 					{
 						if(API == null)
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						{
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
+						}
 						
 						try 
 						{
@@ -186,92 +195,5 @@ public class ZenossWidget extends AppWidgetProvider
 				handler.sendEmptyMessage(0);
 			}
 		}).start();
-    	
-    	/*dataPreload = new Thread() 
-    	{  
-    		public void run() 
-    		{
-    			//Log.i("Widget","Started!");
-    			CritCount = 0;
-    			WarnCount = 0;
-    			ErrCount = 0;
-    			
-    			try 
-    			{
-    				if(API == null)
-    				{
-    					//Log.i("Widget",settings.getString("userName", "No User Name"));
-    					API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-    				}
-    				
-    				try
-    				{
-    					EventsObject = API.GetEvents(true,true,true,true,true, true,false);
-    					if(EventsObject == null)
-    					{
-    						EventsObject = API.GetEvents(true,true,true,true,true,true,true);
-    					}
-    				}
-    				catch(Exception e)
-    				{
-    					
-    				}
-    				
-	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
-				} 
-    			catch (Exception e) 
-    			{
-    				handler.sendEmptyMessage(0);
-    				//e.printStackTrace();
-				}
-    			
-				try 
-				{
-					if(EventsObject != null)
-					{
-						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-						
-						for(int i = 0; i < EventCount; i++)
-		    			{
-		    				JSONObject CurrentEvent = null;
-		    				try 
-		    				{
-			    				CurrentEvent = Events.getJSONObject(i);
-			    				
-			    				if(CurrentEvent.getString("severity").equals("5"))
-			    					CritCount++;
-			    				
-			    				if(CurrentEvent.getString("severity").equals("4"))
-			    					ErrCount++;
-			    				
-			    				if(CurrentEvent.getString("severity").equals("3"))
-			    					WarnCount++;
-		    				}
-		    				catch (JSONException e) 
-		    				{
-		    					//e.printStackTrace();
-		    				}
-		    			}
-						
-						handler.sendEmptyMessage(0);
-					}
-					else
-					{
-	    				handler.sendEmptyMessage(0);
-					}
-				} 
-				catch (JSONException e) 
-				{
-    				handler.sendEmptyMessage(0);
-    				//e.printStackTrace();
-				}
-				
-				//Help out the garbage collector
-				EventsObject = null;
-				Events = null;
-				API = null;
-				dataPreload = null;
-    		}
-    	};*/
     }
 }

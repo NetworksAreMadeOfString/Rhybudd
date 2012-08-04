@@ -326,7 +326,14 @@ public class ViewZenossEvent extends SherlockActivity
 				{
 					if(API == null)
 					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						if(settings.getBoolean("httpBasicAuth", false))
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+						}
+						else
+						{
+							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+						}
 					}
 
 					EventObject = API.GetEvent(getIntent().getStringExtra("EventID"));
