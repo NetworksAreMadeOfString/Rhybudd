@@ -1,11 +1,15 @@
-<RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#929ba4">
-
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background_gradient_3" >
+
      <RelativeLayout
          android:id="@+id/searchContainer"
          android:layout_width="fill_parent"
          android:layout_height="64dp"
          android:layout_centerHorizontal="true"
-         android:background="#6b7681" >
+         android:background="@color/ZenossLightBlack" >
 
          <EditText
              android:id="@+id/searchTermEditText"
@@ -39,8 +43,18 @@
              android:layout_alignTop="@+id/searchTermEditText"
              android:text="@string/searchButton" />
      </RelativeLayout>
-     
-     <ListView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@+id/searchContainer" android:layout_centerHorizontal="true" android:id="@+id/searchResultsListView" android:background="#929ba4" android:cacheColorHint="#929ba4" android:fadingEdge="none" android:divider="#6b7681" android:dividerHeight="2dp"></ListView>
+     
+     <ListView
+         android:id="@+id/searchResultsListView"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/searchContainer"
+         android:layout_centerHorizontal="true"
+         android:cacheColorHint="#929ba4"
+         android:divider="#6b7681"
+         android:dividerHeight="2dp"
+         android:fadingEdge="none" >
+</ListView>
      
      
      

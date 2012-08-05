@@ -391,6 +391,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		if(firstRun)
 		{
+			//TODO Remove as the callback handles this
 			intent.putExtra("settingsUpdate", true);
 			startService(intent);
 			//Refresh();
@@ -398,12 +399,12 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 		else
 		{
-			if(settings.getBoolean("AllowBackgroundService", false))
+			if(settings.getBoolean("AllowBackgroundService", true))
 			{
 				Log.i("RhybuddHome","Background polling is enabled so querying the DB");
 				DBGetThread();
 			}
-			else
+			else//TODO Remove as the DB query will always fall back to doing a direct API call
 			{
 				Log.i("RhybuddHome","Doing a direct call to the API");
 				Refresh();

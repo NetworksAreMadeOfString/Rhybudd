@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/resolveall" android:title="Resolve All" android:showAsAction="always" android:titleCondensed="Resolve" android:icon="@drawable/ic_action_resolve_all"></item>
-    <item android:id="@+id/Help" android:icon="@drawable/ic_action_info" android:title="@string/homeMenu_Help" android:showAsAction="always"></item>
+    
     <item android:id="@+id/escalate" android:icon="@drawable/ic_action_share" android:title="Escalate Event" android:showAsAction="always" android:titleCondensed="Escalate"></item>
-    <item android:id="@+id/refresh" android:icon="@drawable/ic_action_refresh" android:title="Refresh" android:showAsAction="always"></item>
+    <item android:id="@+id/refresh" android:icon="@drawable/ic_action_refresh" android:title="Refresh" android:showAsAction="always"></item><item android:id="@+id/devices" android:icon="@drawable/ic_action_devices" android:title="Infrastructure" android:titleCondensed="Devices" android:showAsAction="always"></item>
     <item android:id="@+id/cache" android:icon="@drawable/ic_action_cache" android:title="@string/homeMenu_ManageDB"></item>
     <item android:id="@+id/settings" android:title="Settings" android:icon="@drawable/ic_action_settings"></item>
-    <item android:id="@+id/devices" android:icon="@drawable/ic_action_devices" android:title="Infrastructure" android:titleCondensed="Devices"></item>
-    <item android:id="@+id/search" android:title="Search" android:icon="@drawable/ic_action_search"></item> 
+    
+    <item android:id="@+id/search" android:title="Search" android:icon="@drawable/ic_action_search"></item><item android:id="@+id/Help" android:icon="@drawable/ic_action_info" android:title="@string/homeMenu_Help"></item> 
 </menu>

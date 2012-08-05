@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -59,6 +60,7 @@ public class ZenossPoller extends Service
 	Handler eventsHandler;
 	int Delay;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
+	List<String> EventDetails = new ArrayList<String>();
 	boolean EventsRefreshInProgress = false;
 	Notification stickyNotification;
 	
@@ -102,6 +104,7 @@ public class ZenossPoller extends Service
     			if(msg.what == 1)
     			{
     				onlyAlertOnProd = settings.getBoolean("onlyProductionAlerts", true);
+    				EventDetails.clear();
     				
     				Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
     				if(listOfZenossEvents != null && listOfZenossEvents.size() > 0)
@@ -111,20 +114,21 @@ public class ZenossPoller extends Service
     					{
     						if(alertsEnabled && event.isNew() && CheckIfNotify(event.getProdState(), event.getDevice()))
     	    				{
+    							EventDetails.add(event.getDevice() + ": " + event.getSummary());
     	    					EventCount++;
     	    				}
     					}
     					
     					if(EventCount > 0)
     					{
-    						/*if(Build.VERSION.SDK_INT > 16)
+    						if(Build.VERSION.SDK_INT >= 16)
     						{
     							SendInboxStyleNotification(EventCount);
     						}
     						else
-    						{*/
+    						{
     							SendCombinedNotification(EventCount,CriticalList);
-    						//}
+    						}
     					}
     				}
     				else
@@ -144,19 +148,6 @@ public class ZenossPoller extends Service
     	};
 	}
 
-	/*public void SendInboxStyleNotification(int EventCount)
-	{
-		Builder test = new Notification.Builder(this)
-        .setContentTitle("5 New mails from ")
-        .setContentText("Something")
-        .setSmallIcon(R.drawable.ic_stat_alert)
-     .addLine("More Errors")
-     .addLine("More Errors")
-     .setContentTitle("New Zenoss Events ")
-     .setSummaryText("+3 more")
-     .build();	         
-	}*/
-	
 	@Override
 	public void onDestroy() 
 	{
@@ -355,6 +346,45 @@ public class ZenossPoller extends Service
 		mNM.notify(43523, notification);//NotificationID++ 
 	}
 	
+	@TargetApi(16)
+	private void SendInboxStyleNotification(int EventCount)
+	{
+		String Event1 = "--", Event2 = "---";
+		//Log.i("EventCount",Integer.toString(EventCount));
+		int remainingCount = 0;
+		
+		Intent notificationIntent = new Intent(this, RhybuddHome.class);
+		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		notificationIntent.putExtra("forceRefresh", true);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+			
+		if(EventDetails.size() > 1)
+		{
+			Event1 = EventDetails.get(0);
+			Event2 = EventDetails.get(1);
+			remainingCount = EventCount - 2;
+		}
+		else
+		{
+			Event1 = EventDetails.get(0);
+			remainingCount = EventCount - 1;
+		}
+		
+		Notification notification = new Notification.InboxStyle(
+			      new Notification.Builder(this)
+			         .setContentTitle(Integer.toString(EventCount) + " New Zenoss Alerts")
+			         .setContentText("Click to start Rhybudd")
+			         .setSmallIcon(R.drawable.ic_stat_alert)
+					 .setContentIntent(contentIntent))
+			      .addLine(Event1)
+			      .addLine(Event2)
+			      .setBigContentTitle(Integer.toString(EventCount) + " New Zenoss Alerts")
+			      .setSummaryText("+"+Integer.toString(remainingCount)+" more")
+			      .build();
+
+		mNM.notify(43523, notification);
+			 
+	}
 	private void SendNotification(String EventSummary,int Severity)
 	{
 		Notification notification = new Notification(R.drawable.ic_stat_alert, "New Zenoss Events!", System.currentTimeMillis());

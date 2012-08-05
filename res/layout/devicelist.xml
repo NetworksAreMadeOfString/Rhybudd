@@ -4,17 +4,18 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_gradient_3" >
-
+
         <ListView
             android:id="@+id/ZenossDeviceList"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:cacheColorHint="#929ba4"
+            android:cacheColorHint="@color/RhybuddWhite"
             android:fadingEdge="vertical"
             android:fastScrollEnabled="true"
             android:isScrollContainer="true" >
+
         </ListView>
 
         <RelativeLayout

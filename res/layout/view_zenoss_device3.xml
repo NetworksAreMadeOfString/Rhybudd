@@ -1,8 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/background_view_device" >
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/viewDeviceContainer"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#FFFFFF" >
+    android:layout_height="fill_parent" >
 
     <RelativeLayout
         android:id="@+id/GeneralDetailsGrid"
@@ -177,7 +184,9 @@
             android:text="Gareth@NetworksAreMadeOfString.co.uk"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
-
+
+
+
     <RelativeLayout
         android:id="@+id/EventsGrid"
         android:layout_width="fill_parent"
@@ -247,7 +256,11 @@
             android:layout_below="@+id/SystemsTitle"
             android:text="Small Text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
+
+
+
         <TextView
             android:id="@+id/eventsTitle"
             android:layout_width="wrap_content"
@@ -257,7 +270,9 @@
             android:text="Events:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
+
         <ListView
             android:id="@+id/ZenossEventsList"
             android:layout_width="match_parent"
@@ -270,3 +285,5 @@
     </RelativeLayout>
 
 </RelativeLayout>
+        
+    </ScrollView>

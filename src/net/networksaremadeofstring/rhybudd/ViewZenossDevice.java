@@ -347,7 +347,7 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 						else
 						{
-							//Log.i("eventsLoad","Had a problem; EventsObject was null");
+							Log.i("eventsLoad","Had a problem; EventsObject was null");
 							//eventsHandler.sendEmptyMessage(0);
 						}
 					} 

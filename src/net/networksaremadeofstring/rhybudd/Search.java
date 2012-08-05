@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -224,5 +226,21 @@ public class Search extends SherlockActivity
 		Intent ViewDeviceIntent = new Intent(Search.this, ViewZenossDevice.class);
 		ViewDeviceIntent.putExtra("UID", UID);
 		startActivity(ViewDeviceIntent);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case android.R.id.home:
+	        {
+	        	//No need for crazy intents
+	        	finish();
+	            
+	            return true;
+	        }
+	        
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 }
