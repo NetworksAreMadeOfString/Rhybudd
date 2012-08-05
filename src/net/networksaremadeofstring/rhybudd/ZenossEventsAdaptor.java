@@ -42,18 +42,18 @@ public class ZenossEventsAdaptor extends BaseAdapter
 {
 	private Context context;
     private List<ZenossEvent> listZenossEvents;
-    private Boolean isRhestr = true;
+    boolean isRhestr = true;
     private OnClickListener listener;
     private OnLongClickListener listenerLong;
     private OnClickListener cablistener;
     
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-	Date date;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	Calendar date;
 	String strDate = "";
 	Date today = Calendar.getInstance().getTime();
 	String[] shortMonths = new DateFormatSymbols().getShortMonths();
     
-    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, Boolean _isRhestr) 
+    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, boolean _isRhestr) 
     {
         this.context = context;
         this.listZenossEvents = _listZenossEvents;
@@ -100,7 +100,26 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         try 
 		{
-			date = sdf.parse(Event.getlastTime());
+			
+			date = Calendar.getInstance();
+			date.setTime(sdf.parse(Event.getlastTime()));
+			if(date.before(today) )
+			{
+				strDate = date.get(Calendar.DAY_OF_MONTH) + " " + date.get(Calendar.MONTH);
+			}
+			else
+			{
+				if(date.get(Calendar.MINUTE) < 10)
+				{
+					strDate = date.get(Calendar.HOUR_OF_DAY) + ":0" + Integer.toString(date.get(Calendar.MINUTE));
+				}
+				else
+				{
+					strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
+				}
+			}
+			
+			/*date = sdf.parse(Event.getlastTime());
 			if(date.getDate() < today.getDate())
 			{
 				strDate = date.getDate() + " " + shortMonths[date.getMonth()];
@@ -115,7 +134,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
 				{
 					strDate = date.getHours() + ":" + date.getMinutes();
 				}
-			}
+			}*/
 		} 
 		catch (Exception e) 
 		{

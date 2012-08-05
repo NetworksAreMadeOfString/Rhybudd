@@ -109,7 +109,7 @@ public class DeviceList extends SherlockActivity
 	}
 	
 	/** Called when the activity is first created. */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
     public void onCreate(Bundle savedInstanceState) 
     {

@@ -18,15 +18,9 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;

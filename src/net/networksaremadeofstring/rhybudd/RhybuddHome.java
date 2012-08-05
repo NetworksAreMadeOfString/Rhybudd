@@ -19,19 +19,12 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
@@ -39,7 +32,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -54,7 +46,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -64,7 +55,6 @@ import android.view.View.OnLongClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class RhybuddHome extends SherlockFragmentActivity 
 {
@@ -153,7 +143,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		actionbar = getSupportActionBar();
-		actionbar.setTitle("Events List");
+		actionbar.setTitle("Rhybudd Events List");
 		actionbar.setSubtitle(settings.getString("URL", ""));
 
 		setContentView(R.layout.rhybudd_home);
@@ -642,8 +632,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 		mActionMode = startActionMode(mActionModeCallback);
 	}
 
-	//TODO Prevent the cab number from increasing / repeatedly adding to selectedEvents
-	// of already selected items
+	/**
+	 * Starts a Contextual Action Bar or adds to the array of items
+	 * to be processed by the CAB
+	 * @param id The position in the listOfZenossEvents / listview
+	 */
 	public void addToCAB(int id)
 	{
 		if(selectedEvents.contains(id))

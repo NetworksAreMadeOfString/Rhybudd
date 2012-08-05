@@ -19,20 +19,13 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
-import com.bugsense.trace.BugSenseHandler;
-
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,16 +33,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class Search extends SherlockActivity
@@ -72,10 +59,7 @@ public class Search extends SherlockActivity
 	{
 		super.onCreate(savedInstanceState);
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.search);
-		//((TextView)findViewById(R.id.HomeHeaderTitle)).setTypeface(Typeface.createFromAsset(this.getAssets(), "fonts/chivo.ttf"));
-
 
 		actionbar = getSupportActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
@@ -96,31 +80,6 @@ public class Search extends SherlockActivity
 			}	
 		}
 				);
-
-		/*ImageView showSearchButton = (ImageView) findViewById(R.id.showSearchImageView);
-        showSearchButton.setClickable(true);
-        showSearchButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) 
-			{
-				RelativeLayout searchContainer = (RelativeLayout) findViewById(R.id.searchContainer);
-
-				if(searchContainer.isShown())
-				{
-					anim = AnimationUtils.loadAnimation(Search.this, android.R.anim.fade_out);
-					anim.setDuration(500);
-					searchContainer.setAnimation(anim);
-					searchContainer.setVisibility(8);
-				}
-				else
-				{
-					anim = AnimationUtils.loadAnimation(Search.this, android.R.anim.fade_in);
-					anim.setDuration(500);
-					searchContainer.setAnimation(anim);
-					searchContainer.setVisibility(0);
-				}
-			}
-        });*/
 
 
 		Intent intent = getIntent();
@@ -188,33 +147,6 @@ public class Search extends SherlockActivity
 		{  
 			public void run() 
 			{
-				//searchResultsHandler.sendEmptyMessage(99);
-
-				/*String Filter = "name like \"%"+query.replaceAll(" ", "%")+"%\"";
-
-    			SQLiteDatabase rhybuddCache = Search.this.openOrCreateDatabase("rhybuddCache", MODE_PRIVATE, null);
-
-    			Cursor dbResults = rhybuddCache.query("devices",new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},Filter, null, null, null, null);
-
-    			while(dbResults.moveToNext())
-    			{
-    				HashMap<String, Integer> events = new HashMap<String, Integer>();
-					events.put("info", dbResults.getInt(5));
-					events.put("debug", dbResults.getInt(6));
-					events.put("warning", dbResults.getInt(7));
-					events.put("error", dbResults.getInt(8));
-					events.put("critical", dbResults.getInt(9));
-
-    				listOfZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-    						dbResults.getInt(2), 
-    						events,
-    						dbResults.getString(3),
-    						dbResults.getString(4)));
-    			}
-    			dbResults.close();
-    			rhybuddCache.close();*/
-
-
 				listOfZenossDevices.clear();
 				try
 				{

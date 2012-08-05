@@ -30,9 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -49,7 +47,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
@@ -60,10 +57,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.bugsense.trace.BugSenseHandler;
-
-import android.content.ContentValues;
 import android.util.Log;
 
 //TODO This needs some serious genericisation to remove all the duplicated code
@@ -298,12 +292,19 @@ public class ZenossAPIv2
 					IPAddress = 0;
 				}
 				
-				//TODO Things could still go wrong here
-				ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
-						IPAddress,
-						events,
-						CurrentDevice.getString("name"),
-						CurrentDevice.getString("uid")));
+				try
+				{
+					ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
+							IPAddress,
+							events,
+							CurrentDevice.getString("name"),
+							CurrentDevice.getString("uid")));
+				}
+				catch(JSONException j)
+				{
+					//Don't care - keep going no point losing all devices
+					BugSenseHandler.log("GetRhybuddDevices", j);
+				}
 			}
 			catch (JSONException j)
 			{
@@ -349,7 +350,10 @@ public class ZenossAPIv2
         reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	String rawDevicesJSON = httpclient.execute(httpost, responseHandler);
+    	//String rawDevicesJSON = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String rawDevicesJSON = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
 		JSONObject json = new JSONObject(rawDevicesJSON);
     	return json; 
 	}
@@ -429,7 +433,12 @@ public class ZenossAPIv2
         reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
+        
+    	//String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String ackEventReturnJSON = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        
 		JSONObject json = new JSONObject(ackEventReturnJSON);
 		Log.i("AcknowledgeEvent",json.toString(2));
     	return json;
@@ -442,7 +451,6 @@ public class ZenossAPIv2
 		//FIXME Makes a valid call to the API but this breaks on 4.x ( JIRA #ZEN-2812 )
 		JSONObject jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,false);
 		
-		//Log.i("GetRhybuddEvents",jsonEvents.toString(3));
 		JSONArray Events = null;
 		try
 		{
@@ -560,7 +568,6 @@ public class ZenossAPIv2
 		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41);
 	}
 	
-    @SuppressWarnings("unchecked")
 	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
     {
     	//Log.i("Test:", Severity);
@@ -609,14 +616,12 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        //Log.i("GetEvents",eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);
     	return json;
     }
     
-    @SuppressWarnings("unchecked")
 	public JSONObject GetEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
     {
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -664,7 +669,6 @@ public class ZenossAPIv2
     	return json;
     }
     
-    @SuppressWarnings("unchecked")
 	public Boolean AddEventLog(String _EventID, String Message) throws JSONException, ClientProtocolException, IOException
     {
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -738,7 +742,6 @@ public class ZenossAPIv2
 		return json;
        }
     
-    @SuppressWarnings("unchecked")
 	public JSONObject GetDevice(String UID) throws JSONException, ClientProtocolException, IOException
     {
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/device_router");
@@ -775,7 +778,6 @@ public class ZenossAPIv2
     	return json;
     }
     
-    @SuppressWarnings("unchecked")
 	public JSONObject GetDeviceEvents(String UID) throws JSONException, ClientProtocolException, IOException
     {
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/evconsole_router");

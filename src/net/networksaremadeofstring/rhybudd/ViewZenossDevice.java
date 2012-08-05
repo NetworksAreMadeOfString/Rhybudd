@@ -41,7 +41,6 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ViewZenossDevice extends SherlockActivity
@@ -131,6 +130,8 @@ public class ViewZenossDevice extends SherlockActivity
 						try
 						{
 							((TextView) findViewById(R.id.deviceID)).setText(DeviceDetails.getString("snmpSysName").toUpperCase());
+							//actionbar.setTitle(DeviceDetails.getString("snmpSysName"));
+							actionbar.setSubtitle(DeviceDetails.getString("snmpSysName"));
 						}
 						catch(Exception e)
 						{
@@ -334,7 +335,11 @@ public class ViewZenossDevice extends SherlockActivity
 								}
 								catch (JSONException e) 
 								{
-									Log.e("API - Stage 2 - Inner", e.getMessage());
+									//Log.e("API - Stage 2 - Inner", e.getMessage());
+								}
+								catch(Exception e)
+								{
+									BugSenseHandler.log("ViewZenossDevice-EventsLoop", e);
 								}
 							}
 
@@ -342,19 +347,21 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 						else
 						{
-							Log.i("eventsLoad","Had a problem; EventsObject was null");
+							//Log.i("eventsLoad","Had a problem; EventsObject was null");
 							//eventsHandler.sendEmptyMessage(0);
 						}
 					} 
 					catch (JSONException e) 
 					{
-						e.printStackTrace();
+						//e.printStackTrace();
+						BugSenseHandler.log("ViewZenossDevice-Events", e);
 						eventsHandler.sendEmptyMessage(0);
 					}
 				} 
 				catch (Exception e) 
 				{
-					Log.e("API - Stage 1", e.getMessage());
+					//Log.e("API - Stage 1", e.getMessage());
+					BugSenseHandler.log("ViewZenossDevice-Events", e);
 					eventsHandler.sendEmptyMessage(0);
 				}
 			}

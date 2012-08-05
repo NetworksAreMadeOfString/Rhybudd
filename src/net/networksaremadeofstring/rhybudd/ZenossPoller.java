@@ -29,7 +29,6 @@ import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -42,7 +41,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class ZenossPoller extends Service
@@ -91,9 +89,9 @@ public class ZenossPoller extends Service
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
+		//TODO Remove?
 		/*if(rhybuddCache == null)
 		{
-			//XXX Main thread safe?
 			rhybuddCache = new RhybuddDatabase(this);
 		}*/
 
@@ -278,7 +276,8 @@ public class ZenossPoller extends Service
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
+	public IBinder onBind(Intent intent) 
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -319,8 +318,6 @@ public class ZenossPoller extends Service
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-		
-		
 		
 		if(settings.getBoolean("notificationSound", true))
 		{
