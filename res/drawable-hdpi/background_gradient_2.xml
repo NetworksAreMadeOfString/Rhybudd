@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
 <gradient
-    android:startColor="#aeb2b7"
-    android:endColor="#929ba4"
+    android:startColor="@color/RhybuddGradientStart"
+    android:endColor="@color/RhybuddGradientStop"
     android:gradientRadius="326"
     android:type="radial"/>
 </shape>

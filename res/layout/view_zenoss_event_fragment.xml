@@ -1,0 +1,190 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout2"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+    <View
+        android:id="@+id/Background"
+        android:layout_width="8dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/event_fragment_border" />
+
+    <TextView
+        android:id="@+id/EventTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="8dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="Title"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold" >
+
+</TextView>
+
+    <TextView
+        android:id="@+id/ComponantLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/EventTitle"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsComponentLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+
+    <TextView
+        android:id="@+id/Componant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/ComponantLabel"
+        android:layout_marginLeft="12dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="TextView"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#FFFFFF" >
+</TextView>
+
+    <TextView
+        android:id="@+id/EventClassLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/Componant"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsEventClassLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+    <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:text="TextView" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/EventClassLabel" android:layout_alignLeft="@+id/Componant" android:id="@+id/EventClass" android:textColor="#FFFFFF" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+
+    <TextView
+        android:id="@+id/SummaryLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/EventClass"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsSummaryLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+    <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:text="TextView" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/SummaryLabel" android:layout_alignLeft="@+id/EventClass" android:id="@+id/Summary" android:textColor="#FFFFFF" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+
+    <TextView
+        android:id="@+id/StartTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/Summary"
+        android:layout_marginTop="24dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsFirstSeenLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+
+    <TextView
+        android:id="@+id/EndTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/StartTimeLabel"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailslastSeenLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+    <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/FirstTime" android:text="...." android:layout_toRightOf="@+id/StartTimeLabel" android:layout_alignBaseline="@+id/StartTimeLabel" android:layout_marginLeft="8dp" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+    <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/EndTimeLabel" android:layout_alignBottom="@+id/EndTimeLabel" android:id="@+id/LastTime" android:text="...." android:layout_toRightOf="@+id/EndTimeLabel" android:layout_marginLeft="11dp" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+
+    <TextView
+        android:id="@+id/EventCountLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/EndTimeLabel"
+        android:layout_marginTop="8dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsEventCountLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+    <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/EventCountLabel" android:layout_alignBottom="@+id/EventCountLabel" android:layout_toRightOf="@+id/EventCountLabel" android:id="@+id/EventCount" android:text="0" android:layout_marginLeft="20dp" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+
+    <TextView
+        android:id="@+id/AgentLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EventTitle"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@+id/EventCountLabel"
+        android:layout_marginTop="8dp"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsAgentLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+
+</TextView>
+    <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_alignBaseline="@+id/AgentLabel" android:layout_alignBottom="@+id/AgentLabel" android:layout_toRightOf="@+id/AgentLabel" android:id="@+id/Agent" android:text="unknown" android:layout_marginLeft="20dp" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
+
+    <LinearLayout
+        android:id="@+id/ButtonHolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Agent"
+        android:layout_centerHorizontal="true" >
+
+        <Button
+            android:id="@+id/AcknowledgeEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Acknowledge" />
+
+    </LinearLayout>
+
+</RelativeLayout>

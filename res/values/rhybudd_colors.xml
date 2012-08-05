@@ -6,4 +6,21 @@
         <color name="WarningOrange">#FF7F00</color>
         <color name="WarningRed">#FF0000</color>
         <color name="WarningGreen">#458B00</color>
+        <color name="subFragmentBlue">#66696b</color>
+       	
+        
+        
+        <color name="RhybuddWhite">#eeeeee</color>
+        <color name="RhybuddStdText">#767676</color>
+        <color name="RhybuddDarkText">#585858</color>
+        <color name="RhybuddGradientStart">#aeb2b7</color>
+        <color name="RhybuddGradientStop">#929ba4</color>
+        
+        <color name="ZenossLightGray">#b9b9b9</color>
+        <color name="ZenossDarkGray">#9a9a9a</color>
+        <color name="ZenossLightBlack">#6d6d6d</color>
+        <color name="ZenossDarkBlack">#333333</color>
+        <color name="ZenossLightBlue">#b5b8c8</color>
+        <color name="ZenossDarkBlue">#7199c6</color>
+        <color name="ZenossWhite">#ffffff</color>
 </resources>

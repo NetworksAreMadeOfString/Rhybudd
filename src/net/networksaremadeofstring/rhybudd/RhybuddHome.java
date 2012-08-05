@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -47,11 +48,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -80,7 +84,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 	int requestCode; //Used for evaluating what the settings Activity returned (Should always be 1)
 	RhybuddDatabase rhybuddCache;
 	ActionMode mActionMode;
-
+	FragmentManager fragmentManager;
+	FragmentTransaction fragmentTransaction;
+	boolean FragmentVisible = false;
+	
 	@Override
 	public void onDestroy()
 	{
@@ -123,17 +130,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onConfigurationChanged(Configuration newConfig) 
 	{
 		super.onConfigurationChanged(newConfig);
-		//setContentView(R.layout.rhybudd_home);
 		Log.i("onConfigurationChanged","Now sending handler");
 		
-		/*if(handler != null)
-		{
-			handler.sendEmptyMessage(0);
-		}
-		else
-		{
-			Log.e("onConfigurationChanged","handler was null");
-		}*/
+		setContentView(R.layout.rhybudd_home);
+		finishStart(false);
 	}
 
 	public void onCreate(Bundle savedInstanceState) 
@@ -442,13 +442,23 @@ public class RhybuddHome extends SherlockFragmentActivity
 						//Sigh
 					}
 
+					
 					OnClickListener listener = new OnClickListener()
 					{
 						public void onClick(View v) 
 						{
 							try
 							{
-								ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+								//Check if we are in a big layout
+								FrameLayout EventDetailsFragmentHolder = (FrameLayout) findViewById(R.id.EventDetailsFragment);
+								if(EventDetailsFragmentHolder == null)
+								{
+									ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+								}
+								else
+								{
+									LoadEventDetailsFragment((Integer) v.getTag(R.integer.EventPositionInList));
+								}
 							}
 							catch(Exception e)
 							{
@@ -986,6 +996,31 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 	}
 
+	public void LoadEventDetailsFragment(int Position)
+	{
+		fragmentManager = getSupportFragmentManager();
+		fragmentTransaction = fragmentManager.beginTransaction();
+		
+		SherlockFragment fragment = new ViewEventFragment();
+		Bundle args = new Bundle();
+		
+		args.putInt("Position", Position);
+	    args.putString("Device", listOfZenossEvents.get(Position).getDevice());
+	    args.putString("Component", listOfZenossEvents.get(Position).getComponentText());
+	    args.putString("EventClass", listOfZenossEvents.get(Position).geteventClass());
+	    args.putString("Summary", listOfZenossEvents.get(Position).getSummary());
+	    args.putString("FirstSeen", listOfZenossEvents.get(Position).getfirstTime());
+	    args.putString("LastSeen", listOfZenossEvents.get(Position).getlastTime());
+	    args.putInt("EventCount", listOfZenossEvents.get(Position).getCount());
+	    
+		fragment.setArguments(args);
+		fragmentTransaction.replace(R.id.EventDetailsFragment, fragment);
+		fragmentTransaction.commit();
+		
+		((FrameLayout) findViewById(R.id.EventDetailsFragment)).setVisibility(View.VISIBLE);
+		FragmentVisible = true;
+	}
+	
 	public void ManageEvent(final String EventID, final int Position, final int viewID)
 	{
 		AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
@@ -995,7 +1030,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			public void onClick(DialogInterface arg0, int arg1) 
 			{
-				listOfZenossEvents.get(Position).setProgress(true);
+				AcknowledgeSingleEvent(Position);
+				/*listOfZenossEvents.get(Position).setProgress(true);
 				AckEventHandler.sendEmptyMessage(0);
 				AckEvent = new Thread() 
 				{  
@@ -1017,7 +1053,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 						}
 					}
 				};
-				AckEvent.start();
+				AckEvent.start();*/
 			}
 		});
 
@@ -1056,4 +1092,51 @@ public class RhybuddHome extends SherlockFragmentActivity
 		});
 		alertbox.show();
 	}
+	
+	public void AcknowledgeSingleEvent(final int Position)
+	{
+		listOfZenossEvents.get(Position).setProgress(true);
+		AckEventHandler.sendEmptyMessage(0);
+		AckEvent = new Thread() 
+		{  
+			public void run() 
+			{
+				try 
+				{
+					ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
+					listOfZenossEvents.get(Position).setProgress(false);
+					listOfZenossEvents.get(Position).setAcknowledged();
+					AckEventHandler.sendEmptyMessage(1);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					BugSenseHandler.log("Acknowledge", e);
+					AckEventHandler.sendEmptyMessage(99);
+				}
+			}
+		};
+		AckEvent.start();
+	}
+	@Override
+    public void onBackPressed() 
+    {
+    	if(FragmentVisible)
+    	{
+    		try
+    		{
+    			((FrameLayout) findViewById(R.id.EventDetailsFragment)).setVisibility(View.GONE);
+    		}
+    		catch(Exception e)
+    		{
+    			super.onBackPressed();
+    		}
+    		FragmentVisible = false;
+    	}
+    	else
+    	{
+    		super.onBackPressed();
+    	}
+    }
 }
