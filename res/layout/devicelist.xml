@@ -34,7 +34,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:background="#4a4c4d" />
-
+
             <ImageView
                 android:id="@+id/StatsImage"
                 android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="12dp"
-                android:src="@drawable/servers" />
+                android:src="@drawable/ic_action_devices" />
 
             <TextView
                 android:id="@+id/ServerCountLabel"
