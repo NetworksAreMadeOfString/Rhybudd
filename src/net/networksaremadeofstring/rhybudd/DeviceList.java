@@ -59,7 +59,6 @@ public class DeviceList extends SherlockActivity
 	ZenossDeviceAdaptor adapter = null;
 	Cursor dbResults = null;
 	
-	
 	//new
 	Handler handler;
 	ActionBar actionbar;
@@ -180,7 +179,7 @@ public class DeviceList extends SherlockActivity
     public void DBGetThread()
     {
     	dialog = new ProgressDialog(this);
-    	dialog.setTitle("Contacting Zenoss");
+    	dialog.setTitle("Querying DB");
    	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
    	 	dialog.setCancelable(false);
    	 	dialog.show();
@@ -209,47 +208,66 @@ public class DeviceList extends SherlockActivity
     			else
     			{
     				Log.i("DeviceList","No DB data found, querying API directly");
-    				if(listOfZenossDevices != null)
-    					listOfZenossDevices.clear();
-    				
-    				try 
-    				{
-    					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-						listOfZenossDevices = API.GetRhybuddDevices();
-						
-						if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
-						{
-							DeviceCount = listOfZenossDevices.size();
-							handler.sendEmptyMessage(1);
-							rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
-						}
-						else
-						{
-							Message msg = new Message();
-	    					Bundle bundle = new Bundle();
-	    					bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
-	    					msg.setData(bundle);
-	    					msg.what = 0;
-	    					handler.sendMessage(msg);
-						}
-						
-					} 
-    				catch (Exception e) 
-					{
-    					BugSenseHandler.log("DeviceList", e);
-    					Message msg = new Message();
-    					Bundle bundle = new Bundle();
-    					bundle.putString("exception",e.getMessage());
-    					msg.setData(bundle);
-    					msg.what = 0;
-    					handler.sendMessage(msg);
-					}
+    				Refresh();
     			}
     		}
     	};
     	dataLoad.start();
     }
   
+    public void Refresh()
+    {
+    	if(!dialog.isShowing())
+    	{
+    		dialog = new ProgressDialog(this);
+        	dialog.setTitle("Contacting Zenoss...");
+       	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
+       	 	dialog.setCancelable(false);
+       	 	dialog.show();
+    	}
+    	
+    	if(listOfZenossDevices != null)
+			listOfZenossDevices.clear();
+    	
+		((Thread) new Thread()
+		{
+			public void run()
+			{
+				try 
+				{
+					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					listOfZenossDevices = API.GetRhybuddDevices();
+					
+					if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
+					{
+						DeviceCount = listOfZenossDevices.size();
+						handler.sendEmptyMessage(1);
+						rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
+					}
+					else
+					{
+						Message msg = new Message();
+						Bundle bundle = new Bundle();
+						bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
+						msg.setData(bundle);
+						msg.what = 0;
+						handler.sendMessage(msg);
+					}
+					
+				} 
+				catch (Exception e) 
+				{
+					BugSenseHandler.log("DeviceList", e);
+					Message msg = new Message();
+					Bundle bundle = new Bundle();
+					bundle.putString("exception",e.getMessage());
+					msg.setData(bundle);
+					msg.what = 0;
+					handler.sendMessage(msg);
+				}
+			}
+		}).start();
+    }
     public void ViewDevice(String UID)
     {
     	Intent ViewDeviceIntent = new Intent(DeviceList.this, ViewZenossDevice.class);
@@ -283,7 +301,7 @@ public class DeviceList extends SherlockActivity
 			
 			case R.id.refresh:
 			{
-				DBGetThread();
+				Refresh();
 				return true;
 			}
 

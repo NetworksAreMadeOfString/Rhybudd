@@ -18,6 +18,8 @@
 */
 package net.networksaremadeofstring.rhybudd;
 
+import org.json.JSONObject;
+
 public class ZenossEvent 
 {
 	private String evid = "01234567890ABCDEF";
@@ -48,6 +50,64 @@ public class ZenossEvent
             this.eventState = _eventState;
             this.severity = _severity;
             this.prodState = _prodState;
+    }
+    
+    public ZenossEvent(JSONObject Event) 
+    {
+            super();
+            try
+            {
+            	this.evid = Event.getString("evid");
+            }
+            catch(Exception e)
+            {
+            	this.evid = "Unknown EVID";
+            }
+            
+            try
+            {
+            	this.device = Event.getJSONObject("device").getString("text");
+            }
+            catch(Exception e)
+            {
+            	this.device = "Unknown Device";
+            }
+            
+            try
+            {
+            	this.summary = Event.getString("summary");
+            }
+            catch(Exception e)
+            {
+            	this.summary = "No Summary found.";
+            }
+            
+            try
+            {
+            	this.eventState = Event.getString("eventState");
+            }
+            catch(Exception e)
+            {
+            	this.eventState = "New";
+            }
+            
+            try
+            {
+            	this.severity = Event.getString("severity");
+            }
+            catch(Exception e)
+            {
+            	this.severity = "Debug";
+            }
+            
+            try
+            {
+            	this.prodState = Event.getString("prodState");
+            }
+            catch(Exception e)
+            {
+            	this.prodState = "Unknown";
+            }
     }
     
     // Constructor for the Ticket class

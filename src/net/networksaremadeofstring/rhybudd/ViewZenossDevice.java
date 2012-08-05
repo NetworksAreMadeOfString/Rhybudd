@@ -321,21 +321,16 @@ public class ViewZenossDevice extends SherlockActivity
 
 							for(int i = 0; i < EventCount; i++)
 							{
-								JSONObject CurrentEvent = null;
+								//JSONObject CurrentEvent = null;
 								try 
 								{
-									CurrentEvent = Events.getJSONObject(i);
-									listOfZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
-											CurrentEvent.getJSONObject("device").getString("text"),
-											CurrentEvent.getString("summary"), 
-											CurrentEvent.getString("eventState"),
-											CurrentEvent.getString("severity"),
-											CurrentEvent.getString("prodState")));
+									//CurrentEvent = Events.getJSONObject(i);
+									listOfZenossEvents.add(new ZenossEvent(Events.getJSONObject(i)));
 									//Log.i("ForLoop",CurrentEvent.getString("summary"));
 								}
 								catch (JSONException e) 
 								{
-									//Log.e("API - Stage 2 - Inner", e.getMessage());
+									Log.e("API - Stage 2 - Inner", e.getMessage());
 								}
 								catch(Exception e)
 								{
@@ -353,7 +348,7 @@ public class ViewZenossDevice extends SherlockActivity
 					} 
 					catch (JSONException e) 
 					{
-						//e.printStackTrace();
+						e.printStackTrace();
 						BugSenseHandler.log("ViewZenossDevice-Events", e);
 						eventsHandler.sendEmptyMessage(0);
 					}

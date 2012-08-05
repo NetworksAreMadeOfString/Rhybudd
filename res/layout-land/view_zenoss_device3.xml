@@ -1,10 +1,16 @@
 
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+	
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_view_device"
         android:gravity="center_vertical|center_horizontal" >
-
+
+
 	<RelativeLayout
 	    xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:id="@+id/viewDeviceContainer"
@@ -135,7 +141,9 @@
             android:text="0Gb / 0Mb"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
-
+
+
+
     <RelativeLayout
         android:id="@+id/SNMPDetailsGrid"
         android:layout_width="fill_parent"
@@ -188,7 +196,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
 </RelativeLayout>
-
+
+
+
+
+
+
+
+
         <RelativeLayout
             android:id="@+id/EventsGrid"
             android:layout_width="wrap_content"
@@ -277,3 +292,5 @@
         </ListView>
     </RelativeLayout>
     </LinearLayout>
+        
+    </ScrollView>
