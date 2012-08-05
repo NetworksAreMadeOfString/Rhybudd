@@ -35,7 +35,7 @@ public class ZenossEvent
 	private String component_text = "unknown";
 	private String component_uid = "unknown";
 	private String eventClass = "unknown";
-	
+	private boolean fragmentDisplay = false;
 
 	
 	 // Constructor for the Ticket class
@@ -93,6 +93,16 @@ public class ZenossEvent
     	return this.Selected;
     }
 	
+    public void setFragmentDisplay(boolean fragmentDisplayed)
+    {
+    	this.fragmentDisplay = fragmentDisplayed;
+    }
+    
+    public boolean isFragmentDisplayed()
+    {
+    	return this.fragmentDisplay;
+    }
+    
 	public String getComponentText()
     {
     	return this.component_text;

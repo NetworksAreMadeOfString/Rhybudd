@@ -87,6 +87,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
 	boolean FragmentVisible = false;
+	int selectedFragmentEvent = 0;
 	
 	@Override
 	public void onDestroy()
@@ -998,6 +999,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 	public void LoadEventDetailsFragment(int Position)
 	{
+		listOfZenossEvents.get(selectedFragmentEvent).setFragmentDisplay(false);
+		listOfZenossEvents.get(Position).setFragmentDisplay(true);
+		selectedFragmentEvent = Position;
+		adapter.notifyDataSetChanged();
+		
 		fragmentManager = getSupportFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		
@@ -1018,6 +1024,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		fragmentTransaction.commit();
 		
 		((FrameLayout) findViewById(R.id.EventDetailsFragment)).setVisibility(View.VISIBLE);
+		//((View) findViewById(R.id.fragmentIndicator)).setVisibility(View.VISIBLE);
 		FragmentVisible = true;
 	}
 	
@@ -1127,6 +1134,10 @@ public class RhybuddHome extends SherlockFragmentActivity
     		try
     		{
     			((FrameLayout) findViewById(R.id.EventDetailsFragment)).setVisibility(View.GONE);
+    			//((View) findViewById(R.id.fragmentIndicator)).setVisibility(View.GONE);
+    			listOfZenossEvents.get(selectedFragmentEvent).setFragmentDisplay(false);
+    			selectedFragmentEvent = 0;
+    			adapter.notifyDataSetChanged();
     		}
     		catch(Exception e)
     		{

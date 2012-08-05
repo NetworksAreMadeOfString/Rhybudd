@@ -1,8 +1,9 @@
 
-    <RelativeLayout android:layout_width="fill_parent"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/background_gradient_2" xmlns:android="http://schemas.android.com/apk/res/android">
-
+        android:background="@drawable/background_gradient_3" >
+
 <ListView
     android:id="@+id/ZenossEventsList"
     android:layout_width="match_parent"
@@ -10,9 +11,10 @@
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
     android:layout_toLeftOf="@+id/EventDetailsFragment"
-    android:cacheColorHint="#929ba4" >
+    android:cacheColorHint="@color/RhybuddWhite" >
 
 </ListView>
+
 <ProgressBar
     android:id="@+id/backgroundWorkingProgressBar"
     style="?android:attr/progressBarStyleSmall"
@@ -20,22 +22,24 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true" />
-
+
 <ImageView
     android:id="@+id/imageView1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_alignParentRight="true"
-    android:src="@drawable/zenoss" />
-
+    android:src="@drawable/zenoss_3" />
+
 <FrameLayout
     android:id="@+id/EventDetailsFragment"
     android:layout_width="480dp"
     android:layout_height="fill_parent"
-    android:layout_alignParentLeft="false"
     android:layout_alignParentRight="true"
-    android:layout_centerVertical="true"
+    android:layout_alignParentTop="true"
+    android:layout_centerVertical="false"
+    android:background="@color/ZenossDarkBlack"
+    android:paddingLeft="1dp"
     android:visibility="gone" >
 
 </FrameLayout>

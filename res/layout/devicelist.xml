@@ -3,20 +3,18 @@
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/background_gradient_2" >
-
+        android:background="@drawable/background_gradient_3" >
+
         <ListView
             android:id="@+id/ZenossDeviceList"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_above="@+id/StatsHolder"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:cacheColorHint="#929ba4"
             android:fadingEdge="vertical"
             android:fastScrollEnabled="true"
             android:isScrollContainer="true" >
-
         </ListView>
 
         <RelativeLayout
@@ -24,34 +22,36 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="false"
-            android:layout_centerHorizontal="true"
-            android:background="#75787a"
+            android:layout_alignParentLeft="true"
+            android:background="@color/ZenossDarkBlack"
             android:minHeight="60dp" >
-
+
             <View
                 android:id="@+id/placeholder"
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:background="#4a4c4d" /><ImageView
-            android:id="@+id/StatsImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:src="@drawable/servers" />
-
-                <TextView
-                    android:id="@+id/ServerCountLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/StatsImage"
-                    android:text="Calculating server count..."
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:background="#4a4c4d" />
+
+            <ImageView
+                android:id="@+id/StatsImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="12dp"
+                android:src="@drawable/servers" />
+
+            <TextView
+                android:id="@+id/ServerCountLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/StatsImage"
+                android:text="Calculating server count..."
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/RhybuddOffWhite" />
 
         </RelativeLayout>
 

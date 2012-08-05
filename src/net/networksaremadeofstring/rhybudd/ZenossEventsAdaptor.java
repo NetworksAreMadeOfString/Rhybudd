@@ -118,28 +118,27 @@ public class ZenossEventsAdaptor extends BaseAdapter
 					strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
 				}
 			}
-			
-			/*date = sdf.parse(Event.getlastTime());
-			if(date.getDate() < today.getDate())
-			{
-				strDate = date.getDate() + " " + shortMonths[date.getMonth()];
-			}
-			else
-			{
-				if(date.getMinutes() < 10)
-				{
-					strDate = date.getHours() + ":0" + Integer.toString(date.getMinutes());
-				}
-				else
-				{
-					strDate = date.getHours() + ":" + date.getMinutes();
-				}
-			}*/
 		} 
 		catch (Exception e) 
 		{
 			strDate = "";
 		}
+        
+        try
+        {
+	        if(Event.isFragmentDisplayed())
+	        {
+	        	((ImageView) convertView.findViewById(R.id.fragment_indicator)).setVisibility(View.VISIBLE);
+	        }
+	        else
+	        {
+	        	((ImageView) convertView.findViewById(R.id.fragment_indicator)).setVisibility(View.GONE);
+	        }
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
         
         ((TextView) convertView.findViewById(R.id.dateTime)).setText(strDate);
         

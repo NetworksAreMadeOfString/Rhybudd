@@ -1,4 +1,8 @@
-<RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:background="#929ba4">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/RhybuddOffWhite" >
 
 	<TextView
 	    android:id="@+id/sizeLabel"
@@ -21,7 +25,7 @@
 	    android:contentDescription="Refresh Local Cache"
 	    android:src="@drawable/ic_menu_refresh" >
 </ImageView>
-
+
 	<TextView
 	    android:id="@+id/refreshDesc"
 	    android:layout_width="wrap_content"
@@ -32,12 +36,35 @@
 	    android:layout_marginRight="8dp"
 	    android:text="@string/refreshDesc"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
-	    android:textColor="#FFFFFF" >
-</TextView>
-	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/RefreshLabel" android:layout_alignTop="@+id/refreshCacheImageView" android:layout_toRightOf="@+id/refreshCacheImageView" android:textStyle="bold" android:text="@string/manageCache_RefreshTitle"></TextView>
-	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_movesd" android:layout_width="wrap_content" android:layout_alignLeft="@+id/refreshCacheImageView" android:id="@+id/moveToSDImageView" android:layout_below="@+id/refreshDesc" android:layout_marginTop="10dp"></ImageView>
-	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignTop="@+id/moveToSDImageView" android:layout_toRightOf="@+id/moveToSDImageView" android:id="@+id/moveToSDLabel" android:textStyle="bold" android:text="@string/manageCache_moveToSDTitle"></TextView>
+	    android:textColor="@color/RhybuddStdText" >
 
+</TextView>
+
+	<TextView
+	    android:id="@+id/RefreshLabel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignTop="@+id/refreshCacheImageView"
+	    android:layout_toRightOf="@+id/refreshCacheImageView"
+	    android:text="@string/manageCache_RefreshTitle"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:textColor="@color/RhybuddTitleText"
+	    android:textStyle="bold" >
+</TextView>
+	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_movesd" android:layout_width="wrap_content" android:layout_alignLeft="@+id/refreshCacheImageView" android:id="@+id/moveToSDImageView" android:layout_below="@+id/refreshDesc" android:layout_marginTop="10dp"></ImageView>
+
+	<TextView
+	    android:id="@+id/moveToSDLabel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignTop="@+id/moveToSDImageView"
+	    android:layout_toRightOf="@+id/moveToSDImageView"
+	    android:text="@string/manageCache_moveToSDTitle"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:textColor="@color/RhybuddTitleText"
+	    android:textStyle="bold" >
+</TextView>
+
 	<TextView
 	    android:id="@+id/moveToSDDesc"
 	    android:layout_width="wrap_content"
@@ -48,11 +75,23 @@
 	    android:layout_marginRight="8dp"
 	    android:text="@string/moveToSDDesc"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
-	    android:textColor="#FFFFFF" >
+	    android:textColor="@color/RhybuddStdText" >
+
 </TextView>
 	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_empty_db" android:layout_width="wrap_content" android:layout_alignLeft="@+id/moveToSDImageView" android:id="@+id/emptyDBImageView" android:layout_below="@+id/moveToSDDesc" android:layout_marginTop="10dp"></ImageView>
-	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignTop="@+id/emptyDBImageView" android:layout_toRightOf="@+id/emptyDBImageView" android:id="@+id/emptyDBLabel" android:textStyle="bold" android:text="@string/manageCache_emptyCacheTitle"></TextView>
 
+	<TextView
+	    android:id="@+id/emptyDBLabel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignTop="@+id/emptyDBImageView"
+	    android:layout_toRightOf="@+id/emptyDBImageView"
+	    android:text="@string/manageCache_emptyCacheTitle"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:textColor="@color/RhybuddTitleText"
+	    android:textStyle="bold" >
+</TextView>
+
 	<TextView
 	    android:id="@+id/emptyCacheDesc"
 	    android:layout_width="wrap_content"
@@ -63,7 +102,8 @@
 	    android:layout_marginRight="8dp"
 	    android:text="@string/emptyCacheDesc"
 	    android:textAppearance="?android:attr/textAppearanceSmall"
-	    android:textColor="#FFFFFF" >
+	    android:textColor="@color/RhybuddStdText" >
+
 </TextView>
 
 

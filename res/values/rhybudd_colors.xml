@@ -11,10 +11,13 @@
         
         
         <color name="RhybuddWhite">#eeeeee</color>
+        <color name="RhybuddOffWhite">#e3e2e2</color>
         <color name="RhybuddStdText">#767676</color>
         <color name="RhybuddDarkText">#585858</color>
+        <color name="RhybuddTitleText">#000000</color>
         <color name="RhybuddGradientStart">#aeb2b7</color>
         <color name="RhybuddGradientStop">#929ba4</color>
+        <color name="RhybuddTextShadow">#505050</color>
         
         <color name="ZenossLightGray">#b9b9b9</color>
         <color name="ZenossDarkGray">#9a9a9a</color>

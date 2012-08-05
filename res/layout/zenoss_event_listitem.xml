@@ -1,8 +1,17 @@
-<RelativeLayout android:id="@+id/relativeLayout1"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingBottom="4px"
-    android:paddingTop="4px" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="fill_parent" >
+
+    <ImageView
+        android:id="@+id/fragment_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:minHeight="24dp"
+        android:minWidth="4dp"
+        android:src="@drawable/event_fragment_indicator" />
 
     <ImageView
         android:id="@+id/AckImage"
@@ -55,6 +64,7 @@
             android:textOff="@string/empty" />
 
     </LinearLayout>
+
     <TextView
         android:id="@+id/DeviceName"
         android:layout_width="wrap_content"
@@ -63,16 +73,13 @@
         android:layout_toLeftOf="@+id/dateTime"
         android:layout_toRightOf="@+id/linearLayout1"
         android:ellipsize="end"
-        android:singleLine="true"
         android:maxLines="1"
-        android:shadowColor="#505050"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="1"
+        android:singleLine="true"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/RhybuddTitleText"
         android:textStyle="bold" />
-
+
     <TextView
         android:id="@+id/EventSummary"
         android:layout_width="wrap_content"
@@ -81,14 +88,10 @@
         android:layout_below="@+id/DeviceName"
         android:layout_marginBottom="8dp"
         android:layout_toLeftOf="@+id/AckImage"
-        android:shadowColor="#505050"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="1"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#FFFFFF" />
-
+        android:textColor="@color/RhybuddStdText" />
+
     <TextView
         android:id="@+id/dateTime"
         android:layout_width="wrap_content"
@@ -96,12 +99,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="6dp"
-        android:shadowColor="#505050"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="1"
         android:text="00:00"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/RhybuddStdText"
         android:textSize="10dp" />
 
 </RelativeLayout>
