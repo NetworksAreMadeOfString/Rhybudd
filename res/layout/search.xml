@@ -3,19 +3,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background_gradient_3" >
-
+
      <RelativeLayout
          android:id="@+id/searchContainer"
          android:layout_width="fill_parent"
          android:layout_height="64dp"
          android:layout_centerHorizontal="true"
-         android:background="@color/ZenossLightBlack" >
-
+         android:background="@color/ZenossLightGray" >
+
          <EditText
              android:id="@+id/searchTermEditText"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_alignParentLeft="true"
+             android:layout_marginLeft="4dp"
              android:layout_marginTop="6dp"
              android:layout_toLeftOf="@+id/SearchButton"
              android:hint="@string/searchHint"
@@ -25,14 +26,15 @@
              <requestFocus>
              </requestFocus>
          </EditText>
-
+
          <View
              android:id="@+id/BottomTile"
              android:layout_width="fill_parent"
-             android:layout_height="6px"
+             android:layout_height="2dp"
              android:layout_alignParentBottom="true"
              android:layout_centerHorizontal="true"
-             android:background="@drawable/drawer_bottom_tile" >
+             android:background="@color/ZenossDarkGray" >
+
          </View>
 
          <Button

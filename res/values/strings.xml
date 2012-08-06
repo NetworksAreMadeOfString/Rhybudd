@@ -60,6 +60,18 @@
     <string name="eventDetailsAgentLabel">Agent:</string>
     <string name="eventDetailsLogLabel">Log:</string>
     
+    <!-- DeviceList -->
+    <string name="deviceListServerCount">Calculating server count&#8230;</string>
+    <string name="deviceListIconDesc">Image depicting 3 servers on a network</string>
+    
+    <!-- Manage Database -->
+    <string name="mgeDBRefreshDesc">Image depicting the refreshing of the local cache</string>
+    <string name="mgeDBSDCard">Image depicting an SD card</string>
+    <string name="mgeDBBin">Image depicting a bin being filled</string>
+    
+    <!-- Rhybudd Home -->
+    <string name="homeLogos">Image showing the Zenoss and Android logos</string>
+    
     <!-- Navigation -->
     <string-array name="actionbar_nav">
         <item>Devices</item>

@@ -13,7 +13,7 @@
 	    android:textAppearance="?android:attr/textAppearanceMedium" >
 </TextView>
 	<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/sizeLabel" android:layout_alignBottom="@+id/sizeLabel" android:layout_toRightOf="@+id/sizeLabel" android:layout_marginLeft="22dp" android:id="@+id/dbSize" android:text="0bytes"></TextView>
-
+
 	<ImageView
 	    android:id="@+id/refreshCacheImageView"
 	    android:layout_width="wrap_content"
@@ -22,8 +22,9 @@
 	    android:layout_below="@+id/sizeLabel"
 	    android:layout_marginLeft="10dp"
 	    android:layout_marginTop="10dp"
-	    android:contentDescription="Refresh Local Cache"
+	    android:contentDescription="@string/mgeDBRefreshDesc"
 	    android:src="@drawable/ic_menu_refresh" >
+
 </ImageView>
 
 	<TextView
@@ -51,7 +52,17 @@
 	    android:textColor="@color/RhybuddTitleText"
 	    android:textStyle="bold" >
 </TextView>
-	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_movesd" android:layout_width="wrap_content" android:layout_alignLeft="@+id/refreshCacheImageView" android:id="@+id/moveToSDImageView" android:layout_below="@+id/refreshDesc" android:layout_marginTop="10dp"></ImageView>
+
+	<ImageView
+	    android:id="@+id/moveToSDImageView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/refreshCacheImageView"
+	    android:layout_below="@+id/refreshDesc"
+	    android:layout_marginTop="10dp"
+	    android:contentDescription="@string/mgeDBSDCard"
+	    android:src="@drawable/ic_menu_movesd" >
+</ImageView>
 
 	<TextView
 	    android:id="@+id/moveToSDLabel"
@@ -78,7 +89,17 @@
 	    android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-	<ImageView android:layout_height="wrap_content" android:src="@drawable/ic_menu_empty_db" android:layout_width="wrap_content" android:layout_alignLeft="@+id/moveToSDImageView" android:id="@+id/emptyDBImageView" android:layout_below="@+id/moveToSDDesc" android:layout_marginTop="10dp"></ImageView>
+
+	<ImageView
+	    android:id="@+id/emptyDBImageView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/moveToSDImageView"
+	    android:layout_below="@+id/moveToSDDesc"
+	    android:layout_marginTop="10dp"
+	    android:contentDescription="@string/mgeDBBin"
+	    android:src="@drawable/ic_menu_empty_db" >
+</ImageView>
 
 	<TextView
 	    android:id="@+id/emptyDBLabel"

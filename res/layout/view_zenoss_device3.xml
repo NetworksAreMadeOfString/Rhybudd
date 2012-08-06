@@ -4,12 +4,12 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_view_device" >
-
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/viewDeviceContainer"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="wrap_content" >
 
     <RelativeLayout
         android:id="@+id/GeneralDetailsGrid"
@@ -57,14 +57,14 @@
             android:layout_below="@+id/UptimeTitle"
             android:text="0 days"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
         <TextView
             android:id="@+id/FirstSeenTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/uptime"
-            android:text="First Seen:"
+            android:text="@string/eventDetailsFirstSeenLabel"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 
