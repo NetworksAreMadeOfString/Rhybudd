@@ -36,6 +36,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -350,14 +351,13 @@ public class ZenossPoller extends Service
 	private void SendInboxStyleNotification(int EventCount)
 	{
 		String Event1 = "--", Event2 = "---";
-		//Log.i("EventCount",Integer.toString(EventCount));
 		int remainingCount = 0;
 		
-		Intent notificationIntent = new Intent(this, RhybuddHome.class);
+		/*Intent notificationIntent = new Intent(this, RhybuddHome.class);
 		notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		notificationIntent.putExtra("forceRefresh", true);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-			
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);*/
+
 		if(EventDetails.size() > 1)
 		{
 			Event1 = EventDetails.get(0);
@@ -369,23 +369,48 @@ public class ZenossPoller extends Service
 			Event1 = EventDetails.get(0);
 			remainingCount = EventCount - 1;
 		}
-		
+
 		Notification notification = new Notification.InboxStyle(
 			      new Notification.Builder(this)
 			         .setContentTitle(Integer.toString(EventCount) + " New Zenoss Alerts")
 			         .setContentText("Click to start Rhybudd")
 			         .setSmallIcon(R.drawable.ic_stat_alert)
-					 .setContentIntent(contentIntent))
+			         .setVibrate(new long[] {0,100,200,300})
+			         .setAutoCancel(true)
+					 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, RhybuddHome.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("forceRefresh", true), 0)))
 			      .addLine(Event1)
 			      .addLine(Event2)
 			      .setBigContentTitle(Integer.toString(EventCount) + " New Zenoss Alerts")
 			      .setSummaryText("+"+Integer.toString(remainingCount)+" more")
 			      .build();
 
+		if(settings.getBoolean("notificationSound", true))
+		{
+			if(settings.getBoolean("notificationSoundInsistent", false))
+				notification.flags |= Notification.FLAG_INSISTENT;
+			
+			if(settings.getString("notificationSoundChoice", "").equals(""))
+			{
+				notification.defaults |= Notification.DEFAULT_SOUND;
+			}
+			else
+			{
+				try
+				{
+					notification.sound = Uri.parse(settings.getString("notificationSoundChoice", ""));
+				}
+				catch(Exception e)
+				{
+					notification.defaults |= Notification.DEFAULT_SOUND;
+				}
+			}
+		}
+		
 		mNM.notify(43523, notification);
 			 
 	}
-	private void SendNotification(String EventSummary,int Severity)
+	
+	/*private void SendNotification(String EventSummary,int Severity)
 	{
 		Notification notification = new Notification(R.drawable.ic_stat_alert, "New Zenoss Events!", System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -415,7 +440,7 @@ public class ZenossPoller extends Service
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, "Rhybudd Notification", EventSummary, contentIntent);
 		mNM.notify(43523, notification);//NotificationID++ 
-	}
+	}*/
 
 	private void RefreshCache()
 	{
