@@ -137,6 +137,16 @@ public class RhybuddHome extends SherlockFragmentActivity
 		finishStart(false);
 	}
 
+	@Override
+	public void onNewIntent(Intent newIntent)
+	{
+		Log.e("onNewIntent",Boolean.toString(newIntent.getBooleanExtra("forceRefresh", false)));
+		if(newIntent.getBooleanExtra("forceRefresh", false))
+		{
+			DBGetThread();
+		}
+	}
+	
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
@@ -149,6 +159,12 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		setContentView(R.layout.rhybudd_home);
 
+		Log.e("onCreate",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
+		if(getIntent().getBooleanExtra("forceRefresh", false))
+		{
+			DBGetThread();
+		}
+		
 		//Clear any notifications event notifications 
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 

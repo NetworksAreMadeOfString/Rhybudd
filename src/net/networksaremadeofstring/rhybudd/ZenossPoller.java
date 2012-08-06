@@ -207,11 +207,11 @@ public class ZenossPoller extends Service
 			Log.i("onStartCommand","Received an intent from the settings Activity");
 			PollerCheck();
 		}
-		/*else
+		else
 		{
 			Log.i("onStartCommand","I got started for no particular reason. I should probably do a refresh");
 			PollerCheck();
-		}*/
+		}
 
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
