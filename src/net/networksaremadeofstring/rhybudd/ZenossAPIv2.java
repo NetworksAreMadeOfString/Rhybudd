@@ -58,7 +58,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
-import android.util.Log;
 
 //TODO This needs some serious genericisation to remove all the duplicated code
 public class ZenossAPIv2 
@@ -91,7 +90,7 @@ public class ZenossAPIv2
     	
     	if(!BAUser.equals("") || !BAPassword.equals(""))
     	{
-    		Log.i("Auth","We have some auth credentials");
+    		//Log.i("Auth","We have some auth credentials");
     		CredentialsProvider credProvider = new BasicCredentialsProvider();
     	    credProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(BAUser, BAPassword));
     	    httpclient.setCredentialsProvider(credProvider);
@@ -200,7 +199,7 @@ public class ZenossAPIv2
 		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
 		JSONObject devices = this.GetDevices();
 
-		Log.e("GetRhybyddDevices",devices.toString(2));
+		//Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
 
 		for(int i = 0; i < DeviceCount; i++)
@@ -394,7 +393,7 @@ public class ZenossAPIv2
         httpost.setEntity(new StringEntity(reqData.toString()));
     	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
 		JSONObject json = new JSONObject(ackEventReturnJSON);
-		Log.i("AcknowledgeEvent",json.toString(2));
+		//Log.i("AcknowledgeEvent",json.toString(2));
     	return json;
 	}
 	
@@ -440,7 +439,7 @@ public class ZenossAPIv2
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(ackEventReturnJSON);
-		Log.i("AcknowledgeEvent",json.toString(2));
+		//Log.i("AcknowledgeEvent",json.toString(2));
     	return json;
 	}
 	
@@ -811,7 +810,7 @@ public class ZenossAPIv2
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-		Log.e("GetDeviceEvents",test);
+		//Log.e("GetDeviceEvents",test);
 		JSONObject json = new JSONObject(test);
     	return json;
     }

@@ -201,7 +201,7 @@ public class RhybuddDock extends SherlockFragmentActivity
 
 	public void Refresh()
 	{
-		Log.i("RhybuddDock","Performing a Direct API Refresh");
+		//Log.i("RhybuddDock","Performing a Direct API Refresh");
 
 		((Thread) new Thread(){
 			public void run()

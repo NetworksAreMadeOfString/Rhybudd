@@ -186,7 +186,7 @@ public class ZenossPoller extends Service
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
 		//Just in case
-		SendStickyNotification();
+		//SendStickyNotification();
 		
 		if(intent != null && intent.getBooleanExtra("events", false))
 		{
@@ -277,7 +277,7 @@ public class ZenossPoller extends Service
 	private void SendStickyNotification()
 	{
 		if(stickyNotification == null)
-			stickyNotification = new Notification(R.drawable.ic_stat_polling, "Rhybudd is polling for events", System.currentTimeMillis());
+			stickyNotification = new Notification(R.drawable.ic_stat_polling, "Rhybudd is actively polling for events", System.currentTimeMillis());
 		
 		stickyNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 		stickyNotification.flags |= Notification.FLAG_ONLY_ALERT_ONCE;
@@ -300,7 +300,7 @@ public class ZenossPoller extends Service
 		{
 			strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
 		}
-		stickyNotification.setLatestEventInfo(context, "Rhybudd is actively polling", "Last query time: " + strDate, contentIntent);
+		stickyNotification.setLatestEventInfo(context, "Rhybudd is actively polling for events", "Last query time: " + strDate, contentIntent);
 		mNM.notify(20, stickyNotification);
 	}
 	

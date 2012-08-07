@@ -202,12 +202,12 @@ public class DeviceList extends SherlockActivity
     			if(listOfZenossDevices!= null && listOfZenossDevices.size() > 0)
     			{
     				DeviceCount = listOfZenossDevices.size();
-    				Log.i("DeviceList","Found DB Data!");
+    				//Log.i("DeviceList","Found DB Data!");
     				handler.sendEmptyMessage(2);
     			}
     			else
     			{
-    				Log.i("DeviceList","No DB data found, querying API directly");
+    				//Log.i("DeviceList","No DB data found, querying API directly");
     				Refresh();
     			}
     		}

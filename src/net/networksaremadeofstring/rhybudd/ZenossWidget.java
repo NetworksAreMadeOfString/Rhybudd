@@ -30,7 +30,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ZenossWidget extends AppWidgetProvider 
@@ -117,12 +116,12 @@ public class ZenossWidget extends AppWidgetProvider
 
 				if(tempZenossEvents!= null)
 				{
-					Log.i("CountWidget","Found DB Data!");
+					//Log.i("CountWidget","Found DB Data!");
 					handler.sendEmptyMessage(1);
 				}
 				else
 				{
-					Log.i("CountWidget","No DB data found, querying API directly");
+					//Log.i("CountWidget","No DB data found, querying API directly");
 					//handler.sendEmptyMessage(2);
 					try
 					{

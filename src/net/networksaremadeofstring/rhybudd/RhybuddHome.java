@@ -204,21 +204,37 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 				if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
 				{
-					listOfZenossEvents = tempZenossEvents;
-
-					Log.i("DeviceList","Found DB Data!");
-					handler.sendEmptyMessage(1);
+					try
+					{
+						listOfZenossEvents = tempZenossEvents;
+	
+						Log.i("DeviceList","Found DB Data!");
+						handler.sendEmptyMessage(1);
+					}
+					catch(Exception e)
+					{
+						//TODO Report to Bugsense
+					}
 				}
 				else
 				{
 					Log.i("DeviceList","No DB data found, querying API directly");
-					handler.sendEmptyMessage(2);
+					try
+					{
+						handler.sendEmptyMessage(2);
+						
+						if(tempZenossEvents != null)
+							tempZenossEvents.clear();
 
-					if(tempZenossEvents != null)
-						tempZenossEvents.clear();
+						//Can we get away with just calling refresh now?
+						Refresh();
+					}
+					catch(Exception e)
+					{
+						//TODO Report to Bugsense
+					}
 
-					//Can we get away with just calling refresh now?
-					Refresh();
+					
 					/*try
 					{
 						if(API == null)

@@ -37,7 +37,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -124,7 +123,7 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					if(DeviceObject != null && msg.what == 1 && DeviceObject.getJSONObject("result").getBoolean("success") == true)
 					{
-						Log.i("DeviceDetails",DeviceObject.toString());
+						//Log.i("DeviceDetails",DeviceObject.toString());
 						DeviceDetails = DeviceObject.getJSONObject("result").getJSONObject("data");
 
 						try
@@ -248,7 +247,7 @@ public class ViewZenossDevice extends SherlockActivity
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					//e.printStackTrace();
 					Toast.makeText(ViewZenossDevice.this, "An error was encountered parsing the JSON.", Toast.LENGTH_LONG).show();
 					BugSenseHandler.log("ViewZenossDevice", e);
 				}
@@ -281,7 +280,7 @@ public class ViewZenossDevice extends SherlockActivity
 				} 
 				catch (Exception e) 
 				{
-					e.printStackTrace();
+					//e.printStackTrace();
 					BugSenseHandler.log("updateDevices-dataPreload", e);
 					firstLoadHandler.sendEmptyMessage(0);
 				}
@@ -330,7 +329,7 @@ public class ViewZenossDevice extends SherlockActivity
 								}
 								catch (JSONException e) 
 								{
-									Log.e("API - Stage 2 - Inner", e.getMessage());
+									//Log.e("API - Stage 2 - Inner", e.getMessage());
 								}
 								catch(Exception e)
 								{
@@ -342,7 +341,7 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 						else
 						{
-							Log.i("eventsLoad","Had a problem; EventsObject was null");
+							//Log.i("eventsLoad","Had a problem; EventsObject was null");
 							//eventsHandler.sendEmptyMessage(0);
 						}
 					} 

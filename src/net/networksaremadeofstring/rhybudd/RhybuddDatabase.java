@@ -49,7 +49,7 @@ public class RhybuddDatabase
 	 */
 	public RhybuddDatabase(Context _context) 
 	{
-		Log.i("RhybuddDatabase","constructor");
+		//Log.i("RhybuddDatabase","constructor");
 		mDatabaseOpenHelper = new RhybuddOpenHelper(_context);
 		//mDatabaseOpenHelper.getWritableDatabase();
 		this.context = _context;
@@ -151,7 +151,8 @@ public class RhybuddDatabase
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			BugSenseHandler.log("DB-GetRhybuddEvents", e);
+			//e.printStackTrace();
 			dbResults.close();
 			dbResults = null;
 		}
@@ -319,7 +320,7 @@ public class RhybuddDatabase
 	
 	public void UpdateRhybuddDevices(final List<ZenossDevice> ZenossDevices)
 	{
-		Log.i("UpdateRhybuddDevices","Recieved a request to update the Devices table");
+		//Log.i("UpdateRhybuddDevices","Recieved a request to update the Devices table");
 		((Thread) new Thread()
 		{
 			public void run()
@@ -345,7 +346,7 @@ public class RhybuddDatabase
 	
 	public void UpdateRhybuddEvents(final List<ZenossEvent> ZenossEvents)
 	{
-		Log.i("UpdateRhybudddEvents","Recieved a request to update the Events table");
+		//Log.i("UpdateRhybudddEvents","Recieved a request to update the Events table");
 		((Thread) new Thread()
 		{
 			public void run()
@@ -354,7 +355,7 @@ public class RhybuddDatabase
 				{
 					mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddEvents(ZenossEvents);
-					Log.i("UpdateRhybuddEvents","Finished updating the Events table");
+					//Log.i("UpdateRhybuddEvents","Finished updating the Events table");
 				}
 				catch(Exception e)
 				{
@@ -365,7 +366,7 @@ public class RhybuddDatabase
 				{
 					//Closing the DB
 					mDatabaseOpenHelper.close();
-					Log.i("UpdateRhybuddEvents","Update events table finally");
+					//Log.i("UpdateRhybuddEvents","Update events table finally");
 				}
 			}
 		}).start();
@@ -404,7 +405,7 @@ public class RhybuddDatabase
 			mDatabase = db;
 			try
 			{
-				Log.i("DB onCreate","Creating Tables");
+				//Log.i("DB onCreate","Creating Tables");
 
 				mDatabase.execSQL("CREATE TABLE \"events\" (\"evid\" TEXT PRIMARY KEY  NOT NULL, " +
 						"\"count\" INTEGER, " +
@@ -580,7 +581,7 @@ public class RhybuddDatabase
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
 		{
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+			//Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
 			try
 			{
 				db.execSQL("DROP TABLE IF EXISTS events");

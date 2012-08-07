@@ -299,12 +299,12 @@ public class RhybuddInitialSettings extends SherlockActivity
     			}
     			catch(org.apache.http.conn.ConnectTimeoutException cte)
     			{
-    				Log.e("Timeout","Hit here");
+    				//Log.e("Timeout","Hit here");
     				HandleException(cte, "Timed out connecting to your Zenoss instance (20 seconds)");
     			}
     			catch (Exception e) 
     			{
-    				Log.e("Exception","Hit here");
+    				//Log.e("Exception","Hit here");
 					e.printStackTrace();
 					API = null;
 					HandleException(e, "");

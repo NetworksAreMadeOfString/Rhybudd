@@ -37,7 +37,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -301,7 +300,7 @@ public class ViewZenossEvent extends SherlockActivity
 					}
 					else
 					{
-						Log.e("ViewEvent",EventObject.toString(3));
+						//Log.e("ViewEvent",EventObject.toString(3));
 						Toast.makeText(ViewZenossEvent.this, "There was an error loading the Event details", Toast.LENGTH_LONG).show();
 						//finish();
 					}
