@@ -22,13 +22,15 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true" />
-
+
 <ImageView
     android:id="@+id/imageView1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
-    android:layout_alignParentRight="true"
+    android:layout_alignParentRight="false"
+    android:layout_alignWithParentIfMissing="true"
+    android:layout_toLeftOf="@+id/EventDetailsFragment"
     android:src="@drawable/zenoss_3" />
 
 <FrameLayout

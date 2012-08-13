@@ -885,7 +885,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		case R.id.Help:
 		{
 			Intent i = new Intent(Intent.ACTION_VIEW);
-			i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
+			i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
 			startActivity(i);
 			return true;
 		}

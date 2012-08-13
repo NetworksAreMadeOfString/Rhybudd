@@ -33,8 +33,8 @@ import android.util.Log;
 
 public class RhybuddDatabase 
 {
-	private static final String TAG = "RhybuddDatabase";
-	/*public static final String KEY_WORD = SearchManager.SUGGEST_COLUMN_TEXT_1;
+	/*private static final String TAG = "RhybuddDatabase";
+	public static final String KEY_WORD = SearchManager.SUGGEST_COLUMN_TEXT_1;
 	public static final String KEY_DEFINITION = SearchManager.SUGGEST_COLUMN_TEXT_2;*/
 
 	private static final String DATABASE_NAME = "rhybudd3Cache";

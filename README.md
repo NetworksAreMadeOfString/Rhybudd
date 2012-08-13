@@ -21,6 +21,7 @@ Features:
     * Choose severity levels used for background poller / event search
     * Choose severity levels for alerting
     * Production only filtering on event listing
+    * Choose alert sound
 * Background poller with Notifications support
 * Filter to only alert on Production level devices
 * SSL Support
@@ -29,10 +30,8 @@ Features:
 * Search (inc voice search)
 * View Device (Infrastructure) list with Crit / Err / Warn status
 * View Device Details (with associated events)
-
-To Do:
---------
 * Device Search
+
 
 Links:
 --------

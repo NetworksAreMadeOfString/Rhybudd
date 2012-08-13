@@ -57,6 +57,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
+
 import com.bugsense.trace.BugSenseHandler;
 
 //TODO This needs some serious genericisation to remove all the duplicated code
@@ -793,6 +796,12 @@ public class ZenossAPIv2
         dataObject.put("sort", "severity");
         dataObject.put("dir", "DESC");
         
+
+    	//4.1 hack
+    	JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
+        dataObject.put("keys", keys);
+        //End 4.1 hack
+        
         data.put(dataObject);
         
         JSONObject reqData = new JSONObject();
@@ -810,7 +819,7 @@ public class ZenossAPIv2
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-		//Log.e("GetDeviceEvents",test);
+		Log.e("GetDeviceEvents",test);
 		JSONObject json = new JSONObject(test);
     	return json;
     }
