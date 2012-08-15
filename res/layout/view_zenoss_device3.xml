@@ -29,14 +29,14 @@
             android:text="Device ID:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/deviceID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/deviceIDTitle"
             android:layout_below="@+id/deviceIDTitle"
-            android:text="web1.networksaremadeofstring.co.uk"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -155,14 +155,14 @@
             android:text="SNMP Location:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/locationTitle"
-            android:text="Small Text"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -174,15 +174,16 @@
             android:text="SNMP Contact:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/contact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/contactTitle"
-            android:text="Gareth@NetworksAreMadeOfString.co.uk"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
 
@@ -209,14 +210,14 @@
             android:text="Production State:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/productionState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/productionStateLabel"
-            android:text="Small Text"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -228,14 +229,14 @@
             android:text="Groups:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/groups"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/GroupsTitle"
-            android:text="Small Text"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -247,19 +248,15 @@
             android:text="Systems:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
         <TextView
             android:id="@+id/systems"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/SystemsTitle"
-            android:text="Small Text"
+            android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
-
-
-
 
         <TextView
             android:id="@+id/eventsTitle"

@@ -29,7 +29,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.util.Log;
 
 public class RhybuddDatabase 
 {
@@ -329,7 +328,7 @@ public class RhybuddDatabase
 				{
 					mDatabaseOpenHelper.getWritableDatabase();
 					mDatabaseOpenHelper.UpdateRhybuddDevices(ZenossDevices);
-					Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
+					//Log.i("UpdateRhybuddDevices","Finished updating the Devices table");
 				}
 				catch(Exception e)
 				{
@@ -388,7 +387,7 @@ public class RhybuddDatabase
 		{
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 			mHelperContext = context;
-			Log.i("RhybuddOpenHelper","constructor");
+			//Log.i("RhybuddOpenHelper","constructor");
 		}
 
 		@Override

@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class ManageUpdate extends BroadcastReceiver
 {
@@ -99,7 +98,7 @@ public class ManageUpdate extends BroadcastReceiver
 			}
 			else
 			{
-				Log.i("ManangeUpdateBroadcastReceiver","Received Notification of an app updated but it wasn't ours");
+				//Log.i("ManangeUpdateBroadcastReceiver","Received Notification of an app updated but it wasn't ours");
 			}
 		}
 		catch(Exception e)

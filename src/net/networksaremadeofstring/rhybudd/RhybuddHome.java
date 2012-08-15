@@ -1017,8 +1017,28 @@ public class RhybuddHome extends SherlockFragmentActivity
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putBoolean("FirstRun", false);
 				editor.commit();
-				Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
-				finishStart(true);
+				//Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage("Additional settings and functionality can be found by pressing the action bar overflow (or pressing the menu button).\r\n" +
+						"\r\nPlease note that this is app is still in Beta. If you experience issues please email;\r\nGareth@NetworksAreMadeOfString.co.uk")
+						.setTitle("Welcome to Rhybudd!")
+				       .setCancelable(false)
+				       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) 
+				           {
+				        	   finishStart(true);
+				           }
+				       });
+				AlertDialog welcomeDialog = builder.create();
+				try
+				{
+					welcomeDialog.show();
+				}
+				catch(Exception e)
+				{
+					finishStart(true);
+				}
+				
 			}
 			else if(resultCode == 2)
 			{
