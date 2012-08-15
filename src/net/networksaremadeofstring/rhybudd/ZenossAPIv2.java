@@ -518,7 +518,7 @@ public class ZenossAPIv2
 			catch(Exception e)
 			{
 				//TODO Do something
-				return null;
+				//return null;
 			}
 		}
 		
@@ -528,7 +528,8 @@ public class ZenossAPIv2
 		}
 		else
 		{
-			return null;
+			listofZenossEvents = new ArrayList<ZenossEvent>();
+			return listofZenossEvents;
 		}
 	}
 	

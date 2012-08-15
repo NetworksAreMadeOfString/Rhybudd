@@ -374,6 +374,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 							listOfZenossEvents = tempZenossEvents;
 							handler.sendEmptyMessage(1);
 						}
+						else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
+						{
+							handler.sendEmptyMessage(50);
+						}
 						else
 						{
 							// TODO Send a proper message
@@ -407,6 +411,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				catch(Exception e)
 				{
 					// TODO Send a proper message
+					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				}
 			}
@@ -565,6 +570,26 @@ public class RhybuddHome extends SherlockFragmentActivity
 						dialog.show();
 					}
 				}
+				else if(msg.what == 50)
+				{
+					if(dialog != null && dialog.isShowing())
+						dialog.dismiss();
+					
+					try
+					{
+					if(listOfZenossEvents != null)
+						listOfZenossEvents.clear();
+					
+					if(adapter != null)
+						adapter.notifyDataSetChanged();
+					}
+					catch(Exception e)
+					{
+						//TODO Bugsense
+					}
+					
+					Toast.makeText(RhybuddHome.this, "There are no events to display", Toast.LENGTH_LONG).show();
+				}
 				else if(msg.what == 3 || msg.what == 999)
 				{
 					if(dialog != null && dialog.isShowing())
@@ -615,56 +640,56 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			public void handleMessage(Message msg) 
 			{
-				if(msg.what == 0)
+				try
 				{
-					adapter.notifyDataSetChanged();
-				}
-				else if(msg.what == 1)
-				{
-					for (ZenossEvent evt : listOfZenossEvents)
+					if(msg.what == 0)
 					{
-						if(!evt.getEventState().equals("Acknowledged"))
-						{
-							evt.setProgress(false);
-							evt.setAcknowledged();	
-						}
+						
+							adapter.notifyDataSetChanged();
+						
 					}
-					adapter.notifyDataSetChanged();
-				}
-				else if(msg.what == 2)
-				{
-					/*for (ZenossEvent evt : listOfZenossEvents)
+					else if(msg.what == 1)
 					{
-						if(!evt.getEventState().equals("Acknowledged"))
+						for (ZenossEvent evt : listOfZenossEvents)
 						{
-							evt.setProgress(false);
-							evt.setAcknowledged();	
+							if(!evt.getEventState().equals("Acknowledged"))
+							{
+								evt.setProgress(false);
+								evt.setAcknowledged();	
+							}
 						}
-					}*/
-					
-					for (Integer i : selectedEvents)
-					{
-						listOfZenossEvents.get(i).setProgress(false);
-						listOfZenossEvents.get(i).setAcknowledged();
+						adapter.notifyDataSetChanged();
 					}
-					adapter.notifyDataSetChanged();
-				}
-				else if(msg.what == 99)
-				{
-					for (ZenossEvent evt : listOfZenossEvents)
+					else if(msg.what == 2)
 					{
-						if(!evt.getEventState().equals("Acknowledged"))
+						for (Integer i : selectedEvents)
 						{
-							evt.setProgress(false);
+							listOfZenossEvents.get(i).setProgress(false);
+							listOfZenossEvents.get(i).setAcknowledged();
 						}
+						adapter.notifyDataSetChanged();
 					}
-					adapter.notifyDataSetChanged();
-					Toast.makeText(getApplicationContext(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+					else if(msg.what == 99)
+					{
+						for (ZenossEvent evt : listOfZenossEvents)
+						{
+							if(!evt.getEventState().equals("Acknowledged"))
+							{
+								evt.setProgress(false);
+							}
+						}
+						adapter.notifyDataSetChanged();
+						Toast.makeText(getApplicationContext(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+					}
+					else
+					{
+	
+						Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+					}
 				}
-				else
+				catch(Exception e)
 				{
-
-					Toast.makeText(getApplicationContext(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+					BugSenseHandler.log("AckEventHandler", e);
 				}
 			}
 		};
