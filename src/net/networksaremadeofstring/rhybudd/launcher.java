@@ -29,37 +29,14 @@ import com.bugsense.trace.BugSenseHandler;
 
 public class launcher extends Activity
 {
-	private SharedPreferences settings = null;
-
 	 @Override
 	 public void onCreate(Bundle savedInstanceState) 
 	 {
 		 super.onCreate(savedInstanceState);
-	     settings = PreferenceManager.getDefaultSharedPreferences(this);
 	     setContentView(R.layout.main);  
-	     
-	     BugSenseHandler.setup(this, "44a76a8c");		
-	     
-		 if((settings.getString("URL", "").equals("") && settings.getString("userName", "").equals("") && settings.getString("passWord", "").equals("")) || settings.getBoolean("DBCreated", false) == false)
-	     {
-			Intent SettingsIntent = new Intent(launcher.this, RhybuddSettings.class);
-			SettingsIntent.putExtra("firstRun", true);
-     		launcher.this.startActivity(SettingsIntent);
-     		finish();
-	     }
-	     else
-	     {
-	    	 if(getIntent().hasCategory(Intent.CATEGORY_DESK_DOCK) || getIntent().hasCategory("android.intent.category.HE_DESK_DOCK") || getIntent().hasCategory("android.intent.category.LE_DESK_DOCK"))
-	    	 {
-	    		 Intent RhybuddDockIntent = new Intent(launcher.this, RhybuddDock.class);
-		    	 launcher.this.startActivity(RhybuddDockIntent);
-	    	 }
-	    	 else
-	    	 {
-		    	 Intent RhybuddHomeIntent = new Intent(launcher.this, RhybuddHome.class);
-		    	 launcher.this.startActivity(RhybuddHomeIntent);
-	    	 }
-	    	 finish();
-	     }
+	     BugSenseHandler.setup(this, "44a76a8c");	
+	     Intent upgradeHelperIntent = new Intent(launcher.this, RhybuddHome.class);
+	     launcher.this.startActivity(upgradeHelperIntent);
+	     finish();
 	 }
 }

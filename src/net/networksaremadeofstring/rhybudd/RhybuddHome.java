@@ -588,7 +588,17 @@ public class RhybuddHome extends SherlockFragmentActivity
 						}
 					});
 					alertDialog = builder.create();
-					alertDialog.show();
+					if(!isFinishing())
+					{
+						try
+						{
+							alertDialog.show();
+						}
+						catch(Exception e)
+						{
+							BugSenseHandler.log("alertDialog", e);
+						}
+					}
 				}
 				else
 				{
