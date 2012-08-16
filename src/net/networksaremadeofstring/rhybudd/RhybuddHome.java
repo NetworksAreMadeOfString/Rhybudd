@@ -645,7 +645,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 					if(msg.what == 0)
 					{
 						
-							adapter.notifyDataSetChanged();
+						adapter.notifyDataSetChanged();
 						
 					}
 					else if(msg.what == 1)

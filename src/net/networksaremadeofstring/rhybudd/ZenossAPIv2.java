@@ -19,6 +19,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -747,7 +748,7 @@ public class ZenossAPIv2
     
 	public JSONObject GetDevice(String UID) throws JSONException, ClientProtocolException, IOException
     {
-    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/device_router");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + URLEncoder.encode(UID, "UTF-8") + "/device_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
@@ -783,7 +784,7 @@ public class ZenossAPIv2
     
 	public JSONObject GetDeviceEvents(String UID) throws JSONException, ClientProtocolException, IOException
     {
-    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID + "/evconsole_router");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + URLEncoder.encode(UID, "UTF-8") + "/evconsole_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
