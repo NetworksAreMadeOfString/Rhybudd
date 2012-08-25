@@ -149,7 +149,9 @@ public class Search extends SherlockActivity
 		{  
 			public void run() 
 			{
-				listOfZenossDevices.clear();
+				if(listOfZenossDevices != null)
+					listOfZenossDevices.clear();
+				
 				try
 				{
 					listOfZenossDevices = rhybuddCache.SearchRhybuddDevices(query);
