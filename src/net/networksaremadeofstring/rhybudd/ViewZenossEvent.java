@@ -167,7 +167,7 @@ public class ViewZenossEvent extends SherlockActivity
 				dialog.dismiss();
 				try
 				{
-					if(EventObject.getJSONObject("result").getBoolean("success") == true)
+					if(EventObject.has("result") && EventObject.getJSONObject("result").getBoolean("success") == true)
 					{
 						//Log.i("Event",EventObject.toString(3));
 						TextView Title = (TextView) findViewById(R.id.EventTitle);

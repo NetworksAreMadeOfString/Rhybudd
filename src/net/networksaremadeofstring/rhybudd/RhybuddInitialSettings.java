@@ -20,6 +20,9 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
 
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.HttpHostConnectException;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -258,14 +261,54 @@ public class RhybuddInitialSettings extends SherlockActivity
     		{
     			Message msg = new Message();
 				Bundle bundle = new Bundle();
+				String MessageExtra = "";
 				
     			try 
     			{
-					API = new ZenossAPIv2(settings.getString("userName", "--"), 
-							settings.getString("passWord", "--"), 
-							settings.getString("URL", "--") , 
-							settings.getString("BAUser", "") , 
-							settings.getString("BAPassword", ""));
+    				//try
+    				//{
+						API = new ZenossAPIv2(settings.getString("userName", "--"), 
+								settings.getString("passWord", "--"), 
+								settings.getString("URL", "--") , 
+								settings.getString("BAUser", "") , 
+								settings.getString("BAPassword", ""));
+    				/*}
+    				catch(ConnectTimeoutException cte)
+					{
+						if(cte.getMessage() != null)
+						{
+							MessageExtra = "A time out exception encountered;\r\n" + cte.getMessage().toString();
+						}
+						else
+						{
+							MessageExtra = "An time out exception was encountered but the exception thrown contains no further information.";
+						}
+						API = null;
+					}
+    				catch(HttpHostConnectException hhce)
+    				{
+    					if(hhce.getMessage() != null)
+						{
+							MessageExtra = "A host connection exception encountered;\r\n" + hhce.getMessage().toString();
+						}
+						else
+						{
+							MessageExtra = "An host connection exception (most likely connection refused) was encountered but the exception thrown contains no further information.";
+						}
+    					API = null;
+    				}
+    				catch(Exception e)
+    				{
+    					if(e.getMessage() != null)
+						{
+							MessageExtra = "An exception was encountered;\r\n" + e.getMessage().toString();
+						}
+						else
+						{
+							MessageExtra = "An exception was encountered but the exception thrown contains no further information.";
+						}
+    					API = null;
+    				}*/
 					
 					try
 	    			{
@@ -277,7 +320,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 	    				}
 	    				else
 	    				{
-	    					bundle.putString("error", "Attempting to login to the API failed.");
+	    					bundle.putString("error", "Attempting to login to the API failed." + MessageExtra);
 	    					Message.obtain();
 	    					msg.what = 99;
 	    					msg.setData(bundle);
@@ -354,7 +397,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 			((Thread) new Thread(){
 				public void run() 
 	    		{
-					BugSenseHandler.log("InitialSettings", e);
+					//BugSenseHandler.log("InitialSettings", e);
 	    		}
 			}).start();
 		}
@@ -367,7 +410,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 		{
 			if(OverrideMessage.equals(""))
 			{
-				bundle.putString("error", "Unknown Error");
+				//bundle.putString("error", "Unknown Error");
 			}
 			else
 			{

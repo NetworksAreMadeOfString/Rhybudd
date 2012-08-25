@@ -21,6 +21,7 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -266,13 +267,38 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					if(API == null)
 					{
-						if(settings.getBoolean("httpBasicAuth", false))
+						try
 						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
 						}
-						else
+						catch(ConnectTimeoutException cte)
 						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							if(cte.getMessage() != null)
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+							}
+							else
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							}
+						}
+						catch(Exception e)
+						{
+							if(e.getMessage() != null)
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+							}
+							else
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							}
 						}
 					}
 
@@ -299,56 +325,88 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					if(API == null)
 					{
-						if(settings.getBoolean("httpBasicAuth", false))
+						try
 						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
 						}
-						else
+						catch(ConnectTimeoutException cte)
 						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							if(cte.getMessage() != null)
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+							}
+							else
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							}
+						}
+						catch(Exception e)
+						{
+							if(e.getMessage() != null)
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+							}
+							else
+							{
+								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							}
 						}
 					}
 
 					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"));
-					Events = EventsObject.getJSONObject("result").getJSONArray("events");
-
-					try 
+					if(EventsObject.has("result") && EventsObject.getJSONObject("result").getInt("totalCount") > 0)
 					{
-						if(EventsObject != null)
+						Events = EventsObject.getJSONObject("result").getJSONArray("events");
+	
+						try 
 						{
-							EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-
-							for(int i = 0; i < EventCount; i++)
+							if(EventsObject != null)
 							{
-								//JSONObject CurrentEvent = null;
-								try 
+								EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
+	
+								for(int i = 0; i < EventCount; i++)
 								{
-									//CurrentEvent = Events.getJSONObject(i);
-									listOfZenossEvents.add(new ZenossEvent(Events.getJSONObject(i)));
-									//Log.i("ForLoop",CurrentEvent.getString("summary"));
+									//JSONObject CurrentEvent = null;
+									try 
+									{
+										//CurrentEvent = Events.getJSONObject(i);
+										listOfZenossEvents.add(new ZenossEvent(Events.getJSONObject(i)));
+										//Log.i("ForLoop",CurrentEvent.getString("summary"));
+									}
+									catch (JSONException e) 
+									{
+										//Log.e("API - Stage 2 - Inner", e.getMessage());
+									}
+									catch(Exception e)
+									{
+										BugSenseHandler.log("ViewZenossDevice-EventsLoop", e);
+									}
 								}
-								catch (JSONException e) 
-								{
-									//Log.e("API - Stage 2 - Inner", e.getMessage());
-								}
-								catch(Exception e)
-								{
-									BugSenseHandler.log("ViewZenossDevice-EventsLoop", e);
-								}
+	
+								eventsHandler.sendEmptyMessage(1);
 							}
-
-							eventsHandler.sendEmptyMessage(1);
-						}
-						else
+							else
+							{
+								//Log.i("eventsLoad","Had a problem; EventsObject was null");
+								//eventsHandler.sendEmptyMessage(0);
+							}
+						} 
+						catch (JSONException e) 
 						{
-							//Log.i("eventsLoad","Had a problem; EventsObject was null");
-							//eventsHandler.sendEmptyMessage(0);
+							e.printStackTrace();
+							BugSenseHandler.log("ViewZenossDevice-Events", e);
+							eventsHandler.sendEmptyMessage(0);
 						}
-					} 
-					catch (JSONException e) 
+					}
+					else
 					{
-						e.printStackTrace();
-						BugSenseHandler.log("ViewZenossDevice-Events", e);
 						eventsHandler.sendEmptyMessage(0);
 					}
 				} 

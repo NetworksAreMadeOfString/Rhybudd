@@ -22,6 +22,7 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONObject;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -232,10 +233,55 @@ public class DeviceList extends SherlockActivity
 		{
 			public void run()
 			{
+				String MessageExtra = "";
 				try 
 				{
-					ZenossAPIv2 API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-					listOfZenossDevices = API.GetRhybuddDevices();
+					ZenossAPIv2 API = null;
+					try
+					{
+						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					}
+					catch(ConnectTimeoutException cte)
+					{
+						if(cte.getMessage() != null)
+						{
+							Toast.makeText(DeviceList.this, "The connection timed out;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+						}
+						else
+						{
+							Toast.makeText(DeviceList.this, "An time out error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+						}
+					}
+					catch(Exception e)
+					{
+						if(e.getMessage() != null)
+						{
+							Toast.makeText(DeviceList.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+						}
+						else
+						{
+							Toast.makeText(DeviceList.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+						}
+					}
+					
+					try
+					{
+						if(API != null)
+						{
+							listOfZenossDevices = API.GetRhybuddDevices();
+						}
+						else
+						{
+							listOfZenossDevices = null;
+						}
+					}
+					catch(Exception e)
+					{
+						if(e.getMessage() != null)
+							MessageExtra = e.getMessage();
+						
+						listOfZenossDevices = null;
+					}
 					
 					if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
 					{
@@ -247,7 +293,7 @@ public class DeviceList extends SherlockActivity
 					{
 						Message msg = new Message();
 						Bundle bundle = new Bundle();
-						bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
+						bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices. " + MessageExtra );
 						msg.setData(bundle);
 						msg.what = 0;
 						handler.sendMessage(msg);

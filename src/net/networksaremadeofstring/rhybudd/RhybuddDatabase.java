@@ -458,7 +458,8 @@ public class RhybuddDatabase
 			}
 			finally
 			{
-				mDatabase.endTransaction();
+				if(mDatabase != null)
+					mDatabase.endTransaction();
 			}
 		}
 		

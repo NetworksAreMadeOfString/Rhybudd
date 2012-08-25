@@ -644,9 +644,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 				{
 					if(msg.what == 0)
 					{
-						
-						adapter.notifyDataSetChanged();
-						
+						if(adapter != null)
+							adapter.notifyDataSetChanged();
 					}
 					else if(msg.what == 1)
 					{
@@ -658,7 +657,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 								evt.setAcknowledged();	
 							}
 						}
-						adapter.notifyDataSetChanged();
+						
+						if(adapter != null)
+							adapter.notifyDataSetChanged();
 					}
 					else if(msg.what == 2)
 					{
@@ -678,7 +679,10 @@ public class RhybuddHome extends SherlockFragmentActivity
 								evt.setProgress(false);
 							}
 						}
-						adapter.notifyDataSetChanged();
+						
+						if(adapter != null)
+							adapter.notifyDataSetChanged();
+						
 						Toast.makeText(getApplicationContext(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
 					}
 					else

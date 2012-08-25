@@ -69,7 +69,8 @@ public class ManageDatabase extends SherlockActivity
 			{
 				try
 				{
-					if(msg.what == 0)
+					Toast.makeText(ManageDatabase.this, "Complete!", Toast.LENGTH_SHORT).show();
+					/*if(msg.what == 0)
 					{
 						((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(0);
 						((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(0);
@@ -78,7 +79,7 @@ public class ManageDatabase extends SherlockActivity
 					{
 						((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
 				    	((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
-					}
+					}*/
 				}
 				catch(Exception e)
 				{
