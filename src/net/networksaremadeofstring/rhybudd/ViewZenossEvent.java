@@ -37,6 +37,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -150,7 +152,7 @@ public class ViewZenossEvent extends SherlockActivity
 		try
 		{
 			((TextView) findViewById(R.id.EventTitle)).setText(getIntent().getStringExtra("Device"));
-			((TextView) findViewById(R.id.Summary)).setText(getIntent().getStringExtra("Summary"));
+			((TextView) findViewById(R.id.Summary)).setText(Html.fromHtml(getIntent().getStringExtra("Summary")));
 			((TextView) findViewById(R.id.LastTime)).setText(getIntent().getStringExtra("LastTime"));
 			((TextView) findViewById(R.id.EventCount)).setText(Integer.toString(getIntent().getIntExtra("Count",0)));
 		}
@@ -208,7 +210,17 @@ public class ViewZenossEvent extends SherlockActivity
 
 						try
 						{
-							Summary.setText(EventDetails.getString("message"));
+							Summary.setText(Html.fromHtml(EventDetails.getString("message")));
+							try
+							{
+								Summary.setMovementMethod(LinkMovementMethod.getInstance());
+							}
+							catch(Exception e)
+							{
+								//Worth a shot
+							}
+							
+
 						}
 						catch(Exception e)
 						{

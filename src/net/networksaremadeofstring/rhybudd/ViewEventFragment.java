@@ -1,6 +1,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ public class ViewEventFragment extends SherlockFragment
     	((TextView) getView().findViewById(R.id.EventTitle)).setText(getArguments().getString("Device"));
     	((TextView) getView().findViewById(R.id.Componant)).setText(getArguments().getString("Component"));
     	((TextView) getView().findViewById(R.id.EventClass)).setText(getArguments().getString("EventClass"));
-		((TextView) getView().findViewById(R.id.Summary)).setText(getArguments().getString("Summary"));
+		((TextView) getView().findViewById(R.id.Summary)).setText(Html.fromHtml(getArguments().getString("Summary")));
 		((TextView) getView().findViewById(R.id.FirstTime)).setText(getArguments().getString("FirstSeen"));
 		((TextView) getView().findViewById(R.id.LastTime)).setText(getArguments().getString("LastSeen"));
 		((TextView) getView().findViewById(R.id.EventCount)).setText(Integer.toString(getArguments().getInt("EventCount")));

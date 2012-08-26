@@ -668,7 +668,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 							listOfZenossEvents.get(i).setProgress(false);
 							listOfZenossEvents.get(i).setAcknowledged();
 						}
-						adapter.notifyDataSetChanged();
+						
+						if(adapter != null)
+							adapter.notifyDataSetChanged();
 					}
 					else if(msg.what == 99)
 					{

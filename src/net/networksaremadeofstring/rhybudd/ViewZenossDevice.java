@@ -370,7 +370,7 @@ public class ViewZenossDevice extends SherlockActivity
 					
 					try
 					{
-						if(EventsObject.has("type") && EventsObject.get("type").equals("exception"))
+						if((EventsObject.has("type") && EventsObject.get("type").equals("exception")) || !EventsObject.getJSONObject("result").has("totalCount") )
 						{
 							EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),true);
 						}

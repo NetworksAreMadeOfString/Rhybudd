@@ -98,16 +98,18 @@
         android:textColor="@color/RhybuddTitleText"
         android:textStyle="bold" >
     </TextView>
-
+
     <TextView
         android:id="@+id/Summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/EventClass"
         android:layout_below="@+id/SummaryLabel"
+        android:linksClickable="true"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/RhybuddStdText" >
+
     </TextView>
 
     <TextView
