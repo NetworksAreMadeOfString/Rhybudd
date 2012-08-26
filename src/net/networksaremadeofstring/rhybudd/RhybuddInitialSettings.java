@@ -334,7 +334,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 				} 
     			catch(java.lang.IllegalStateException ise)
     			{
-    				HandleException(ise, "Neither the Hostname, Username or Password can be null");
+    				HandleException(ise, "Neither the Schema, Hostname, Username or Password can be null");
     			}
     			catch(java.net.UnknownHostException uhe)
     			{

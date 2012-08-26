@@ -748,7 +748,7 @@ public class ZenossAPIv2
     
 	public JSONObject GetDevice(String UID) throws JSONException, ClientProtocolException, IOException
     {
-    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + URLEncoder.encode(UID, "UTF-8") + "/device_router");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID.replace(" ", "%20") + "/device_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
@@ -773,18 +773,19 @@ public class ZenossAPIv2
         Wrapper.put(reqData);
         httpost.setEntity(new StringEntity(Wrapper.toString()));
     	
+        Log.i("httpHost",ZENOSS_INSTANCE + URLEncoder.encode(UID, "UTF-8") + "/device_router");
     	//String test = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-		
+        Log.e("GetDevice",test);
 		JSONObject json = new JSONObject(test);
     	return json;
     }
     
-	public JSONObject GetDeviceEvents(String UID) throws JSONException, ClientProtocolException, IOException
+	public JSONObject GetDeviceEvents(String UID, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
     {
-    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + URLEncoder.encode(UID, "UTF-8") + "/evconsole_router");
+    	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID.replace(" ", "%20") + "/evconsole_router");
 
     	httpost.addHeader("Content-type", "application/json; charset=utf-8");
     	httpost.setHeader("Accept", "application/json");
@@ -800,8 +801,11 @@ public class ZenossAPIv2
         
 
     	//4.1 hack
-    	JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
-        dataObject.put("keys", keys);
+        if(Zenoss41)
+        {
+	    	JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
+	        dataObject.put("keys", keys);
+        }
         //End 4.1 hack
         
         data.put(dataObject);
@@ -821,7 +825,7 @@ public class ZenossAPIv2
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-		Log.e("GetDeviceEvents",test);
+		//Log.e("GetDeviceEvents",test);
 		JSONObject json = new JSONObject(test);
     	return json;
     }

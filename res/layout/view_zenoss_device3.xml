@@ -267,9 +267,7 @@
             android:text="Events:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
-
-
+
         <ListView
             android:id="@+id/ZenossEventsList"
             android:layout_width="match_parent"

@@ -29,6 +29,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Log;
 
 public class RhybuddDatabase 
 {
@@ -56,7 +57,21 @@ public class RhybuddDatabase
 
 	public void FlushDB()
 	{
-		mDatabaseOpenHelper.FlushDB();
+		try
+		{
+			mDatabaseOpenHelper.getWritableDatabase();
+			mDatabaseOpenHelper.FlushDB();
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(mDatabaseOpenHelper != null)
+				mDatabaseOpenHelper.close();
+		}
 	}
 	
 	public ZenossDevice getDevice(String UID)
@@ -393,7 +408,7 @@ public class RhybuddDatabase
 		@Override
 		public void onOpen(SQLiteDatabase db) 
 		{
-			//Log.i("RhybuddOpenHelper","onOpen");
+			Log.i("RhybuddOpenHelper","onOpen");
 			mDatabase = db;
 		}
 

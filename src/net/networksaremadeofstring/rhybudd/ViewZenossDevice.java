@@ -129,13 +129,19 @@ public class ViewZenossDevice extends SherlockActivity
 
 						try
 						{
-							((TextView) findViewById(R.id.deviceID)).setText(DeviceDetails.getString("snmpSysName").toUpperCase());
+							String Name = DeviceDetails.getString("snmpSysName").toUpperCase();
+							if(Name.equals(""))
+							{
+								Name = DeviceDetails.getString("name").toUpperCase();
+							}
+							
+							((TextView) findViewById(R.id.deviceID)).setText(Name);
 							//actionbar.setTitle(DeviceDetails.getString("snmpSysName"));
-							actionbar.setSubtitle(DeviceDetails.getString("snmpSysName"));
+							actionbar.setSubtitle(Name);
 						}
 						catch(Exception e)
 						{
-							((TextView) findViewById(R.id.deviceID)).setText("No Name - Details");
+							((TextView) findViewById(R.id.deviceID)).setText("--");
 						}
 
 						try
@@ -360,7 +366,20 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 					}
 
-					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"));
+					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),false);
+					
+					try
+					{
+						if(EventsObject.has("type") && EventsObject.get("type").equals("exception"))
+						{
+							EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),true);
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					
 					if(EventsObject.has("result") && EventsObject.getJSONObject("result").getInt("totalCount") > 0)
 					{
 						Events = EventsObject.getJSONObject("result").getJSONArray("events");
