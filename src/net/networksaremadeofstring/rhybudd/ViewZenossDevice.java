@@ -49,7 +49,7 @@ public class ViewZenossDevice extends SherlockActivity
 	JSONObject DeviceObject = null, EventsObject = null;
 	JSONObject DeviceDetails = null;
 	private SharedPreferences settings = null;
-	Handler firstLoadHandler, eventsHandler;
+	Handler firstLoadHandler, eventsHandler, errorHandler;
 	ProgressDialog dialog;
 	Thread dataPreload, eventsLoad;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
@@ -81,6 +81,21 @@ public class ViewZenossDevice extends SherlockActivity
 		
 		list = (ListView)findViewById(R.id.ZenossEventsList);
 
+		errorHandler = new Handler()
+		{
+			public void handleMessage(Message msg) 
+			{
+				try
+				{
+					Toast.makeText(ViewZenossDevice.this, msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+				}
+				catch(Exception e)
+				{
+					BugSenseHandler.log("ViewZenossDevice-ErrorHandler", e);
+				}
+			}
+		};
+		
 		eventsHandler = new Handler()
 		{
 			public void handleMessage(Message msg) 
@@ -271,6 +286,9 @@ public class ViewZenossDevice extends SherlockActivity
 			{
 				try 
 				{
+					Message msg = new Message();
+					Bundle bundle = new Bundle();
+					
 					if(API == null)
 					{
 						try
@@ -288,22 +306,38 @@ public class ViewZenossDevice extends SherlockActivity
 						{
 							if(cte.getMessage() != null)
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+								bundle.putString("exception","The connection timed out;\r\n" + cte.getMessage().toString());
+								msg.setData(bundle);
+								msg.what = 0;
+								errorHandler.sendMessage(msg);
 							}
 							else
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								bundle.putString("exception","A time out error was encountered but the exception thrown contains no further information.");
+								msg.setData(bundle);
+								msg.what = 0;
+								errorHandler.sendMessage(msg);
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 							}
 						}
 						catch(Exception e)
 						{
 							if(e.getMessage() != null)
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered;\r\n" + e.getMessage().toString());
+								msg.setData(bundle);
+								msg.what = 0;
+								errorHandler.sendMessage(msg);
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
 							}
 							else
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered but the exception thrown contains no further information.");
+								msg.setData(bundle);
+								msg.what = 0;
+								errorHandler.sendMessage(msg);
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 							}
 						}
 					}

@@ -236,6 +236,9 @@ public class DeviceList extends SherlockActivity
 				String MessageExtra = "";
 				try 
 				{
+					Message msg = new Message();
+					Bundle bundle = new Bundle();
+					
 					ZenossAPIv2 API = null;
 					try
 					{
@@ -245,22 +248,39 @@ public class DeviceList extends SherlockActivity
 					{
 						if(cte.getMessage() != null)
 						{
-							Toast.makeText(DeviceList.this, "The connection timed out;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+							
+							bundle.putString("exception","The connection timed out;\r\n" + cte.getMessage().toString());
+							msg.setData(bundle);
+							msg.what = 0;
+							handler.sendMessage(msg);
+							//Toast.makeText(DeviceList.this, "The connection timed out;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
 						}
 						else
 						{
-							Toast.makeText(DeviceList.this, "An time out error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							bundle.putString("exception","A time out error was encountered but the exception thrown contains no further information.");
+							msg.setData(bundle);
+							msg.what = 0;
+							handler.sendMessage(msg);
+							//Toast.makeText(DeviceList.this, "A time out error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 						}
 					}
 					catch(Exception e)
 					{
 						if(e.getMessage() != null)
 						{
-							Toast.makeText(DeviceList.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+							bundle.putString("exception","An error was encountered;\r\n" + e.getMessage().toString());
+							msg.setData(bundle);
+							msg.what = 0;
+							handler.sendMessage(msg);
+							//Toast.makeText(DeviceList.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
 						}
 						else
 						{
-							Toast.makeText(DeviceList.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+							bundle.putString("exception","An error was encountered but the exception thrown contains no further information.");
+							msg.setData(bundle);
+							msg.what = 0;
+							handler.sendMessage(msg);
+							//Toast.makeText(DeviceList.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 						}
 					}
 					
@@ -291,8 +311,8 @@ public class DeviceList extends SherlockActivity
 					}
 					else
 					{
-						Message msg = new Message();
-						Bundle bundle = new Bundle();
+						//Message msg = new Message();
+						//Bundle bundle = new Bundle();
 						bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices. " + MessageExtra );
 						msg.setData(bundle);
 						msg.what = 0;
