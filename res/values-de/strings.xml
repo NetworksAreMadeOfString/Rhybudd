@@ -1,0 +1,119 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <string name="hello">"Hallo Welt, rhestr!"</string>
+    <string name="app_name">"Rhybudd"</string>
+    <string name="Description">"Rhybudd ist ein Zenoss Events und Device Management-App für Android Verwendet die neue Zenoss 3.0 API für abzufragen, aufmerksam an und quittieren oder tauchen Sie ein in Zenoss Warnungen."</string>
+    <string name="widget_GraphTitle">"Aktuelle Veranstaltung Counts"</string>
+    <string name="AddtoLogButton">"In den Log"</string>
+    <string name="DefaultStatusMessageText">"Aktualisieren..."</string>
+    <string name="deviceListTitle">"Infrastruktur"</string>
+    <string name="eventListTitle">"Events Liste"</string>
+    
+    <string name="productionStateNotificationLabel">"Nur zu erhöhen Warnungen für Produktion Geräten"</string>
+    <string name="notificationSoundLabel">"Benachrichtigungston"</string>
+    
+    <!-- Initial Settings -->
+    <string name="initialSettings">"Zusätzliche Konfiguration wie Hintergrund Abfrageintervall etc können später konfiguriert werden"</string>
+    
+    <string name="mangeDatabaseTitle">"Verwalten Cache"</string>
+    <string name="mangeDatabaseDBSizeTitle">"Aktuelle DB Größe:"</string>
+    <string name="manageCache_RefreshTitle">"Lokalen Cache aktualisieren"</string>
+    <string name="refreshDesc">"Der Cache ist jedesmal, wenn die Lasten app so gibt es keine Notwendigkeit, eine Aktualisierung zu erzwingen aufgefrischt."</string>
+    <string name="manageCache_moveToSDTitle">"Bewegen App auf SD-Karte"</string>
+    <string name="moveToSDDesc">"Abhängig von der Größe Ihrer Infrastruktur dieser Cache kann recht groß. Umzug in SD ist ratsam."</string>
+    <string name="manageCache_emptyCacheTitle">"Leere Lokale Cache"</string>
+    <string name="emptyCacheDesc">"Der lokale Cache wird geleert jedes Mal die App geladen, aber Sie können es manuell spülen, falls erforderlich."</string>
+    
+    
+    <string name="homeMenu_Help">"HILFE"</string>
+    <string name="homeMenu_PagerDuty">"Pager Pflicht"</string>
+    <string name="homeMenu_ManageDB">"Datenbank verwalten"</string>
+    <string name="homeMenu_Infrastructure">"Infrastruktur"</string>
+    <string name="homeMenu_Settings">"Einstellungen"</string>
+    <string name="homeMenu_Refresh">"Aktualisieren"</string>
+    
+    
+    <string name="searchTitle">"Suchergebnisse"</string>
+    <string name="searchStatus">"Searching .."</string>
+    <string name="searchHint">"Suchbegriffe"</string>
+    <string name="searchButton">"Suchen"</string>
+    <string name="searchLabel">"Suchen"</string>
+    <string name="searchHintDevice">"Gerätename"</string>
+    <string name="searchVoicePromptDevice">"Für beste Ergebnisse verwenden Sie einen kurzen einzelnes Wort wie dem Gerätenamen."</string>
+    
+    <string name="deviceIDLabel">"Geräte-ID"</string>
+    <string name="uptimeLabel">"Betriebszeit"</string>
+    <string name="deviceDetailsLastChange">"Letzte Änderung"</string>
+    <string name="deviceDetailsModelTime">"Modell Zeit"</string>
+    <string name="deviceDetailsMemorySwap">"Memory / Swap"</string>
+    <string name="deviceDetailsTitle">"Device Details"</string>
+    <string name="deviceDetailsOSModelLabel">"OS Modeling:"</string>
+    <string name="deviceDetailsGroupsLabel">"Gruppen:"</string>
+    <string name="deviceDetailsSystemsLabel">"zur Fabrik. "</string>
+    <string name="deviceDetailsUptimeLabel">"Betriebszeit"</string>
+    <string name="deviceDetailsProductionStateLabel">"Produktion Staat:"</string>
+    <string name="empty">""</string>
+    <string name="deviceDetailsSNMPLocation">"SNMP Location"</string>
+    <string name="deviceDetailsSNMPContact">"SNMP Kontakt"</string>
+    <string name="deviceDetailsEventsTitle">"Ereignisse"</string>
+    
+    <string name="eventDetailsTitle">"Event Details"</string>
+    <string name="eventDetailsComponentLabel">"Komponente:"</string>
+    <string name="eventDetailsEventClassLabel">"Ereignisklasse:"</string>
+    <string name="eventDetailsSummaryLabel">"Zusammenfassung:"</string>
+    <string name="eventDetailsFirstSeenLabel">"Erstmals gesehen:"</string>
+    <string name="eventDetailslastSeenLabel">"Zuletzt gesehen:"</string>
+    
+    <string name="eventDetailsEventCountLabel">"Event Count:"</string>
+    <string name="eventDetailsAgentLabel">"Vertreter:"</string>
+    <string name="eventDetailsLogLabel">"Log"</string>
+    
+    <!-- DeviceList -->
+    <string name="deviceListServerCount">"Berechnung Server zählen ..."</string>
+    <string name="deviceListIconDesc">"Bild Darstellung 3 Server in einem Netzwerk"</string>
+    
+    <!-- Manage Database -->
+    <string name="mgeDBRefreshDesc">"Bild Darstellung der Auffrischung des lokalen Cache"</string>
+    <string name="mgeDBSDCard">"Bild Darstellung einer SD-Karte"</string>
+    <string name="mgeDBBin">"Bild Darstellung einer bin gefüllt"</string>
+    
+    <!-- Rhybudd Home -->
+    <string name="homeLogos">"Bild zeigt die Zenoss und Android logos"</string>
+    
+    <!-- Navigation -->
+    <string-array name="actionbar_nav">
+        <item>"Devices"</item>
+        <item>"Suchen"</item>
+        <item>"Reports"</item>
+    </string-array>
+    
+    <!-- Initial Settings -->
+    <string name="SaveSettingsButton">"Einstellungen speichern &amp; Login"</string>
+    <string name="UserNameHint">"Zenoss User Name"</string>
+    <string name="PasswordHint">"Zenoss Passwort"</string>
+    <string name="EnableHTTPAuthCheck">"Aktivieren Sie HTTP Basic Auth"</string>
+    <string name="HTTPAuthUserNameHint">"HTTP Basic Auth Benutzer"</string>
+    <string name="HTTPAuthPasswordHint">"HTTP Basic Auth Passwort"</string>
+    
+    <!-- Preferences -->
+    <string-array name="BackgroundServiceDelay_preference">
+        <item>"30 Sekunden"</item>
+        <item>"1 Minute"</item>
+        <item>"2 Minuten"</item>
+        <item>"5 Minuten"</item>
+        <item>"10 Minuten"</item>
+        <item>"15 Minuten"</item>
+        <item>"30 Minuten"</item>
+        <item>"1 Stunde"</item>
+    </string-array>
+    
+    <string-array name="BackgroundServiceDelay_preference_values">
+        <item>"30"</item>
+        <item>"60"</item>
+        <item>"120"</item>
+        <item>"360"</item>
+        <item>"600"</item>
+        <item>"900"</item>
+        <item>"1800 "</item>
+        <item>"3600"</item>
+    </string-array>
+</resources>

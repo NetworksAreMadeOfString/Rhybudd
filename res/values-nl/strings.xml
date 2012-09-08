@@ -1,57 +1,119 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="hello">Hello World, rhestr!</string>
-    <string name="app_name">Rhybudd</string>
-    <string name="Description">Rhybudd is een Zenoss Evenementen en Device Management App voor Android Maakt gebruik van de nieuwe Zenoss 3.0 API om poll voor, alert en-bevestiging of in Zenoss waarschuwingen verdiepen.</string>
-    <string name="widget_GraphTitle">8Hr Evenement Distributie</string>
-    <string name="AddtoLogButton">Voeg toe aan Log</string>
-    <string name="DefaultStatusMessageText">Verfrissend..</string>
-    <string name="deviceListTitle">Infrastructuur</string>
-    <string name="eventListTitle">Events Lijst</string>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <string name="hello">"Hello World, rhestr!"</string>
+    <string name="app_name">"Rhybudd"</string>
+    <string name="Description">"Rhybudd is een Zenoss Evenementen en Device Management App voor Android Maakt gebruik van de nieuwe Zenoss 3,0 API om pollen voor, op alert en of Erken verdiepen in Zenoss waarschuwingen."</string>
+    <string name="widget_GraphTitle">"Huidig ​​evenement Counts"</string>
+    <string name="AddtoLogButton">"Toevoegen aan Inloggen"</string>
+    <string name="DefaultStatusMessageText">"Verfrissende .."</string>
+    <string name="deviceListTitle">"Infrastructuur"</string>
+    <string name="eventListTitle">"Events Lijst"</string>
+    
+    <string name="productionStateNotificationLabel">"Alleen verhogen waarschuwingen voor Productie-apparaten"</string>
+    <string name="notificationSoundLabel">"Notificatiegeluid"</string>
+    
+    <!-- Initial Settings -->
+    <string name="initialSettings">"Aanvullende configuratie zoals achtergrond polling interval enz. kunnen later worden geconfigureerd"</string>
+    
+    <string name="mangeDatabaseTitle">"Beheer Cache"</string>
+    <string name="mangeDatabaseDBSizeTitle">"Actueel DB Maat:"</string>
+    <string name="manageCache_RefreshTitle">"Refresh Local Cache"</string>
+    <string name="refreshDesc">"De cache wordt vernieuwd iedere keer dat de lading app dus er is geen noodzaak om een ​​refresh dwingen."</string>
+    <string name="manageCache_moveToSDTitle">"Verplaats App naar SD-kaart"</string>
+    <string name="moveToSDDesc">"Afhankelijk van de grootte van uw infrastructuur deze cache kunnen vrij groot worden. Verhuizen naar SD is aan te raden."</string>
+    <string name="manageCache_emptyCacheTitle">"Lege Local Cache"</string>
+    <string name="emptyCacheDesc">"De lokale cache wordt geleegd elke keer dat de app laadt, maar u kunt handmatig spoelen indien nodig."</string>
     
     
-    <string name="mangeDatabaseTitle">Beheren Cache</string>
-    <string name="mangeDatabaseDBSizeTitle">Stroom DB Maat:</string>
-    <string name="manageCache_RefreshTitle">Vernieuwen Local Cache</string>
-    <string name="refreshDesc">De cache wordt vernieuwd elke keer dat de app laadt, dus er is geen noodzaak om een refresh kracht.</string>
-    <string name="manageCache_moveToSDTitle">Verhuizen App naar SD-kaart</string>
-    <string name="moveToSDDesc">Afhankelijk van de grootte van uw infrastructuur deze cache kunnen vrij groot worden. Verhuizen naar SD is aan te raden.</string>
-    <string name="manageCache_emptyCacheTitle">Lege Local Cache</string>
-    <string name="emptyCacheDesc">De lokale cache wordt geleegd elke keer dat de app laadt, maar kunt u deze handmatig spoelen indien nodig.</string>
+    <string name="homeMenu_Help">"Help"</string>
+    <string name="homeMenu_PagerDuty">"Pager Duty"</string>
+    <string name="homeMenu_ManageDB">"Database beheren"</string>
+    <string name="homeMenu_Infrastructure">"Infrastructuur"</string>
+    <string name="homeMenu_Settings">"instellingen"</string>
+    <string name="homeMenu_Refresh">"Vernieuwen"</string>
     
     
-    <string name="homeMenu_Help">Hulp</string>
-    <string name="homeMenu_PagerDuty">Pager Duty</string>
-    <string name="homeMenu_ManageDB">Database beheren</string>
-    <string name="homeMenu_Infrastructure">Infrastructuur</string>
-    <string name="homeMenu_Settings">Instellingen</string>
-    <string name="homeMenu_Refresh">Verversen</string>
+    <string name="searchTitle">"Zoekresultaten"</string>
+    <string name="searchStatus">"Wordt doorzocht..."</string>
+    <string name="searchHint">"Zoektermen"</string>
+    <string name="searchButton">"Zoeken"</string>
+    <string name="searchLabel">"Zoeken"</string>
+    <string name="searchHintDevice">"Apparaatnaam"</string>
+    <string name="searchVoicePromptDevice">"Voor het beste resultaat gebruikt u een korte enkel woord, zoals de naam van het apparaat."</string>
     
+    <string name="deviceIDLabel">"Apparaat-ID"</string>
+    <string name="uptimeLabel">"Uptime"</string>
+    <string name="deviceDetailsLastChange">"Laatste wijziging"</string>
+    <string name="deviceDetailsModelTime">"Model Tijd"</string>
+    <string name="deviceDetailsMemorySwap">"Geheugen / Swap"</string>
+    <string name="deviceDetailsTitle">"Apparaat Details"</string>
+    <string name="deviceDetailsOSModelLabel">"OS Modeling:"</string>
+    <string name="deviceDetailsGroupsLabel">"Groepen:"</string>
+    <string name="deviceDetailsSystemsLabel">"Systems:"</string>
+    <string name="deviceDetailsUptimeLabel">"Uptime:"</string>
+    <string name="deviceDetailsProductionStateLabel">"Productie staat:"</string>
+    <string name="empty">""</string>
+    <string name="deviceDetailsSNMPLocation">"SNMP Woonplaats"</string>
+    <string name="deviceDetailsSNMPContact">"SNMP Contact"</string>
+    <string name="deviceDetailsEventsTitle">"Activiteiten"</string>
     
-    <string name="searchTitle">Zoekresultaten</string>
-    <string name="searchStatus">Zoeken..</string>
-    <string name="searchHint">Zoektermen</string>
-    <string name="searchButton">Zoeken</string>
-    <string name="searchLabel">Zoeken</string>
-    <string name="searchHintDevice">Apparaatnaam</string>
-    <string name="searchVoicePromptDevice">Voor het beste resultaat gebruik maken van een korte enkel woord om de naam van het apparaat dat u zoekt te beschrijven.</string>
-    <string name="empty"></string>
+    <string name="eventDetailsTitle">"Event Details"</string>
+    <string name="eventDetailsComponentLabel">"Component"</string>
+    <string name="eventDetailsEventClassLabel">"Event-klasse:"</string>
+    <string name="eventDetailsSummaryLabel">"Samenvatting:"</string>
+    <string name="eventDetailsFirstSeenLabel">"Eerste bezoek:"</string>
+    <string name="eventDetailslastSeenLabel">"Laatst gezien:"</string>
     
-    <string name="deviceDetailsTitle">Apparaat Details</string>
-    <string name="deviceDetailsOSModelLabel">OS Modeling:</string>
-    <string name="deviceDetailsGroupsLabel">Groepen:</string>
-    <string name="deviceDetailsSystemsLabel">Systemen:</string>
-    <string name="deviceDetailsUptimeLabel">Uptime:</string>
-    <string name="deviceDetailsProductionStateLabel">Productie Staat:</string>
+    <string name="eventDetailsEventCountLabel">"Event Count:"</string>
+    <string name="eventDetailsAgentLabel">"Agent:"</string>
+    <string name="eventDetailsLogLabel">"Inloggen"</string>
     
+    <!-- DeviceList -->
+    <string name="deviceListServerCount">"Berekenen aantal servers ..."</string>
+    <string name="deviceListIconDesc">"Afbeelding van 3 servers op een netwerk"</string>
     
-    <string name="eventDetailsTitle">Evenement Details</string>
-    <string name="eventDetailsComponentLabel">Bestanddeel</string>
-    <string name="eventDetailsEventClassLabel">Klasse Event:</string>
-    <string name="eventDetailsSummaryLabel">Overzicht:</string>
-    <string name="eventDetailsFirstSeenLabel">Eerst Gezien:</string>
-    <string name="eventDetailslastSeenLabel">Laatst Gezien:</string>
-    <string name="eventDetailsEventCountLabel">Event Tellen:</string>
-    <string name="eventDetailsAgentLabel">Agent:</string>
-    <string name="eventDetailsLogLabel">Logboek:</string>
+    <!-- Manage Database -->
+    <string name="mgeDBRefreshDesc">"Afbeelding van het verversen van de lokale cache"</string>
+    <string name="mgeDBSDCard">"Afbeelding van een SD-kaart"</string>
+    <string name="mgeDBBin">"Afbeelding van een bak wordt gevuld"</string>
+    
+    <!-- Rhybudd Home -->
+    <string name="homeLogos">"Beeld dat de Zenoss en Android logo's"</string>
+    
+    <!-- Navigation -->
+    <string-array name="actionbar_nav">
+        <item>"Apparaten"</item>
+        <item>"Zoeken"</item>
+        <item>"Rapporten"</item>
+    </string-array>
+    
+    <!-- Initial Settings -->
+    <string name="SaveSettingsButton">"Instellingen opslaan &amp; Login"</string>
+    <string name="UserNameHint">"Zenoss Gebruikersnaam"</string>
+    <string name="PasswordHint">"Zenoss Wachtwoord"</string>
+    <string name="EnableHTTPAuthCheck">"Enable HTTP Basic Auth"</string>
+    <string name="HTTPAuthUserNameHint">"HTTP Basic Auth Gebruiker"</string>
+    <string name="HTTPAuthPasswordHint">"HTTP Basic Auth Password"</string>
+    
+    <!-- Preferences -->
+    <string-array name="BackgroundServiceDelay_preference">
+        <item>"30 Seconds"</item>
+        <item>"1 minuut"</item>
+        <item>"2 Minuten"</item>
+        <item>"5 minuten"</item>
+        <item>"10 minuten"</item>
+        <item>"15 Minuten"</item>
+        <item>"30 minuten"</item>
+        <item>"1 uur"</item>
+    </string-array>
+    
+    <string-array name="BackgroundServiceDelay_preference_values">
+        <item>"30"</item>
+        <item>"60 "</item>
+        <item>"120 "</item>
+        <item>"360"</item>
+        <item>"600 "</item>
+        <item>"900 "</item>
+        <item>"1800"</item>
+        <item>"$3600"</item>
+    </string-array>
 </resources>

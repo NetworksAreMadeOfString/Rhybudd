@@ -41,7 +41,11 @@
     <string name="searchHintDevice">Device Name</string>
     <string name="searchVoicePromptDevice">For best results use a short single word such as the device name.</string>
     
-    
+    <string name="deviceIDLabel">Device ID</string>
+    <string name="uptimeLabel">Uptime</string>
+    <string name="deviceDetailsLastChange">Last Change</string>
+    <string name="deviceDetailsModelTime">Model Time</string>
+    <string name="deviceDetailsMemorySwap">Memory / Swap</string>
     <string name="deviceDetailsTitle">Device Details</string>
     <string name="deviceDetailsOSModelLabel">OS Modeling:</string>
     <string name="deviceDetailsGroupsLabel">Groups:</string>
@@ -49,6 +53,9 @@
     <string name="deviceDetailsUptimeLabel">Uptime:</string>
     <string name="deviceDetailsProductionStateLabel">Production State:</string>
     <string name="empty"></string>
+    <string name="deviceDetailsSNMPLocation">SNMP Location</string>
+    <string name="deviceDetailsSNMPContact">SNMP Contact</string>
+    <string name="deviceDetailsEventsTitle">Events</string>
     
     <string name="eventDetailsTitle">Event Details</string>
     <string name="eventDetailsComponentLabel">Component:</string>
@@ -56,6 +63,7 @@
     <string name="eventDetailsSummaryLabel">Summary:</string>
     <string name="eventDetailsFirstSeenLabel">First Seen:</string>
     <string name="eventDetailslastSeenLabel">Last Seen:</string>
+    
     <string name="eventDetailsEventCountLabel">Event Count:</string>
     <string name="eventDetailsAgentLabel">Agent:</string>
     <string name="eventDetailsLogLabel">Log:</string>
@@ -78,6 +86,14 @@
         <item>Search</item>
         <item>Reports</item>
     </string-array>
+    
+    <!-- Initial Settings -->
+    <string name="SaveSettingsButton">Save Settings &amp; Login</string>
+    <string name="UserNameHint">Zenoss User Name</string>
+    <string name="PasswordHint">Zenoss Password</string>
+    <string name="EnableHTTPAuthCheck">Enable HTTP Basic Auth</string>
+    <string name="HTTPAuthUserNameHint">HTTP Basic Auth User</string>
+    <string name="HTTPAuthPasswordHint">HTTP Basic Auth Password</string>
     
     <!-- Preferences -->
     <string-array name="BackgroundServiceDelay_preference">
