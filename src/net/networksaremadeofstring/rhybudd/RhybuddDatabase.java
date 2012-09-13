@@ -575,9 +575,9 @@ public class RhybuddDatabase
 					}
 					catch (Exception e) 
 					{
-						e.printStackTrace();
+						//e.printStackTrace();
 						//This could get a little excessive
-						BugSenseHandler.log("Database-refreshEvents", e);
+						//BugSenseHandler.log("Database-refreshEvents", e);
 					}
 				}
 				mDatabase.setTransactionSuccessful();

@@ -217,10 +217,21 @@ public class DeviceList extends SherlockActivity
   
     public void Refresh()
     {
-    	if(!dialog.isShowing())
+    	if(dialog != null)
+    	{
+    		dialog.setTitle("Contacting Zenoss...");
+       	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
+       	 	dialog.setCancelable(false);
+       	 	
+    		if(!dialog.isShowing())
+    		{
+    			dialog.show();
+    		}
+    	}
+    	else
     	{
     		dialog = new ProgressDialog(this);
-        	dialog.setTitle("Contacting Zenoss...");
+    		dialog.setTitle("Contacting Zenoss...");
        	 	dialog.setMessage("Please wait:\nLoading Infrastructure....");
        	 	dialog.setCancelable(false);
        	 	dialog.show();
@@ -306,6 +317,7 @@ public class DeviceList extends SherlockActivity
 					if(listOfZenossDevices != null && listOfZenossDevices.size() > 0)
 					{
 						DeviceCount = listOfZenossDevices.size();
+						Message.obtain();
 						handler.sendEmptyMessage(1);
 						rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
 					}

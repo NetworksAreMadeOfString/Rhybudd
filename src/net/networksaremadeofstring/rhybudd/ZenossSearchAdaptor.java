@@ -60,6 +60,7 @@ public class ZenossSearchAdaptor extends BaseAdapter implements OnClickListener,
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
 		ZenossDevice Device = listZenossDevices.get(position);
+		
         if (convertView == null) 
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

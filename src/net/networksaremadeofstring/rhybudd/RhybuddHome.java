@@ -651,7 +651,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						for (ZenossEvent evt : listOfZenossEvents)
 						{
-							if(!evt.getEventState().equals("Acknowledged"))
+							if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
 							{
 								evt.setProgress(false);
 								evt.setAcknowledged();	
@@ -665,8 +665,11 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						for (Integer i : selectedEvents)
 						{
-							listOfZenossEvents.get(i).setProgress(false);
-							listOfZenossEvents.get(i).setAcknowledged();
+							if(listOfZenossEvents.get(i).getProgress())
+							{
+								listOfZenossEvents.get(i).setProgress(false);
+								listOfZenossEvents.get(i).setAcknowledged();
+							}
 						}
 						
 						if(adapter != null)
@@ -676,7 +679,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						for (ZenossEvent evt : listOfZenossEvents)
 						{
-							if(!evt.getEventState().equals("Acknowledged"))
+							if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
 							{
 								evt.setProgress(false);
 							}

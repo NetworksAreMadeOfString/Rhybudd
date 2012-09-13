@@ -340,9 +340,9 @@ public class ViewZenossDevice extends SherlockActivity
 								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 							}
 						}
+						
+						DeviceObject = API.GetDevice(getIntent().getStringExtra("UID"));
 					}
-
-					DeviceObject = API.GetDevice(getIntent().getStringExtra("UID"));
 				} 
 				catch (Exception e) 
 				{
@@ -365,6 +365,9 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					if(API == null)
 					{
+						Message msg = new Message();
+						Bundle bundle = new Bundle();
+						
 						try
 						{
 							if(settings.getBoolean("httpBasicAuth", false))
@@ -380,23 +383,34 @@ public class ViewZenossDevice extends SherlockActivity
 						{
 							if(cte.getMessage() != null)
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + cte.getMessage().toString(), Toast.LENGTH_LONG).show();
+								//Toast.makeText(ViewZenossDevice.this, , Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered;\r\n" + cte.getMessage().toString());
 							}
 							else
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered but the exception thrown contains no further information.");
 							}
+							msg.setData(bundle);
+							msg.what = 0;
+							errorHandler.sendMessage(msg);
 						}
 						catch(Exception e)
 						{
 							if(e.getMessage() != null)
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered;\r\n" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered;\r\n" + e.getMessage().toString());
 							}
 							else
 							{
-								Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
+								bundle.putString("exception","An error was encountered but the exception thrown contains no further information.");
 							}
+							
+							msg.setData(bundle);
+							msg.what = 0;
+							errorHandler.sendMessage(msg);
 						}
 					}
 

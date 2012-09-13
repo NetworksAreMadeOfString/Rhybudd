@@ -203,6 +203,17 @@ public class ZenossAPIv2
 
 		//Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
+		try
+		{
+			if(((int) devices.getJSONObject("result").getJSONArray("devices").length()) < DeviceCount)
+			{
+				DeviceCount = (int) devices.getJSONObject("result").getJSONArray("devices").length();
+			}
+		}
+		catch(Exception e)
+		{
+			BugSenseHandler.log("GetRhybuddDevices", e);
+		}
 
 		for(int i = 0; i < DeviceCount; i++)
 		{
@@ -331,7 +342,7 @@ public class ZenossAPIv2
 		
 		JSONObject dataContents = new JSONObject();
     	dataContents.put("start", 0);
-    	dataContents.put("limit", 500);
+    	dataContents.put("limit", 1000);
     	dataContents.put("dir", "ASC");
     	dataContents.put("sort", "name");
     	dataContents.put("uid", "/zport/dmd/Devices");

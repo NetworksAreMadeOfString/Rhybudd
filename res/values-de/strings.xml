@@ -1,30 +1,30 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <string name="hello">"Hallo Welt, rhestr!"</string>
     <string name="app_name">"Rhybudd"</string>
-    <string name="Description">"Rhybudd ist ein Zenoss Events und Device Management-App für Android Verwendet die neue Zenoss 3.0 API für abzufragen, aufmerksam an und quittieren oder tauchen Sie ein in Zenoss Warnungen."</string>
-    <string name="widget_GraphTitle">"Aktuelle Veranstaltung Counts"</string>
-    <string name="AddtoLogButton">"In den Log"</string>
-    <string name="DefaultStatusMessageText">"Aktualisieren..."</string>
+    <string name="Description">"Rhybudd ist eine Zenoss Events und Device Management-App für Android Benutzer, die es ermöglicht die neue Zenoss 3.0 API abzufragen, alarmiert zu werden und Zenoss Warnungen einzusehen."</string>
+    <string name="widget_GraphTitle">"Aktuelle Event Counts"</string>
+    <string name="AddtoLogButton">"In den Log hinzufügen"</string>
+    <string name="DefaultStatusMessageText">"Aktualisiert..."</string>
     <string name="deviceListTitle">"Infrastruktur"</string>
     <string name="eventListTitle">"Events Liste"</string>
     
-    <string name="productionStateNotificationLabel">"Nur zu erhöhen Warnungen für Produktion Geräten"</string>
+    <string name="productionStateNotificationLabel">"Nur bezüglich Production Geräte alarmieren"</string>
     <string name="notificationSoundLabel">"Benachrichtigungston"</string>
     
     <!-- Initial Settings -->
     <string name="initialSettings">"Zusätzliche Konfiguration wie Hintergrund Abfrageintervall etc können später konfiguriert werden"</string>
     
-    <string name="mangeDatabaseTitle">"Verwalten Cache"</string>
+    <string name="mangeDatabaseTitle">"Cache verwalten"</string>
     <string name="mangeDatabaseDBSizeTitle">"Aktuelle DB Größe:"</string>
     <string name="manageCache_RefreshTitle">"Lokalen Cache aktualisieren"</string>
-    <string name="refreshDesc">"Der Cache ist jedesmal, wenn die Lasten app so gibt es keine Notwendigkeit, eine Aktualisierung zu erzwingen aufgefrischt."</string>
-    <string name="manageCache_moveToSDTitle">"Bewegen App auf SD-Karte"</string>
-    <string name="moveToSDDesc">"Abhängig von der Größe Ihrer Infrastruktur dieser Cache kann recht groß. Umzug in SD ist ratsam."</string>
-    <string name="manageCache_emptyCacheTitle">"Leere Lokale Cache"</string>
-    <string name="emptyCacheDesc">"Der lokale Cache wird geleert jedes Mal die App geladen, aber Sie können es manuell spülen, falls erforderlich."</string>
+    <string name="refreshDesc">"Der Cache wird beim laden der App automatisch aktualisiert. Es ist nicht nötig von Hand zu aktualisieren."</string>
+    <string name="manageCache_moveToSDTitle">"App auf die SD-Karte verschieben"</string>
+    <string name="moveToSDDesc">"Abhängig von der Größe Ihrer Infrastruktur kann der Cache recht groß werden. Die App auf eine SD-Karte zu verschieben ist empfohlen."</string>
+    <string name="manageCache_emptyCacheTitle">"Lokalen Cache leeren"</string>
+    <string name="emptyCacheDesc">"Der lokale Cache wird bei jedem laden der App geleert, kann aber bei bedarf auch manuell geleert werden."</string>
     
     
-    <string name="homeMenu_Help">"HILFE"</string>
+    <string name="homeMenu_Help">"Hilfe"</string>
     <string name="homeMenu_PagerDuty">"Pager Pflicht"</string>
     <string name="homeMenu_ManageDB">"Datenbank verwalten"</string>
     <string name="homeMenu_Infrastructure">"Infrastruktur"</string>
@@ -33,12 +33,12 @@
     
     
     <string name="searchTitle">"Suchergebnisse"</string>
-    <string name="searchStatus">"Searching .."</string>
+    <string name="searchStatus">"Suche.."</string>
     <string name="searchHint">"Suchbegriffe"</string>
     <string name="searchButton">"Suchen"</string>
     <string name="searchLabel">"Suchen"</string>
     <string name="searchHintDevice">"Gerätename"</string>
-    <string name="searchVoicePromptDevice">"Für beste Ergebnisse verwenden Sie einen kurzen einzelnes Wort wie dem Gerätenamen."</string>
+    <string name="searchVoicePromptDevice">"Für beste Ergebnisse verwenden Sie ein kurzes einzelnes Wort wie dem Gerätenamen."</string>
     
     <string name="deviceIDLabel">"Geräte-ID"</string>
     <string name="uptimeLabel">"Betriebszeit"</string>
@@ -48,15 +48,15 @@
     <string name="deviceDetailsTitle">"Device Details"</string>
     <string name="deviceDetailsOSModelLabel">"OS Modeling:"</string>
     <string name="deviceDetailsGroupsLabel">"Gruppen:"</string>
-    <string name="deviceDetailsSystemsLabel">"zur Fabrik. "</string>
+    <string name="deviceDetailsSystemsLabel">"Systeme:"</string>
     <string name="deviceDetailsUptimeLabel">"Betriebszeit"</string>
-    <string name="deviceDetailsProductionStateLabel">"Produktion Staat:"</string>
+    <string name="deviceDetailsProductionStateLabel">"Production Zustand:"</string>
     <string name="empty">""</string>
     <string name="deviceDetailsSNMPLocation">"SNMP Location"</string>
     <string name="deviceDetailsSNMPContact">"SNMP Kontakt"</string>
     <string name="deviceDetailsEventsTitle">"Ereignisse"</string>
     
-    <string name="eventDetailsTitle">"Event Details"</string>
+    <string name="eventDetailsTitle">"Ereigniss Details"</string>
     <string name="eventDetailsComponentLabel">"Komponente:"</string>
     <string name="eventDetailsEventClassLabel">"Ereignisklasse:"</string>
     <string name="eventDetailsSummaryLabel">"Zusammenfassung:"</string>
