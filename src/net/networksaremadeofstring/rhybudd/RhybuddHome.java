@@ -140,12 +140,25 @@ public class RhybuddHome extends SherlockFragmentActivity
 	@Override
 	public void onNewIntent(Intent newIntent)
 	{
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 		Log.e("onNewIntent",Boolean.toString(newIntent.getBooleanExtra("forceRefresh", false)));
 		if(newIntent.getBooleanExtra("forceRefresh", false))
 		{
 			DBGetThread();
 		}
+		/*else
+		{
+			Log.e("onNewIntent","Didn't get told to refresh");
+		}*/
 	}
+	
+	@Override
+    protected void onResume() 
+	{
+        super.onResume();
+        DBGetThread();
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
+    }
 	
 	public void onCreate(Bundle savedInstanceState) 
 	{

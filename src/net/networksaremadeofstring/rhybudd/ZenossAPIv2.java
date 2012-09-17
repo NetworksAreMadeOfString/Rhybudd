@@ -19,6 +19,8 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -456,7 +458,7 @@ public class ZenossAPIv2
     	return json;
 	}
 	
-	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException
+	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
 		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
 		
@@ -478,14 +480,14 @@ public class ZenossAPIv2
 			}
 			catch(Exception e1)
 			{
-				BugSenseHandler.log("GetRhybuddEvents", e1);
+				//BugSenseHandler.log("GetRhybuddEvents", e1);
 				//Nope something bad happened
 				return null;
 			}
 		}
 		catch(Exception e1)
 		{
-			BugSenseHandler.log("GetRhybuddEvents", e1);
+			//BugSenseHandler.log("GetRhybuddEvents", e1);
 			e1.printStackTrace();
 			return null;
 		}
@@ -553,7 +555,7 @@ public class ZenossAPIv2
 		return this.GetEvents(Critical,Error,Warning,Info,Debug,false);
 	}*/
 	
-	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
+	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
 		String SeverityLevels = "";
         
@@ -581,7 +583,7 @@ public class ZenossAPIv2
 		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41);
 	}
 	
-	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
+	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
     {
     	//Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");

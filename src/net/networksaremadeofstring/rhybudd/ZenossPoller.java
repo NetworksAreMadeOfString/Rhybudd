@@ -577,7 +577,8 @@ public class ZenossPoller extends Service
 				}
 				catch(Exception e)
 				{
-					
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				finally
 				{
