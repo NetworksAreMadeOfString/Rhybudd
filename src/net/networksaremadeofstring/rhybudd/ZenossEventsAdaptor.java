@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -170,10 +171,13 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         if(Event.getEventState().equals("Acknowledged"))
         {
-        	AckImage.setImageResource(R.drawable.ack);
+        	AckImage.setImageResource(R.drawable.large_ack);
         }
         else
         {
+        	DeviceNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        	SummaryTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT_BOLD);
         	AckImage.setImageResource(R.drawable.nack);
         }
         
