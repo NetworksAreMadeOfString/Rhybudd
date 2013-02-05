@@ -12,7 +12,8 @@
                   android:uiOptions="splitActionBarWhenNarrow"
                   uiOptions="splitActionBarWhenNarrow"
                   android:launchMode="singleTop"
-                  android:configChanges="orientation|screenSize">
+                  android:configChanges="orientation|screenSize"
+                  android:backupAgent="RhybuddBackupAgent" android:allowBackup="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
