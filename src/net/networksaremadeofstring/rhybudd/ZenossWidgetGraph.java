@@ -154,7 +154,9 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 										true,
 										false,
 										false,
-										true);
+										true,
+										null,
+										null);
 							}
 							else
 							{

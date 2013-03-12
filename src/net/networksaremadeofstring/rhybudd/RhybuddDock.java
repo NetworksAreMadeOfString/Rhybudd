@@ -235,7 +235,9 @@ public class RhybuddDock extends SherlockFragmentActivity
 								settings.getBoolean("SeverityWarning", true),
 								settings.getBoolean("SeverityInfo", false),
 								settings.getBoolean("SeverityDebug", false),
-								settings.getBoolean("onlyProductionEvents", true));
+								settings.getBoolean("onlyProductionEvents", true),
+								settings.getString("SummaryFilter", ""),
+								settings.getString("DeviceFilter", ""));
 
 						if(tempZenossEvents!= null)
 						{

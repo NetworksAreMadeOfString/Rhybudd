@@ -146,7 +146,9 @@ public class ZenossWidget extends AppWidgetProvider
 										true,
 										false,
 										false,
-										true);
+										true,
+										null,
+										null);
 							}
 							else
 							{

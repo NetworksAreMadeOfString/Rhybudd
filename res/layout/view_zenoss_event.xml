@@ -4,7 +4,14 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_view_device" >
-
+
+
+
+
+
+
+
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout2"
@@ -98,7 +105,10 @@
         android:textColor="@color/RhybuddTitleText"
         android:textStyle="bold" >
     </TextView>
-
+
+
+
+
     <TextView
         android:id="@+id/Summary"
         android:layout_width="wrap_content"
@@ -110,23 +120,6 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/RhybuddStdText" >
 
-    </TextView>
-
-    <TextView
-        android:id="@+id/StartTimeLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/Summary"
-        android:layout_marginTop="24dp"
-        android:shadowColor="#505050"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="1"
-        android:text="@string/eventDetailsFirstSeenLabel"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/RhybuddTitleText"
-        android:textStyle="bold" >
     </TextView>
 
     <TextView
@@ -242,7 +235,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/RhybuddTitleText"
         android:textStyle="bold" />
-
+
+
     <ListView
         android:id="@+id/LogList"
         android:layout_width="match_parent"
@@ -255,6 +249,29 @@
         android:minHeight="200dp" >
 
     </ListView>
+
+    <WebView
+        android:id="@+id/summaryWebView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Summary"
+        android:layout_below="@+id/Summary"
+        android:minHeight="200dp" />
+
+    <TextView
+        android:id="@+id/StartTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/EndTimeLabel"
+        android:layout_below="@+id/summaryWebView"
+        android:shadowColor="#505050"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:text="@string/eventDetailsFirstSeenLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/RhybuddTitleText"
+        android:textStyle="bold" />
 
 </RelativeLayout>
         

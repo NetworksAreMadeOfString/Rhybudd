@@ -21,7 +21,6 @@ package net.networksaremadeofstring.rhybudd;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -60,6 +60,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -186,7 +188,7 @@ public class ZenossAPIv2
 		//on whether my cookie is valid appears to be waaaay too complicated
     	try 
     	{
-			this.GetEvents("5",true,false);
+			this.GetEvents("5",true,false,null,null);
 			this.LoginSuccessful = true;
 			return true;
 		} 
@@ -458,12 +460,12 @@ public class ZenossAPIv2
     	return json;
 	}
 	
-	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
+	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly, String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
 		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
 		
 		//FIXME Makes a valid call to the API but this breaks on 4.x ( JIRA #ZEN-2812 )
-		JSONObject jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,false);
+		JSONObject jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,false, SummaryFilter, DeviceFilter);
 		
 		JSONArray Events = null;
 		try
@@ -475,7 +477,7 @@ public class ZenossAPIv2
 			try
 			{
 				//FIXME If we got an exception it may be because of JIRA #ZEN-2812
-				jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,true);
+				jsonEvents = GetEvents(Critical,Error,Warning,Info,Debug,ProductionOnly,true, SummaryFilter, DeviceFilter);
 				Events = jsonEvents.getJSONObject("result").getJSONArray("events");
 			}
 			catch(Exception e1)
@@ -504,6 +506,7 @@ public class ZenossAPIv2
 			EventCount = 0;
 		}
 
+		Log.i("Events",Events.toString(2));
 		//If EventCount is 0 this will never process
 		for(int i = 0; i < EventCount; i++)
 		{
@@ -555,7 +558,7 @@ public class ZenossAPIv2
 		return this.GetEvents(Critical,Error,Warning,Info,Debug,false);
 	}*/
 	
-	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
+	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41,String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
 		String SeverityLevels = "";
         
@@ -580,10 +583,10 @@ public class ZenossAPIv2
         	SeverityLevels = SeverityLevels.substring(0, SeverityLevels.length() - 1);
         }
         
-		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41);
+		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41, SummaryFilter, DeviceFilter);
 	}
 	
-	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
+	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41, String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
     {
     	//Log.i("Test:", Severity);
     	HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
@@ -600,6 +603,7 @@ public class ZenossAPIv2
     	//4.1 stuff Jira #ZEN-2812
     	if(Zenoss41)
     	{
+    		Log.i("Zenoss41","true");
     		dataContents.put("keys", new JSONArray("[evid,count,prodState,firstTime,severity,component,summary,eventState,device,eventClass,lastTime,ownerid]"));
     	}
     	//4.1 stuff
@@ -607,6 +611,16 @@ public class ZenossAPIv2
         JSONObject params = new JSONObject();
         params.put("severity", new JSONArray("["+Severity+"]"));
         params.put("eventState", new JSONArray("[0, 1]"));
+        
+        if(null != SummaryFilter && !SummaryFilter.equals(""))
+        {
+        	params.put("summary", SummaryFilter);
+        }
+        
+        if(null != DeviceFilter && !DeviceFilter.equals(""))
+        {
+        	params.put("device", DeviceFilter);
+        }
         
         if(ProductionOnly)
         {
@@ -631,6 +645,7 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
+        Log.i("Raw",eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);

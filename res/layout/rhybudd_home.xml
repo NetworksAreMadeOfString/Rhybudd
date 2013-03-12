@@ -3,7 +3,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_gradient_3" >
-
+
+
 <ListView
     android:id="@+id/ZenossEventsList"
     android:layout_width="match_parent"
@@ -13,14 +14,20 @@
     android:cacheColorHint="@color/RhybuddWhite" >
 
 </ListView>
-<ProgressBar
+
+<ProgressBar
     android:id="@+id/backgroundWorkingProgressBar"
     style="?android:attr/progressBarStyleSmall"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true" />
-
+
+
+
+
+
+
 <ImageView
     android:id="@+id/imageView1"
     android:layout_width="wrap_content"

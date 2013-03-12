@@ -21,33 +21,37 @@ package net.networksaremadeofstring.rhybudd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.Html.ImageGetter;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.webkit.WebView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.EditText;
-import android.widget.Toast;
 
 public class ViewZenossEvent extends SherlockActivity
 {
@@ -207,10 +211,29 @@ public class ViewZenossEvent extends SherlockActivity
 						{
 							EventClass.setText("Unknown Event Class");
 						}
+						
+						/*ImageGetter test = new ImageGetter() 
+						{
+							   @Override public Drawable getDrawable(String source) 
+							   {
+								   Drawable drawFromPath;
+								   int path = ViewZenossEvent.this.getResources().getIdentifier(source, "drawable", "com.package...");
+								   drawFromPath = (Drawable) ViewZenossEvent.this.getResources().getDrawable(path);
 
+								   drawFromPath.setBounds(0, 0, drawFromPath.getIntrinsicWidth(), drawFromPath.getIntrinsicHeight());
+								   return drawFromPath;
+							   }
+						};*/
+						
 						try
 						{
 							Summary.setText(Html.fromHtml(EventDetails.getString("message")));
+							
+							Log.i("Summary",EventDetails.getString("message"));
+							((TextView) findViewById(R.id.Summary)).setVisibility(View.GONE);
+							//((WebView) findViewById(R.id.summaryWebView)).loadData(EventDetails.getString("message"), "text/html", null);
+							((WebView) findViewById(R.id.summaryWebView)).loadDataWithBaseURL(null, EventDetails.getString("message"), "text/html", "UTF-8", "about:blank");
+							
 							try
 							{
 								Summary.setMovementMethod(LinkMovementMethod.getInstance());

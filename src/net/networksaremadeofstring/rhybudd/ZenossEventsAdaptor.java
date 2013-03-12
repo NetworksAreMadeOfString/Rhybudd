@@ -96,7 +96,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         if (convertView == null) 
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.zenoss_event_listitem, null);
+            convertView = inflater.inflate(R.layout.zenoss_event_listitem_large, null);
         }
         
         try 
@@ -145,10 +145,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Event.getDevice());
-        
+        //DeviceNameTextView.setText("Example Device");
         
         TextView SummaryTextView = (TextView) convertView.findViewById(R.id.EventSummary);
         SummaryTextView.setText(Event.getSummary());
+        //SummaryTextView.setText("Example summary of an event (maybe with some details)");
         
         ImageView SeverityImage = (ImageView) convertView.findViewById(R.id.SeverityImageView);
         ImageView AckImage = (ImageView) convertView.findViewById(R.id.AckImage);
@@ -172,10 +173,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
         if(Event.getEventState().equals("Acknowledged"))
         {
         	AckImage.setImageResource(R.drawable.large_ack);
+        	SummaryTextView.setTypeface(Typeface.DEFAULT);
+        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT);
         }
         else
         {
-        	DeviceNameTextView.setTypeface(Typeface.DEFAULT_BOLD);
         	SummaryTextView.setTypeface(Typeface.DEFAULT_BOLD);
         	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT_BOLD);
         	AckImage.setImageResource(R.drawable.nack);
@@ -190,6 +192,48 @@ public class ZenossEventsAdaptor extends BaseAdapter
         {
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
         }
+        
+        if(Event.getownerID().equals(""))
+        {
+        	try
+        	{
+        		((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Not Ack'd");
+        	}
+        	catch(Exception e)
+        	{
+        		
+        	}
+        }
+        else
+        {
+        	try
+        	{
+        		((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Ack'd " + Event.getownerID());
+        	}
+        	catch(Exception e)
+        	{
+        		
+        	}
+        }
+        
+        try
+        {
+        	((TextView) convertView.findViewById(R.id.EventCount)).setText("Count: " + Integer.toString(Event.getCount()));
+        }
+    	catch(Exception e)
+    	{
+    		
+    	}
+        
+        try
+        {
+        	((TextView) convertView.findViewById(R.id.prodState)).setText(Event.getProdState());
+        }
+    	catch(Exception e)
+    	{
+    		
+    	}
+        
         
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.integer.EventPositionInList,position);
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
