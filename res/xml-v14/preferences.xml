@@ -75,6 +75,13 @@
                 android:summary="Only query for and list production events." 
                 android:defaultValue="true"
                 />
+		
+		<CheckBoxPreference
+                android:key="hideAckdAlerts"
+                android:title="Hide Acknowledged alerts"
+                android:summary="Hides alerts that have been acknowledged to reduce on-screen clutter" 
+                android:defaultValue="false"
+                />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="Alert Filtering">

@@ -462,6 +462,11 @@ public class ZenossAPIv2
 	
 	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly, String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
+		return GetRhybuddEvents(Critical,  Error,  Warning,  Info,  Debug,  ProductionOnly, SummaryFilter,  DeviceFilter, false);
+	}
+	
+	public List<ZenossEvent> GetRhybuddEvents(boolean Critical, boolean Error, boolean Warning, boolean Info, boolean Debug, boolean ProductionOnly, String SummaryFilter, String DeviceFilter, boolean hideAckd) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
+	{
 		List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
 		
 		//FIXME Makes a valid call to the API but this breaks on 4.x ( JIRA #ZEN-2812 )
@@ -516,19 +521,26 @@ public class ZenossAPIv2
 				CurrentEvent = Events.getJSONObject(i);
 				
 				//TODO Lots more error catching
-				listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
-													CurrentEvent.getInt("count"),
-													CurrentEvent.getString("prodState"),
-													CurrentEvent.getString("firstTime"),
-													CurrentEvent.getString("severity"),
-													CurrentEvent.getJSONObject("component").getString("text"),
-													CurrentEvent.getJSONObject("component").getString("uid"),
-													CurrentEvent.getString("summary"), 
-													CurrentEvent.getString("eventState"),
-													CurrentEvent.getJSONObject("device").getString("text"),
-													CurrentEvent.getJSONObject("eventClass").getString("text"),
-													CurrentEvent.getString("lastTime"),
-													CurrentEvent.getString("ownerid")));
+				if(hideAckd && CurrentEvent.getString("eventState").equals("Acknowledged"))
+				{
+					continue;
+				}
+				else
+				{
+					listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+														CurrentEvent.getInt("count"),
+														CurrentEvent.getString("prodState"),
+														CurrentEvent.getString("firstTime"),
+														CurrentEvent.getString("severity"),
+														CurrentEvent.getJSONObject("component").getString("text"),
+														CurrentEvent.getJSONObject("component").getString("uid"),
+														CurrentEvent.getString("summary"), 
+														CurrentEvent.getString("eventState"),
+														CurrentEvent.getJSONObject("device").getString("text"),
+														CurrentEvent.getJSONObject("eventClass").getString("text"),
+														CurrentEvent.getString("lastTime"),
+														CurrentEvent.getString("ownerid")));
+				}
 			}
 			catch(Exception e)
 			{

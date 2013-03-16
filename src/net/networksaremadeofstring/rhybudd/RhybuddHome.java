@@ -36,6 +36,7 @@ import com.bugsense.trace.BugSenseHandler;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -382,7 +383,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 								settings.getBoolean("SeverityDebug", false),
 								settings.getBoolean("onlyProductionEvents", true),
 								settings.getString("SummaryFilter", ""),
-								settings.getString("DeviceFilter", ""));
+								settings.getString("DeviceFilter", ""),
+								settings.getBoolean("hideAckdAlerts", false));
 
 						if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
 						{
@@ -1047,7 +1049,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
 	{
-
+		BackupManager bm = new BackupManager(this);
+		Log.i("Backup","Going to call backup");
 		//Check what the result was from the Settings Activity
 		if(requestCode == 99)
 		{
@@ -1057,6 +1060,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 			Intent intent = new Intent(this, ZenossPoller.class);
 			intent.putExtra("settingsUpdate", true);
 			startService(intent);
+			bm.dataChanged();
 		}
 		else
 		{
@@ -1087,6 +1091,9 @@ public class RhybuddHome extends SherlockFragmentActivity
 				{
 					finishStart(true);
 				}
+				
+				
+				bm.dataChanged();
 				
 			}
 			else if(resultCode == 2)
