@@ -37,6 +37,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -208,6 +209,8 @@ public class RhybuddInitialSettings extends SherlockActivity
     			}
     			else if(msg.what == 99)
     			{
+    				((TextView) findViewById(R.id.debugOutput)).setText(msg.getData().getString("exception") + "\n");
+    				
     				try
     				{
     					dialog.dismiss();
@@ -413,10 +416,12 @@ public class RhybuddInitialSettings extends SherlockActivity
 			if(OverrideMessage.equals(""))
 			{
 				//bundle.putString("error", "Unknown Error");
+				bundle.putString("exception", e.getMessage());
 			}
 			else
 			{
 				bundle.putString("error", OverrideMessage);
+				bundle.putString("exception", e.getMessage());
 			}
 		}
 		
