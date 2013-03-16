@@ -51,7 +51,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -60,6 +59,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+//import android.util.Log;
 
 public class RhybuddHome extends SherlockFragmentActivity 
 {
@@ -132,7 +132,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onConfigurationChanged(Configuration newConfig) 
 	{
 		super.onConfigurationChanged(newConfig);
-		Log.i("onConfigurationChanged","Now sending handler");
+		//Log.i("onConfigurationChanged","Now sending handler");
 		
 		setContentView(R.layout.rhybudd_home);
 		finishStart(false);
@@ -142,7 +142,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	public void onNewIntent(Intent newIntent)
 	{
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
-		Log.e("onNewIntent",Boolean.toString(newIntent.getBooleanExtra("forceRefresh", false)));
+		//Log.e("onNewIntent",Boolean.toString(newIntent.getBooleanExtra("forceRefresh", false)));
 		if(newIntent.getBooleanExtra("forceRefresh", false))
 		{
 			DBGetThread();
@@ -173,7 +173,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 		setContentView(R.layout.rhybudd_home);
 
-		Log.e("onCreate",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
+		//Log.e("onCreate",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
 		if(getIntent().getBooleanExtra("forceRefresh", false))
 		{
 			DBGetThread();
@@ -222,7 +222,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 					{
 						listOfZenossEvents = tempZenossEvents;
 	
-						Log.i("DeviceList","Found DB Data!");
+						//Log.i("DeviceList","Found DB Data!");
 						handler.sendEmptyMessage(1);
 					}
 					catch(Exception e)
@@ -232,7 +232,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				else
 				{
-					Log.i("DeviceList","No DB data found, querying API directly");
+					//Log.i("DeviceList","No DB data found, querying API directly");
 					try
 					{
 						handler.sendEmptyMessage(2);
@@ -326,7 +326,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 	public void Refresh()
 	{
-		Log.i("RhybuddHOMe","Performing a Direct API Refresh");
+		//Log.i("RhybuddHOMe","Performing a Direct API Refresh");
 		try
 		{
 			if(dialog == null || !dialog.isShowing())
@@ -344,7 +344,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		catch(Exception e)
 		{
 			//TODO Handle this and tell the user
-			Log.i("RhybuddHOMe","Error launching Dialog window");
+			//Log.i("RhybuddHOMe","Error launching Dialog window");
 		}
 
 		((Thread) new Thread(){
@@ -455,12 +455,12 @@ public class RhybuddHome extends SherlockFragmentActivity
 		{
 			if(settings.getBoolean("AllowBackgroundService", true))
 			{
-				Log.i("RhybuddHome","Background polling is enabled so querying the DB");
+				//Log.i("RhybuddHome","Background polling is enabled so querying the DB");
 				DBGetThread();
 			}
 			else//TODO Remove as the DB query will always fall back to doing a direct API call
 			{
-				Log.i("RhybuddHome","Doing a direct call to the API");
+				//Log.i("RhybuddHome","Doing a direct call to the API");
 				Refresh();
 			}
 
@@ -1050,7 +1050,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
 	{
 		BackupManager bm = new BackupManager(this);
-		Log.i("Backup","Going to call backup");
+		//Log.i("Backup","Going to call backup");
 		//Check what the result was from the Settings Activity
 		if(requestCode == 99)
 		{

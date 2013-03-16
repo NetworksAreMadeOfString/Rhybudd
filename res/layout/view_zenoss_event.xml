@@ -13,7 +13,6 @@
 
 
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout2"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -106,15 +105,13 @@
         android:textStyle="bold" >
     </TextView>
 
-
-
-
     <TextView
         android:id="@+id/Summary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/EventClass"
         android:layout_below="@+id/SummaryLabel"
+        android:gravity="bottom"
         android:linksClickable="true"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -250,20 +247,21 @@
 
     </ListView>
 
-    <WebView
-        android:id="@+id/summaryWebView"
-        android:layout_width="fill_parent"
+    <ImageView
+        android:id="@+id/summaryImage"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/Summary"
         android:layout_below="@+id/Summary"
-        android:minHeight="200dp" />
+        android:layout_centerHorizontal="true"
+        android:minHeight="2dp"
+        android:src="@drawable/horiz_split" />
 
     <TextView
         android:id="@+id/StartTimeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/EndTimeLabel"
-        android:layout_below="@+id/summaryWebView"
+        android:layout_below="@+id/summaryImage"
         android:shadowColor="#505050"
         android:shadowDx="1"
         android:shadowDy="1"

@@ -82,18 +82,8 @@
                 android:summary="Hides alerts that have been acknowledged to reduce on-screen clutter" 
                 android:defaultValue="false"
                 />
-    </PreferenceCategory>
-    
-    <PreferenceCategory android:title="Alert Filtering">
-        <SwitchPreference
-                android:key="onlyProductionAlerts"
-                android:title="Production Only Alerting"
-                android:summary="Only raise an alert for production level events." 
-                android:defaultValue="true"
-                android:dependency="AllowBackgroundService"
-                />
-        
-        <EditTextPreference
+		
+		<EditTextPreference
                 android:key="SummaryFilter"
                 android:summary="Only raise an alert for items whose summary matches this field. (Use | to separate terms)" 
                 android:title="Summary Filter"
@@ -104,6 +94,16 @@
                 android:summary="Only raise an alert for events from devices whose name match this field. (Use | to separate terms)" 
                 android:title="Device Name Filter"
                 android:dialogTitle="Device Name Filter" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="Alert Filtering">
+        <SwitchPreference
+                android:key="onlyProductionAlerts"
+                android:title="Production Only Alerting"
+                android:summary="Only raise an alert for production level events." 
+                android:defaultValue="true"
+                android:dependency="AllowBackgroundService"
+                />
         
 		<SwitchPreference
                 android:key="notificationSound"
@@ -176,8 +176,23 @@
 	                android:key="BAPassword"
 	                android:title="Basic Auth Password"
 	                android:dependency="httpBasicAuth"
-	                android:dialogTitle="HTTP Basic Auth Password" />
+	                android:dialogTitle="HTTP Basic Auth Password"
+	                android:inputType="textPassword"/>
 			</PreferenceCategory>
         </PreferenceScreen>
     </PreferenceCategory>
+    
+    <PreferenceCategory android:title="Supplementary HTTP Basic Authentication"
+        android:summary="If you embed img tags in your Zenoss summary but they are behind HTTP basic auth add the details here">
+           <EditTextPreference
+               android:key="suppBAUser"
+               android:title="Supplementary Basic Auth User"
+               android:dialogTitle="Supplementary HTTP Basic Auth User Name" />
+           
+           <EditTextPreference
+               android:key="suppBAPassword"
+               android:title="Supplementary Basic Auth Password"
+               android:dialogTitle="Supplementary HTTP Basic Auth Password"
+               android:inputType="textPassword"/>
+	</PreferenceCategory>
 </PreferenceScreen>

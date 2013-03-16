@@ -321,7 +321,16 @@
             android:layout_below="@+id/loadAverageGraph"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
-            android:src="@drawable/horiz_split" />
+            android:src="@drawable/graph" />
+        
+        <ImageView
+            android:id="@+id/MemoryGraph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/CPUGraph"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/graph" />
 
     </RelativeLayout>
 

@@ -73,7 +73,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+//import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -523,7 +523,7 @@ public class ZenossAPIv2
 			EventCount = 0;
 		}
 
-		Log.i("Events",Events.toString(2));
+		//Log.i("Events",Events.toString(2));
 		//If EventCount is 0 this will never process
 		for(int i = 0; i < EventCount; i++)
 		{
@@ -627,7 +627,7 @@ public class ZenossAPIv2
     	//4.1 stuff Jira #ZEN-2812
     	if(Zenoss41)
     	{
-    		Log.i("Zenoss41","true");
+    		//Log.i("Zenoss41","true");
     		dataContents.put("keys", new JSONArray("[evid,count,prodState,firstTime,severity,component,summary,eventState,device,eventClass,lastTime,ownerid]"));
     	}
     	//4.1 stuff
@@ -669,7 +669,7 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        Log.i("Raw",eventsRawJSON);
+        //Log.i("Raw",eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);

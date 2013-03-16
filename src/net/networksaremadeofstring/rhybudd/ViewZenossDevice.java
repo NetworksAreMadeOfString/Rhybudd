@@ -52,7 +52,7 @@ public class ViewZenossDevice extends SherlockActivity
 	JSONObject DeviceObject = null, EventsObject = null;
 	JSONObject DeviceDetails = null;
 	private SharedPreferences settings = null;
-	Handler firstLoadHandler, eventsHandler, errorHandler,loadAverageHandler,CPUGraphHandler;
+	Handler firstLoadHandler, eventsHandler, errorHandler,loadAverageHandler,CPUGraphHandler,MemoryGraphHandler;
 	ProgressDialog dialog;
 	Thread dataPreload, eventsLoad, loadAvgGraphLoad, CPUGraphLoad;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
@@ -63,6 +63,7 @@ public class ViewZenossDevice extends SherlockActivity
 	ActionBar actionbar; 
 	Drawable loadAverageGraph;
 	Drawable CPUGraph;
+	Drawable MemoryGraph;
 	
 	@Override
 	public void onAttachedToWindow() 
@@ -115,6 +116,14 @@ public class ViewZenossDevice extends SherlockActivity
 			public void handleMessage(Message msg) 
 			{
 				((ImageView) findViewById(R.id.CPUGraph)).setImageDrawable(CPUGraph);
+			}
+		};
+		
+		MemoryGraphHandler = new Handler()
+		{
+			public void handleMessage(Message msg) 
+			{
+				((ImageView) findViewById(R.id.MemoryGraph)).setImageDrawable(MemoryGraph);
 			}
 		};
 		
@@ -428,6 +437,11 @@ public class ViewZenossDevice extends SherlockActivity
 							{
 								CPUGraph = API.GetGraph(currentGraph.getString("url"));
 								CPUGraphHandler.sendEmptyMessage(1);
+							}
+							else if(currentGraph.getString("title").equals("Memory Utilization"))
+							{
+								MemoryGraph = API.GetGraph(currentGraph.getString("url"));
+								MemoryGraphHandler.sendEmptyMessage(1);
 							}
 						}
 						catch(Exception e)
