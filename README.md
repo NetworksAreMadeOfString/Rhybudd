@@ -13,6 +13,7 @@ Features:
 * View Event Details
     * Events History
     * Add to Events log
+    * Renders inline images
 * Settings
     * Zenoss details
     * HTTP Basic Auth
@@ -21,6 +22,8 @@ Features:
     * Choose severity levels used for background poller / event search
     * Choose severity levels for alerting
     * Production only filtering on event listing
+    * Hide Acknowledged events
+    * Filter events based on summary and/or Device name
     * Choose alert sound
 * Background poller with Notifications support
 * Filter to only alert on Production level devices
@@ -31,7 +34,8 @@ Features:
 * View Device (Infrastructure) list with Crit / Err / Warn status
 * View Device Details (with associated events)
 * Device Search
-
+* Google cloud backup
+* Device CPU, Memory and Load graphs
 
 Links:
 --------
