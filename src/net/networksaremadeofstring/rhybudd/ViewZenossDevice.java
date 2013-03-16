@@ -26,22 +26,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
-
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 
 public class ViewZenossDevice extends SherlockActivity
 {
@@ -49,15 +52,18 @@ public class ViewZenossDevice extends SherlockActivity
 	JSONObject DeviceObject = null, EventsObject = null;
 	JSONObject DeviceDetails = null;
 	private SharedPreferences settings = null;
-	Handler firstLoadHandler, eventsHandler, errorHandler;
+	Handler firstLoadHandler, eventsHandler, errorHandler,loadAverageHandler,CPUGraphHandler;
 	ProgressDialog dialog;
-	Thread dataPreload, eventsLoad;
+	Thread dataPreload, eventsLoad, loadAvgGraphLoad, CPUGraphLoad;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	ListView list;
 	ZenossEventsAdaptor adapter;
 	JSONArray Events = null;
 	private int EventCount = 0;
 	ActionBar actionbar; 
+	Drawable loadAverageGraph;
+	Drawable CPUGraph;
+	
 	@Override
 	public void onAttachedToWindow() 
 	{
@@ -93,6 +99,22 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					BugSenseHandler.log("ViewZenossDevice-ErrorHandler", e);
 				}
+			}
+		};
+		
+		loadAverageHandler = new Handler()
+		{
+			public void handleMessage(Message msg) 
+			{
+				((ImageView) findViewById(R.id.loadAverageGraph)).setImageDrawable(loadAverageGraph);
+			}
+		};
+		
+		CPUGraphHandler = new Handler()
+		{
+			public void handleMessage(Message msg) 
+			{
+				((ImageView) findViewById(R.id.CPUGraph)).setImageDrawable(CPUGraph);
 			}
 		};
 		
@@ -357,6 +379,74 @@ public class ViewZenossDevice extends SherlockActivity
 
 		dataPreload.start();
 
+		loadAvgGraphLoad = new Thread() 
+		{  
+			public void run() 
+			{
+				try 
+				{
+					if(API == null)
+					{
+						Message msg = new Message();
+						Bundle bundle = new Bundle();
+						
+						try
+						{
+							if(settings.getBoolean("httpBasicAuth", false))
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+							}
+							else
+							{
+								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					
+					JSONObject graphURLs = API.GetDeviceGraphs(getIntent().getStringExtra("UID"));
+					
+					//Log.e("graphURLs",graphURLs.toString(3));
+					int urlCount = graphURLs.getJSONObject("result").getJSONArray("data").length();
+					
+					for(int i = 0; i < urlCount; i++)
+					{
+						JSONObject currentGraph = null;
+						try 
+						{
+							currentGraph = graphURLs.getJSONObject("result").getJSONArray("data").getJSONObject(i);
+							
+							if(currentGraph.getString("title").equals("Load Average"))
+							{
+								loadAverageGraph = API.GetGraph(currentGraph.getString("url"));
+								loadAverageHandler.sendEmptyMessage(1);
+							}
+							else if(currentGraph.getString("title").equals("CPU Utilization"))
+							{
+								CPUGraph = API.GetGraph(currentGraph.getString("url"));
+								CPUGraphHandler.sendEmptyMessage(1);
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					
+					
+					
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
+		loadAvgGraphLoad.start();
+		
 		eventsLoad = new Thread() 
 		{  
 			public void run() 

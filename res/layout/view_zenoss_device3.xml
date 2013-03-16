@@ -4,9 +4,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@drawable/background_view_device" >
-
+
+
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/viewDeviceContainer"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
@@ -21,7 +21,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/device_grid_background" >
-
+
+
         <TextView
             android:id="@+id/deviceIDTitle"
             android:layout_width="wrap_content"
@@ -29,7 +30,8 @@
             android:text="Device ID:"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/deviceID"
             android:layout_width="wrap_content"
@@ -38,7 +40,8 @@
             android:layout_below="@+id/deviceIDTitle"
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/UptimeTitle"
             android:layout_width="wrap_content"
@@ -57,7 +60,8 @@
             android:layout_below="@+id/UptimeTitle"
             android:text="0 days"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/FirstSeenTitle"
             android:layout_width="wrap_content"
@@ -76,7 +80,8 @@
             android:layout_below="@+id/FirstSeenTitle"
             android:text="Today"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/lastChangeTitle"
             android:layout_width="wrap_content"
@@ -95,7 +100,8 @@
             android:layout_below="@+id/lastChangeTitle"
             android:text="Today"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/modelTimeTitle"
             android:layout_width="wrap_content"
@@ -114,7 +120,8 @@
             android:layout_below="@+id/modelTimeTitle"
             android:text="Today"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/memoryTitle"
             android:layout_width="wrap_content"
@@ -145,7 +152,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/device_grid_background" >
-
+
+
         <TextView
             android:id="@+id/locationTitle"
             android:layout_width="wrap_content"
@@ -155,7 +163,8 @@
             android:text="@string/deviceDetailsSNMPLocation"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/location"
             android:layout_width="wrap_content"
@@ -164,7 +173,8 @@
             android:layout_below="@+id/locationTitle"
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/contactTitle"
             android:layout_width="wrap_content"
@@ -174,7 +184,8 @@
             android:text="@string/deviceDetailsSNMPContact"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/contact"
             android:layout_width="wrap_content"
@@ -186,21 +197,19 @@
 
     </RelativeLayout>
 
-
-
     <RelativeLayout
         android:id="@+id/EventsGrid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/SNMPDetailsGrid"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentBottom="false"
         android:layout_alignRight="@+id/SNMPDetailsGrid"
         android:layout_below="@+id/SNMPDetailsGrid"
         android:layout_marginBottom="4dp"
         android:layout_marginTop="4dp"
         android:background="@drawable/device_grid_background"
         android:minHeight="200dp" >
-
+
         <TextView
             android:id="@+id/productionStateLabel"
             android:layout_width="wrap_content"
@@ -210,7 +219,8 @@
             android:text="@string/deviceDetailsProductionStateLabel"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/productionState"
             android:layout_width="wrap_content"
@@ -219,7 +229,8 @@
             android:layout_below="@+id/productionStateLabel"
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/GroupsTitle"
             android:layout_width="wrap_content"
@@ -229,7 +240,8 @@
             android:text="@string/deviceDetailsGroupsLabel"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/groups"
             android:layout_width="wrap_content"
@@ -238,7 +250,8 @@
             android:layout_below="@+id/GroupsTitle"
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/SystemsTitle"
             android:layout_width="wrap_content"
@@ -248,7 +261,8 @@
             android:text="@string/deviceDetailsSystemsLabel"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <TextView
             android:id="@+id/systems"
             android:layout_width="wrap_content"
@@ -257,7 +271,8 @@
             android:layout_below="@+id/SystemsTitle"
             android:text="-"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
         <TextView
             android:id="@+id/eventsTitle"
             android:layout_width="wrap_content"
@@ -267,7 +282,8 @@
             android:text="@string/deviceDetailsEventsTitle"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
+
+
         <ListView
             android:id="@+id/ZenossEventsList"
             android:layout_width="match_parent"
@@ -276,6 +292,36 @@
             android:layout_below="@+id/eventsTitle" >
 
         </ListView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/GraphGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/EventsGrid"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/device_grid_background"
+        android:padding="18dp" >
+
+        <ImageView
+            android:id="@+id/loadAverageGraph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/graph" />
+
+        <ImageView
+            android:id="@+id/CPUGraph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/loadAverageGraph"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/horiz_split" />
 
     </RelativeLayout>
 

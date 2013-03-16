@@ -19,8 +19,13 @@
 package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -41,11 +47,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -61,6 +69,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
@@ -866,4 +878,58 @@ public class ZenossAPIv2
 		JSONObject json = new JSONObject(test);
     	return json;
     }
+	
+	public JSONObject GetDeviceGraphs(String UID) throws JSONException, ClientProtocolException, IOException
+    {
+		HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID.replace(" ", "%20") + "/device_router");
+
+    	httpost.addHeader("Content-type", "application/json; charset=utf-8");
+    	httpost.setHeader("Accept", "application/json");
+
+    	JSONArray data = new JSONArray();
+        
+        JSONObject dataObject = new JSONObject();
+        dataObject.put("uid", UID);
+        dataObject.put("drange", "129600");
+        
+        data.put(dataObject);
+        
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getGraphDefs");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+        
+        JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));
+    	
+    	//String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+		//Log.e("GetDeviceEvents",test);
+		JSONObject json = new JSONObject(test);
+    	return json;
+    }
+	
+	public Drawable GetGraph(String urlString) throws IOException, URISyntaxException
+	{
+		HttpGet httpRequest = new HttpGet(new URL(ZENOSS_INSTANCE + urlString).toURI());
+		HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+		HttpEntity entity = response.getEntity();
+		BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity); 
+		final long contentLength = bufHttpEntity.getContentLength();
+		if (contentLength >= 0) 
+		{
+		    InputStream is = bufHttpEntity.getContent();
+		    Bitmap bitmap = BitmapFactory.decodeStream(is);
+		    return new BitmapDrawable(bitmap);
+		} 
+		else 
+		{
+		    return null;
+		}
+	}
 }
