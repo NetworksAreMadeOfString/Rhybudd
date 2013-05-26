@@ -828,8 +828,15 @@ public class ZenossAPIv2
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
         //Log.e("GetDevice",test);
-		JSONObject json = new JSONObject(test);
-    	return json;
+        try
+        {
+			JSONObject json = new JSONObject(test);
+	    	return json;
+        }
+        catch(Exception e)
+        {
+        	return null;
+        }
     }
     
 	public JSONObject GetDeviceEvents(String UID, boolean Zenoss41) throws JSONException, ClientProtocolException, IOException
@@ -875,8 +882,15 @@ public class ZenossAPIv2
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
 		//Log.e("GetDeviceEvents",test);
-		JSONObject json = new JSONObject(test);
-    	return json;
+        try
+        {
+			JSONObject json = new JSONObject(test);
+	    	return json;
+        }
+        catch(Exception e)
+        {
+        	return null;
+        }
     }
 	
 	public JSONObject GetDeviceGraphs(String UID) throws JSONException, ClientProtocolException, IOException

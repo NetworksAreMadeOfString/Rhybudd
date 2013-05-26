@@ -107,7 +107,14 @@ public class ViewZenossDevice extends SherlockActivity
 		{
 			public void handleMessage(Message msg) 
 			{
-				((ImageView) findViewById(R.id.loadAverageGraph)).setImageDrawable(loadAverageGraph);
+				try
+				{
+					((ImageView) findViewById(R.id.loadAverageGraph)).setImageDrawable(loadAverageGraph);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		};
 		
@@ -115,7 +122,14 @@ public class ViewZenossDevice extends SherlockActivity
 		{
 			public void handleMessage(Message msg) 
 			{
-				((ImageView) findViewById(R.id.CPUGraph)).setImageDrawable(CPUGraph);
+				try
+				{
+					((ImageView) findViewById(R.id.CPUGraph)).setImageDrawable(CPUGraph);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		};
 		
@@ -123,7 +137,14 @@ public class ViewZenossDevice extends SherlockActivity
 		{
 			public void handleMessage(Message msg) 
 			{
-				((ImageView) findViewById(R.id.MemoryGraph)).setImageDrawable(MemoryGraph);
+				try
+				{
+					((ImageView) findViewById(R.id.MemoryGraph)).setImageDrawable(MemoryGraph);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		};
 		
@@ -518,7 +539,14 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 					}
 
-					EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),false);
+					try
+					{	
+						EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),false);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 					
 					try
 					{
@@ -532,7 +560,7 @@ public class ViewZenossDevice extends SherlockActivity
 						e.printStackTrace();
 					}
 					
-					if(EventsObject.has("result") && EventsObject.getJSONObject("result").getInt("totalCount") > 0)
+					if(null != EventsObject && EventsObject.has("result") && EventsObject.getJSONObject("result").getInt("totalCount") > 0)
 					{
 						Events = EventsObject.getJSONObject("result").getJSONArray("events");
 	
