@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -53,6 +54,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -83,7 +85,10 @@ public class ZenossAPIv2
 	String ZENOSS_INSTANCE = null;
     String ZENOSS_USERNAME = null;
     String ZENOSS_PASSWORD = null;
-    
+
+    public static String SENDER_ID = "228666382181";
+    public static String PREFERENCE_PUSHKEY = "pushkey";
+
     //These don't get used directly
   	private DefaultHttpClient client;
   	private ThreadSafeClientConnManager mgr;
@@ -192,7 +197,36 @@ public class ZenossAPIv2
     {
     	return this.LoginSuccessful;
     }
-    
+
+    public static String getPushKey() throws IOException, JSONException {
+        DefaultHttpClient client = new DefaultHttpClient();
+        SchemeRegistry registry = new SchemeRegistry();
+        SocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+        registry.register(new Scheme("https", socketFactory, 443));
+        ThreadSafeClientConnManager mgr = new ThreadSafeClientConnManager(client.getParams(), registry);
+        DefaultHttpClient httpclient = new DefaultHttpClient(mgr, client.getParams());
+
+        HttpPost httpost = new HttpPost("https://api.coldstart.io/1/getrhybuddpushkey");
+
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        HttpResponse response = httpclient.execute(httpost);
+        String rawJSON = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        JSONObject json = new JSONObject(rawJSON);
+        Log.i("getPushKey",rawJSON);
+
+        if(json.has("pushkey"))
+        {
+            return json.getString("pushkey");
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 	public boolean CheckLoggedIn()
     {
 		//If we got JSON back rather than HTML then we are probably logged in
@@ -228,7 +262,7 @@ public class ZenossAPIv2
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("GetRhybuddDevices", e);
+			//BugSenseHandler.log("GetRhybuddDevices", e);
 		}
 
 		for(int i = 0; i < DeviceCount; i++)
@@ -331,18 +365,18 @@ public class ZenossAPIv2
 				catch(JSONException j)
 				{
 					//Don't care - keep going no point losing all devices
-					BugSenseHandler.log("GetRhybuddDevices", j);
+					//BugSenseHandler.log("GetRhybuddDevices", j);
 				}
 			}
 			catch (JSONException j)
 			{
-				BugSenseHandler.log("GetRhybuddDevices", j);
+				//BugSenseHandler.log("GetRhybuddDevices", j);
 				//Keep going
 				//throw j;
 			}
 			catch (Exception e)
 			{
-				BugSenseHandler.log("GetRhybuddDevices", e);
+				//BugSenseHandler.log("GetRhybuddDevices", e);
 			}
 		}
 		
@@ -420,7 +454,7 @@ public class ZenossAPIv2
         reqData.put("tid", String.valueOf(this.reqCount++));
         
         httpost.setEntity(new StringEntity(reqData.toString()));
-    	String ackEventReturnJSON = httpclient.execute(httpost, responseHandler);
+    	String ackEventReturnJSON = (String) httpclient.execute(httpost, responseHandler);
 		JSONObject json = new JSONObject(ackEventReturnJSON);
 		//Log.i("AcknowledgeEvent",json.toString(2));
     	return json;
@@ -669,7 +703,7 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        //Log.i("Raw",eventsRawJSON);
+        Log.i("Raw", eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);
@@ -790,7 +824,7 @@ public class ZenossAPIv2
 	       
        httpost.setEntity(new StringEntity(reqData.toString()));
        	
-       String test = httpclient.execute(httpost, responseHandler);
+       String test = (String) httpclient.execute(httpost, responseHandler);
    		
        JSONObject json = new JSONObject(test);
 		return json;

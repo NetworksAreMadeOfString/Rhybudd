@@ -21,17 +21,17 @@ package net.networksaremadeofstring.rhybudd;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.app.ActionBar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.*;
+import com.google.android.gcm.GCMRegistrar;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -51,8 +51,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.FrameLayout;
@@ -61,7 +59,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 //import android.util.Log;
 
-public class RhybuddHome extends SherlockFragmentActivity 
+public class RhybuddHome extends FragmentActivity
 {
 	SharedPreferences settings = null;
 	Handler HomeHandler = null, runnablesHandler = null;
@@ -89,7 +87,8 @@ public class RhybuddHome extends SherlockFragmentActivity
 	FragmentTransaction fragmentTransaction;
 	boolean FragmentVisible = false;
 	int selectedFragmentEvent = 0;
-	
+    String regId = "";
+
 	@Override
 	public void onDestroy()
 	{
@@ -108,7 +107,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("RhybuddHome-onDestroy", e);
+			////BugSenseHandler.log("RhybuddHome-onDestroy", e);
 		}
 	}
 
@@ -166,12 +165,29 @@ public class RhybuddHome extends SherlockFragmentActivity
 		super.onCreate(savedInstanceState);
 		
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		actionbar = getSupportActionBar();
-		actionbar.setTitle("Rhybudd Events List");
-		actionbar.setSubtitle(settings.getString("URL", ""));
 
 		setContentView(R.layout.rhybudd_home);
+
+        actionbar = getActionBar();
+        actionbar.setTitle("Rhybudd Events List");
+        actionbar.setSubtitle(settings.getString("URL", ""));
+
+        //GCM stuff
+        GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkManifest(this);
+        regId = GCMRegistrar.getRegistrationId(this);
+
+        if (regId.equals(""))
+        {
+            Log.v("GCM", "Registering");
+            GCMRegistrar.register(this, API.SENDER_ID);
+        }
+        else
+        {
+            Log.v("GCM", "Already registered");
+        }
+
+        Log.e("GCMID",GCMRegistrar.getRegistrationId(this));
 
 		//Log.e("onCreate",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
 		if(getIntent().getBooleanExtra("forceRefresh", false))
@@ -182,11 +198,12 @@ public class RhybuddHome extends SherlockFragmentActivity
 		//Clear any notifications event notifications 
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
 
-		BugSenseHandler.setup(this, "44a76a8c");		
+        BugSenseHandler.initAndStartSession(RhybuddHome.this, "44a76a8c");
 
 		if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
 		{
-			Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
+			//Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
+            Intent SettingsIntent = new Intent(RhybuddHome.this, FirstRunSettings.class);
 			SettingsIntent.putExtra("firstRun", true);
 			RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
 		}
@@ -519,7 +536,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 							catch(Exception e)
 							{
 								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
-								BugSenseHandler.log("EventListOnclick", e);
+								//BugSenseHandler.log("EventListOnclick", e);
 							}
 						}
 					};
@@ -535,7 +552,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 							catch(Exception e)
 							{
 								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
-								BugSenseHandler.log("RhybuddHome-onDestroy", e);
+								//BugSenseHandler.log("RhybuddHome-onDestroy", e);
 							}
 							return true;
 						}
@@ -552,7 +569,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 							catch(Exception e)
 							{
 								Toast.makeText(getApplicationContext(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
-								BugSenseHandler.log("RhybuddHome-onDestroy", e);
+								//BugSenseHandler.log("RhybuddHome-onDestroy", e);
 							}
 						}
 					};
@@ -638,7 +655,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 						}
 						catch(Exception e)
 						{
-							BugSenseHandler.log("alertDialog", e);
+							//BugSenseHandler.log("alertDialog", e);
 						}
 					}
 				}
@@ -715,7 +732,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("AckEventHandler", e);
+					//BugSenseHandler.log("AckEventHandler", e);
 				}
 			}
 		};
@@ -755,7 +772,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("addToCAB", e);
+				//BugSenseHandler.log("addToCAB", e);
 			}
 		}
 		else
@@ -779,7 +796,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("addToCAB", e);
+				//BugSenseHandler.log("addToCAB", e);
 			}
 		}
 	}
@@ -788,7 +805,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
 		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) 
+		public boolean onCreateActionMode(ActionMode mode, Menu menu)
 		{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.events_cab, menu);
@@ -835,7 +852,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 							catch (Exception e)
 							{
 								AckEventHandler.sendEmptyMessage(99);
-								BugSenseHandler.log("Acknowledge", e);
+								//BugSenseHandler.log("Acknowledge", e);
 							}
 						}
 					};
@@ -865,7 +882,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 						}
 						catch (Exception e)
 						{
-							BugSenseHandler.log("CABAcknowledge", e);
+							//BugSenseHandler.log("CABAcknowledge", e);
 							e.printStackTrace();
 							AckEventHandler.sendEmptyMessage(99);
 						}
@@ -926,7 +943,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.home_menu, menu);
 		return true;
 	}
@@ -1098,7 +1115,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 			}
 			else if(resultCode == 2)
 			{
-				Toast.makeText(RhybuddHome.this, "Rhybudd cannot start without configured settings.\n\nExiting....", Toast.LENGTH_LONG).show();
+				Toast.makeText(RhybuddHome.this, getResources().getString(R.string.FirstRunNeedSettings), Toast.LENGTH_LONG).show();
 
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putString("URL", "");
@@ -1126,7 +1143,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 		fragmentManager = getSupportFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		
-		SherlockFragment fragment = new ViewEventFragment();
+		Fragment fragment = new ViewEventFragment();
 		Bundle args = new Bundle();
 		
 		args.putInt("Position", Position);
@@ -1174,7 +1191,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 						catch (Exception e)
 						{
 							e.printStackTrace();
-							BugSenseHandler.log("Acknowledge", e);
+							//BugSenseHandler.log("Acknowledge", e);
 							AckEventHandler.sendEmptyMessage(99);
 						}
 					}
@@ -1238,7 +1255,7 @@ public class RhybuddHome extends SherlockFragmentActivity
 				catch (Exception e)
 				{
 					e.printStackTrace();
-					BugSenseHandler.log("Acknowledge", e);
+					//BugSenseHandler.log("Acknowledge", e);
 					AckEventHandler.sendEmptyMessage(99);
 				}
 			}

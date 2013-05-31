@@ -20,10 +20,9 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -33,6 +32,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
@@ -41,7 +41,7 @@ import android.widget.ListView;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class Search extends SherlockActivity
+public class Search extends Activity
 {
 	//private SharedPreferences settings = null;
 	ListView list;
@@ -63,7 +63,7 @@ public class Search extends SherlockActivity
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		setContentView(R.layout.search);
 
-		actionbar = getSupportActionBar();
+		actionbar = getActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 

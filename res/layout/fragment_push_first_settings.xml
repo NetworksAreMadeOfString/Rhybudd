@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/PushCategorySummary"
+        android:id="@+id/pushSummary"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp"
+        android:autoLink="web"
+        android:textColorLink="@color/LightBlue"/>
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/PushAddExistingButton"
+        android:id="@+id/setPushIDButton"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/pushSummary"
+        style="@style/ButtonText"
+        android:background="@drawable/dark_blue_button"/>
+
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pushKeyEditText"
+        android:clickable="false"
+        android:lines="1"
+        android:textIsSelectable="true"
+        android:typeface="monospace"
+        android:enabled="false"
+        android:editable="false"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/setPushIDButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:hint="@string/PushKeyHint"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/PushIDDesc"
+        android:id="@+id/pushIDDesc"
+        android:layout_below="@+id/pushKeyEditText"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:visibility="invisible"
+        android:autoLink="web"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/PushCreateIDButton"
+        android:id="@+id/GenerateNewIDButton"
+        android:layout_below="@+id/pushSummary"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        style="@style/ButtonText"
+        android:background="@drawable/light_blue_button"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/PushSaveID"
+        android:id="@+id/saveKeyButton"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/pushKeyEditText"
+        android:layout_below="@+id/pushKeyEditText"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        style="@style/ButtonText"
+        android:background="@drawable/light_blue_button"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignTop="@+id/pushKeyEditText"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>

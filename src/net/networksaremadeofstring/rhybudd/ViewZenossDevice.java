@@ -21,6 +21,9 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.MenuItem;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,12 +44,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
-public class ViewZenossDevice extends SherlockActivity
+public class ViewZenossDevice extends Activity
 {
 	ZenossAPIv2 API = null;
 	JSONObject DeviceObject = null, EventsObject = null;
@@ -60,7 +60,7 @@ public class ViewZenossDevice extends SherlockActivity
 	ZenossEventsAdaptor adapter;
 	JSONArray Events = null;
 	private int EventCount = 0;
-	ActionBar actionbar; 
+	ActionBar actionbar;
 	Drawable loadAverageGraph;
 	Drawable CPUGraph;
 	Drawable MemoryGraph;
@@ -82,7 +82,7 @@ public class ViewZenossDevice extends SherlockActivity
 
 		setContentView(R.layout.view_zenoss_device3);
 
-		actionbar = getSupportActionBar();
+		actionbar = getActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 		
@@ -98,7 +98,7 @@ public class ViewZenossDevice extends SherlockActivity
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("ViewZenossDevice-ErrorHandler", e);
+					////BugSenseHandler.sendException("ViewZenossDevice-ErrorHandler", e);
 				}
 			}
 		};
@@ -158,7 +158,7 @@ public class ViewZenossDevice extends SherlockActivity
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("ViewZenossDevice", e);
+					////BugSenseHandler.sendException("ViewZenossDevice", e);
 				}
 				
 				if(EventCount > 0 && msg.what == 1)
@@ -170,7 +170,7 @@ public class ViewZenossDevice extends SherlockActivity
 					}
 					catch(Exception e)
 					{
-						BugSenseHandler.log("ViewZenossDevice", e);
+						////BugSenseHandler.sendException("ViewZenossDevice", e);
 					}
 				}
 				else
@@ -279,7 +279,7 @@ public class ViewZenossDevice extends SherlockActivity
 								}
 								catch(Exception e)
 								{
-									//BugSenseHandler.log("ViewZenossDevice", e);
+									////BugSenseHandler.sendException("ViewZenossDevice", e);
 								}
 							}
 
@@ -288,7 +288,7 @@ public class ViewZenossDevice extends SherlockActivity
 						}
 						catch(Exception e)
 						{
-							//BugSenseHandler.log("ViewZenossDevice", e);
+							////BugSenseHandler.sendException("ViewZenossDevice", e);
 						}
 
 						String Systems = "";
@@ -308,7 +308,7 @@ public class ViewZenossDevice extends SherlockActivity
 						catch(Exception e)
 						{
 							//Already got a placeholder
-							BugSenseHandler.log("ViewZenossDevice", e);
+							////BugSenseHandler.sendException("ViewZenossDevice", e);
 						}
 
 						//etc
@@ -323,7 +323,7 @@ public class ViewZenossDevice extends SherlockActivity
 				{
 					//e.printStackTrace();
 					Toast.makeText(ViewZenossDevice.this, "An error was encountered parsing the JSON.", Toast.LENGTH_LONG).show();
-					BugSenseHandler.log("ViewZenossDevice", e);
+					////BugSenseHandler.sendException("ViewZenossDevice", e);
 				}
 			}
 		};
@@ -399,7 +399,7 @@ public class ViewZenossDevice extends SherlockActivity
 				catch (Exception e) 
 				{
 					//e.printStackTrace();
-					BugSenseHandler.log("updateDevices-dataPreload", e);
+					//BugSenseHandler.sendException("updateDevices-dataPreload",e);
 					firstLoadHandler.sendEmptyMessage(0);
 				}
 
@@ -585,7 +585,7 @@ public class ViewZenossDevice extends SherlockActivity
 									}
 									catch(Exception e)
 									{
-										BugSenseHandler.log("ViewZenossDevice-EventsLoop", e);
+										//BugSenseHandler.sendException("ViewZenossDevice-EventsLoop", e);
 									}
 								}
 	
@@ -600,7 +600,7 @@ public class ViewZenossDevice extends SherlockActivity
 						catch (JSONException e) 
 						{
 							e.printStackTrace();
-							BugSenseHandler.log("ViewZenossDevice-Events", e);
+							//BugSenseHandler.sendException("ViewZenossDevice-Events", e);
 							eventsHandler.sendEmptyMessage(0);
 						}
 					}
@@ -612,7 +612,7 @@ public class ViewZenossDevice extends SherlockActivity
 				catch (Exception e) 
 				{
 					//Log.e("API - Stage 1", e.getMessage());
-					BugSenseHandler.log("ViewZenossDevice-Events", e);
+					//BugSenseHandler.sendException("ViewZenossDevice-Events", e);
 					eventsHandler.sendEmptyMessage(0);
 				}
 			}
@@ -621,7 +621,8 @@ public class ViewZenossDevice extends SherlockActivity
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+    {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
 	        {

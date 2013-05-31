@@ -34,7 +34,7 @@ public class launcher extends Activity
 	 {
 		 super.onCreate(savedInstanceState);
 	     setContentView(R.layout.main);  
-	     BugSenseHandler.setup(this, "44a76a8c");	
+	     //BugSenseHandler.setup(this, "44a76a8c");
 	     Intent upgradeHelperIntent = new Intent(launcher.this, RhybuddHome.class);
 	     launcher.this.startActivity(upgradeHelperIntent);
 	     finish();

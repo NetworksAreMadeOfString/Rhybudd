@@ -85,9 +85,9 @@ public class ZenossPoller extends Service
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		Log.i("ServiceThread","Service Starting");
-		
-		BugSenseHandler.setup(this, "44a76a8c");
-		
+	
+        BugSenseHandler.initAndStartSession(ZenossPoller.this, "44a76a8c");
+
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 		
@@ -159,7 +159,7 @@ public class ZenossPoller extends Service
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("ZenossPoller", e);
+				//BugSenseHandler.log("ZenossPoller", e);
 			}
 		}
 		/*if(rhybuddCache != null)
@@ -170,7 +170,7 @@ public class ZenossPoller extends Service
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("ZenossPoller", e);
+				//BugSenseHandler.log("ZenossPoller", e);
 			}
 		}*/
 	}
@@ -235,7 +235,7 @@ public class ZenossPoller extends Service
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("ZenossPoller", e);
+				//BugSenseHandler.log("ZenossPoller", e);
 				am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, (long) 0,  60000, Monitoring);
 			}
 		}
@@ -482,7 +482,7 @@ public class ZenossPoller extends Service
 				catch (Exception e) 
 				{
 					//TODO Send Warning
-					BugSenseHandler.log("DeviceList", e);
+					//BugSenseHandler.log("DeviceList", e);
 					/*Message msg = new Message();
 					Bundle bundle = new Bundle();
 					bundle.putString("exception",e.getMessage());

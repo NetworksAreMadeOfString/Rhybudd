@@ -45,7 +45,7 @@ public class RhybuddDatabase
 
 	/**
 	 * Constructor
-	 * @param context The Context within which to work, used to create the DB
+	 * @param _context The Context within which to work, used to create the DB
 	 */
 	public RhybuddDatabase(Context _context) 
 	{
@@ -122,7 +122,7 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+					//BugSenseHandler.log("DB-GetRhybuddDevices", e);
 					if(cursor != null)
 						cursor.close();
 					
@@ -165,7 +165,7 @@ public class RhybuddDatabase
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("DB-GetRhybuddEvents", e);
+			//BugSenseHandler.log("DB-GetRhybuddEvents", e);
 			//e.printStackTrace();
 			dbResults.close();
 			dbResults = null;
@@ -193,7 +193,7 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("GetRhybuddEvents", e);
+					//BugSenseHandler.log("GetRhybuddEvents", e);
 				}	
 			}
 			dbResults.close();
@@ -250,7 +250,7 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+					//BugSenseHandler.log("DB-GetRhybuddDevices", e);
 				}
 			}
 			
@@ -312,7 +312,7 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("DB-GetRhybuddDevices", e);
+					//BugSenseHandler.log("DB-GetRhybuddDevices", e);
 				}
 			}
 			
@@ -347,7 +347,7 @@ public class RhybuddDatabase
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("UpdateRhybuddDevices", e);
+					//BugSenseHandler.log("UpdateRhybuddDevices", e);
 				}
 				finally
 				{
@@ -374,7 +374,7 @@ public class RhybuddDatabase
 				catch(Exception e)
 				{
 					e.printStackTrace();
-					BugSenseHandler.log("UpdateRhybudddEvents", e);
+					//BugSenseHandler.log("UpdateRhybudddEvents", e);
 				}
 				finally
 				{
@@ -448,12 +448,12 @@ public class RhybuddDatabase
 			}
 			catch(SQLiteException s)
 			{
-				BugSenseHandler.log("Database-onCreate", s);
+				//BugSenseHandler.log("Database-onCreate", s);
 				//s.printStackTrace();
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("Database-onCreate", e);
+				//BugSenseHandler.log("Database-onCreate", e);
 				//e.printStackTrace();
 			}
 		}
@@ -469,7 +469,7 @@ public class RhybuddDatabase
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("Database-Flush", e);
+				//BugSenseHandler.log("Database-Flush", e);
 			}
 			finally
 			{
@@ -518,7 +518,7 @@ public class RhybuddDatabase
 						e.printStackTrace();
 						
 						//This could get a little excessive
-						BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
+						//BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
 					}
 				}
 				mDatabase.setTransactionSuccessful();
@@ -526,7 +526,7 @@ public class RhybuddDatabase
 			catch(Exception e)
 			{
 				//This could get a little excessive
-				BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
+				//BugSenseHandler.log("Database-UpdateRhybuddDevices", e);
 			}
 			finally
 			{
@@ -585,7 +585,7 @@ public class RhybuddDatabase
 			catch(Exception e)
 			{
 				//This could get a little excessive
-				BugSenseHandler.log("Database-refreshDevices", e);
+				//BugSenseHandler.log("Database-refreshDevices", e);
 			}
 			finally
 			{
@@ -604,7 +604,7 @@ public class RhybuddDatabase
 			}
 			catch(Exception e)
 			{
-				BugSenseHandler.log("Database-onUpgrade", e);
+				//BugSenseHandler.log("Database-onUpgrade", e);
 				e.printStackTrace();
 			}
 			

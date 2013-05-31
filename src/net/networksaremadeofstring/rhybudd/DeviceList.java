@@ -22,13 +22,13 @@ package net.networksaremadeofstring.rhybudd;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONObject;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -44,7 +44,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DeviceList extends SherlockActivity
+public class DeviceList extends Activity
 {
 	ZenossAPIv2 API = null;
 	JSONObject DeviceObject = null;
@@ -58,7 +58,7 @@ public class DeviceList extends SherlockActivity
 	ListView list;
 	ZenossDeviceAdaptor adapter = null;
 	Cursor dbResults = null;
-	
+
 	//new
 	Handler handler;
 	ActionBar actionbar;
@@ -77,7 +77,7 @@ public class DeviceList extends SherlockActivity
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("DeviceList-OnDestroy", e);
+			//BugSenseHandler.log("DeviceList-OnDestroy", e);
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class DeviceList extends SherlockActivity
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("DeviceList-onRetainNonConfigurationInstance", e);
+			//BugSenseHandler.log("DeviceList-onRetainNonConfigurationInstance", e);
 		}
 	
 	    return listOfZenossDevices;
@@ -117,18 +117,18 @@ public class DeviceList extends SherlockActivity
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         
         setContentView(R.layout.devicelist);
-        BugSenseHandler.setup(this, "44a76a8c");	
-        
-        actionbar = getSupportActionBar();
+        BugSenseHandler.initAndStartSession(DeviceList.this, "44a76a8c");
+
+        actionbar = getActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setTitle("Infrastructure");
-        
+
         list = (ListView)findViewById(R.id.ZenossDeviceList);
         
         rhybuddCache = new RhybuddDatabase(this);
         
-        BugSenseHandler.setup(this, "44a76a8c");
+        BugSenseHandler.initAndStartSession(DeviceList.this, "44a76a8c");
         
         handler = new Handler()
         {
@@ -160,7 +160,7 @@ public class DeviceList extends SherlockActivity
         catch(Exception e)
 		{
         	listOfZenossDevices = null;
-			BugSenseHandler.log("DeviceList", e);
+			//BugSenseHandler.log("DeviceList", e);
 		}
     	
     	if(listOfZenossDevices == null || listOfZenossDevices.size() < 1)
@@ -334,7 +334,7 @@ public class DeviceList extends SherlockActivity
 				} 
 				catch (Exception e) 
 				{
-					BugSenseHandler.log("DeviceList", e);
+					//BugSenseHandler.log("DeviceList", e);
 					Message msg = new Message();
 					Bundle bundle = new Bundle();
 					bundle.putString("exception",e.getMessage());
@@ -352,15 +352,15 @@ public class DeviceList extends SherlockActivity
     	DeviceList.this.startActivity(ViewDeviceIntent);
     }
     
-    public boolean onCreateOptionsMenu(Menu menu) 
+    public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.devices, menu);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) 
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId()) 
 		{

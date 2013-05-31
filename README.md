@@ -1,11 +1,15 @@
 Rhybudd is a Zenoss Events & Device Management App for Android
 ======
-Uses the new Zenoss 3.x & 4.x API to poll for, alert on and Acknowledge or delve into Zenoss alerts.
+Uses the Zenoss 3.x, 4.x & ZaaS APIs to poll for, alert on and acknowledge or delve into Zenoss events.
+
+Now with a dedicated ZenPack for direct delivery of events!
 
 The source code has been released under the GPL version 3 license.
 
 Features:
 --------
+* GCM enabled for 'push' delivery of events
+* Full ZaaS support
 * List Events
 * Acknowledge Event
 * Acknowledge all events
@@ -39,9 +43,10 @@ Features:
 
 Links:
 --------
+* ZenPack: http://bit.ly/ZenossPush
 * Email: Gareth@NetworksAreMadeOfString.co.uk
 * GitHub: https://github.com/NetworksAreMadeOfString/Rhybudd
-* Market URL: https://market.android.com/details?id=net.networksaremadeofstring.rhybudd
+* Market URL: http://bit.ly/ZenossAndroid
 * Twitter: @NetworkString
 
 

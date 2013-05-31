@@ -34,7 +34,7 @@ public class ManageUpdate extends BroadcastReceiver
 	@Override
 	public void onReceive(Context arg0, Intent intent) 
 	{
-		BugSenseHandler.setup(arg0, "44a76a8c");
+		//BugSenseHandler.setup(arg0, "44a76a8c");
 		try
 		{
 			if (intent.getDataString().contains("net.networksaremadeofstring.rhybudd"))
@@ -61,7 +61,7 @@ public class ManageUpdate extends BroadcastReceiver
 					{
 						//Log.e("ManangeUpdateBroadcastReceiver","Failed to kill the alarm manager");
 						e.printStackTrace();
-						BugSenseHandler.log("UpdateReceiver-mAlarmSender", e);
+						//BugSenseHandler.log("UpdateReceiver-mAlarmSender", e);
 					}
 					
 					
@@ -103,7 +103,7 @@ public class ManageUpdate extends BroadcastReceiver
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("UpdateReceiver", e);
+			//BugSenseHandler.log("UpdateReceiver", e);
 		}
 	}
 }

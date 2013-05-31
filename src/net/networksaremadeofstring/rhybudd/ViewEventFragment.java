@@ -1,6 +1,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +10,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 
-public class ViewEventFragment extends SherlockFragment
+public class ViewEventFragment extends Fragment
 {
 	int postionInList = 0;
 	

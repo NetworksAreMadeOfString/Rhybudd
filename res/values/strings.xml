@@ -14,7 +14,27 @@
     
     <!-- Initial Settings -->
     <string name="initialSettings">Additional configuration such as background polling interval etc can be configured later</string>
-    
+
+    <!-- First Run Settings -->
+    <string name="FirstRunTitle">Configure Rhybudd Settings</string>
+    <string name="FirstRunSubtitle">Supports Zenoss 3.x, 4.x &amp; ZaaS</string>
+    <string name="FirstRunNeedSettings">To operate Rhybudd needs a Zenoss URL and credentials.\nExiting</string>
+    <string name="FirstRunZenossCore">Zenoss Core Community / Ent</string>
+    <string name="FirstRunZaaS">Zenoss as a Service [ZaaS]</string>
+    <string name="FirstRunPush">Rhybudd Push\nInstant Alerts</string>
+    <string name="FirstRunDebug">Debug Output:</string>
+
+    <!-- Preference Push Simple -->
+    <string name="PushCategoryTitle">Rhybudd Push Settings</string>
+    <string name="PushCategorySummary">Rhybudd Push enables Zenoss to push Events directly to your device without the need for polling. This massively reduces battery drain &amp; decreases data usage too. Average latency is only ~700ms.\n\nSee http://bit.ly/ZenossPush for more details.</string>
+    <string name="PushEnableSwitch">Enable Push</string>
+    <string name="PushIDDesc">This is your Push key for use with the ZenPack.rhybudd.alerts ZenPack.\n\nThis key has been saved to this device, you\'re ready to start receiving pushed events!</string>
+    <string name="PushAddExistingButton">Add Existing Key</string>
+    <string name="PushCreateIDButton">Create new Key</string>
+    <string name="PushSaveID">Save</string>
+    <string name="PushKeyHint">cc18379a0d064140def2f2eb13376a1b</string>
+    <string name="PushKeyLengthError">Push keys are 32 characters long</string>
+
     <string name="mangeDatabaseTitle">Manage Cache</string>
     <string name="mangeDatabaseDBSizeTitle">Current DB Size:</string>
     <string name="manageCache_RefreshTitle">Refresh Local Cache</string>

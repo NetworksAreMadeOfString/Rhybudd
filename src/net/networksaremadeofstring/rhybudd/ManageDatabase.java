@@ -19,9 +19,9 @@
 
 package net.networksaremadeofstring.rhybudd;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
 import android.app.AlertDialog;
@@ -38,7 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManageDatabase extends SherlockActivity
+public class ManageDatabase extends Activity
 {
 	Thread FlushDBThread;
 	Handler UIUpdate;
@@ -49,7 +49,7 @@ public class ManageDatabase extends SherlockActivity
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.manage_database);
-        actionbar = getSupportActionBar();
+        actionbar = getActionBar();
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 
@@ -59,7 +59,7 @@ public class ManageDatabase extends SherlockActivity
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("ManageDatabase", e);
+			//BugSenseHandler.log("ManageDatabase", e);
 		}
         
         
@@ -83,7 +83,7 @@ public class ManageDatabase extends SherlockActivity
 				}
 				catch(Exception e)
 				{
-					BugSenseHandler.log("ManageDatabase", e);
+					//BugSenseHandler.log("ManageDatabase", e);
 				}
 			}
         };
@@ -135,7 +135,7 @@ public class ManageDatabase extends SherlockActivity
 		        	    			}
 		        					catch(Exception e)
 		        					{
-		        						BugSenseHandler.log("emptyDBButton", e);
+		        						//BugSenseHandler.log("emptyDBButton", e);
 		        					}
 		        	    		}
 		        	    	}).start();

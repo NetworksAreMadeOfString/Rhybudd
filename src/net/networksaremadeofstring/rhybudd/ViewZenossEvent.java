@@ -18,6 +18,9 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,9 +37,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,15 +45,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
-public class ViewZenossEvent extends SherlockActivity
+
+public class ViewZenossEvent extends Activity
 {
 	ZenossAPIv2 API = null;
 	JSONObject EventObject = null;
@@ -72,15 +68,15 @@ public class ViewZenossEvent extends SherlockActivity
 		window.setFormat(PixelFormat.RGBA_8888);
 	}
 
-	public boolean onCreateOptionsMenu(Menu menu) 
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.view_event, menu);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) 
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId()) 
 		{
@@ -143,13 +139,13 @@ public class ViewZenossEvent extends SherlockActivity
 
 		try
 		{
-			actionbar = getSupportActionBar();
+			actionbar = getActionBar();
 			actionbar.setDisplayHomeAsUpEnabled(true);
 			actionbar.setHomeButtonEnabled(true);
 		}
 		catch(Exception e)
 		{
-			BugSenseHandler.log("ViewZenossEvent", e);
+			//BugSenseHandler.log("ViewZenossEvent", e);
 		}
 		
 		try
@@ -162,7 +158,7 @@ public class ViewZenossEvent extends SherlockActivity
 		catch(Exception e)
 		{
 			//We don't need to much more than report it because the direct API request will sort it out for us.
-			BugSenseHandler.log("ViewZenossEvent", e);
+			//BugSenseHandler.log("ViewZenossEvent", e);
 		}
 
 		firstLoadHandler = new Handler() 
@@ -305,14 +301,14 @@ public class ViewZenossEvent extends SherlockActivity
 								catch(Exception e)
 								{
 									Toast.makeText(getApplicationContext(), "There was an error trying process the log entries for this event.", Toast.LENGTH_SHORT).show();
-									BugSenseHandler.log("ViewZenossEvent", e);
+									//BugSenseHandler.log("ViewZenossEvent", e);
 									
 								}
 							}
 						}
 						catch(Exception e)
 						{
-							BugSenseHandler.log("ViewZenossEvent-LogEntries", e);
+							//BugSenseHandler.log("ViewZenossEvent-LogEntries", e);
 							
 							String[] LogEntries = {"No log entries could be found"};
 							try
@@ -321,7 +317,7 @@ public class ViewZenossEvent extends SherlockActivity
 							}
 							catch(Exception e1)
 							{
-								BugSenseHandler.log("ViewZenossEvent-LogEntries", e1);
+								//BugSenseHandler.log("ViewZenossEvent-LogEntries", e1);
 							}
 						}
 					}
@@ -335,7 +331,7 @@ public class ViewZenossEvent extends SherlockActivity
 				catch(Exception e)
 				{
 					Toast.makeText(ViewZenossEvent.this, "An error was encountered parsing the JSON. An error report has been sent.", Toast.LENGTH_LONG).show();
-					BugSenseHandler.log("ViewZenossEvent", e);
+					//BugSenseHandler.log("ViewZenossEvent", e);
 				}
 			}
 		};

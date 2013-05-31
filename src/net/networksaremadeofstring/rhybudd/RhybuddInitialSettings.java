@@ -20,6 +20,9 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.view.*;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 
@@ -32,22 +35,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
-public class RhybuddInitialSettings extends SherlockActivity
+public class RhybuddInitialSettings extends Activity
 {
 	SharedPreferences settings = null;
 	ProgressDialog dialog;
@@ -76,7 +72,7 @@ public class RhybuddInitialSettings extends SherlockActivity
         
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         
-        actionbar = getSupportActionBar();
+        actionbar = getActionBar();
 		actionbar.setTitle("Basic Zenoss Settings");
 		
 		setContentView(R.layout.settings_initial);
@@ -97,7 +93,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				}
     				catch(Exception e)
     				{
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
     					Toast.makeText(RhybuddInitialSettings.this, "Logged in Successfully. Preparing Database!", Toast.LENGTH_SHORT).show();
     				}
         			
@@ -179,7 +175,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				}
     				catch(Exception e)
     				{
-    					//BugSenseHandler.log("InitialSettings", e);
+    					////BugSenseHandler.log("InitialSettings", e);
     					HandleException(e, "Initialising the Database failed. An error message has been logged.");
     				}
     			}
@@ -196,7 +192,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				catch(Exception e)
     				{
     					//Not much else we can do here :/
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
     				}
     				
     				Intent in = new Intent();
@@ -218,7 +214,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				catch(Exception e)
     				{
     					//Not much else we can do here :/
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
     				}
     				
     				try
@@ -227,7 +223,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				}
     				catch(Exception e)
     				{
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
     					Toast.makeText(RhybuddInitialSettings.this, "An unknown error occured. It has been reported.", Toast.LENGTH_SHORT).show();
     				}
     			}
@@ -240,7 +236,7 @@ public class RhybuddInitialSettings extends SherlockActivity
     				catch(Exception e)
     				{
     					//Not much else we can do here :/
-    					BugSenseHandler.log("InitialSettings", e);
+    					//BugSenseHandler.log("InitialSettings", e);
     				}
     				Toast.makeText(RhybuddInitialSettings.this, "Login Failed - Please check details.", Toast.LENGTH_SHORT).show();
     			}
@@ -402,7 +398,7 @@ public class RhybuddInitialSettings extends SherlockActivity
 			((Thread) new Thread(){
 				public void run() 
 	    		{
-					//BugSenseHandler.log("InitialSettings", e);
+					////BugSenseHandler.log("InitialSettings", e);
 	    		}
 			}).start();
 		}
@@ -431,15 +427,15 @@ public class RhybuddInitialSettings extends SherlockActivity
 		handler.sendMessage(msg);
 	}
 	
-	public boolean onCreateOptionsMenu(Menu menu) 
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.initial_settings, menu);
 	    return true;
     }
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) 
+    public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) 
         {
