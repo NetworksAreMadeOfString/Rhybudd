@@ -2,8 +2,36 @@
     android:id="@+id/relativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:minHeight="64dp" >
-
+    android:minHeight="64dp"
+    android:padding="4dp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <ImageView
         android:id="@+id/fragment_indicator"
         android:layout_width="wrap_content"
@@ -13,7 +41,8 @@
         android:minHeight="24dp"
         android:minWidth="4dp"
         android:src="@drawable/event_fragment_indicator" />
-
+
+
     <ImageView
         android:id="@+id/AckImage"
         android:layout_width="wrap_content"
@@ -24,7 +53,8 @@
         android:src="@drawable/nack" >
 
     </ImageView>
-
+
+
     <ProgressBar
         android:id="@+id/inProgressBar"
         style="?android:attr/progressBarStyleSmall"
@@ -36,7 +66,9 @@
         android:indeterminate="true" >
 
     </ProgressBar>
-
+
+
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
@@ -54,7 +86,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/severity_info" />
-
+
+
+
+
         <ToggleButton
             android:id="@+id/cabSelect"
             android:layout_width="16dp"
@@ -65,7 +100,12 @@
             android:textOff="@string/empty" />
 
     </LinearLayout>
-
+
+
+
+
+
+
     <TextView
         android:id="@+id/DeviceName"
         android:layout_width="wrap_content"
@@ -79,8 +119,18 @@
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/RhybuddTitleText"
-        android:textStyle="bold" />
-
+        android:textStyle="bold"
+        android:paddingLeft="8dp"/>
+
+
+
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/EventSummary"
         android:layout_width="wrap_content"
@@ -91,8 +141,26 @@
         android:layout_toLeftOf="@+id/AckImage"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/RhybuddStdText" />
-
+        android:textColor="@color/RhybuddStdText"
+        android:paddingLeft="8dp"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/dateTime"
         android:layout_width="wrap_content"

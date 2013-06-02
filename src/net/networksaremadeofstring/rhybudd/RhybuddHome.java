@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - Gareth Llewellyn
+ * Copyright (C) 2013 - Gareth Llewellyn
  *
  * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
  *
@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActionBar;
+import android.content.*;
+import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -31,18 +34,12 @@ import com.google.android.gcm.GCMRegistrar;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.backup.BackupManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
@@ -57,59 +54,32 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-//import android.util.Log;
 
 public class RhybuddHome extends FragmentActivity
 {
 	SharedPreferences settings = null;
-	Handler HomeHandler = null, runnablesHandler = null;
-	Runnable updateEvents = null, updateDevices = null, updateDeviceDetails = null;
-	Boolean OneOff = true;
-
-	//New
 	ZenossAPIv2 API = null;
-	JSONObject EventsObject = null;
-	JSONArray Events = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	List<Integer> selectedEvents = new ArrayList<Integer>();
-	Thread dataPreload,AckEvent,dataReload;
+	Thread dataPreload,AckEvent;
 	volatile Handler handler, AckEventHandler;
 	ProgressDialog dialog;
 	AlertDialog alertDialog;
 	ListView list;
 	ZenossEventsAdaptor adapter;
-	Cursor dbResults = null;
 	ActionBar actionbar;
-	int requestCode; //Used for evaluating what the settings Activity returned (Should always be 1)
-	RhybuddDatabase rhybuddCache;
+	int requestCode;
 	ActionMode mActionMode;
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
 	boolean FragmentVisible = false;
 	int selectedFragmentEvent = 0;
     String regId = "";
-
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		try
-		{
-			if(dbResults != null)
-			{
-				dbResults.close();
-			}
-
-			if(rhybuddCache != null)
-			{
-				rhybuddCache.Close();
-			}
-		}
-		catch(Exception e)
-		{
-			////BugSenseHandler.log("RhybuddHome-onDestroy", e);
-		}
-	}
+    ZenossPoller mService;
+    boolean mBound = false;
+    int retryCount = 0;
+    boolean firstRun = false;
+    boolean resumeOnResultPollAPI = true;
 
 	@Override
 	public void onAttachedToWindow() 
@@ -131,7 +101,6 @@ public class RhybuddHome extends FragmentActivity
 	public void onConfigurationChanged(Configuration newConfig) 
 	{
 		super.onConfigurationChanged(newConfig);
-		//Log.i("onConfigurationChanged","Now sending handler");
 		
 		setContentView(R.layout.rhybudd_home);
 		finishStart(false);
@@ -140,81 +109,86 @@ public class RhybuddHome extends FragmentActivity
 	@Override
 	public void onNewIntent(Intent newIntent)
 	{
-		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
-		//Log.e("onNewIntent",Boolean.toString(newIntent.getBooleanExtra("forceRefresh", false)));
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
 		if(newIntent.getBooleanExtra("forceRefresh", false))
 		{
 			DBGetThread();
 		}
-		/*else
-		{
-			Log.e("onNewIntent","Didn't get told to refresh");
-		}*/
 	}
 	
 	@Override
     protected void onResume() 
 	{
         super.onResume();
-        DBGetThread();
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
+
+        //Can't hurt to try and start the service just in case
+        startService(new Intent(this, ZenossPoller.class));
+
+        Log.e("-----------------------------------------","OnResume");
+        //User is about to see the list of events - no need for them to hang around
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
+
+        //Lets try and bind to our service (if it's alive)
+        doBindService();
+
+        //Might as well update GCM whilst we're here
+        if(settings.contains(ZenossAPI.PREFERENCE_PUSHKEY) && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals(""))
+        {
+            doGCMRegistration(settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,""));
+        }
+
+        //OnCreate checks the settings for various bits. If they aren't there it sets first run to true
+        //Checking a single bool is a hell of a lot more lightweight than 3 Preferences each onResume !
+        if(firstRun)
+        {
+            //We need to set this now as no doubt on resume gets called before onActivityResult
+            firstRun = false;
+
+            Intent SettingsIntent = new Intent(RhybuddHome.this, FirstRunSettings.class);
+            SettingsIntent.putExtra("firstRun", true);
+            //Test
+            RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
+        }
+        else
+        {
+            //If we've resumed from one of our own activities we probably don't want to do a full refresh
+            //finishStart will force a full refresh if backgroundPolling isn't enabled
+            if(resumeOnResultPollAPI)
+            {
+                finishStart(false);
+            }
+            else
+            {
+                //Nice and fast for returning from within our own app
+                DBGetThread();
+                resumeOnResultPollAPI = true;
+            }
+        }
     }
 	
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
+        BugSenseHandler.initAndStartSession(RhybuddHome.this, "44a76a8c");
+
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		setContentView(R.layout.rhybudd_home);
 
         actionbar = getActionBar();
         actionbar.setTitle("Rhybudd Events List");
         actionbar.setSubtitle(settings.getString("URL", ""));
 
-        //GCM stuff
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        regId = GCMRegistrar.getRegistrationId(this);
-
-        if (regId.equals(""))
+        if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
         {
-            Log.v("GCM", "Registering");
-            GCMRegistrar.register(this, API.SENDER_ID);
+            firstRun = true;
         }
-        else
-        {
-            Log.v("GCM", "Already registered");
-        }
-
-        Log.e("GCMID",GCMRegistrar.getRegistrationId(this));
-
-		//Log.e("onCreate",Boolean.toString(getIntent().getBooleanExtra("forceRefresh", false)));
-		if(getIntent().getBooleanExtra("forceRefresh", false))
-		{
-			DBGetThread();
-		}
-		
-		//Clear any notifications event notifications 
-		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(43523);
-
-        BugSenseHandler.initAndStartSession(RhybuddHome.this, "44a76a8c");
-
-		if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
-		{
-			//Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
-            Intent SettingsIntent = new Intent(RhybuddHome.this, FirstRunSettings.class);
-			SettingsIntent.putExtra("firstRun", true);
-			RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
-		}
-		else
-		{
-			finishStart(false);
-		}
 	}
 
 	public void DBGetThread()
 	{
+        Log.e("DBGetThread","Doing a DB lookup");
 		listOfZenossEvents.clear();
 		dataPreload = new Thread() 
 		{  
@@ -224,7 +198,10 @@ public class RhybuddHome extends FragmentActivity
 
 				try
 				{
-					tempZenossEvents = rhybuddCache.GetRhybuddEvents();
+                    RhybuddDataSource datasource = new RhybuddDataSource(RhybuddHome.this);
+                    datasource.open();
+                    tempZenossEvents = datasource.GetRhybuddEvents();
+                    datasource.close();
 				}
 				catch(Exception e)
 				{
@@ -238,18 +215,17 @@ public class RhybuddHome extends FragmentActivity
 					try
 					{
 						listOfZenossEvents = tempZenossEvents;
-	
-						//Log.i("DeviceList","Found DB Data!");
+						//Log.i("EventList","Found DB Data!");
 						handler.sendEmptyMessage(1);
 					}
 					catch(Exception e)
 					{
-						//TODO Report to Bugsense
+                        BugSenseHandler.sendExceptionMessage("RhybuddHome","DBGetThread",e);
 					}
 				}
 				else
 				{
-					//Log.i("DeviceList","No DB data found, querying API directly");
+					Log.i("EventList","No DB data found, querying API directly");
 					try
 					{
 						handler.sendEmptyMessage(2);
@@ -262,79 +238,8 @@ public class RhybuddHome extends FragmentActivity
 					}
 					catch(Exception e)
 					{
-						//TODO Report to Bugsense
+                        BugSenseHandler.sendExceptionMessage("RhybuddHome","DBGetThread",e);
 					}
-
-					
-					/*try
-					{
-						if(API == null)
-						{
-							if(settings.getBoolean("httpBasicAuth", false))
-							{
-								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
-							}
-							else
-							{
-								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							}
-						}
-
-					}
-					catch(Exception e)
-					{
-						API = null;
-						e.printStackTrace();
-					}
-
-					try 
-					{
-						if(API != null)
-						{
-							tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
-									settings.getBoolean("SeverityError", true),
-									settings.getBoolean("SeverityWarning", true),
-									settings.getBoolean("SeverityInfo", false),
-									settings.getBoolean("SeverityDebug", false),
-									settings.getBoolean("onlyProductionEvents", true));
-
-							if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
-							{
-								listOfZenossEvents = tempZenossEvents;
-								handler.sendEmptyMessage(1);
-							}
-							else
-							{
-								handler.sendEmptyMessage(999);
-							}
-						}
-						else
-						{
-							handler.sendEmptyMessage(999);
-						}
-					} 
-					catch (ClientProtocolException e) 
-					{
-						// TODO Send a proper message
-						e.printStackTrace();
-						handler.sendEmptyMessage(999);
-					} 
-					catch (JSONException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						handler.sendEmptyMessage(999);
-					} 
-					catch (IOException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						handler.sendEmptyMessage(999);
-					}
-					catch(Exception e)
-					{
-						handler.sendEmptyMessage(999);
-					}*/
 				}
 			}
 		};
@@ -343,7 +248,7 @@ public class RhybuddHome extends FragmentActivity
 
 	public void Refresh()
 	{
-		//Log.i("RhybuddHOMe","Performing a Direct API Refresh");
+		Log.i("RhybuddHOMe","Performing a Direct API Refresh");
 		try
 		{
 			if(dialog == null || !dialog.isShowing())
@@ -353,15 +258,16 @@ public class RhybuddHome extends FragmentActivity
 
 			dialog.setTitle("Querying Zenoss Directly");
 			dialog.setMessage("Refreshing Events...");
-			dialog.setCancelable(false);
+			//dialog.setCancelable(false);
 
 			if(!dialog.isShowing())
 				dialog.show();
 		}
 		catch(Exception e)
 		{
+            e.printStackTrace();
 			//TODO Handle this and tell the user
-			//Log.i("RhybuddHOMe","Error launching Dialog window");
+            BugSenseHandler.sendExceptionMessage("RhybuddHome","Refresh",e);
 		}
 
 		((Thread) new Thread(){
@@ -369,121 +275,124 @@ public class RhybuddHome extends FragmentActivity
 			{
 				List<ZenossEvent> tempZenossEvents = null;
 
-				try
-				{
-					if(API == null)
-					{
-						if(settings.getBoolean("httpBasicAuth", false))
-						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
-						}
-						else
-						{
-							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-						}
-					}
-				}
-				catch(Exception e)
-				{
-					API = null;
-					e.printStackTrace();
-				}
+                //This is a bit dirty but hell it saves an extra API call
+                if (null == mService && !mBound)
+                {
+                    Log.e("Refresh","Service was dead or something so sleeping");
+                    try
+                    {
+                        sleep(500);
+                    }
+                    catch(Exception e)
+                    {
 
-				try 
-				{
-					if(API != null)
-					{
-						tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
-								settings.getBoolean("SeverityError", true),
-								settings.getBoolean("SeverityWarning", true),
-								settings.getBoolean("SeverityInfo", false),
-								settings.getBoolean("SeverityDebug", false),
-								settings.getBoolean("onlyProductionEvents", true),
-								settings.getString("SummaryFilter", ""),
-								settings.getString("DeviceFilter", ""),
-								settings.getBoolean("hideAckdAlerts", false));
+                    }
+                }
 
-						if(tempZenossEvents!= null && tempZenossEvents.size() > 0)
-						{
-							listOfZenossEvents = tempZenossEvents;
-							handler.sendEmptyMessage(1);
-						}
-						else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
-						{
-							handler.sendEmptyMessage(50);
-						}
-						else
-						{
-							// TODO Send a proper message
-							handler.sendEmptyMessage(999);
-						}
-					}
-					else
-					{
-						// TODO Send a proper message
-						handler.sendEmptyMessage(999);
-					}
-				} 
-				catch (ClientProtocolException e) 
-				{
-					// TODO Send a proper message
-					e.printStackTrace();
-					handler.sendEmptyMessage(999);
-				} 
-				catch (JSONException e) 
-				{
-					// TODO Send a proper message
-					e.printStackTrace();
-					handler.sendEmptyMessage(999);
-				} 
-				catch (IOException e) 
-				{
-					// TODO Send a proper message
-					e.printStackTrace();
-					handler.sendEmptyMessage(999);
-				}
-				catch(Exception e)
-				{
-					// TODO Send a proper message
-					e.printStackTrace();
-					handler.sendEmptyMessage(999);
-				}
+                if (null != mService && mBound)
+                {
+                    Log.e("Refresh","yay not dead");
+                    try
+                    {
+                        if(null == mService.API)
+                        {
+                            mService.PrepAPI(true);
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(RhybuddHome.this);
+                        mService.API.Login(credentials);
+
+                        tempZenossEvents = mService.API.GetRhybuddEvents(RhybuddHome.this);
+
+                        if(null == tempZenossEvents)
+                        {
+                            Log.e("Refresh","We got a null return from the service API, lets try ourselves");
+                            ZenossAPI API;
+
+                            if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
+                            {
+                                API = new ZenossAPIZaas();
+                            }
+                            else
+                            {
+                                API = new ZenossAPICore();
+                            }
+
+                            credentials = new ZenossCredentials(RhybuddHome.this);
+                            API.Login(credentials);
+
+                            tempZenossEvents = API.GetRhybuddEvents(RhybuddHome.this);
+                        }
+
+                        if(tempZenossEvents != null && tempZenossEvents.size() > 0)
+                        {
+                            retryCount = 0;
+                            listOfZenossEvents = tempZenossEvents;
+                            handler.sendEmptyMessage(1);
+                            RhybuddDataSource datasource = new RhybuddDataSource(RhybuddHome.this);
+                            datasource.open();
+                            datasource.UpdateRhybuddEvents(listOfZenossEvents);
+                            datasource.close();
+                        }
+                        else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
+                        {
+                            handler.sendEmptyMessage(50);
+                        }
+                        else
+                        {
+                            // TODO Send a proper message
+                            handler.sendEmptyMessage(999);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","General success path",e);
+                        handler.sendEmptyMessage(999);
+                    }
+                }
+                else
+                {
+                    Log.e("Refresh","The service wasn't running for some reason");
+                    dialog.setMessage("The backend service wasn't running.\n\nStarting...");
+                    Intent intent = new Intent(RhybuddHome.this, ZenossPoller.class);
+                    startService(intent);
+                    retryCount++;
+
+                    doBindService();
+                    if(retryCount > 5)
+                    {
+                        handler.sendEmptyMessage(999);
+                    }
+                    else
+                    {
+                        //handler.sendEmptyMessage(ZenossAPI.HANDLER_REDOREFRESH);
+                        handler.sendEmptyMessageDelayed(ZenossAPI.HANDLER_REDOREFRESH,300);
+                    }
+                }
 			}
 		}).start();
 	}
 
 	private void finishStart(Boolean firstRun)
 	{
-		Intent intent = new Intent(this, ZenossPoller.class);
 		list = (ListView)findViewById(R.id.ZenossEventsList);
 		list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-		rhybuddCache = new RhybuddDatabase(this);
 		ConfigureHandlers();
 
-		if(firstRun)
-		{
-			//TODO Remove as the callback handles this
-			intent.putExtra("settingsUpdate", true);
-			startService(intent);
-			//Refresh();
-			DBGetThread();
-		}
-		else
-		{
-			if(settings.getBoolean("AllowBackgroundService", true))
-			{
-				//Log.i("RhybuddHome","Background polling is enabled so querying the DB");
-				DBGetThread();
-			}
-			else//TODO Remove as the DB query will always fall back to doing a direct API call
-			{
-				//Log.i("RhybuddHome","Doing a direct call to the API");
-				Refresh();
-			}
-
-			//TODO Check if we don't need this anymore
-			startService(intent);
-		}
+        //In certain cases it's perfectly safe to rely that the DB is up to date.
+        if(settings.getBoolean("AllowBackgroundService", false) ||
+           getIntent().getBooleanExtra("forceRefresh", false) == false ||
+           (!regId.equals("") && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals("")))
+        {
+            Log.i("RhybuddHome","Background polling is enabled OR we are GCM enabled AND we haven't been asked to force a refresh so we're safe to query the DB");
+            DBGetThread();
+        }
+        else
+        {
+            Log.i("RhybuddHome","Doing a direct call to the API");
+            Refresh();
+        }
 	}
 
 	private void ConfigureHandlers()
@@ -659,6 +568,10 @@ public class RhybuddHome extends FragmentActivity
 						}
 					}
 				}
+                else if (msg.what == ZenossAPI.HANDLER_REDOREFRESH)
+                {
+                    Refresh();
+                }
 				else
 				{
 					if(dialog != null && dialog.isShowing())
@@ -801,7 +714,6 @@ public class RhybuddHome extends FragmentActivity
 		}
 	}
 
-
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() 
 	{
 		@Override
@@ -836,27 +748,6 @@ public class RhybuddHome extends FragmentActivity
 				{
 					listOfZenossEvents.get(i).setProgress(true);
 					EventIDs.add(listOfZenossEvents.get(i).getEVID());
-
-					/*AckEvent = new Thread() 
-					{  
-						public void run() 
-						{
-							try 
-							{
-								ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-								ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(i).getEVID());
-								listOfZenossEvents.get(i).setProgress(false);
-								listOfZenossEvents.get(i).setAcknowledged();
-								AckEventHandler.sendEmptyMessage(1);
-							}
-							catch (Exception e)
-							{
-								AckEventHandler.sendEmptyMessage(99);
-								//BugSenseHandler.log("Acknowledge", e);
-							}
-						}
-					};
-					AckEvent.start();*/
 				}
 				AckEventHandler.sendEmptyMessage(0);
 
@@ -953,121 +844,174 @@ public class RhybuddHome extends FragmentActivity
 	{
 		switch (item.getItemId()) 
 		{
-		case R.id.settings:
-		{
-			Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
-			this.startActivityForResult(SettingsIntent, 99);
-			return true;
-		}
+            case R.id.settings:
+            {
+                Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+                this.startActivityForResult(SettingsIntent, 99);
+                return true;
+            }
 
-		case R.id.Help:
-		{
-			Intent i = new Intent(Intent.ACTION_VIEW);
-			i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
-			startActivity(i);
-			return true;
-		}
+            case R.id.pushconfig:
+            {
+                Intent PushSettingsIntent = new Intent(RhybuddHome.this, PushConfigActivity.class);
+                this.startActivityForResult(PushSettingsIntent, ZenossAPI.ACTIVITYRESULT_PUSHCONFIG);
+                return true;
+            }
 
-		case R.id.devices:
-		{
-			Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
-			RhybuddHome.this.startActivity(DeviceList);
-			return true;
-		}
+            case R.id.Help:
+            {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
+                startActivity(i);
+                return true;
+            }
 
-		case R.id.search:
-		{
-			onSearchRequested();
-			return true;
-		}
+            case R.id.devices:
+            {
+                Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
+                RhybuddHome.this.startActivity(DeviceList);
+                return true;
+            }
 
-		case R.id.cache:
-		{
-			Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
-			RhybuddHome.this.startActivity(MangeDBIntent);
-			return true;
-		}
+            case R.id.search:
+            {
+                onSearchRequested();
+                return true;
+            }
 
-		case R.id.resolveall:
-		{
-			final List<String> EventIDs = new ArrayList<String>();
+            case R.id.cache:
+            {
+                Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
+                RhybuddHome.this.startActivity(MangeDBIntent);
+                return true;
+            }
+
+            case R.id.resolveall:
+            {
+                final List<String> EventIDs = new ArrayList<String>();
 
 
-			for (ZenossEvent evt : listOfZenossEvents)
-			{
-				if(!evt.getEventState().equals("Acknowledged"))
-				{
-					evt.setProgress(true);
-					AckEventHandler.sendEmptyMessage(0);
-					EventIDs.add(evt.getEVID());	
-				}
-			}
+                for (ZenossEvent evt : listOfZenossEvents)
+                {
+                    if(!evt.getEventState().equals("Acknowledged"))
+                    {
+                        evt.setProgress(true);
+                        AckEventHandler.sendEmptyMessage(0);
+                        EventIDs.add(evt.getEVID());
+                    }
+                }
 
-			AckEventHandler.sendEmptyMessage(0);
+                AckEventHandler.sendEmptyMessage(0);
 
-			AckEvent = new Thread() 
-			{  
-				public void run() 
-				{
-					try 
-					{
-						ZenossAPIv2 ackEventAPI;
-						if(settings.getBoolean("httpBasicAuth", false))
-						{
-							ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
-						}
-						else
-						{
-							ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-						}
-						ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
+                AckEvent = new Thread()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            ZenossAPIv2 ackEventAPI;
+                            if(settings.getBoolean("httpBasicAuth", false))
+                            {
+                                ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
+                            }
+                            else
+                            {
+                                ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+                            }
+                            ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
 
-						//TODO Check it actually succeeded
-						AckEventHandler.sendEmptyMessage(1);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-						AckEventHandler.sendEmptyMessage(99);
-					}
-				}
-			};
-			AckEvent.start();
+                            //TODO Check it actually succeeded
+                            AckEventHandler.sendEmptyMessage(1);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            AckEventHandler.sendEmptyMessage(99);
+                        }
+                    }
+                };
+                AckEvent.start();
 
-			return true;
-		}
-		case R.id.refresh:
-		{
-			Refresh();
-			return true;
-		}
+                return true;
+            }
+            case R.id.refresh:
+            {
+                Refresh();
+                return true;
+            }
 
-		case R.id.escalate:
-		{
-			Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-			intent.setType("text/plain");
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            case R.id.escalate:
+            {
+                Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-			// Add data to the intent, the receiving app will decide what to do with it.
-			intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
-			String Events = "";
-			for (ZenossEvent evt : listOfZenossEvents)
-			{
-				Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
-			}
-			intent.putExtra(Intent.EXTRA_TEXT, Events);
+                // Add data to the intent, the receiving app will decide what to do with it.
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
+                String Events = "";
+                for (ZenossEvent evt : listOfZenossEvents)
+                {
+                    Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
+                }
+                intent.putExtra(Intent.EXTRA_TEXT, Events);
 
-			startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-		}
+                startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+            }
 		}
 		return false;
 	}
 
+    private void doGCMRegistration(final String PushKey)
+    {
+        //TODO check for freshness so as to not waste too much data / bandwidth on every resume!
+        if(!PushKey.equals(""))
+        {
+            GCMRegistrar.checkDevice(this);
+            GCMRegistrar.checkManifest(this);
+            regId = GCMRegistrar.getRegistrationId(this);
+
+            if (regId.equals(""))
+            {
+                //Log.e("GCM", "Registering");
+                GCMRegistrar.register(this, ZenossAPI.SENDER_ID);
+            }
+            else
+            {
+                //Log.e("GCM", "Already registered");
+            }
+
+
+            ((Thread) new Thread()
+            {
+                public void run()
+                {
+                    if(!ZenossAPI.registerPushKey(PushKey,regId,ZenossAPI.md5(Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID))))
+                    {
+                        runOnUiThread(new Runnable()
+                        {
+                            public void run() {
+                                Toast.makeText(RhybuddHome.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                }
+            }).start();
+
+        }
+    }
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
 	{
+        super.onActivityResult(requestCode,resultCode,data);
+
+        //Forces our onResume() function to do a DB call rather than a full HTTP request just cos we returned
+        //from one of our subscreens
+        resumeOnResultPollAPI = false;
+
 		BackupManager bm = new BackupManager(this);
-		//Log.i("Backup","Going to call backup");
+
 		//Check what the result was from the Settings Activity
 		if(requestCode == 99)
 		{
@@ -1079,6 +1023,13 @@ public class RhybuddHome extends FragmentActivity
 			startService(intent);
 			bm.dataChanged();
 		}
+        else if(requestCode == ZenossAPI.ACTIVITYRESULT_PUSHCONFIG)
+        {
+            if(data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
+            {
+                doGCMRegistration(data.getStringExtra(ZenossAPI.PREFERENCE_PUSHKEY));
+            }
+        }
 		else
 		{
 			//In theory the Settings activity should perform validation and only finish() if the settings pass validation
@@ -1087,7 +1038,10 @@ public class RhybuddHome extends FragmentActivity
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putBoolean("FirstRun", false);
 				editor.commit();
-				//Toast.makeText(RhybuddHome.this, "Welcome to Rhybudd!\r\nPress the menu button to configure additional settings.", Toast.LENGTH_LONG).show();
+
+                //Also update our onResume helper bool although it should already be set
+                firstRun = false;
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("Additional settings and functionality can be found by pressing the action bar overflow (or pressing the menu button).\r\n" +
 						"\r\nPlease note that this is app is still in Beta. If you experience issues please email;\r\nGareth@NetworksAreMadeOfString.co.uk")
@@ -1100,7 +1054,8 @@ public class RhybuddHome extends FragmentActivity
 				           }
 				       });
 				AlertDialog welcomeDialog = builder.create();
-				try
+
+                try
 				{
 					welcomeDialog.show();
 				}
@@ -1108,8 +1063,7 @@ public class RhybuddHome extends FragmentActivity
 				{
 					finishStart(true);
 				}
-				
-				
+
 				bm.dataChanged();
 				
 			}
@@ -1117,18 +1071,13 @@ public class RhybuddHome extends FragmentActivity
 			{
 				Toast.makeText(RhybuddHome.this, getResources().getString(R.string.FirstRunNeedSettings), Toast.LENGTH_LONG).show();
 
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putString("URL", "");
-				editor.commit();
-
 				finish();
 			}
-			else //There is the potential for an infinite loop of unhappiness here but I doubt it'll happen
+            //Who knows what happened here - quit
+			else
 			{
-				Toast.makeText(RhybuddHome.this, "Settings did not validate, returning to the settings screen.", Toast.LENGTH_LONG).show();
-				Intent SettingsIntent = new Intent(RhybuddHome.this, RhybuddInitialSettings.class);
-				SettingsIntent.putExtra("firstRun", true);
-				RhybuddHome.this.startActivityForResult(SettingsIntent, requestCode);
+                Toast.makeText(RhybuddHome.this, getResources().getString(R.string.FirstRunNeedSettings), Toast.LENGTH_LONG).show();
+                finish();
 			}
 		}
 	}
@@ -1174,29 +1123,6 @@ public class RhybuddHome extends FragmentActivity
 			public void onClick(DialogInterface arg0, int arg1) 
 			{
 				AcknowledgeSingleEvent(Position);
-				/*listOfZenossEvents.get(Position).setProgress(true);
-				AckEventHandler.sendEmptyMessage(0);
-				AckEvent = new Thread() 
-				{  
-					public void run() 
-					{
-						try 
-						{
-							ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							ackEventAPI.AcknowledgeEvent(EventID);//ackEventAPI
-							listOfZenossEvents.get(Position).setProgress(false);
-							listOfZenossEvents.get(Position).setAcknowledged();
-							AckEventHandler.sendEmptyMessage(1);
-						}
-						catch (Exception e)
-						{
-							e.printStackTrace();
-							//BugSenseHandler.log("Acknowledge", e);
-							AckEventHandler.sendEmptyMessage(99);
-						}
-					}
-				};
-				AckEvent.start();*/
 			}
 		});
 
@@ -1230,7 +1156,6 @@ public class RhybuddHome extends FragmentActivity
 		{
 			public void onClick(DialogInterface arg0, int arg1) 
 			{
-				//Toast.makeText(getApplicationContext(), "Event not ACK'd", Toast.LENGTH_SHORT).show();
 			}
 		});
 		alertbox.show();
@@ -1246,6 +1171,7 @@ public class RhybuddHome extends FragmentActivity
 			{
 				try 
 				{
+                    //TODO This needs moving to the new API model
 					ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 					ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
 					listOfZenossEvents.get(Position).setProgress(false);
@@ -1255,14 +1181,15 @@ public class RhybuddHome extends FragmentActivity
 				catch (Exception e)
 				{
 					e.printStackTrace();
-					//BugSenseHandler.log("Acknowledge", e);
+                    BugSenseHandler.sendExceptionMessage("RhybuddHome","AcknowledgeSingleEvent",e);
 					AckEventHandler.sendEmptyMessage(99);
 				}
 			}
 		};
 		AckEvent.start();
 	}
-	@Override
+
+    @Override
     public void onBackPressed() 
     {
     	if(FragmentVisible)
@@ -1286,4 +1213,54 @@ public class RhybuddHome extends FragmentActivity
     		super.onBackPressed();
     	}
     }
+
+
+    //------------------------------------------------------------------//
+    //                                                                  //
+    //               Connection to the the ZenossPoller Service         //
+    //                                                                  //
+    //------------------------------------------------------------------//
+    void doUnbindService()
+    {
+        if (mBound)
+        {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    void doBindService()
+    {
+        bindService(new Intent(this, ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
+        mBound = true;
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        // Unbind from the service
+        doUnbindService();
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            //Toast.makeText(RhybuddHome.this, "Connected to Service", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0)
+        {
+            //Toast.makeText(RhybuddHome.this, "Disconnected to Service", Toast.LENGTH_SHORT).show();
+            mBound = false;
+        }
+    };
 }

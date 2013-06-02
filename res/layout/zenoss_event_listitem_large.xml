@@ -2,7 +2,8 @@
     android:id="@+id/relativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:minHeight="64dp" >
+    android:minHeight="64dp"
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/fragment_indicator"
@@ -91,7 +92,8 @@
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/RhybuddTitleText"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:paddingLeft="8dp"/>
 
 
 
@@ -112,7 +114,8 @@
         android:layout_toLeftOf="@+id/AckImage"
         android:text="TextView"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/RhybuddStdText" />
+        android:textColor="@color/RhybuddStdText"
+        android:paddingLeft="8dp"/>
 
 
 
@@ -146,7 +149,7 @@
     <LinearLayout
         android:id="@+id/StatsIndicator"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/EventSummary"
         android:layout_marginBottom="15dp"
@@ -155,7 +158,8 @@
         android:divider="@drawable/vert_split"
         android:dividerPadding="8dp"
         android:gravity="center_vertical|center_horizontal"
-        android:showDividers="middle" >
+        android:showDividers="middle"
+        android:minHeight="40dp">
 
         <TextView
             android:id="@+id/ackAuthor"

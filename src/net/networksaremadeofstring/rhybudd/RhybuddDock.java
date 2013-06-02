@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - Gareth Llewellyn
+ * Copyright (C) 2013 - Gareth Llewellyn
  *
  * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
  *
@@ -78,14 +78,6 @@ public class RhybuddDock extends FragmentActivity
 	ZenossEventsAdaptor adapter;
 	Cursor dbResults = null;
 	ActionBar actionbar;
-	RhybuddDatabase rhybuddCache;
-
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		rhybuddCache.Close();
-	}
 
 	@Override
 	public void onAttachedToWindow() {
@@ -105,9 +97,6 @@ public class RhybuddDock extends FragmentActivity
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setTitle("Rhybudd Dock");
-		//actionbar.setSubtitle("Find Stat");
-
-		rhybuddCache = new RhybuddDatabase(this);
 
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		list = (ListView)findViewById(R.id.ZenossEventsList);

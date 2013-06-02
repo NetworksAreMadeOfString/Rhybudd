@@ -26,4 +26,11 @@
         <color name="ZenossLightBlue">#b5b8c8</color>
         <color name="ZenossDarkBlue">#7199c6</color>
         <color name="ZenossWhite">#ffffff</color>
+
+        <color name="ZaasDarkBlue">#537eaf</color>
+        <color name="ZaasLightBlue">#86a7cc</color>
+        <color name="ZaasLightGray">#6f6f6f</color>
+        <color name="ZaasDarkGray">#343434</color>
+
+        <color name="pressed_rhybudd_default">#CC66C1DE</color>
 </resources>

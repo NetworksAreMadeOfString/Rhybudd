@@ -1,23 +1,25 @@
 /*
-* Copyright (C) 2012 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2013 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package net.networksaremadeofstring.rhybudd;
 
+import android.content.Intent;
+import android.os.Bundle;
 import org.json.JSONObject;
 
 public class ZenossEvent 
@@ -33,13 +35,18 @@ public class ZenossEvent
 	private Boolean inProgress = false;
 	private Boolean Selected = false;
 	private String prodState = "Production";
-	private String ownerID = "unknown";
+	private String ownerID = "";
 	private String component_text = "unknown";
 	private String component_uid = "unknown";
 	private String eventClass = "unknown";
 	private boolean fragmentDisplay = false;
 
-	
+
+    public ZenossEvent(String _evid, String _summary)
+    {
+        this.evid = _evid;
+        this.summary = _summary;
+    }
 	 // Constructor for the Ticket class
     public ZenossEvent(String _evid, String _device, String _summary, String _eventState, String _severity, String _prodState) 
     {
@@ -51,7 +58,33 @@ public class ZenossEvent
             this.severity = _severity;
             this.prodState = _prodState;
     }
-    
+
+    public ZenossEvent(Intent intent)
+    {
+        this.Count = Integer.getInteger(intent.getExtras().getString("count"));
+        this.evid = intent.getExtras().getString("evid");
+        this.device = intent.getExtras().getString("device");
+        this.summary = intent.getExtras().getString("summary");
+        this.severity = intent.getExtras().getString("severity");
+        this.eventClass = intent.getExtras().getString("event_class");
+        //String event_class_key = intent.getExtras().getString("event_class_key");
+        //String sent = intent.getExtras().getString("sent");
+    }
+
+    public ZenossEvent(Bundle extras)
+    {
+        if(null != extras.getString("count"))
+            this.Count = Integer.getInteger(extras.getString("count"));
+
+        this.evid = extras.getString("evid");
+        this.device = extras.getString("device");
+        this.summary = extras.getString("summary");
+        this.severity = extras.getString("severity");
+        this.eventClass = extras.getString("event_class");
+        //String event_class_key = intent.getExtras().getString("event_class_key");
+        //String sent = intent.getExtras().getString("sent");
+    }
+
     public ZenossEvent(JSONObject Event) 
     {
             super();

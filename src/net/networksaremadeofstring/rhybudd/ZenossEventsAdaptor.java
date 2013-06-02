@@ -1,21 +1,21 @@
 /*
-* Copyright (C) 2012 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2013 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package net.networksaremadeofstring.rhybudd;
 
 import java.text.DateFormatSymbols;
@@ -193,7 +193,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
         }
         
-        if(Event.getownerID().equals(""))
+        if(null == Event.getownerID() || Event.getownerID().equals("") || Event.getownerID().equals("null") )
         {
         	try
         	{
@@ -201,24 +201,51 @@ public class ZenossEventsAdaptor extends BaseAdapter
         	}
         	catch(Exception e)
         	{
-        		
+        		e.printStackTrace();
         	}
         }
         else
         {
         	try
         	{
-        		((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Ack'd " + Event.getownerID());
+                String owner = "";
+                if(Event.getownerID().contains("@"))
+                {
+                    owner = Event.getownerID().substring(0,Event.getownerID().indexOf("@"));
+                }
+                else
+                {
+                    owner = Event.getownerID();
+                }
+
+                if(null == owner)
+                {
+                    ((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Not Ack'd");
+                }
+                else
+                {
+        		    ((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Ack'd " + owner);
+                }
         	}
         	catch(Exception e)
         	{
-        		
+        		e.printStackTrace();
         	}
         }
         
         try
         {
-        	((TextView) convertView.findViewById(R.id.EventCount)).setText("Count: " + Integer.toString(Event.getCount()));
+            String count = "";
+            if(Event.getCount() > 9999)
+            {
+                count = "-";
+            }
+            else
+            {
+                count = Integer.toString(Event.getCount());
+            }
+
+        	((TextView) convertView.findViewById(R.id.EventCount)).setText("Count: " + count);
         }
     	catch(Exception e)
     	{

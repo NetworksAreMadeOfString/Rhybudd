@@ -5,7 +5,7 @@
         <CheckBoxPreference
                 android:key="refreshCache"
                 android:title="Cache Refresh"
-                android:summary="Checks Zenoss every ~30minutes to update the local database"
+                android:summary="Checks Zenoss every hour or so for new devices etc"
                 android:defaultValue="true"
                 />
         

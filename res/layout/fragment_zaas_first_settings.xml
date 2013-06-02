@@ -1,15 +1,130 @@
-<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:id="@+id/scrollView1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
 
-    <TextView
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fadeScrollbars="true"
+        android:fadingEdge="vertical"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical" >
+
+        <TextView
+            android:id="@+id/URLLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="6dp"
+            android:shadowColor="#505050"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:text="Zenoss URL:"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="gone" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/ZenossURL"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/URLLabel"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:hint="subdomain"
+            android:inputType="textUri"
+            android:layout_toLeftOf="@+id/textView">
+
+            <requestFocus>
+            </requestFocus>
+        </EditText>
+
+
+        <EditText
+            android:id="@+id/ZenossUserName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ZenossURL"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="6dp"
+            android:hint="@string/UserNameHint"
+            android:inputType="textPersonName" >
+
+        </EditText>
+
+
+        <EditText
+            android:id="@+id/ZenossPassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ZenossUserName"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:hint="@string/PasswordHint"
+            android:inputType="textPassword" >
+
+        </EditText>
+
+        <Button
+        android:id="@+id/SaveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView"
-        android:layout_gravity="left|center_vertical"/>
-</LinearLayout>
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/SaveSettingsButton"
+        style="@style/ButtonText"
+        android:background="@drawable/light_blue_button"
+        android:layout_below="@+id/ZenossPassword"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/FirstRunDebug"
+            android:id="@+id/debugLabel"
+            android:layout_below="@+id/SaveButton"
+            android:layout_marginTop="12dp"
+            android:layout_alignLeft="@+id/ZenossURL"
+            android:visibility="invisible"/>
+
+        <EditText
+            android:id="@+id/debugOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="8dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/WarningRed"
+            android:layout_alignParentBottom="false"
+            android:layout_below="@+id/debugLabel"
+            android:typeface="monospace"
+            android:textIsSelectable="false"
+            android:minLines="2"
+            android:visibility="invisible"
+            android:layout_alignRight="@+id/ZenossPassword"
+            android:layout_alignLeft="@+id/ZenossPassword"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=".zenaas.com"
+            android:id="@+id/textView"
+            android:layout_alignTop="@+id/ZenossURL"
+            android:layout_alignBaseline="@+id/ZenossURL"
+            android:layout_alignParentLeft="false"
+            android:layout_alignRight="@+id/ZenossUserName"/>
+
+    </RelativeLayout>
+
+</ScrollView>

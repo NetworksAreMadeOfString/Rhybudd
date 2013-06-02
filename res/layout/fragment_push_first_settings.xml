@@ -34,12 +34,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/pushKeyEditText"
-        android:clickable="false"
         android:lines="1"
-        android:textIsSelectable="true"
         android:typeface="monospace"
-        android:enabled="false"
-        android:editable="false"
         android:gravity="center_horizontal"
         android:layout_below="@+id/setPushIDButton"
         android:layout_alignParentLeft="true"
@@ -87,7 +83,8 @@
         android:layout_marginTop="12dp"
         android:visibility="gone"
         style="@style/ButtonText"
-        android:background="@drawable/light_blue_button"/>
+        android:background="@drawable/light_blue_button"
+        android:layout_marginRight="20dp"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -96,5 +93,17 @@
         android:layout_alignTop="@+id/pushKeyEditText"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save and Exit"
+        android:id="@+id/exitButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        style="@style/ButtonText"
+        android:background="@drawable/light_blue_button"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible"/>
 
 </RelativeLayout>

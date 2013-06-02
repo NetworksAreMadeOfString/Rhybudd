@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - Gareth Llewellyn
+ * Copyright (C) 2013 - Gareth Llewellyn
  *
  * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
  *
@@ -52,7 +52,7 @@ public class Search extends Activity
 	Animation anim;
 	ActionBar actionbar;
 	ProgressDialog dialog;
-	RhybuddDatabase rhybuddCache;
+
 	int DeviceCount = 0;
 	SharedPreferences settings = null;
 
@@ -67,7 +67,6 @@ public class Search extends Activity
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setHomeButtonEnabled(true);
 
-		rhybuddCache = new RhybuddDatabase(this);
 
 		list = (ListView)findViewById(R.id.searchResultsListView);
 
@@ -154,7 +153,11 @@ public class Search extends Activity
 				
 				try
 				{
-					listOfZenossDevices = rhybuddCache.SearchRhybuddDevices(query);
+					//listOfZenossDevices = rhybuddCache.SearchRhybuddDevices(query);
+                    RhybuddDataSource datasource = new RhybuddDataSource(Search.this);
+                    datasource.open();
+                    listOfZenossDevices = datasource.SearchRhybuddDevices(query);
+                    datasource.close();
 				}
 				catch(Exception e)
 				{

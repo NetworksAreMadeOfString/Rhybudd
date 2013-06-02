@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="CriticalNotificationTitle">New Critical events received</string>
+    <string name="ErrorNotificationTitle">New Error events received</string>
+    <string name="WarnNotificationTitle">New Warning events received</string>
+    <string name="InfoNotificationTitle">New Info events received</string>
+    <string name="DebugNotificationTitle">New Debug events received</string>
+</resources>

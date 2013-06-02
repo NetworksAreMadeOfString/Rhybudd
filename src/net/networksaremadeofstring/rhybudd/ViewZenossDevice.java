@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - Gareth Llewellyn
+ * Copyright (C) 2013 - Gareth Llewellyn
  *
  * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
  *

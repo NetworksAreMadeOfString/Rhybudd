@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
 
@@ -66,19 +67,14 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
         }
     }
 
-    public void DoSave()
-    {
-
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu)
+    /*public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.initial_settings, menu);
         return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId())
@@ -94,6 +90,11 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
                 return false;
             }
         }
+    }*/
+
+    public void setPushTab(int tab)
+    {
+        getActionBar().selectTab(getActionBar().getTabAt(tab));
     }
 
     @Override
@@ -148,9 +149,8 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
                 break;
             }
             fragment.setHasOptionsMenu(true);
-            Bundle args = new Bundle();
-            args.putInt(ZaasSettingsFragment.ARG_SECTION_NUMBER, position + 1);
-            fragment.setArguments(args);
+            /*Bundle args = new Bundle();
+            fragment.setArguments(args);*/
             return fragment;
         }
 
@@ -179,7 +179,7 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
     @Override
     public void onBackPressed()
     {
-        //Return back to the launcher
+        //Return back to RhybuddHome
         Intent in = new Intent();
         setResult(2,in);
         finish();

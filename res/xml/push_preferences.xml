@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Rhybudd Push">
+        <EditTextPreference
+            android:key="pushkey"
+            android:title="Rhybudd Push ID"
+            android:hint="AABBCCDDEEFF1234567890"
+            android:summary="The unique key to ID your device"
+            android:dialogTitle="Rhybudd Push ID" />
+    </PreferenceCategory>
+</PreferenceScreen>

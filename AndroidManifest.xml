@@ -11,7 +11,7 @@
     <permission android:name="net.networksaremadeofstring.rhybudd.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="net.networksaremadeofstring.rhybudd.permission.C2D_MESSAGE" />
 
-    <application android:theme="@style/rhybudd_default" android:icon="@drawable/icon" 
+    <application android:theme="@style/Theme.Rhybudd_default" android:icon="@drawable/icon"
         android:label="@string/app_name" android:allowClearUserData="true" android:description="@string/Description"
         android:backupAgent="RhybuddBackupAgent" android:allowBackup="true">
         <activity android:name=".RhybuddHome"
@@ -39,8 +39,7 @@
 
         <service android:name=".GCMIntentService" />
 
-        <activity android:name=".RhybuddDock"
-                  android:label="Rhybudd Dock">
+        <activity android:name=".RhybuddDock"  android:label="Rhybudd Dock">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.CAR_DOCK" /> 
@@ -52,10 +51,10 @@
         <activity android:name=".SettingsFragment"
 			android:label="@string/app_name">
 		</activity>
-		
-        <activity android:name=".RhybuddInitialSettings"
-			android:label="@string/app_name">
-		</activity>
+
+        <activity android:name=".PushConfigActivity"
+                  android:label="@string/app_name">
+        </activity>
 
         <activity android:name=".FirstRunSettings"
                   android:label="@string/app_name">
@@ -89,7 +88,7 @@
 			android:label="Rhybudd - Search">
 		</activity>-->
 
-		<activity android:name="Search" android:label="Search" android:theme="@style/rhybudd_default">
+		<activity android:name="Search" android:label="Search" android:theme="@style/Theme.Rhybudd_default">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.SEARCH_LONG_PRESS" />
@@ -108,14 +107,21 @@
 		          
 		          		                                                        
 		-->
-        <service android:name=".ZenossPoller" />
-        
-        <receiver android:name="ManageUpdate">
+        <service android:name=".ZenossPoller">
+        </service>
+
+        <receiver android:name=".MassAcknowledgeReceiver" >
+            <intent-filter>
+                <action android:name="net.networksaremadeofstring.rhybudd.broadcast.massacknowledge" />
+            </intent-filter>
+        </receiver>
+
+        <!-- <receiver android:name="ManageUpdate">
 		  <intent-filter>
 		    <action android:name="android.intent.action.PACKAGE_REPLACED" />
 		    <data android:scheme="package"/> 
 		  </intent-filter>
-		</receiver>
+		</receiver> -->
 		
 		<!-- 
 		 __     __     __     _____     ______     ______     ______   ______       
@@ -142,7 +148,7 @@
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/zenoss_widget_graph" />
 		</receiver>
-		<meta-data android:name="com.google.android.backup.api_key"
-    android:value="AEdPqrEAAAAI_p4Fmym8ZBYQy6zNfaz3mQ-mj-C6zPWIFf3WDA" />
+
+		<meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAI_p4Fmym8ZBYQy6zNfaz3mQ-mj-C6zPWIFf3WDA" />
     </application>
 </manifest>

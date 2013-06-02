@@ -1,21 +1,21 @@
 /*
-* Copyright (C) 2012 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2013 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 
 package net.networksaremadeofstring.rhybudd;
 
@@ -129,8 +129,10 @@ public class ManageDatabase extends Activity
 		        	    			try
 		        	    			{
 			        	    			UIUpdate.sendEmptyMessage(0);
-			        	    			RhybuddDatabase rhybuddCache = new RhybuddDatabase(ManageDatabase.this);
-			        	    			rhybuddCache.FlushDB();
+                                        RhybuddDataSource datasource = new RhybuddDataSource(ManageDatabase.this);
+                                        datasource.open();
+                                        datasource.FlushDB();
+                                        datasource.close();
 			        	    			UIUpdate.sendEmptyMessage(1);
 		        	    			}
 		        					catch(Exception e)

@@ -4,4 +4,5 @@
     <string name="JSONExceptionMessage">A JSON parsing error was encountered, please try again later.</string>
     <string name="HttpTransportExceptionMessage">A transport error was encountered, are you online?</string>
     <string name="GenericExceptionMessage">Server response was empty, please try again later.</string>
+    <string name="ErrorRegisterGCM">Apologies but there was a problem registering that key.\n\nPlease try again later</string>
 </resources>

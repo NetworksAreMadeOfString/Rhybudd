@@ -1,21 +1,21 @@
 /*
-* Copyright (C) 2012 - Gareth Llewellyn
-*
-* This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
-*
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License
-* for more details.
-*
-* You should have received a copy of the GNU General Public License along with
-* this program. If not, see <http://www.gnu.org/licenses/>
-*/
+ * Copyright (C) 2013 - Gareth Llewellyn
+ *
+ * This file is part of Rhybudd - http://blog.NetworksAreMadeOfString.co.uk/Rhybudd/
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package net.networksaremadeofstring.rhybudd;
 
 
@@ -57,23 +57,21 @@ public class DeviceList extends Activity
 	int DeviceCount = 0;
 	ListView list;
 	ZenossDeviceAdaptor adapter = null;
-	Cursor dbResults = null;
+	//Cursor dbResults = null;
 
 	//new
 	Handler handler;
 	ActionBar actionbar;
-	RhybuddDatabase rhybuddCache;
 	Thread dataLoad;
 	
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		rhybuddCache.Close();
 		try
 		{
-		if(dialog != null && dialog.isShowing())
-			dialog.dismiss();
+		    if(dialog != null && dialog.isShowing())
+			    dialog.dismiss();
 		}
 		catch(Exception e)
 		{
@@ -125,9 +123,7 @@ public class DeviceList extends Activity
 		actionbar.setTitle("Infrastructure");
 
         list = (ListView)findViewById(R.id.ZenossDeviceList);
-        
-        rhybuddCache = new RhybuddDatabase(this);
-        
+
         BugSenseHandler.initAndStartSession(DeviceList.this, "44a76a8c");
         
         handler = new Handler()
@@ -191,7 +187,11 @@ public class DeviceList extends Activity
     		{
     			try
     			{
-    				listOfZenossDevices = rhybuddCache.GetRhybuddDevices();
+    				//listOfZenossDevices = rhybuddCache.GetRhybuddDevices();
+                    RhybuddDataSource datasource = new RhybuddDataSource(DeviceList.this);
+                    datasource.open();
+                    listOfZenossDevices = datasource.GetRhybuddDevices();
+                    datasource.close();
     			}
     			catch(Exception e)
     			{
@@ -319,7 +319,11 @@ public class DeviceList extends Activity
 						DeviceCount = listOfZenossDevices.size();
 						Message.obtain();
 						handler.sendEmptyMessage(1);
-						rhybuddCache.UpdateRhybuddDevices(listOfZenossDevices);
+
+                        RhybuddDataSource datasource = new RhybuddDataSource(DeviceList.this);
+                        datasource.open();
+                        datasource.UpdateRhybuddDevices(listOfZenossDevices);
+                        datasource.close();
 					}
 					else
 					{

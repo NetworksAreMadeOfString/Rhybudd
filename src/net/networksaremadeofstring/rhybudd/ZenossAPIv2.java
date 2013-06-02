@@ -193,12 +193,12 @@ public class ZenossAPIv2
         httpclient = new DefaultHttpClient(mgr, client.getParams());
     }
     
-    public boolean getLoggedInStatus()
+    /*public boolean getLoggedInStatus()
     {
     	return this.LoginSuccessful;
-    }
+    }*/
 
-    public static String getPushKey() throws IOException, JSONException {
+    /*public static String getPushKey() throws IOException, JSONException {
         DefaultHttpClient client = new DefaultHttpClient();
         SchemeRegistry registry = new SchemeRegistry();
         SocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
@@ -225,9 +225,9 @@ public class ZenossAPIv2
         {
             return null;
         }
-    }
+    }*/
 
-	public boolean CheckLoggedIn()
+	/*public boolean CheckLoggedIn()
     {
 		//If we got JSON back rather than HTML then we are probably logged in
 		//Why the fuck I can't hit an endpoint and get a 401 or 200 depending
@@ -243,7 +243,7 @@ public class ZenossAPIv2
 			this.LoginSuccessful = false;
 			return false;
 		}
-    }
+    }*/
 	
 	
 	public List<ZenossDevice> GetRhybuddDevices() throws JSONException, ClientProtocolException, IOException
@@ -525,6 +525,7 @@ public class ZenossAPIv2
 		}
 		catch(JSONException e)
 		{
+            e.printStackTrace();
 			try
 			{
 				//FIXME If we got an exception it may be because of JIRA #ZEN-2812
@@ -533,6 +534,7 @@ public class ZenossAPIv2
 			}
 			catch(Exception e1)
 			{
+                e.printStackTrace();
 				//BugSenseHandler.log("GetRhybuddEvents", e1);
 				//Nope something bad happened
 				return null;
@@ -554,6 +556,7 @@ public class ZenossAPIv2
 		}
 		catch(Exception e)
 		{
+            e.printStackTrace();
 			EventCount = 0;
 		}
 
@@ -590,6 +593,7 @@ public class ZenossAPIv2
 			}
 			catch(Exception e)
 			{
+                e.printStackTrace();
 				//TODO Do something
 				//return null;
 			}
@@ -605,16 +609,6 @@ public class ZenossAPIv2
 			return listofZenossEvents;
 		}
 	}
-	
-	/*public JSONObject GetEvents() throws JSONException, ClientProtocolException, IOException
-	{
-		return this.GetEvents("5,4,3,2",false);
-	}
-	
-	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug) throws JSONException, ClientProtocolException, IOException
-	{
-		return this.GetEvents(Critical,Error,Warning,Info,Debug,false);
-	}*/
 	
 	public JSONObject GetEvents(Boolean Critical, Boolean Error, Boolean Warning, Boolean Info, Boolean Debug, boolean ProductionOnly, boolean Zenoss41,String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
 	{
@@ -643,7 +637,9 @@ public class ZenossAPIv2
         
 		return this.GetEvents(SeverityLevels,ProductionOnly, Zenoss41, SummaryFilter, DeviceFilter);
 	}
-	
+
+
+    //////////////
 	private JSONObject GetEvents(String Severity, boolean ProductionOnly, boolean Zenoss41, String SummaryFilter, String DeviceFilter) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
     {
     	//Log.i("Test:", Severity);
@@ -787,8 +783,7 @@ public class ZenossAPIv2
 
     	return json.getJSONObject("result").getBoolean("success");
     }
-    
-    
+
     @SuppressWarnings("unchecked")
     public JSONObject GetEventsHistory() throws JSONException, ClientProtocolException, IOException
     {
