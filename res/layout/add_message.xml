@@ -7,5 +7,7 @@
         <EditText android:inputType="textMultiLine" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:id="@+id/LogMessage" android:lines="3" android:gravity="top|left" android:layout_centerHorizontal="true" android:layout_width="260dp">
             <requestFocus></requestFocus>
         </EditText>
-        <Button android:id="@+id/SaveButton" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/LogMessage" android:layout_alignRight="@+id/LogMessage" android:text="@string/AddtoLogButton"></Button>
+        <Button android:id="@+id/SaveButton" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/LogMessage" android:layout_alignRight="@+id/LogMessage" android:text="@string/AddtoLogButton"
+                style="@style/ButtonText"
+                android:background="@drawable/dark_blue_button"></Button>
     </RelativeLayout>

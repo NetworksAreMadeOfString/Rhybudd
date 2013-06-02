@@ -64,6 +64,11 @@
 			android:label="Rhybudd - Event Details"
 			android:uiOptions="splitActionBarWhenNarrow">
 		</activity>
+
+        <activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEventActivity"
+                  android:label="Rhybudd - Event Details"
+                  android:uiOptions="splitActionBarWhenNarrow">
+        </activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
 			android:label="Rhybudd - Infrastructure List">

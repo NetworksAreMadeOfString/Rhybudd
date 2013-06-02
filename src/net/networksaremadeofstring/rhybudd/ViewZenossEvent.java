@@ -21,6 +21,7 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.view.*;
+import android.widget.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,19 +39,11 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 
 
 public class ViewZenossEvent extends Activity
 {
-	ZenossAPIv2 API = null;
 	JSONObject EventObject = null;
 	JSONObject EventDetails = null;
 	private SharedPreferences settings = null;
@@ -60,6 +53,7 @@ public class ViewZenossEvent extends Activity
 	Dialog addMessageDialog;
 	String[] LogEntries;
 	ActionBar actionbar;
+    ZenossAPI API;
 
 	@Override
 	public void onAttachedToWindow() {
@@ -134,7 +128,10 @@ public class ViewZenossEvent extends Activity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
+        BugSenseHandler.initAndStartSession(ViewZenossEvent.this, "44a76a8c");
+
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
+
 		setContentView(R.layout.view_zenoss_event);
 
 		try
@@ -145,7 +142,7 @@ public class ViewZenossEvent extends Activity
 		}
 		catch(Exception e)
 		{
-			//BugSenseHandler.log("ViewZenossEvent", e);
+            BugSenseHandler.sendExceptionMessage("ViewZenossEvent","OnCreate",e);
 		}
 		
 		try
@@ -153,12 +150,12 @@ public class ViewZenossEvent extends Activity
 			((TextView) findViewById(R.id.EventTitle)).setText(getIntent().getStringExtra("Device"));
 			((TextView) findViewById(R.id.Summary)).setText(Html.fromHtml(getIntent().getStringExtra("Summary")));
 			((TextView) findViewById(R.id.LastTime)).setText(getIntent().getStringExtra("LastTime"));
-			((TextView) findViewById(R.id.EventCount)).setText(Integer.toString(getIntent().getIntExtra("Count",0)));
+			((TextView) findViewById(R.id.EventCount)).setText("Count: " + Integer.toString(getIntent().getIntExtra("Count",0)));
 		}
 		catch(Exception e)
 		{
 			//We don't need to much more than report it because the direct API request will sort it out for us.
-			//BugSenseHandler.log("ViewZenossEvent", e);
+            BugSenseHandler.sendExceptionMessage("ViewZenossEvent","OnCreate",e);
 		}
 
 		firstLoadHandler = new Handler() 
@@ -177,8 +174,22 @@ public class ViewZenossEvent extends Activity
 						TextView Summary = (TextView) findViewById(R.id.Summary);
 						TextView FirstTime = (TextView) findViewById(R.id.FirstTime);
 						TextView LastTime = (TextView) findViewById(R.id.LastTime);
+                        LinearLayout logList;
 
 						EventDetails = EventObject.getJSONObject("result").getJSONArray("event").getJSONObject(0);
+
+                        try
+                        {
+                            if(EventDetails.getString("eventState").equals("Acknowledged"))
+                            {
+                                ((ImageView) findViewById(R.id.ackIcon)).setImageResource(R.drawable.ic_acknowledged);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        Log.e("EventDetails",EventDetails.toString(3));
 
 						try
 						{
@@ -258,11 +269,11 @@ public class ViewZenossEvent extends Activity
 
 						try
 						{
-							((TextView) findViewById(R.id.EventCount)).setText(EventDetails.getString("count"));
+							((TextView) findViewById(R.id.EventCount)).setText("Count: " + EventDetails.getString("count"));
 						}
 						catch(Exception e)
 						{
-							((TextView) findViewById(R.id.EventCount)).setText("Unknown");
+							((TextView) findViewById(R.id.EventCount)).setText("Count: ??");
 						}
 
 						try
@@ -280,37 +291,51 @@ public class ViewZenossEvent extends Activity
 
 							int LogEntryCount = Log.length();
 
+                            logList = (LinearLayout) findViewById(R.id.LogList);
+
 							if(LogEntryCount == 0)
 							{
-								String[] LogEntries = {"No log entries could be found"};
-								((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
+								/*String[] LogEntries = {"No log entries could be found"};
+								((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));*/
+
+                                TextView newLog = new TextView(ViewZenossEvent.this);
+                                newLog.setText("No log entries could be found");
+
+                                logList.addView(newLog);
 							}
 							else
 							{
 								LogEntries = new String[LogEntryCount];
-	
+
+
 								for (int i = 0; i < LogEntryCount; i++)
 								{
-									LogEntries[i] = Log.getJSONArray(i).getString(0) + " set " + Log.getJSONArray(i).getString(2) +"\nAt: " + Log.getJSONArray(i).getString(1);
+									//LogEntries[i] = Log.getJSONArray(i).getString(0) + " set " + Log.getJSONArray(i).getString(2) +"\nAt: " + Log.getJSONArray(i).getString(1);
+
+                                    TextView newLog = new TextView(ViewZenossEvent.this);
+                                    newLog.setText(Html.fromHtml("<strong>" + Log.getJSONArray(i).getString(0) + "</strong> wrote " + Log.getJSONArray(i).getString(2) +"\n<br/><strong>At:</strong> " + Log.getJSONArray(i).getString(1)));
+                                    newLog.setPadding(0,6,0,6);
+                                    logList.addView(newLog);
 								}
 	
-								try
+								/*try
 								{
 									((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
 								}
 								catch(Exception e)
 								{
 									Toast.makeText(getApplicationContext(), "There was an error trying process the log entries for this event.", Toast.LENGTH_SHORT).show();
-									//BugSenseHandler.log("ViewZenossEvent", e);
-									
-								}
+								}*/
 							}
 						}
 						catch(Exception e)
 						{
-							//BugSenseHandler.log("ViewZenossEvent-LogEntries", e);
-							
-							String[] LogEntries = {"No log entries could be found"};
+                            TextView newLog = new TextView(ViewZenossEvent.this);
+                            newLog.setText("No log entries could be found");
+                            newLog.setPadding(0,6,0,6);
+                            ((LinearLayout) findViewById(R.id.LogList)).addView(newLog);
+
+							/*String[] LogEntries = {"No log entries could be found"};
 							try
 							{
 								((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
@@ -318,7 +343,7 @@ public class ViewZenossEvent extends Activity
 							catch(Exception e1)
 							{
 								//BugSenseHandler.log("ViewZenossEvent-LogEntries", e1);
-							}
+							}*/
 						}
 					}
 					else
@@ -346,7 +371,7 @@ public class ViewZenossEvent extends Activity
 			{
 				try 
 				{
-					if(API == null)
+					/*if(API == null)
 					{
 						if(settings.getBoolean("httpBasicAuth", false))
 						{
@@ -358,14 +383,31 @@ public class ViewZenossEvent extends Activity
 						}
 					}
 
-					EventObject = API.GetEvent(getIntent().getStringExtra("EventID"));
+					EventObject = API.GetEvent(getIntent().getStringExtra("EventID"));*/
+
+
+                    if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
+                    {
+                        API = new ZenossAPIZaas();
+                    }
+                    else
+                    {
+                        API = new ZenossAPICore();
+                    }
+
+                    ZenossCredentials credentials = new ZenossCredentials(ViewZenossEvent.this);
+                    API.Login(credentials);
+                    EventObject = API.GetEvent(getIntent().getStringExtra("EventID"));
 				} 
 				catch (Exception e) 
 				{
 					firstLoadHandler.sendEmptyMessage(0);
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEvent","DataPreloadThread",e);
 				}
-
-				firstLoadHandler.sendEmptyMessage(1);
+                finally
+                {
+                    firstLoadHandler.sendEmptyMessage(1);
+                }
 			}
 		};
 
@@ -389,25 +431,27 @@ public class ViewZenossEvent extends Activity
 				{
 					try 
 					{
-						String[] tmp = LogEntries.clone();
+						/*String[] tmp = LogEntries.clone();
 						final int NewArrlength = tmp.length + 1;
 						LogEntries = new String[NewArrlength];
 
-						LogEntries[0] = settings.getString("userName", "") + " set " + Message + "\nAt: Just now";
+						LogEntries[0] = settings.getString("userName", "") + " wrote " + Message + "\nAt: Just now";*/
 
-						for (int i = 1; i < NewArrlength; ++i) //
+						/*for (int i = 1; i < NewArrlength; ++i) //
 						{
 							LogEntries[i] = tmp[(i -1)];
 						}
-
 						tmp = null;//help out the GC
+                        ((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));*/
 
-
-						((ListView) findViewById(R.id.LogList)).setAdapter(new ArrayAdapter<String>(ViewZenossEvent.this, R.layout.search_simple,LogEntries));
+                        TextView newLog = new TextView(ViewZenossEvent.this);
+                        newLog.setText(Html.fromHtml("<strong>" + settings.getString("userName", "") + "</strong> wrote " + Message + "\n<br/><strong>At:</strong> Just now"));
+                        newLog.setPadding(0,6,0,6);
+                        ((LinearLayout) findViewById(R.id.LogList)).addView(newLog);
 					} 
 					catch (Exception e) 
 					{
-						//e.printStackTrace();
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEvent","AddMessageProgressHandler",e);
 						Toast.makeText(ViewZenossEvent.this, "The log message was successfully sent to Zenoss but an error occured when updating the UI", Toast.LENGTH_LONG).show();
 					}
 				}
@@ -429,13 +473,23 @@ public class ViewZenossEvent extends Activity
 				{
 					if(API == null)
 					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+                        if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+                        ZenossCredentials credentials = new ZenossCredentials(ViewZenossEvent.this);
+                        API.Login(credentials);
 					}
 
-					Success = API.AddEventLog(getIntent().getStringExtra("EventID"),Message);
+                    Success = API.AddEventLog(getIntent().getStringExtra("EventID"),Message);
 				} 
 				catch (Exception e) 
 				{
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEvent","AddLogMessageThread",e);
 					addLogMessageHandler.sendEmptyMessage(0);
 				}
 

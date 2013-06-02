@@ -156,23 +156,23 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         
         if(Event.getSeverity().equals("5"))
-        	SeverityImage.setImageResource(R.drawable.severity_critical);
+        	SeverityImage.setImageResource(R.drawable.ic_critical);
         
         if(Event.getSeverity().equals("4"))
-        	SeverityImage.setImageResource(R.drawable.severity_error);
+        	SeverityImage.setImageResource(R.drawable.ic_error);
         
         if(Event.getSeverity().equals("3"))
-        	SeverityImage.setImageResource(R.drawable.severity_warning);
+        	SeverityImage.setImageResource(R.drawable.ic_warning);
         
         if(Event.getSeverity().equals("2"))
-        	SeverityImage.setImageResource(R.drawable.severity_info);
+        	SeverityImage.setImageResource(R.drawable.ic_info);
         
         if(Event.getSeverity().equals("1"))
-        	SeverityImage.setImageResource(R.drawable.severity_debug);
+        	SeverityImage.setImageResource(R.drawable.ic_debug);
         
         if(Event.getEventState().equals("Acknowledged"))
         {
-        	AckImage.setImageResource(R.drawable.large_ack);
+        	AckImage.setImageResource(R.drawable.ic_acknowledged);
         	SummaryTextView.setTypeface(Typeface.DEFAULT);
         	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT);
         }
@@ -180,17 +180,19 @@ public class ZenossEventsAdaptor extends BaseAdapter
         {
         	SummaryTextView.setTypeface(Typeface.DEFAULT_BOLD);
         	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT_BOLD);
-        	AckImage.setImageResource(R.drawable.nack);
+        	AckImage.setImageResource(R.drawable.ic_unacknowledged);
         }
         
         
         if(Event.getProgress())
         {
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(0);
+            AckImage.setVisibility(View.INVISIBLE);
         }
         else
         {
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
+            AckImage.setVisibility(View.VISIBLE);
         }
         
         if(null == Event.getownerID() || Event.getownerID().equals("") || Event.getownerID().equals("null") )

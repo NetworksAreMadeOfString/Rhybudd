@@ -1130,8 +1130,7 @@ public class RhybuddHome extends FragmentActivity
 		{
 			public void onClick(DialogInterface arg0, int arg1) 
 			{
-				Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
-				//This shouldn't fail but no harm in being safe
+				/*Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEvent.class);
 				try
 				{
 					ViewEventIntent.putExtra("EventID", EventID);
@@ -1148,7 +1147,22 @@ public class RhybuddHome extends FragmentActivity
 
 				}
 
-				RhybuddHome.this.startActivity(ViewEventIntent);
+				RhybuddHome.this.startActivity(ViewEventIntent);*/
+
+                Intent ViewEventIntent = new Intent(RhybuddHome.this, ViewZenossEventActivity.class);
+                ViewEventIntent.putExtra("EventID", EventID);
+                ArrayList<String> EventNames = new ArrayList<String>();
+                ArrayList<String> EVIDs = new ArrayList<String>();
+
+                for(ZenossEvent evt : listOfZenossEvents)
+                {
+                    EventNames.add(evt.getDevice());
+                    EVIDs.add(evt.getEVID());
+                }
+
+                ViewEventIntent.putStringArrayListExtra("eventnames",EventNames);
+                ViewEventIntent.putStringArrayListExtra("evids",EVIDs);
+                RhybuddHome.this.startActivity(ViewEventIntent);
 			}
 		});
 
