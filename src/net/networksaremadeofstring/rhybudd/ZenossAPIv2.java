@@ -250,7 +250,7 @@ public class ZenossAPIv2
 	{
 		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
 		JSONObject devices = this.GetDevices();
-
+        Log.e("devices",devices.toString(3));
 		//Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
 		try
@@ -353,14 +353,47 @@ public class ZenossAPIv2
 				{
 					IPAddress = 0;
 				}
-				
+
+                String OS;
+                try
+                {
+                    OS = CurrentDevice.getJSONObject("osModel").getString("name");
+
+                    if(OS.contains("inux"))
+                    {
+                        OS = "Linux";
+                    }
+                    else if(OS.contains("indows"))
+                    {
+                        OS = "Windows";
+                    }
+                    else if (OS.contains("IOS"))
+                    {
+                        OS = "Cisco IOS";
+                    }
+                    else if(OS.contains("EOS"))
+                    {
+                        OS = "Arista EOS";
+                    }
+                    else
+                    {
+                        OS = "Unknown";
+                    }
+                }
+                catch(Exception e)
+                {
+                    OS = "Unknown";
+                }
+
 				try
 				{
 					ZenossDevices.add(new ZenossDevice(CurrentDevice.getString("productionState"),
 							IPAddress,
 							events,
 							CurrentDevice.getString("name"),
-							CurrentDevice.getString("uid")));
+							CurrentDevice.getString("uid"),
+                            OS
+                            ));
 				}
 				catch(JSONException j)
 				{

@@ -1,23 +1,91 @@
+<FrameLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="8dp">
+    <RelativeLayout
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginBottom="4dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/device_grid_background">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/relativeLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
-        android:paddingBottom="4dp"
-        android:paddingLeft="6dp"
-        android:paddingTop="4dp" >
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_height="wrap_content" android:layout_width="fill_parent"
+              android:layout_alignParentLeft="true" android:id="@+id/DeviceName"
+              android:ellipsize="end"
+              android:layout_alignParentTop="true"
+              android:paddingLeft="8dp"
+              android:paddingTop="4dp"
+              android:background="@drawable/device_grid_title_background"
+              android:textColor="@color/RhybuddWhite"
+              android:paddingBottom="4dp"
+              android:layout_marginBottom="6dp"></TextView>
 
-        <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:text="TextView" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/DeviceName" android:shadowColor="#505050" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="1"></TextView>
-        <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/linearLayout1" android:layout_below="@+id/DeviceName" android:layout_centerHorizontal="true">
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/CriticalImage" android:src="@drawable/severity_critical"></ImageView>
-            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:id="@+id/CriticalCount" android:text="0" android:layout_marginRight="20px" android:textColor="#FF00"></TextView>
-            
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/ErrorImage" android:src="@drawable/severity_error"></ImageView>
-            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/ErrorCount" android:textColor="#FF6600"></TextView>
-            
-            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/WarningImage" android:src="@drawable/severity_warning"></ImageView>
-            <TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/WarningCount" android:textColor="#FFE303"></TextView>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/metaContainer"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAlignment="center"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/linearLayout1"
+            android:layout_marginTop="6dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_marginBottom="1dp"
+            android:padding="4dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Production"
+                android:id="@+id/prodStateTextView"
+                android:layout_marginRight="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="127.0.0.1"
+                android:id="@+id/IPAddressTextView"
+                android:layout_marginLeft="12dp"/>
         </LinearLayout>
+
+        <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/linearLayout1"
+                      android:layout_centerHorizontal="true"
+                      android:divider="@drawable/vert_split"
+                      android:dividerPadding="8dp"
+                      android:showDividers="middle"
+                      android:paddingLeft="8dp"
+                      android:paddingRight="8dp"
+                      android:background="@drawable/event_details_meta_container"
+                      android:layout_marginBottom="8dp"
+                      android:layout_below="@+id/DeviceName"
+                      android:layout_marginTop="8dp">
+
+            <TextView android:layout_width="wrap_content" android:drawableLeft="@drawable/ic_critical" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:id="@+id/CriticalCount" android:text="0" android:layout_marginRight="20px" android:textColor="#FF00"
+                      android:paddingLeft="8dp"
+                      android:textSize="18sp"
+                      android:gravity="center_vertical"
+                      android:minWidth="40dp"></TextView>
+
+            <TextView android:layout_width="wrap_content" android:drawableLeft="@drawable/ic_error" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/ErrorCount" android:textColor="#ff8800"
+                      android:paddingLeft="8dp"
+                      android:textSize="18sp"
+                      android:gravity="center_vertical"
+                      android:minWidth="40dp"></TextView>
+
+            <TextView android:layout_width="wrap_content" android:drawableLeft="@drawable/ic_warning" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:text="0" android:layout_marginRight="20px" android:id="@+id/WarningCount" android:textColor="#ffbb33"
+                      android:paddingLeft="8dp"
+                      android:textSize="18sp"
+                      android:gravity="center_vertical"
+                      android:minWidth="40dp"></TextView>
+        </LinearLayout>
+
     </RelativeLayout>
+</FrameLayout>

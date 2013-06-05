@@ -22,10 +22,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import com.bugsense.trace.BugSenseHandler;
 
 public class RhybuddOpenHelper extends SQLiteOpenHelper
 {
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "rhybudd3Cache";
 
 
@@ -58,6 +60,7 @@ public class RhybuddOpenHelper extends SQLiteOpenHelper
                     "\"ipAddress\" INTEGER," +
                     "\"name\" TEXT," +
                     "\"uid\" TEXT, " +
+                    "\"os\" TEXT, " +
                     "\"infoEvents\" INTEGER DEFAULT (0) ," +
                     "\"debugEvents\" INTEGER DEFAULT (0) ," +
                     "\"warningEvents\" INTEGER DEFAULT (0) ," +
@@ -79,7 +82,7 @@ public class RhybuddOpenHelper extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        //Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+        Log.v("onUpgrade", "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
         try
         {
             db.execSQL("DROP TABLE IF EXISTS events");
@@ -87,7 +90,7 @@ public class RhybuddOpenHelper extends SQLiteOpenHelper
         }
         catch(Exception e)
         {
-            //BugSenseHandler.log("Database-onUpgrade", e);
+            BugSenseHandler.sendExceptionMessage("RhybudOpenHelper", "onUpgrade", e);
             e.printStackTrace();
         }
 

@@ -74,10 +74,15 @@
 			android:label="Rhybudd - Infrastructure List">
 			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
 		</activity>
-		
-		<activity android:name="net.networksaremadeofstring.rhybudd.ManageDatabase"
-			android:label="Rhybudd - Manage Cache">
-		</activity>
+
+        <activity android:name=".ViewZenossDeviceListActivity"
+                  android:label="Rhybudd - Infrastructure List">
+            <meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
+        </activity>
+
+        <activity android:name=".ViewZenossDeviceActivity"
+                  android:label="Rhybudd - View Device">
+        </activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
 			android:label="Rhybudd - Device Details">
@@ -88,7 +93,11 @@
 			     <data android:path="/zport/dmd/Devices/*" />
 			 </intent-filter>
 		</activity>
-		
+
+        <activity android:name="net.networksaremadeofstring.rhybudd.ManageDatabase"
+                  android:label="Rhybudd - Manage Cache">
+        </activity>
+
 		<!-- <activity android:name="net.networksaremadeofstring.rhybudd.Search"
 			android:label="Rhybudd - Search">
 		</activity>-->

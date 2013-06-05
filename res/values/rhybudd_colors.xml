@@ -36,7 +36,7 @@
 
         <color name="transparant">#00000000</color>
         <color name="PartialWhiteTransparancy">#AFFFFFFF</color>
-
+        <color name="PartialGreyTransparancy">#DFd4d4d4</color>
         <color name="FlatGray">#e5e5e5</color>
 
         <!-- Reply Colors -->

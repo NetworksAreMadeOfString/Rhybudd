@@ -234,6 +234,7 @@ public class RhybuddHome extends FragmentActivity
 							tempZenossEvents.clear();
 
 						//Can we get away with just calling refresh now?
+                        //TODO This needs to be sent as a runnable or something
 						Refresh();
 					}
 					catch(Exception e)
@@ -868,7 +869,7 @@ public class RhybuddHome extends FragmentActivity
 
             case R.id.devices:
             {
-                Intent DeviceList = new Intent(RhybuddHome.this, DeviceList.class);
+                Intent DeviceList = new Intent(RhybuddHome.this, ViewZenossDeviceListActivity.class);
                 RhybuddHome.this.startActivity(DeviceList);
                 return true;
             }

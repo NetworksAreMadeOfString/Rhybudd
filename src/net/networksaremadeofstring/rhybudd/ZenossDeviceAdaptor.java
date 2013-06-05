@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener, OnLongClickListener 
+public class ZenossDeviceAdaptor extends BaseAdapter
 {
 	private Context context;
     private List<ZenossDevice> listZenossDevices;
@@ -78,27 +78,13 @@ public class ZenossDeviceAdaptor extends BaseAdapter implements OnClickListener,
         
         TextView WarningTextView = (TextView) convertView.findViewById(R.id.WarningCount);
         WarningTextView.setText(Device.getevents().get("warning").toString());
-        
+
+        ((TextView) convertView.findViewById(R.id.prodStateTextView)).setText(Device.getproductionStateAsString());
+        //((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText(Device.getipAddress());
+
         //convertView.setTag(Event.getEVID());
-        convertView.setOnClickListener(this);
-        convertView.setOnLongClickListener(this);
-        
         convertView.setTag(R.integer.DeviceUID,Device.getuid());
         
         return convertView;
 	}
-
-	@Override
-	public boolean onLongClick(View v) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	//TODO Replace with a setOnClickListener from within the Activity
-	public void onClick(View v) 
-	{
-		((DeviceList)context).ViewDevice(v.getTag(R.integer.DeviceUID).toString());
-	}
-
 }

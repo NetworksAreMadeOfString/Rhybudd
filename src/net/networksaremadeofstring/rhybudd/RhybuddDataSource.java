@@ -99,7 +99,7 @@ public class RhybuddDataSource
     {
         String Filter = "name like \"%"+Query.replaceAll(" ", "%")+"%\"";
 
-        Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},  Filter, 	null, 					null, 			null, 			null);
+        Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents","os"},  Filter, 	null, 					null, 			null, 			null);
 
         List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
         if(dbResults.getCount() > 0)
@@ -130,7 +130,8 @@ public class RhybuddDataSource
                             dbResults.getInt(2),
                             events,
                             dbResults.getString(3),
-                            dbResults.getString(4)));
+                            dbResults.getString(4),
+                            dbResults.getString(10)));
                 }
                 catch(Exception e)
                 {
@@ -192,7 +193,7 @@ public class RhybuddDataSource
 
     public List<ZenossDevice> GetRhybuddDevices()
     {
-        Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents"},  null, 	null, 					null, 			null, 			null);
+        Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents","os"},  null, 	null, 					null, 			null, 			null);
 
         List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
         if(dbResults.getCount() > 0)
@@ -223,7 +224,8 @@ public class RhybuddDataSource
                             dbResults.getInt(2),
                             events,
                             dbResults.getString(3),
-                            dbResults.getString(4)));
+                            dbResults.getString(4),
+                            dbResults.getString(10)));
                 }
                 catch(Exception e)
                 {
@@ -381,7 +383,7 @@ public class RhybuddDataSource
     public ZenossDevice getDevice(String UID)
     {
         //						 query(String table, 	String[] columns, 	                                             String selection, 	String[] selectionArgs, String groupBy, String having, String orderBy)
-        Cursor cursor = database.query("devices",       new String[]{"rhybuddDeviceID","productionState","uid","name"},  "uid = '"+UID+"'", 	            null, 					null, 			null, 			null);
+        Cursor cursor = database.query("devices",       new String[]{"rhybuddDeviceID","productionState","uid","name","os"},  "uid = '"+UID+"'", 	            null, 					null, 			null, 			null);
 
         if(cursor.moveToFirst())
         {
@@ -411,7 +413,7 @@ public class RhybuddDataSource
                     cursor.close();
 
 
-                ZenossDevice returnDevice = new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4));
+                ZenossDevice returnDevice = new ZenossDevice(cursor.getString(1),cursor.getInt(2), events, cursor.getString(3),cursor.getString(4),cursor.getString(5));
                 cursor.close();
                 return returnDevice;
             }

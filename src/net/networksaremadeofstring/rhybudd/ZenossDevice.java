@@ -22,11 +22,12 @@ import java.util.HashMap;
 
 public class ZenossDevice 
 {
-	private String productionState;
+	private String productionState = "Production";
 	private int ipAddress;
 	private HashMap<String, Integer> events;
 	private String name;
 	private String uid;
+    private String os = "Unknown";
 	
 	//Not yet used
 	/*private String firstSeen;
@@ -56,10 +57,50 @@ public class ZenossDevice
          this.name = _name;
          this.uid = _uid;
 	}
+
+    public ZenossDevice(String _productionState, int _ipAddress, HashMap<String, Integer> _events, String _name, String _uid, String _os)
+    {
+        super();
+        this.productionState = _productionState;
+        this.ipAddress = _ipAddress;
+        this.events = _events;
+        this.name = _name;
+        this.uid = _uid;
+        this.os = _os;
+    }
 	
 	public String getproductionState()
     {
     	return this.productionState;
+    }
+
+    public String getproductionStateAsString()
+    {
+        if(this.productionState.equals("1000"))
+            return "Production";
+
+        if(this.productionState.equals("750"))
+            return "Operations";
+
+        if(this.productionState.equals("500"))
+            return "Staging";
+
+        if(this.productionState.equals("400"))
+            return "QA";
+
+        if(this.productionState.equals("300"))
+            return "Integration";
+
+        if(this.productionState.equals("200"))
+            return "Developer";
+
+        if(this.productionState.equals("100"))
+            return "Ops";
+
+        if(this.productionState.equals("-1"))
+            return "Decommisioned";
+
+        return "Unknown";
     }
 	
 	public int getipAddress()
@@ -80,5 +121,10 @@ public class ZenossDevice
 	public String getuid()
     {
     	return this.uid;
+    }
+
+    public String getos()
+    {
+        return this.os;
     }
 }
