@@ -530,6 +530,7 @@ public class RhybuddHome extends FragmentActivity
 					catch(Exception e)
 					{
 						//TODO Bugsense
+                        BugSenseHandler.sendExceptionMessage("RhybuddHome","handler-50",e);
 					}
 					
 					Toast.makeText(RhybuddHome.this, "There are no events to display", Toast.LENGTH_LONG).show();
@@ -605,6 +606,27 @@ public class RhybuddHome extends FragmentActivity
 								evt.setAcknowledged();	
 							}
 						}
+
+                        RhybuddDataSource datasource = null;
+
+                        try
+                        {
+                            //TODO maybe do this with the bunch of ack id's we have in the thread?
+                            datasource = new RhybuddDataSource(RhybuddHome.this);
+                            datasource.open();
+                            datasource.UpdateRhybuddEvents(listOfZenossEvents);
+
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("RhybuddHome","AckEventHandler",e);
+                        }
+                        finally
+                        {
+                            if(null != datasource)
+                                datasource.close();
+                        }
 						
 						if(adapter != null)
 							adapter.notifyDataSetChanged();
@@ -920,6 +942,7 @@ public class RhybuddHome extends FragmentActivity
                                 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
                             }
                             ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
+
 
                             //TODO Check it actually succeeded
                             AckEventHandler.sendEmptyMessage(1);

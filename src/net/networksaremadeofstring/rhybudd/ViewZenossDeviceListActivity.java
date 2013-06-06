@@ -12,6 +12,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Gareth on 04/06/13.
  */
@@ -53,11 +56,13 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
         }
      }
 
+    /*@Override
+    public void onItemSelected(ZenossDevice ZenossDevice)*/
     @Override
-    public void onItemSelected(ZenossDevice ZenossDevice)
+    public void onItemSelected(ZenossDevice device, ArrayList<String> DeviceNames, ArrayList<String> DeviceIDs)
     {
-        selectedUID = ZenossDevice.getuid();
-        selectedDevice = ZenossDevice.getname();
+        selectedUID = device.getuid();
+        selectedDevice = device.getname();
 
         if (mTwoPane)
         {
@@ -68,6 +73,9 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
             arguments.putString(ViewZenossDeviceFragment.ARG_HOSTNAME, selectedDevice);
             arguments.putString(ViewZenossDeviceFragment.ARG_UID, selectedUID);
             arguments.putBoolean(ViewZenossDeviceFragment.ARG_2PANE, true);
+            arguments.putStringArrayList(ViewZenossDeviceFragment.ARG_DEVICENAMES,DeviceNames);
+            arguments.putStringArrayList(ViewZenossDeviceFragment.ARG_DEVICEIDS,DeviceIDs);
+
 
             ViewZenossDeviceFragment fragment = new ViewZenossDeviceFragment();
             fragment.setArguments(arguments);
@@ -83,7 +91,8 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
             detailIntent.putExtra(ViewZenossDeviceFragment.ARG_HOSTNAME, selectedDevice);
             detailIntent.putExtra(ViewZenossDeviceFragment.ARG_UID, selectedUID);
             detailIntent.putExtra(ViewZenossDeviceFragment.ARG_2PANE, false);
-
+            detailIntent.putStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES,DeviceNames);
+            detailIntent.putStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS,DeviceIDs);
             startActivityForResult(detailIntent,LAUNCHDETAILACTIVITY);
         }
     }

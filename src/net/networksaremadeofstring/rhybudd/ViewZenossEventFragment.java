@@ -440,7 +440,15 @@ public class ViewZenossEventFragment extends Fragment {
                 }
                 catch (Exception e)
                 {
-                    Toast.makeText(getActivity(), "An error was encountered parsing the JSON. An error report has been sent.", Toast.LENGTH_LONG).show();
+                    try
+                    {
+                        Toast.makeText(getActivity(), "An error was encountered parsing the JSON. An error report has been sent.", Toast.LENGTH_LONG).show();
+                    }
+                    catch(Exception e2)
+                    {
+                        e.printStackTrace();
+                        e2.printStackTrace();
+                    }
                 }
             }
         };

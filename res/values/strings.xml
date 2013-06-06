@@ -93,6 +93,7 @@
     <!-- DeviceList -->
     <string name="deviceListServerCount">Calculating server count&#8230;</string>
     <string name="deviceListIconDesc">Image depicting 3 servers on a network</string>
+    <string name="ViewDeviceActivitySubtitle">Swipe to see other devices</string>
     
     <!-- Manage Database -->
     <string name="mgeDBRefreshDesc">Image depicting the refreshing of the local cache</string>

@@ -33,6 +33,8 @@ public class ViewZenossDeviceListFragment extends ListFragment
     ZenossDeviceAdaptor adapter = null;
     //TrapsDataSource datasource = null;
     public List<ZenossDevice> listOfDevices = null;
+    ArrayList<String> DeviceNames;
+    ArrayList<String> DeviceIDs;
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
     private Callbacks mCallbacks = sDummyCallbacks;
     private int mActivatedPosition = ListView.INVALID_POSITION;
@@ -43,13 +45,18 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
     public interface Callbacks
     {
-        public void onItemSelected(ZenossDevice ZenossDevice);
+        //public void onItemSelected(ZenossDevice ZenossDevice);
+
+        public void onItemSelected(ZenossDevice ZenossDevice, ArrayList<String> DeviceNames, ArrayList<String> DeviceIDs);
     }
 
     private static Callbacks sDummyCallbacks = new Callbacks()
     {
-        @Override
+        /*@Override
         public void onItemSelected(ZenossDevice ZenossDevice)
+        {
+        }*/
+        public void onItemSelected(ZenossDevice ZenossDevice, ArrayList<String> DeviceNames, ArrayList<String> DeviceIDs)
         {
         }
     };
@@ -106,6 +113,17 @@ public class ViewZenossDeviceListFragment extends ListFragment
         }
     }
 
+    private void PopulateMetaLists()
+    {
+        DeviceNames = new ArrayList<String>();
+        DeviceIDs = new ArrayList<String>();
+
+        for(ZenossDevice device : listOfDevices)
+        {
+            DeviceNames.add(device.getname());
+            DeviceIDs.add(device.getuid());
+        }
+    }
     public void DBGetThread()
     {
         dialog = new ProgressDialog(getActivity());
@@ -135,6 +153,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
                 if(listOfDevices!= null && listOfDevices.size() > 0)
                 {
+                    PopulateMetaLists();
                     //DeviceCount = listOfZenossDevices.size();
                     //Log.i("DeviceList","Found DB Data!");
                     handler.sendEmptyMessage(2);
@@ -253,6 +272,8 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
                     if(listOfDevices != null && listOfDevices.size() > 0)
                     {
+                        PopulateMetaLists();
+
                         //DeviceCount = listOfZenossDevices.size();
                         Message.obtain();
                         handler.sendEmptyMessage(1);
@@ -342,7 +363,8 @@ public class ViewZenossDeviceListFragment extends ListFragment
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         //mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
-        mCallbacks.onItemSelected(listOfDevices.get(position));
+        //mCallbacks.onItemSelected(listOfDevices.get(position));
+        mCallbacks.onItemSelected(listOfDevices.get(position),DeviceNames,DeviceIDs);
 
         //We want to keep track of this for our own purposes
         //mActivatedPosition = position;

@@ -98,7 +98,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.zenoss_event_listitem_large, null);
         }
-        
+
+        Typeface acknowledged = Typeface.create("sans-serif-light", Typeface.NORMAL);
+        Typeface open = Typeface.create("sans-serif", Typeface.BOLD);
+        Typeface normal = Typeface.create("sans-serif", Typeface.NORMAL);
+
         try 
 		{
 			
@@ -145,8 +149,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
         DeviceNameTextView.setText(Event.getDevice());
-        //DeviceNameTextView.setText("Example Device");
-        
+
         TextView SummaryTextView = (TextView) convertView.findViewById(R.id.EventSummary);
         SummaryTextView.setText(Event.getSummary());
         //SummaryTextView.setText("Example summary of an event (maybe with some details)");
@@ -169,21 +172,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         
         if(Event.getSeverity().equals("1"))
         	SeverityImage.setImageResource(R.drawable.ic_debug);
-        
-        if(Event.getEventState().equals("Acknowledged"))
-        {
-        	AckImage.setImageResource(R.drawable.ic_acknowledged);
-        	SummaryTextView.setTypeface(Typeface.DEFAULT);
-        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT);
-        }
-        else
-        {
-        	SummaryTextView.setTypeface(Typeface.DEFAULT_BOLD);
-        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT_BOLD);
-        	AckImage.setImageResource(R.drawable.ic_unacknowledged);
-        }
-        
-        
+
         if(Event.getProgress())
         {
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(0);
@@ -194,12 +183,15 @@ public class ZenossEventsAdaptor extends BaseAdapter
         	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
             AckImage.setVisibility(View.VISIBLE);
         }
-        
+
+        TextView ackAuthor = ((TextView) convertView.findViewById(R.id.ackAuthor));
+        ackAuthor.setTypeface(normal);
+
         if(null == Event.getownerID() || Event.getownerID().equals("") || Event.getownerID().equals("null") )
         {
         	try
         	{
-        		((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Not Ack'd");
+                ackAuthor.setText("Not Ack'd");
         	}
         	catch(Exception e)
         	{
@@ -222,11 +214,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
 
                 if(null == owner)
                 {
-                    ((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Not Ack'd");
+                    ackAuthor.setText("Not Ack'd");
                 }
                 else
                 {
-        		    ((TextView) convertView.findViewById(R.id.ackAuthor)).setText("Ack'd " + owner);
+                    ackAuthor.setText("Ack'd " + owner);
                 }
         	}
         	catch(Exception e)
@@ -234,7 +226,9 @@ public class ZenossEventsAdaptor extends BaseAdapter
         		e.printStackTrace();
         	}
         }
-        
+
+        TextView eventCount = ((TextView) convertView.findViewById(R.id.EventCount));
+        eventCount.setTypeface(normal);
         try
         {
             String count = "";
@@ -247,23 +241,59 @@ public class ZenossEventsAdaptor extends BaseAdapter
                 count = Integer.toString(Event.getCount());
             }
 
-        	((TextView) convertView.findViewById(R.id.EventCount)).setText("Count: " + count);
+            eventCount.setText("Count: " + count);
         }
     	catch(Exception e)
     	{
-    		
+    		e.printStackTrace();
     	}
-        
+
+
+        TextView prodState = ((TextView) convertView.findViewById(R.id.prodState));
+        prodState.setTypeface(normal);
+
         try
         {
-        	((TextView) convertView.findViewById(R.id.prodState)).setText(Event.getProdState());
+            prodState.setText(Event.getProdState());
         }
     	catch(Exception e)
     	{
-    		
+    		e.printStackTrace();
     	}
-        
-        
+
+
+        if(Event.getEventState().equals("Acknowledged"))
+        {
+            AckImage.setImageResource(R.drawable.ic_acknowledged);
+        	/*SummaryTextView.setTypeface(Typeface.DEFAULT);
+        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT);*/
+
+            DeviceNameTextView.setTypeface(normal);
+            SummaryTextView.setTypeface(normal);
+            ((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(acknowledged);
+            prodState.setTypeface(acknowledged);
+            eventCount.setTypeface(acknowledged);
+            ackAuthor.setTypeface(acknowledged);
+
+
+        }
+        else
+        {
+        	/*SummaryTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        	((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(Typeface.DEFAULT_BOLD);*/
+            AckImage.setImageResource(R.drawable.ic_unacknowledged);
+
+
+            DeviceNameTextView.setTypeface(open);
+            ((TextView) convertView.findViewById(R.id.dateTime)).setTypeface(open);
+
+            SummaryTextView.setTypeface(normal);
+            prodState.setTypeface(open);
+            eventCount.setTypeface(open);
+            ackAuthor.setTypeface(open);
+        }
+
+
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.integer.EventPositionInList,position);
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
         

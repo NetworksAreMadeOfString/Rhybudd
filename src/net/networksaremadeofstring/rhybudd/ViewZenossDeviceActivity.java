@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity
      */
     ViewPager mViewPager;
     String currentDeviceID = "";
+    String currentDeviceName = "";
     ArrayList<String> DeviceNames;
     ArrayList<String> DeviceIDs;
     int currentIndex = 0;
@@ -39,24 +42,30 @@ public class ViewZenossDeviceActivity extends FragmentActivity
             actionbar = getActionBar();
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setHomeButtonEnabled(true);
+            actionbar.setSubtitle(getResources().getString(R.string.ViewDeviceActivitySubtitle));
         }
         catch (Exception e)
         {
             BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "OnCreate", e);
         }
 
-        currentDeviceID = getIntent().getStringExtra("EventID");
+        currentDeviceID = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_UID);
+        currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
 
-        DeviceNames = getIntent().getStringArrayListExtra("eventnames");
-        DeviceIDs = getIntent().getStringArrayListExtra("evids");
+        DeviceNames = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES);
+        DeviceIDs = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS);
 
         int i = 0;
 
         for(String str : DeviceIDs)
         {
+            Log.e("test","Comparing " + str + " to " + currentDeviceID);
             if(str.equals(currentDeviceID))
+            {
+                Log.e("test", "----------------FOUND---------------");
                 currentIndex = i;
-
+                break;
+            }
             i++;
         }
 
@@ -84,6 +93,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity
             Fragment fragment = new ViewZenossDeviceFragment();
             Bundle args = new Bundle();
             args.putString("DeviceID", DeviceIDs.get(position));
+            args.putString("DeviceName", DeviceNames.get(position));
             fragment.setArguments(args);
             fragment.setHasOptionsMenu(true);
             return fragment;
@@ -110,6 +120,24 @@ public class ViewZenossDeviceActivity extends FragmentActivity
             }
             return null;*/
             return DeviceNames.get(position);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                finish();
+                return true;
+            }
+
+            default:
+            {
+                return false;
+            }
         }
     }
 }

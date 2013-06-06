@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -281,7 +282,7 @@ public class RhybuddDataSource
                     values.put("lastTime", CurrentEvent.getlastTime());
                     values.put("ownerid", CurrentEvent.getownerID());
 
-                    //Log.i("DB","Writing " + CurrentEvent.getEVID() + " to the DB");
+                    //Log.i("DB", "Writing " + CurrentEvent.getEVID() + " to the DB");
 
                     database.insert("events", null, values);
                     //Log.i("DB","Done writing " + CurrentEvent.getEVID() + " to the DB");
