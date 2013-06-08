@@ -37,6 +37,7 @@
         <color name="transparant">#00000000</color>
         <color name="PartialWhiteTransparancy">#AFFFFFFF</color>
         <color name="PartialGreyTransparancy">#DFd4d4d4</color>
+        <color name="PartialBlackTransparancy">#AA000000</color>
         <color name="FlatGray">#e5e5e5</color>
 
         <!-- Reply Colors -->
@@ -44,6 +45,8 @@
         <color name="MetaBottom">#f1f1f1</color>
         <color name="MetaText">#6b6b6b</color>
         <color name="MetaEdge">#d9d9d9</color>
+
+
 
 
 </resources>

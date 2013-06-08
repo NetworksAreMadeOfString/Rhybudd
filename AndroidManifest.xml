@@ -81,7 +81,10 @@
         </activity>
 
         <activity android:name=".ViewZenossDeviceActivity"
+                  android:parentActivityName=".RhybuddHome"
                   android:label="Rhybudd - View Device">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".RhybuddHome" />
         </activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"

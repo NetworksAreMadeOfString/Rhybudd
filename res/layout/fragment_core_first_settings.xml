@@ -14,31 +14,14 @@
             android:isScrollContainer="true"
             android:scrollbars="vertical" >
 
-            <TextView
-                android:id="@+id/URLLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="6dp"
-                android:layout_marginTop="6dp"
-                android:shadowColor="#505050"
-                android:shadowDx="1"
-                android:shadowDy="1"
-                android:shadowRadius="1"
-                android:text="Zenoss URL:"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:visibility="gone" >
-            </TextView>
-
             <EditText
                 android:id="@+id/ZenossURL"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/URLLabel"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/SettingsMargin"
+                android:layout_marginRight="@dimen/SettingsMargin"
+                android:layout_marginTop="@dimen/SettingsMargin"
                 android:hint="http://zenoss.url:8080"
                 android:inputType="textUri" >
 
@@ -52,9 +35,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ZenossURL"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginLeft="@dimen/SettingsMargin"
+                android:layout_marginRight="@dimen/SettingsMargin"
+                android:layout_marginTop="@dimen/SettingsMargin"
                 android:hint="@string/UserNameHint"
                 android:inputType="textPersonName" >
 
@@ -66,8 +49,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ZenossUserName"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/SettingsMargin"
+                android:layout_marginRight="@dimen/SettingsMargin"
                 android:hint="@string/PasswordHint"
                 android:inputType="textPassword" >
 
@@ -79,9 +62,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ZenossPassword"
                 android:layout_centerHorizontal="true"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginLeft="@dimen/SettingsMargin"
+                android:layout_marginRight="@dimen/SettingsMargin"
+                android:layout_marginTop="@dimen/SettingsTopMargin"
                 android:gravity="center_horizontal"
                 android:text="@string/initialSettings"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -105,7 +88,7 @@
             android:layout_alignParentBottom="false"
             android:layout_below="@+id/basicAuthPassword"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/SettingsTopMargin"
             android:text="@string/SaveSettingsButton"
             style="@style/ButtonText"
             android:background="@drawable/light_blue_button"/>
@@ -155,7 +138,7 @@
                 android:layout_alignLeft="@+id/basicAuthUser"
                 android:layout_alignRight="@+id/basicAuthUser"
                 android:layout_below="@+id/basicAuthUser"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/SettingsMargin"
                 android:ems="10"
                 android:hint="@string/HTTPAuthPasswordHint"
                 android:inputType="textPassword" />
@@ -167,7 +150,7 @@
                 android:text="@string/FirstRunDebug"
                 android:id="@+id/debugLabel"
                 android:layout_below="@+id/SaveButton"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/SettingsTopMargin"
                 android:layout_alignLeft="@+id/ZenossURL"
                 android:visibility="invisible"/>
 
@@ -175,8 +158,8 @@
                 android:id="@+id/debugOutput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingTop="8dp"
+                android:paddingBottom="@dimen/SettingsMargin"
+                android:paddingTop="@dimen/SettingsMargin"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/WarningRed"
                 android:layout_alignParentBottom="false"

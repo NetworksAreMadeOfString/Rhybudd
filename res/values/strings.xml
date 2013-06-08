@@ -140,4 +140,15 @@
         <item>1800</item>
         <item>3600</item>
     </string-array>
+
+    <string-array name="drawer_array">
+        <item>Infrastructure</item>
+        <item>Manage Database</item>
+        <item>Settings</item>
+        <item>Configure Rhybudd Push</item>
+        <item>Help</item>
+        <item>Feedback</item>
+    </string-array>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

@@ -33,7 +33,7 @@ public class ZenossDeviceAdaptor extends BaseAdapter
 {
 	private Context context;
     private List<ZenossDevice> listZenossDevices;
-	
+    public static final int EVENTPOSITIONINLIST = 0;
     
     public ZenossDeviceAdaptor(Context context, List<ZenossDevice> _listZenossDevices) 
     {
@@ -79,11 +79,15 @@ public class ZenossDeviceAdaptor extends BaseAdapter
         TextView WarningTextView = (TextView) convertView.findViewById(R.id.WarningCount);
         WarningTextView.setText(Device.getevents().get("warning").toString());
 
-        ((TextView) convertView.findViewById(R.id.prodStateTextView)).setText(Device.getproductionStateAsString());
-        //((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText(Device.getipAddress());
+        if (convertView.findViewById(R.id.prodStateTextView) != null)
+        {
+            ((TextView) convertView.findViewById(R.id.prodStateTextView)).setText(Device.getproductionStateAsString());
+
+            //((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText(Device.getipAddress());
+        }
 
         //convertView.setTag(Event.getEVID());
-        convertView.setTag(R.integer.DeviceUID,Device.getuid());
+        convertView.setTag(Device.getuid());
         
         return convertView;
 	}

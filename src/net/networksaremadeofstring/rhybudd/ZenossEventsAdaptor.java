@@ -41,6 +41,9 @@ import android.widget.ToggleButton;
 
 public class ZenossEventsAdaptor extends BaseAdapter
 {
+    //public static final int EVENTPOSITIONINLIST = 346345;
+    //public static final int EVENTID = 678568;
+
 	private Context context;
     private List<ZenossEvent> listZenossEvents;
     boolean isRhestr = true;
@@ -294,13 +297,12 @@ public class ZenossEventsAdaptor extends BaseAdapter
         }
 
 
-        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.integer.EventPositionInList,position);
+        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.id.EVENTPOSITIONINLIST,position);
         ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
-        
-        //TODO this needs some serious tidying up (like not cheating on R.integer.*
+
         //convertView.setTag(Event.getEVID());
-        convertView.setTag(R.integer.EventID,Event.getEVID());
-        convertView.setTag(R.integer.EventPositionInList,position);
+        convertView.setTag(R.id.EVENTID,Event.getEVID());
+        convertView.setTag(R.id.EVENTPOSITIONINLIST,position);
         
         
         convertView.setClickable(true);

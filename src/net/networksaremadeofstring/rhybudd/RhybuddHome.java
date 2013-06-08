@@ -18,45 +18,44 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ActionBar;
-import android.content.*;
-import android.os.IBinder;
-import android.provider.Settings;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.*;
-import com.google.android.gcm.GCMRegistrar;
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import com.bugsense.trace.BugSenseHandler;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.backup.BackupManager;
+import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.provider.Settings;
+import android.support.v4.app.*;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.*;
+import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gcm.GCMRegistrar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RhybuddHome extends FragmentActivity
 {
+    private static final int INFRASTRUCTURE = 0;
+    private static final int MANAGEDATABASE = 1;
+    private static final int SETTINGS = 2;
+    private static final int CONFIGURERHYBUDDPUSH = 3;
+    private static final int HELP = 4;
+    private static final int FEEDBACK = 5;
+
 	SharedPreferences settings = null;
 	ZenossAPIv2 API = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
@@ -80,8 +79,13 @@ public class RhybuddHome extends FragmentActivity
     int retryCount = 0;
     boolean firstRun = false;
     boolean resumeOnResultPollAPI = true;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private String[] mDrawerTitles;
 
-	@Override
+
+    @Override
 	public void onAttachedToWindow() 
 	{
 		super.onAttachedToWindow();
@@ -104,7 +108,8 @@ public class RhybuddHome extends FragmentActivity
 		
 		setContentView(R.layout.rhybudd_home);
 		finishStart(false);
-	}
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 
 	@Override
 	public void onNewIntent(Intent newIntent)
@@ -179,12 +184,127 @@ public class RhybuddHome extends FragmentActivity
         actionbar = getActionBar();
         actionbar.setTitle("Rhybudd Events List");
         actionbar.setSubtitle(settings.getString("URL", ""));
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
 
         if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
         {
             firstRun = true;
         }
-	}
+
+        mDrawerTitles = getResources().getStringArray(R.array.drawer_array);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDrawerTitles));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        )
+        {
+            public void onDrawerClosed(View view)
+            {
+                //getActionBar().setTitle(mTitle);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView)
+            {
+               // getActionBar().setTitle(mDrawerTitle);
+               // invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+
+
+
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener
+    {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id)
+        {
+            ProcessDrawerClick(position);
+        }
+    }
+
+    private void ProcessDrawerClick(int position)
+    {
+        switch(position)
+        {
+            case SETTINGS:
+            {
+                Intent SettingsIntent = new Intent(RhybuddHome.this, SettingsFragment.class);
+                this.startActivityForResult(SettingsIntent, 99);
+
+            }
+            break;
+
+            case CONFIGURERHYBUDDPUSH:
+            {
+                Intent PushSettingsIntent = new Intent(RhybuddHome.this, PushConfigActivity.class);
+                this.startActivityForResult(PushSettingsIntent, ZenossAPI.ACTIVITYRESULT_PUSHCONFIG);
+            }
+            break;
+
+            case HELP:
+            {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
+                startActivity(i);
+            }
+            break;
+
+            case INFRASTRUCTURE:
+            {
+                Intent DeviceList = new Intent(RhybuddHome.this, ViewZenossDeviceListActivity.class);
+                RhybuddHome.this.startActivity(DeviceList);
+            }
+            break;
+
+            case MANAGEDATABASE:
+            {
+                Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
+                RhybuddHome.this.startActivity(MangeDBIntent);
+            }
+            break;
+
+            case FEEDBACK:
+            {
+                try
+                {
+                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","Gareth@DataSift.com", null));
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback suggestion for Rhybudd");
+                    startActivity(Intent.createChooser(emailIntent, "Send feedback as email"));
+                }
+                catch(Exception e)
+                {
+                    Toast.makeText(RhybuddHome.this,"There was a problem launching your email client.\n\nPlease email Gareth@DataSift.com with your feedback.",Toast.LENGTH_LONG).show();
+                }
+            }
+            break;
+        }
+
+        // update selected item and title, then close the drawer
+        //mDrawerList.setItemChecked(position, true);
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
 
 	public void DBGetThread()
 	{
@@ -436,11 +556,11 @@ public class RhybuddHome extends FragmentActivity
 								FrameLayout EventDetailsFragmentHolder = (FrameLayout) findViewById(R.id.EventDetailsFragment);
 								if(EventDetailsFragmentHolder == null)
 								{
-									ManageEvent(v.getTag(R.integer.EventID).toString(),(Integer) v.getTag(R.integer.EventPositionInList), v.getId());
+									ManageEvent(v.getTag(R.id.EVENTID).toString(),(Integer) v.getTag(R.id.EVENTPOSITIONINLIST), v.getId());
 								}
 								else
 								{
-									LoadEventDetailsFragment((Integer) v.getTag(R.integer.EventPositionInList));
+									LoadEventDetailsFragment((Integer) v.getTag(R.id.EVENTPOSITIONINLIST));
 								}
 							}
 							catch(Exception e)
@@ -457,7 +577,7 @@ public class RhybuddHome extends FragmentActivity
 						{
 							try
 							{
-								selectForCAB((Integer)v.getTag(R.integer.EventPositionInList));
+								selectForCAB((Integer)v.getTag(R.id.EVENTPOSITIONINLIST));
 							}
 							catch(Exception e)
 							{
@@ -474,7 +594,7 @@ public class RhybuddHome extends FragmentActivity
 						{
 							try
 							{
-								addToCAB((Integer)v.getTag(R.integer.EventPositionInList));
+								addToCAB((Integer)v.getTag(R.id.EVENTPOSITIONINLIST));
 							}
 							catch(Exception e)
 							{
@@ -521,15 +641,14 @@ public class RhybuddHome extends FragmentActivity
 					
 					try
 					{
-					if(listOfZenossEvents != null)
-						listOfZenossEvents.clear();
-					
-					if(adapter != null)
-						adapter.notifyDataSetChanged();
+                        if(listOfZenossEvents != null)
+                            listOfZenossEvents.clear();
+
+                        if(adapter != null)
+                            adapter.notifyDataSetChanged();
 					}
 					catch(Exception e)
 					{
-						//TODO Bugsense
                         BugSenseHandler.sendExceptionMessage("RhybuddHome","handler-50",e);
 					}
 					
@@ -708,7 +827,7 @@ public class RhybuddHome extends FragmentActivity
 			}
 			catch(Exception e)
 			{
-				//BugSenseHandler.log("addToCAB", e);
+                BugSenseHandler.sendExceptionMessage("RhybuddHome","addToCAB",e);
 			}
 		}
 		else
@@ -732,7 +851,7 @@ public class RhybuddHome extends FragmentActivity
 			}
 			catch(Exception e)
 			{
-				//BugSenseHandler.log("addToCAB", e);
+                BugSenseHandler.sendExceptionMessage("RhybuddHome","addToCAB",e);
 			}
 		}
 	}
@@ -865,7 +984,12 @@ public class RhybuddHome extends FragmentActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) 
 	{
-		switch (item.getItemId()) 
+        if (mDrawerToggle.onOptionsItemSelected(item))
+        {
+            return true;
+        }
+
+        switch (item.getItemId())
 		{
             case R.id.settings:
             {
@@ -874,20 +998,20 @@ public class RhybuddHome extends FragmentActivity
                 return true;
             }
 
-            case R.id.pushconfig:
+            /*case R.id.pushconfig:
             {
                 Intent PushSettingsIntent = new Intent(RhybuddHome.this, PushConfigActivity.class);
                 this.startActivityForResult(PushSettingsIntent, ZenossAPI.ACTIVITYRESULT_PUSHCONFIG);
                 return true;
-            }
+            }*/
 
-            case R.id.Help:
+            /*case R.id.Help:
             {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
                 startActivity(i);
                 return true;
-            }
+            }*/
 
             case R.id.devices:
             {
@@ -902,12 +1026,12 @@ public class RhybuddHome extends FragmentActivity
                 return true;
             }
 
-            case R.id.cache:
+            /*case R.id.cache:
             {
                 Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
                 RhybuddHome.this.startActivity(MangeDBIntent);
                 return true;
-            }
+            }*/
 
             case R.id.resolveall:
             {
@@ -1049,7 +1173,7 @@ public class RhybuddHome extends FragmentActivity
 		}
         else if(requestCode == ZenossAPI.ACTIVITYRESULT_PUSHCONFIG)
         {
-            if(data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
+            if(null != data && data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
             {
                 doGCMRegistration(data.getStringExtra(ZenossAPI.PREFERENCE_PUSHKEY));
             }
@@ -1301,4 +1425,10 @@ public class RhybuddHome extends FragmentActivity
             mBound = false;
         }
     };
+
+
+
+
+
+
 }

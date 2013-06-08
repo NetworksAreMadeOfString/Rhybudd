@@ -7,7 +7,7 @@
         android:id="@+id/summaryImage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:minHeight="80dp"
+        android:minHeight="@dimen/ImageMinHeight"
         android:src="@color/transparant"
         android:cropToPadding="false"
         android:scaleType="matrix"

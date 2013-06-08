@@ -44,9 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Gareth on 30/05/13.
- */
 public class CoreSettingsFragment extends Fragment
 {
     SharedPreferences settings = null;

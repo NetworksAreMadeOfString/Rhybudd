@@ -10,10 +10,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:dividerHeight="1dp"
-    android:paddingTop="8dp"
+    android:paddingTop="@dimen/ListViewPaddMarg"
     android:clipToPadding="false"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
+    android:layout_marginLeft="@dimen/ListViewPaddMarg"
+    android:layout_marginRight="@dimen/ListViewPaddMarg"
     android:divider="@android:color/transparent">
 
     </ListView>

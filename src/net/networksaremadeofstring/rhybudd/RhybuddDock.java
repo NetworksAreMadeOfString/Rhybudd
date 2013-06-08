@@ -147,13 +147,13 @@ public class RhybuddDock extends FragmentActivity
 			return true;
 		}
 
-		case R.id.Help:
+		/*case R.id.Help:
 		{
 			Intent i = new Intent(Intent.ACTION_VIEW);
 			i.setData(Uri.parse("http://www.android-zenoss.info/help.php"));
 			startActivity(i);
 			return true;
-		}
+		}*/
 
 		case R.id.devices:
 		{

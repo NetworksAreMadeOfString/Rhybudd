@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fragment first settings -->
+    <dimen name="SettingsMargin">10dp</dimen>
+    <dimen name="SettingsTopMargin">20dp</dimen>
+    <dimen name="SettingEditPadding">12dp</dimen>
+
+    <!-- Generic List View Fragment -->
+    <dimen name="ListViewPaddMarg">8dp</dimen>
+
+    <!-- Zenoss Device List Two Pane -->
+    <dimen name="FragmentMargins">8dp</dimen>
+
+    <!-- View Zenoss Event -->
+    <dimen name="ImageMinHeight">80dp</dimen>
+
+    <!-- View Device -->
+    <dimen name="deviceRepImgHeight">160dp</dimen>
+    <dimen name="DeviceTitlePadding">16dp</dimen>
+    <dimen name="DeviceTitleVertPadding">4dp</dimen>
+    <dimen name="DeviceGraphHeight">180dp</dimen>
+</resources>

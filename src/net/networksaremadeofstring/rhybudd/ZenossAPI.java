@@ -20,11 +20,16 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import com.bugsense.trace.BugSenseHandler;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -41,6 +46,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -57,8 +63,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -879,11 +888,104 @@ public class ZenossAPI
     }
 
 
+    public JSONObject GetDevice(String UID) throws JSONException, ClientProtocolException, IOException
+    {
+        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID.replace(" ", "%20") + "/device_router");
+
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        JSONArray keys = new JSONArray("[events,uptime,firstSeen,lastChanged,lastCollected,memory,name,productionState,systems,groups,location,tagNumber,serialNumber,rackSlot,osModel,links,comments,snmpSysName,snmpLocation,snmpContact,snmpAgent]");
+        JSONArray data = new JSONArray();
+
+        JSONObject dataObject = new JSONObject();
+        dataObject.put("uid", UID);
+        dataObject.put("keys", keys);
+
+        data.put(dataObject);
+
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getInfo");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+
+        JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));
+
+        //String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        Log.e("GetDevice",test);
+        try
+        {
+            JSONObject json = new JSONObject(test);
+            return json;
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
+    }
 
 
+    public JSONObject GetDeviceGraphs(String UID) throws JSONException, ClientProtocolException, IOException
+    {
+        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + UID.replace(" ", "%20") + "/device_router");
+
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        JSONArray data = new JSONArray();
+
+        JSONObject dataObject = new JSONObject();
+        dataObject.put("uid", UID);
+        dataObject.put("drange", "129600");
+
+        data.put(dataObject);
+
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getGraphDefs");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+
+        JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));
+
+        //String test = httpclient.execute(httpost, responseHandler);
+        HttpResponse response = httpclient.execute(httpost);
+        String test = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        //Log.e("GetDeviceEvents",test);
+        JSONObject json = new JSONObject(test);
+        return json;
+    }
 
 
-
+    public Drawable GetGraph(String urlString) throws IOException, URISyntaxException
+    {
+        HttpGet httpRequest = new HttpGet(new URL(ZENOSS_INSTANCE + urlString).toURI());
+        HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+        HttpEntity entity = response.getEntity();
+        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+        final long contentLength = bufHttpEntity.getContentLength();
+        if (contentLength >= 0)
+        {
+            InputStream is = bufHttpEntity.getContent();
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            return new BitmapDrawable(bitmap);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public JSONObject AcknowledgeEvent(String _EventID) throws JSONException, ClientProtocolException, IOException
     {

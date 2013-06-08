@@ -83,7 +83,7 @@ public class ZenossSearchAdaptor extends BaseAdapter implements OnClickListener,
         convertView.setOnClickListener(this);
         convertView.setOnLongClickListener(this);
         
-        convertView.setTag(R.integer.DeviceUID,Device.getuid());
+        convertView.setTag(Device.getuid());
         
         return convertView;
 	}
@@ -97,8 +97,8 @@ public class ZenossSearchAdaptor extends BaseAdapter implements OnClickListener,
 	@Override
 	public void onClick(View v) 
 	{
-		if(v.getTag(R.integer.DeviceUID) != null)
-			((Search)context).ViewDevice(v.getTag(R.integer.DeviceUID).toString());
+		if(v.getTag() != null)
+			((Search)context).ViewDevice(v.getTag().toString());
 	}
 
 }

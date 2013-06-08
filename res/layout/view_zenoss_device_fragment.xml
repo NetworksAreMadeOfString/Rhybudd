@@ -1,15 +1,104 @@
-<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollViewFragmentContainer"
+    android:background="@color/FlatGray">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:showDividers="middle"
+                  android:divider="?android:dividerHorizontal"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textView"
-        android:layout_gravity="center"/>
-</LinearLayout>
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/deviceRepImgHeight"
+                android:id="@+id/deviceRepImg"
+                android:src="@drawable/img_router"
+                android:scaleType="centerCrop"
+                android:maxHeight="200dp"
+                android:background="@color/ZaasDarkGray"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Large Text"
+                android:id="@+id/DeviceTitle"
+                android:layout_alignBottom="@+id/deviceRepImg"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:background="@color/PartialBlackTransparancy"
+                android:textColor="@color/RhybuddWhite"
+                android:paddingLeft="@dimen/DeviceTitlePadding"
+                android:paddingTop="@dimen/DeviceTitleVertPadding"
+                android:paddingBottom="@dimen/DeviceTitleVertPadding"/>
+        </RelativeLayout>
+
+        <HorizontalScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/DeviceGraphHeight"
+            android:id="@+id/horizontalScrollView"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/DeviceTitleVertPadding">
+                <ImageView
+                    android:id="@+id/loadAverageGraph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/graph"
+                    android:scaleType="centerInside"
+                    />
+
+                <ImageView
+                    android:id="@+id/CPUGraph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_below="@+id/loadAverageGraph"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/graph"
+                    android:scaleType="centerInside"
+                    />
+
+                <ImageView
+                    android:id="@+id/MemoryGraph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_below="@+id/CPUGraph"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/graph"
+                    android:scaleType="centerInside"
+                    />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView"
+            android:layout_gravity="left|center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView2"
+            android:layout_gravity="left|center_vertical"/>
+    </LinearLayout>
+
+    </ScrollView>
