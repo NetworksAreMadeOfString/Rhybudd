@@ -19,4 +19,9 @@
     <dimen name="DeviceTitlePadding">16dp</dimen>
     <dimen name="DeviceTitleVertPadding">4dp</dimen>
     <dimen name="DeviceGraphHeight">180dp</dimen>
+    <dimen name="DeviceGraphPadding">0dp</dimen>
+    <dimen name="HorizDivPadding">0dp</dimen>
+    <dimen name="WelcomePadding">16dp</dimen>
+    <dimen name="DeviceDetailsPadding">8dp</dimen>
+
 </resources>

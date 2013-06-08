@@ -76,6 +76,9 @@ public class ZenossDevice
 
     public String getproductionStateAsString()
     {
+        if(this.productionState.length() > 5)
+            return this.productionState;
+
         if(this.productionState.equals("1000"))
             return "Production";
 

@@ -31,12 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.ToggleButton;
-
+import android.widget.*;
 
 
 public class ZenossEventsAdaptor extends BaseAdapter
@@ -278,7 +273,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
             eventCount.setTypeface(acknowledged);
             ackAuthor.setTypeface(acknowledged);
 
-
+            ((RelativeLayout) convertView.findViewById(R.id.relativeLayout1)).setBackgroundResource(R.color.FlatGray);
         }
         else
         {
@@ -294,6 +289,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
             prodState.setTypeface(open);
             eventCount.setTypeface(open);
             ackAuthor.setTypeface(open);
+            ((RelativeLayout) convertView.findViewById(R.id.relativeLayout1)).setBackgroundResource(R.color.ZenossWhite);
         }
 
 

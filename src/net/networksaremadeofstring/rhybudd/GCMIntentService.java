@@ -47,90 +47,127 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     protected void onMessage(Context arg0, Intent intent)
     {
         Bundle extras = intent.getExtras();
+        String purpose = extras.getString("purpose","push");
 
-        //GCM Payload
-        String alertCount = extras.getString("count","");
-        String evid = extras.getString("evid","");
-        String device = extras.getString("device","");
-        String summary = extras.getString("summary","");
-        String status = extras.getString("status","");
-        String severity = extras.getString("severity","");
-        String event_class = extras.getString("event_class","");
-        String event_class_key = extras.getString("event_class_key","");
-        String sent = extras.getString("sent","");
-
-        //TODO Outstanding from ZenPack
-        String prodState = extras.getString("prodstate","Production");
-        String firstTime = extras.getString("firsttime","");
-        String componentText = extras.getString("componenttext","");
-        String ownerID = extras.getString("ownerid","");
-
-        if(alertCount == null)
-            alertCount = "0";
-
-        if(evid == null)
-            evid = "0";
-
-        if(severity == null)
-            severity = "2";
-
-        if(summary == null)
-            summary = "No summary available";
-
-        if(status == null)
-            status = "unacknowledged";
-
-        if(device == null)
-            device = "localhost.localdomain";
-
-        if(event_class == null)
-            event_class = "/Status";
-
-        if(sent == null)
-            sent = "--/--/---- --:--:--";
-
-        try
+        if(purpose.equals("push"))
         {
-            Log.v("GCMPayload",alertCount + " / " +
-                    evid + " / " +
-                    device + " / " +
-                    summary + " / " +
-                    status + " / " +
-                    severity + " / " +
-                    event_class + " / " +
-                    event_class_key + " / " +
-                    sent
-            );
+            //GCM Payload
+            String alertCount = extras.getString("count","");
+            String evid = extras.getString("evid","");
+            String device = extras.getString("device","");
+            String summary = extras.getString("summary","");
+            String status = extras.getString("status","");
+            String severity = extras.getString("severity","");
+            String event_class = extras.getString("event_class","");
+            String event_class_key = extras.getString("event_class_key","");
+            String sent = extras.getString("sent","");
 
-            //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
-            ZenossEvent gcmEvent = new ZenossEvent( evid,   99999, prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
-            //ZenossEvent gcmEvent = new ZenossEvent(evid,summary);
+            //TODO Outstanding from ZenPack
+            String prodState = extras.getString("prodstate","Production");
+            String firstTime = extras.getString("firsttime","");
+            String componentText = extras.getString("componenttext","");
+            String ownerID = extras.getString("ownerid","");
 
-            RhybuddDataSource datasource = new RhybuddDataSource(arg0);
-            datasource.open();
-            datasource.addEvent(gcmEvent);
-            datasource.close();
+            if(alertCount == null)
+                alertCount = "0";
 
-            Notifications.SendGCMNotification(gcmEvent,arg0);
+            if(evid == null)
+                evid = "0";
 
-            //TODO Broadcast if the UI is in the foreground?
+            if(severity == null)
+                severity = "2";
+
+            if(summary == null)
+                summary = "No summary available";
+
+            if(status == null)
+                status = "unacknowledged";
+
+            if(device == null)
+                device = "localhost.localdomain";
+
+            if(event_class == null)
+                event_class = "/Status";
+
+            if(sent == null)
+                sent = "--/--/---- --:--:--";
+
+            try
+            {
+                Log.v("GCMPayload",alertCount + " / " +
+                        evid + " / " +
+                        device + " / " +
+                        summary + " / " +
+                        status + " / " +
+                        severity + " / " +
+                        event_class + " / " +
+                        event_class_key + " / " +
+                        sent
+                );
+
+                //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
+                ZenossEvent gcmEvent = new ZenossEvent( evid,   99999, prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
+                //ZenossEvent gcmEvent = new ZenossEvent(evid,summary);
+
+                RhybuddDataSource datasource = new RhybuddDataSource(arg0);
+                datasource.open();
+                datasource.addEvent(gcmEvent);
+                datasource.close();
+
+                Notifications.SendGCMNotification(gcmEvent,arg0);
+
+                //TODO Broadcast if the UI is in the foreground?
+            }
+            catch(Exception e)
+            {
+                BugSenseHandler.initAndStartSession(getApplicationContext(), "44a76a8c");
+                BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
+
+                e.printStackTrace();
+                Log.e("GCMPayload",alertCount + " / " +
+                        evid + " / " +
+                        device + " / " +
+                        summary + " / " +
+                        status + " / " +
+                        severity + " / " +
+                        event_class + " / " +
+                        event_class_key + " / " +
+                        sent
+                );
+            }
         }
-        catch(Exception e)
+        else if(purpose.equals("ack"))
         {
-            BugSenseHandler.initAndStartSession(getApplicationContext(), "44a76a8c");
-            BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
-
-            e.printStackTrace();
-            Log.e("GCMPayload",alertCount + " / " +
-                    evid + " / " +
-                    device + " / " +
-                    summary + " / " +
-                    status + " / " +
-                    severity + " / " +
-                    event_class + " / " +
-                    event_class_key + " / " +
-                    sent
-            );
+            RhybuddDataSource datasource = new RhybuddDataSource(arg0);
+            try
+            {
+                datasource.open();
+                datasource.ackEvent(extras.getString("evid",""));
+            }
+            catch(Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
+            }
+            finally
+            {
+                datasource.close();
+            }
+        }
+        else if(purpose.equals("ack"))
+        {
+            try
+            {
+                ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
+                ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            //Log.i("GCMIntentService","Unknown message");
         }
     }
 

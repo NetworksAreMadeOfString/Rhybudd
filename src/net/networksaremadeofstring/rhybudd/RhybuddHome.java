@@ -417,7 +417,7 @@ public class RhybuddHome extends FragmentActivity
                     {
                         if(null == mService.API)
                         {
-                            mService.PrepAPI(true);
+                            mService.PrepAPI(true,true);
                         }
 
                         ZenossCredentials credentials = new ZenossCredentials(RhybuddHome.this);

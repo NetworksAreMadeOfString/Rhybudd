@@ -10,7 +10,7 @@
                   android:layout_height="match_parent"
                   android:showDividers="middle"
                   android:divider="?android:dividerHorizontal"
-        >
+                  android:dividerPadding="@dimen/HorizDivPadding">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -21,7 +21,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="@dimen/deviceRepImgHeight"
                 android:id="@+id/deviceRepImg"
-                android:src="@drawable/img_router"
+                android:src="@drawable/img_server"
                 android:scaleType="centerCrop"
                 android:maxHeight="200dp"
                 android:background="@color/ZaasDarkGray"/>
@@ -60,7 +60,7 @@
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="centerInside"
-                    />
+                    android:paddingLeft="@dimen/DeviceGraphPadding"/>
 
                 <ImageView
                     android:id="@+id/CPUGraph"
@@ -70,7 +70,7 @@
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="centerInside"
-                    />
+                    android:paddingLeft="@dimen/DeviceGraphPadding"/>
 
                 <ImageView
                     android:id="@+id/MemoryGraph"
@@ -80,25 +80,84 @@
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="centerInside"
-                    />
+                    android:paddingLeft="@dimen/DeviceGraphPadding"
+                    android:paddingRight="@dimen/DeviceGraphPadding"/>
             </LinearLayout>
         </HorizontalScrollView>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/textView"
-            android:layout_gravity="left|center_vertical"/>
+            android:id="@+id/SNMPContainer"
+            android:paddingLeft="@dimen/DeviceDetailsPadding"
+            android:paddingRight="@dimen/DeviceDetailsPadding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="SNMP Location"
+                android:id="@+id/snmpLocation"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="SNMP Agent"
+                android:id="@+id/snmpAgent"
+                android:layout_below="@+id/snmpLocation"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="SNMP Contact"
+                android:id="@+id/snmpContact"
+                android:layout_below="@+id/snmpAgent"/>
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/textView2"
-            android:layout_gravity="left|center_vertical"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/uptime"
+            android:padding="@dimen/DeviceDetailsPadding"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/memory_container"
+            android:gravity="center_horizontal"
+            android:showDividers="middle"
+            android:divider="?android:dividerVertical"
+            android:dividerPadding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/memory_ram"
+                android:layout_marginRight="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/memory_swap"
+                android:layout_marginLeft="12dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/lastCollected"
+            android:paddingLeft="@dimen/DeviceDetailsPadding"/>
+
     </LinearLayout>
 
     </ScrollView>

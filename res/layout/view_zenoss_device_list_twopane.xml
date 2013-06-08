@@ -2,12 +2,12 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:layout_marginRight="16dp"
               android:baselineAligned="false"
-              android:divider="?android:attr/dividerHorizontal"
+              android:divider="?android:attr/dividerVertical"
               android:orientation="horizontal"
               android:showDividers="middle"
-              tools:context=".TrapListActivity" >
+              tools:context=".TrapListActivity"
+              android:background="@color/FlatGray">
 
     <!--
     This layout is a two-pane layout for the Traps

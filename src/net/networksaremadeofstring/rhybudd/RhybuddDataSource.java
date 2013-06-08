@@ -65,6 +65,23 @@ public class RhybuddDataSource
         dbHelper.close();
     }
 
+    public boolean ackEvent(String EVID)
+    {
+        ContentValues values = new ContentValues();
+        values.put("eventState","Acknowledged");
+
+        int rows = database.update ("events", values,"evid = ?",new String[] {EVID});
+
+        if(rows > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public boolean addEvent(ZenossEvent event)
     {
         ContentValues values = new ContentValues();

@@ -94,6 +94,8 @@
     <string name="deviceListServerCount">Calculating server count&#8230;</string>
     <string name="deviceListIconDesc">Image depicting 3 servers on a network</string>
     <string name="ViewDeviceActivitySubtitle">Swipe to see other devices</string>
+    <string name="DeviceListWelcomeTitle">Infrastructure List</string>
+    <string name="DeviceListWelcome">Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris.\n\n Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.\n\nQui animated corpse, cricket bat max brucks terribilem incessu zomby.</string>
     
     <!-- Manage Database -->
     <string name="mgeDBRefreshDesc">Image depicting the refreshing of the local cache</string>
@@ -151,4 +153,61 @@
     </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+
+    <!-- Add Device -->
+    <string name="AddDeviceTitle">Add a Device to Zenoss</string>
+    <string name="AddDeviceButton">Add Device</string>
+    <string name="CancelButton">Cancel</string>
+
+    <string-array name="device_class">
+        <item>/</item>
+        <item>/Discovered</item>
+        <item>/KVM</item>
+        <item>/Network</item>
+        <item>/Network/Cisco</item>
+        <item>/Network/Router</item>
+        <item>/Network/Router/Cisco</item>
+        <item>/Network/Router/Firewall</item>
+        <item>/Network/Router/RSM</item>
+        <item>/Network/Router/TerminalServer</item>
+        <item>/Network/Switch</item>
+        <item>/Ping</item>
+        <item>/Power</item>
+        <item>/Power/UPS</item>
+        <item>/Power/UPS/APC</item>
+        <item>/Printer</item>
+        <item>/Printer/InkJet</item>
+        <item>/Printer/Laser</item>
+        <item>/Server</item>
+        <item>/Server/Cmd</item>
+        <item>/Server/Darwin</item>
+        <item>/Server/Linux</item>
+        <item>/Server/Remote</item>
+        <item>/Server/Scan</item>
+        <item>/Server/Solaris</item>
+        <item>/Server/SSH</item>
+        <item>/Server/SSH/Linux</item>
+        <item>/Server/Windows</item>
+        <item>/Server/Windows/WMI</item>
+        <item>/Storage</item>
+        <item>/VMware</item>
+    </string-array>
+
+    <string-array name="production_state">
+        <item>Production</item>
+        <item>Pre-Production</item>
+        <item>Test</item>
+        <item>Maintenance</item>
+        <item>Decommissioned</item>
+    </string-array>
+
+    <string-array name="device_priority">
+        <item>Normal</item>
+        <item>Highest</item>
+        <item>High</item>
+        <item>Low</item>
+        <item>Lowest</item>
+        <item>Trivial</item>
+    </string-array>
 </resources>

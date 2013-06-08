@@ -88,6 +88,64 @@ public class ViewZenossEventFragment extends Fragment {
         agent = (TextView) rootView.findViewById(R.id.Agent);
         logList = (LinearLayout) rootView.findViewById(R.id.LogList);
         progressbar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        ackIcon.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View view)
+            {
+                progressbar.setVisibility(View.VISIBLE);
+
+                ((Thread) new Thread(){
+                    public void run()
+                    {
+                        if (settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                        try
+                        {
+                            API.Login(credentials);
+                            JSONObject ackJSON = API.AcknowledgeEvent(getArguments().getString("EventID"));
+
+                            if(ackJSON.getJSONObject("result").getBoolean("success"))
+                            {
+                                getActivity().runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        progressbar.setVisibility(View.INVISIBLE);
+                                        ackIcon.setImageResource(R.drawable.ic_acknowledged);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                Toast.makeText(getActivity(),"Unable to acknowledge alert",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run()
+                                {
+                                    Toast.makeText(getActivity(),"Unable to acknowledge alert",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
+            }
+        });
         return rootView;
     }
 
@@ -224,7 +282,7 @@ public class ViewZenossEventFragment extends Fragment {
                 EventClass.setText(bundle.getString("EventClass"));
 
             if(bundle.containsKey("Summary"))
-                Summary.setText(bundle.getString("Summary"));
+                Summary.setText(Html.fromHtml(bundle.getString("Summary"), null, null));
 
             if(bundle.containsKey("FirstTime"))
                 FirstTime.setText(bundle.getString("FirstTime"));
@@ -326,7 +384,8 @@ public class ViewZenossEventFragment extends Fragment {
 
                         try
                         {
-                            if (EventDetails.getString("eventState").equals("Acknowledged"))
+                            Log.e("Ack",EventDetails.getString("eventState"));
+                            if (EventDetails.getString("eventState").equals("Acknowledged") ||EventDetails.getString("eventState").equals("1") )
                             {
                                 ackIcon.setImageResource(R.drawable.ic_acknowledged);
                                 isAcknowledged = true;
@@ -365,7 +424,7 @@ public class ViewZenossEventFragment extends Fragment {
 
                             Spanned htmlSpan = Html.fromHtml(EventDetails.getString("message"), p, null);
 
-                            Summary.setText(htmlSpan);
+                            Summary.setText(Html.fromHtml(EventDetails.getString("message"), null, null));
 
                             Log.i("Summary", EventDetails.getString("message"));
 

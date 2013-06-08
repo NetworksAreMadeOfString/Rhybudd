@@ -18,6 +18,7 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import java.net.InetAddress;
 import java.util.List;
 
 import android.content.Context;
@@ -83,10 +84,17 @@ public class ZenossDeviceAdaptor extends BaseAdapter
         {
             ((TextView) convertView.findViewById(R.id.prodStateTextView)).setText(Device.getproductionStateAsString());
 
-            //((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText(Device.getipAddress());
+            String IPAddress = ZenossAPI.ntoa(Device.getipAddress());
+            if(null != IPAddress)
+            {
+                ((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText(IPAddress);
+            }
+            else
+            {
+                ((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText("");
+            }
         }
 
-        //convertView.setTag(Event.getEVID());
         convertView.setTag(Device.getuid());
         
         return convertView;

@@ -62,12 +62,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.*;
+import java.net.*;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +97,7 @@ public class ZenossAPI
     //These don't get used directly
     protected DefaultHttpClient client;
     protected ThreadSafeClientConnManager mgr;
-    protected DefaultHttpClient httpclient;
+    protected DefaultHttpClient httpclient = null;
 
     protected ResponseHandler responseHandler = new BasicResponseHandler();
     protected int reqCount = 1;
@@ -109,6 +105,18 @@ public class ZenossAPI
 
     public ZenossAPI()
     {
+    }
+
+    public boolean isHTTPClientAlive()
+    {
+        if(null == httpclient)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public static String getPushKey() throws IOException, JSONException
@@ -139,6 +147,56 @@ public class ZenossAPI
         {
             return null;
         }
+    }
+
+    public void AddDevice(String FQDN, String Title, String DeviceClass, String ProductionState,String DevicePriority) throws JSONException, IOException {
+        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/device_router");
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        JSONObject dataContents = new JSONObject();
+        dataContents.put("deviceName",FQDN);
+        dataContents.put("deviceClass", DeviceClass);
+        dataContents.put("title", Title);
+        //Look this up
+        dataContents.put("productionState", 1000);
+
+        //Look this up
+        dataContents.put("priority", 3);
+
+        //Defaults
+        dataContents.put("collector", "localhost");
+        dataContents.put("model", true);
+        dataContents.put("snmpCommunity", "");
+        dataContents.put("snmpPort", "161");
+        dataContents.put("tag", "");
+        dataContents.put("rackSlot", "");
+        dataContents.put("serialNumber", "");
+        dataContents.put("hwManufacturer", "");
+        dataContents.put("hwProductName", "");
+        dataContents.put("osManufacturer", "");
+        dataContents.put("osProductName", "");
+        dataContents.put("comments", "");
+        dataContents.put("groupPaths", new JSONArray());
+        dataContents.put("systemPaths", new JSONArray());
+
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "addDevice");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+
+        httpost.setEntity(new StringEntity(reqData.toString()));
+        HttpResponse response = httpclient.execute(httpost);
+        String rawJSON = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        Log.e("rawJSON",rawJSON);
+        //JSONObject json = new JSONObject(rawJSON);
+        //return json.getJSONObject("result").getBoolean("success");
     }
 
     public static String md5(String s)
@@ -923,6 +981,7 @@ public class ZenossAPI
         try
         {
             JSONObject json = new JSONObject(test);
+            json.toString(3);
             return json;
         }
         catch(Exception e)
@@ -975,10 +1034,17 @@ public class ZenossAPI
         HttpEntity entity = response.getEntity();
         BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
         final long contentLength = bufHttpEntity.getContentLength();
+        Log.e("GetGraph",Long.toString(contentLength));
         if (contentLength >= 0)
         {
             InputStream is = bufHttpEntity.getContent();
             Bitmap bitmap = BitmapFactory.decodeStream(is);
+
+            /*ByteArrayOutputStream out = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, out);
+
+            return new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray())));*/
+
             return new BitmapDrawable(bitmap);
         }
         else
@@ -1024,6 +1090,21 @@ public class ZenossAPI
         JSONObject json = new JSONObject(ackEventReturnJSON);
         //Log.i("AcknowledgeEvent",json.toString(2));
         return json;
+    }
+
+    public static String ntoa(long raw)
+    {
+        byte[] b = new byte[] {(byte)(raw >> 24), (byte)(raw >> 16), (byte)(raw >> 8), (byte)raw};
+
+        try
+        {
+            return InetAddress.getByAddress(b).getHostAddress();
+        }
+        catch (UnknownHostException e)
+        {
+            //No way here
+            return null;
+        }
     }
 
     public JSONObject AcknowledgeEvents(List<String> EventIDs) throws JSONException, ClientProtocolException, IOException

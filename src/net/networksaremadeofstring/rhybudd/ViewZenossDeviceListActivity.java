@@ -66,11 +66,11 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
             // 'activated' state when touched.
             ((ViewZenossDeviceListFragment) getSupportFragmentManager().findFragmentById(R.id.device_list)).setActivateOnItemClick(true);
 
-            /*if(savedInstanceState == null)
+            if(savedInstanceState == null)
             {
-                WelcomeFragment fragment = new WelcomeFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.trap_detail_container, fragment).commit();
-            }*/
+                DeviceListWelcomeFragment fragment = new DeviceListWelcomeFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.device_detail_container, fragment).commit();
+            }
         }
      }
 
@@ -136,6 +136,24 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
             case R.id.search:
             {
                 onSearchRequested();
+                return true;
+            }
+
+            case R.id.adddevice:
+            {
+                if (mTwoPane)
+                {
+                    AddDeviceFragment fragment = new AddDeviceFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.device_detail_container, fragment).commit();
+                    ab.setSubtitle(getString(R.string.AddDeviceTitle));
+                }
+                else
+                {
+                    Intent AddDeviceIntent = new Intent(ViewZenossDeviceListActivity.this, AddDeviceActivity.class);
+                    //Not strictly required because we can get the activity to do it for us
+                    AddDeviceIntent.putExtra(AddDeviceFragment.TWOPANEINDICATOR,false);
+                    this.startActivity(AddDeviceIntent);
+                }
                 return true;
             }
 

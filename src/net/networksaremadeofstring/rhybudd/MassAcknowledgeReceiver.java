@@ -77,6 +77,8 @@ public class MassAcknowledgeReceiver extends BroadcastReceiver
                         }
 
                         API.AcknowledgeEvents(EventIDs);
+
+
                     }
                 }
                 catch (Exception e)

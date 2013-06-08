@@ -97,7 +97,7 @@ public class ZenossPoller extends Service
 			listOfZenossEvents.clear();
 	}
 
-    public void PrepAPI(Boolean Login)
+    public void PrepAPI(Boolean Login, Boolean inThread)
     {
             //There are some minor differences here
             if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
@@ -110,6 +110,43 @@ public class ZenossPoller extends Service
                 Log.e("PrepAPI","Am not ZAAS");
                 API = new ZenossAPICore();
             }
+
+
+        if(Login)
+        {
+            if(inThread)
+            {
+                ZenossCredentials credentials = new ZenossCredentials(ZenossPoller.this);
+                try
+                {
+                    loginSuccessful = API.Login(credentials);
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                    loginSuccessful = false;
+                }
+            }
+            else
+            {
+                ((Thread) new Thread()
+                {
+                    public void run()
+                    {
+                        ZenossCredentials credentials = new ZenossCredentials(ZenossPoller.this);
+                        try
+                        {
+                            loginSuccessful = API.Login(credentials);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            loginSuccessful = false;
+                        }
+                    }
+                }).start();
+            }
+        }
     }
 
 	@Override
@@ -123,7 +160,7 @@ public class ZenossPoller extends Service
 		String ns = Context.NOTIFICATION_SERVICE;
 		mNM = (NotificationManager) getSystemService(ns);
 
-        PrepAPI(true);
+        PrepAPI(true,false);
 
 		eventsHandler = new Handler() 
     	{
@@ -346,7 +383,7 @@ public class ZenossPoller extends Service
 				{
 					if(API == null)
 					{
-                        PrepAPI(true);
+                        PrepAPI(true,true);
                     }
 
                     ZenossCredentials credentials = new ZenossCredentials(ZenossPoller.this);

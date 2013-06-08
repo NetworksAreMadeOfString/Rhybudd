@@ -31,9 +31,7 @@ import com.bugsense.trace.BugSenseHandler;
 
 import java.util.ArrayList;
 
-/**
- * Created by Gareth on 02/06/13.
- */
+
 public class ViewZenossDeviceActivity extends FragmentActivity
 {
     SectionsPagerAdapter mSectionsPagerAdapter;

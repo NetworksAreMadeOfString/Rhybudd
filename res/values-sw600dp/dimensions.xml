@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="DeviceGraphHeight">250dp</dimen>
+    <dimen name="DeviceGraphPadding">20dp</dimen>
+    <dimen name="HorizDivPadding">10dp</dimen>
+    <dimen name="ListViewPaddMarg">8dp</dimen>
+    <dimen name="WelcomePadding">24dp</dimen>
+    <dimen name="DeviceDetailsPadding">16dp</dimen>
 </resources>

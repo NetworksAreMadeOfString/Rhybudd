@@ -3,7 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:minHeight="64dp"
-    android:padding="4dp">
+    android:padding="4dp"
+    android:background="@color/ZenossWhite">
 
     <ImageView
         android:id="@+id/fragment_indicator"

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/DeviceListWelcome"
+        android:id="@+id/WelcomeIntro"
+        android:padding="@dimen/WelcomePadding"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentLeft="true"/>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/DeviceGraphHeight"
+        android:id="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/device_welcome"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/DeviceListWelcomeTitle"
+        android:id="@+id/WelcomeTitle"
+        android:layout_above="@+id/WelcomeIntro"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="24dp"
+        android:textSize="32sp"
+        android:background="@color/PartialBlackTransparancy"
+        android:textColor="@color/ZenossWhite"
+        android:paddingTop="@dimen/DeviceTitlePadding"
+        android:paddingBottom="@dimen/DeviceTitlePadding"/>
+</RelativeLayout>

@@ -1,5 +1,5 @@
-
-    <menu xmlns:android="http://schemas.android.com/apk/res/android">
-        <item android:id="@+id/refresh" android:icon="@drawable/ic_action_refresh" android:title="Refresh" android:showAsAction="always"></item>
-        <item android:id="@+id/search" android:title="Search" android:icon="@drawable/ic_action_search" android:showAsAction="always"></item> 
-    </menu>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/refresh" android:icon="@drawable/ic_action_refresh" android:title="Refresh" android:showAsAction="always"></item>
+    <item android:id="@+id/search" android:title="Search" android:icon="@drawable/ic_action_search" android:showAsAction="always"></item>
+    <item android:id="@+id/adddevice" android:title="Add Device" android:icon="@drawable/ic_action_add_device" android:showAsAction="always"></item>
+</menu>
