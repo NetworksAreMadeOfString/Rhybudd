@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/DeviceListWelcome"
-        android:id="@+id/WelcomeIntro"
+        android:id="@+id/DeviceListWelcomeIntro"
         android:padding="@dimen/WelcomePadding"
         android:layout_below="@+id/imageView"
         android:layout_alignParentLeft="true"/>
@@ -29,7 +29,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/DeviceListWelcomeTitle"
         android:id="@+id/WelcomeTitle"
-        android:layout_above="@+id/WelcomeIntro"
+        android:layout_above="@+id/DeviceListWelcomeIntro"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:paddingLeft="24dp"

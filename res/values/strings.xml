@@ -95,7 +95,7 @@
     <string name="deviceListIconDesc">Image depicting 3 servers on a network</string>
     <string name="ViewDeviceActivitySubtitle">Swipe to see other devices</string>
     <string name="DeviceListWelcomeTitle">Infrastructure List</string>
-    <string name="DeviceListWelcome">Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris.\n\n Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium.\n\nQui animated corpse, cricket bat max brucks terribilem incessu zomby.</string>
+    <string name="DeviceListWelcome">Hello this is a shorter string</string>
     
     <!-- Manage Database -->
     <string name="mgeDBRefreshDesc">Image depicting the refreshing of the local cache</string>
@@ -146,6 +146,7 @@
     <string-array name="drawer_array">
         <item>Infrastructure</item>
         <item>Manage Database</item>
+        <item>View Groups</item>
         <item>Settings</item>
         <item>Configure Rhybudd Push</item>
         <item>Help</item>

@@ -18,13 +18,11 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,7 +32,6 @@ import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.bugsense.trace.BugSenseHandler;
@@ -220,7 +217,7 @@ public class ViewZenossEventFragment extends Fragment {
     {
         super.onSaveInstanceState(outState);
 
-        Log.e("Saving","Saving some data");
+        //Log.e("Saving","Saving some data");
 
         outState.putString("Title",Title.getText().toString());
         outState.putString("Component",Component.getText().toString());
@@ -264,7 +261,7 @@ public class ViewZenossEventFragment extends Fragment {
     {
         if(null != bundle)
         {
-            Log.e("Saving","Found a bundle!!!!");
+            //Log.e("Saving","Found a bundle!!!!");
 
             if(bundle.containsKey("eventStateAcknowledged") && bundle.getBoolean("eventStateAcknowledged"))
             {
@@ -334,7 +331,7 @@ public class ViewZenossEventFragment extends Fragment {
         }
         else
         {
-            Log.e("Saving","Didn't find any data so getting it");
+            //Log.e("Saving","Didn't find any data so getting it");
             preLoadData();
         }
 
@@ -346,7 +343,7 @@ public class ViewZenossEventFragment extends Fragment {
     {
         super.onResume();
 
-        Log.e("Saving","Resuming");
+        //Log.e("Saving","Resuming");
     }
 
     /**
@@ -384,7 +381,7 @@ public class ViewZenossEventFragment extends Fragment {
 
                         try
                         {
-                            Log.e("Ack",EventDetails.getString("eventState"));
+                            //Log.e("Ack",EventDetails.getString("eventState"));
                             if (EventDetails.getString("eventState").equals("Acknowledged") ||EventDetails.getString("eventState").equals("1") )
                             {
                                 ackIcon.setImageResource(R.drawable.ic_acknowledged);
@@ -426,7 +423,7 @@ public class ViewZenossEventFragment extends Fragment {
 
                             Summary.setText(Html.fromHtml(EventDetails.getString("message"), null, null));
 
-                            Log.i("Summary", EventDetails.getString("message"));
+                            //Log.i("Summary", EventDetails.getString("message"));
 
                             try
                             {

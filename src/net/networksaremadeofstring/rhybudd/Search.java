@@ -20,7 +20,6 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -31,7 +30,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -168,12 +166,12 @@ public class Search extends Activity
 				if(listOfZenossDevices!= null && listOfZenossDevices.size() > 0)
 				{
 					DeviceCount = listOfZenossDevices.size();
-					Log.i("DeviceList","Found DB Data!");
+					//Log.i("DeviceList","Found DB Data!");
 					searchResultsHandler.sendEmptyMessage(0);
 				}
 				else
 				{
-					Log.i("DeviceList","No DB data found, querying API directly");
+					//Log.i("DeviceList","No DB data found, querying API directly");
 					Message msg = new Message();
 					Bundle bundle = new Bundle();
 					bundle.putString("exception","A query to both the local DB returned no devices");

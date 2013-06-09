@@ -24,7 +24,6 @@ import android.view.*;
 import android.widget.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -37,7 +36,6 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.View.OnClickListener;
 import com.bugsense.trace.BugSenseHandler;
 
@@ -189,7 +187,7 @@ public class ViewZenossEvent extends Activity
                         {
                             e.printStackTrace();
                         }
-                        Log.e("EventDetails",EventDetails.toString(3));
+                        //Log.e("EventDetails",EventDetails.toString(3));
 
 						try
 						{
@@ -229,7 +227,7 @@ public class ViewZenossEvent extends Activity
 							//Summary.setText(Html.fromHtml(EventDetails.getString("message")));
 							
 							//((ImageView) findViewById(R.id.summaryImage)).setImageDrawable(p.drawable);
-							Log.i("Summary",EventDetails.getString("message"));
+							//Log.i("Summary",EventDetails.getString("message"));
 							
 							//((TextView) findViewById(R.id.Summary)).setVisibility(View.GONE);
 							//((WebView) findViewById(R.id.summaryWebView)).loadData(EventDetails.getString("message"), "text/html", null);

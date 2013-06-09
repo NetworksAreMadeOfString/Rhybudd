@@ -22,12 +22,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
 
-/**
- * Created by Gareth on 26/05/13.
- */
+
 public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentService
 {
     private NotificationManager mNM;
@@ -40,7 +37,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     @Override
     protected void onError(Context arg0, String arg1)
     {
-        Log.e("GCMIntentService", "Error");
+        //Log.e("GCMIntentService", "Error");
     }
 
     @Override
@@ -94,7 +91,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 
             try
             {
-                Log.v("GCMPayload",alertCount + " / " +
+                /*Log.v("GCMPayload",alertCount + " / " +
                         evid + " / " +
                         device + " / " +
                         summary + " / " +
@@ -103,7 +100,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                         event_class + " / " +
                         event_class_key + " / " +
                         sent
-                );
+                );*/
 
                 //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
                 ZenossEvent gcmEvent = new ZenossEvent( evid,   99999, prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
@@ -124,7 +121,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                 BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
 
                 e.printStackTrace();
-                Log.e("GCMPayload",alertCount + " / " +
+                /*Log.e("GCMPayload",alertCount + " / " +
                         evid + " / " +
                         device + " / " +
                         summary + " / " +
@@ -133,7 +130,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                         event_class + " / " +
                         event_class_key + " / " +
                         sent
-                );
+                );*/
             }
         }
         else if(purpose.equals("ack"))

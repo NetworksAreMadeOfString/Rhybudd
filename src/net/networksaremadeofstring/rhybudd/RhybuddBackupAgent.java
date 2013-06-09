@@ -20,7 +20,7 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.SharedPreferencesBackupHelper;
-import android.util.Log;
+//import android.util.Log;
 
 public class RhybuddBackupAgent extends BackupAgentHelper 
 {
@@ -34,7 +34,7 @@ public class RhybuddBackupAgent extends BackupAgentHelper
     @Override
     public void onCreate() 
     {
-    	Log.i("Backup","Backup called!");
+    	//Log.i("Backup","Backup called!");
         SharedPreferencesBackupHelper helper = new SharedPreferencesBackupHelper(this,"net.networksaremadeofstring.rhybudd_preferences");
         addHelper(PREFS_BACKUP_KEY, helper);
     }

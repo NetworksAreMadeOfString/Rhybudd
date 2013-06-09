@@ -25,17 +25,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import com.bugsense.trace.BugSenseHandler;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -45,10 +39,8 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -61,7 +53,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.*;
 import java.security.*;
@@ -137,7 +128,7 @@ public class ZenossAPI
         String rawJSON = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
         JSONObject json = new JSONObject(rawJSON);
-        Log.i("getPushKey", rawJSON);
+        //Log.i("getPushKey", rawJSON);
 
         if(json.has("pushkey"))
         {
@@ -194,7 +185,7 @@ public class ZenossAPI
         HttpResponse response = httpclient.execute(httpost);
         String rawJSON = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-        Log.e("rawJSON",rawJSON);
+        //Log.e("rawJSON",rawJSON);
         //JSONObject json = new JSONObject(rawJSON);
         //return json.getJSONObject("result").getBoolean("success");
     }
@@ -249,7 +240,7 @@ public class ZenossAPI
             HttpResponse response = httpclient.execute(httpost);
             String rawJSON = EntityUtils.toString(response.getEntity());
             response.getEntity().consumeContent();
-            Log.e("rawJSON",rawJSON);
+            //Log.e("rawJSON",rawJSON);
             json = new JSONObject(rawJSON);
         }
         catch(Exception e)
@@ -386,7 +377,7 @@ public class ZenossAPI
             HttpResponse response = httpclient.execute(httpost);
             String RawJSON = EntityUtils.toString(response.getEntity());
 
-            Log.e("eventsRawJSON",RawJSON);
+            //Log.e("eventsRawJSON",RawJSON);
 
             try
             {
@@ -910,7 +901,7 @@ public class ZenossAPI
         //String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        Log.i("Raw", eventsRawJSON);
+        //Log.i("Raw", eventsRawJSON);
         response.getEntity().consumeContent();
 
         JSONObject json = new JSONObject(eventsRawJSON);
@@ -977,7 +968,7 @@ public class ZenossAPI
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-        Log.e("GetDevice",test);
+        //Log.e("GetDevice",test);
         try
         {
             JSONObject json = new JSONObject(test);
@@ -1027,6 +1018,53 @@ public class ZenossAPI
     }
 
 
+    public String[] GetGroups() throws JSONException, ClientProtocolException, IOException
+    {
+        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/device_router");
+
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        JSONArray data = new JSONArray();
+
+        JSONObject dataObject = new JSONObject();
+        //dataObject.put("drange", "129600");
+        data.put(dataObject);
+
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "DeviceRouter");
+        reqData.put("method", "getGroups");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+
+        httpost.setEntity(new StringEntity(reqData.toString()));
+
+        /*JSONArray Wrapper = new JSONArray();
+        Wrapper.put(reqData);
+        httpost.setEntity(new StringEntity(Wrapper.toString()));*/
+
+        String groupsJSON = (String) httpclient.execute(httpost, responseHandler);
+        //Log.e("groupsJSON",groupsJSON);
+        JSONObject json = new JSONObject(groupsJSON);
+
+        JSONArray groups = json.getJSONObject("result").getJSONArray("groups");
+
+        int groupLength = groups.length();
+
+        String[] groupsList = new String[groupLength];
+
+        for(int i = 0; i < groupLength; i++)
+        {
+            JSONObject groupObj = (JSONObject) groups.get(i);
+
+            groupsList[i] = groupObj.getString("name");
+        }
+
+        return groupsList;
+    }
+
+
     public Drawable GetGraph(String urlString) throws IOException, URISyntaxException
     {
         HttpGet httpRequest = new HttpGet(new URL(ZENOSS_INSTANCE + urlString).toURI());
@@ -1034,7 +1072,7 @@ public class ZenossAPI
         HttpEntity entity = response.getEntity();
         BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
         final long contentLength = bufHttpEntity.getContentLength();
-        Log.e("GetGraph",Long.toString(contentLength));
+        //Log.e("GetGraph",Long.toString(contentLength));
         if (contentLength >= 0)
         {
             InputStream is = bufHttpEntity.getContent();

@@ -20,12 +20,10 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -37,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -54,7 +50,6 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.scheme.SocketFactory;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -70,12 +65,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-//import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -250,7 +243,7 @@ public class ZenossAPIv2
 	{
 		List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
 		JSONObject devices = this.GetDevices();
-        Log.e("devices",devices.toString(3));
+        //Log.e("devices",devices.toString(3));
 		//Log.e("GetRhybyddDevices",devices.toString(2));
 		int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
 		try
@@ -732,7 +725,7 @@ public class ZenossAPIv2
     	//String eventsRawJSON = httpclient.execute(httpost, responseHandler);
         HttpResponse response = httpclient.execute(httpost);
         String eventsRawJSON = EntityUtils.toString(response.getEntity());
-        Log.i("Raw", eventsRawJSON);
+        //Log.i("Raw", eventsRawJSON);
         response.getEntity().consumeContent();
         
 		JSONObject json = new JSONObject(eventsRawJSON);

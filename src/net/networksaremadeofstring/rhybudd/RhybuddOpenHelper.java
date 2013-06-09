@@ -22,7 +22,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
 
 public class RhybuddOpenHelper extends SQLiteOpenHelper
@@ -82,7 +81,7 @@ public class RhybuddOpenHelper extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        Log.v("onUpgrade", "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+        //Log.v("onUpgrade", "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
         try
         {
             db.execSQL("DROP TABLE IF EXISTS events");

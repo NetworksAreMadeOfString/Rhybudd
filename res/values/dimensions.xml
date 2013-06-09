@@ -24,4 +24,7 @@
     <dimen name="WelcomePadding">16dp</dimen>
     <dimen name="DeviceDetailsPadding">8dp</dimen>
 
+    <!-- View Groups -->
+    <integer name="GridColumns">2</integer>
+
 </resources>

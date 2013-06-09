@@ -6,4 +6,7 @@
     <dimen name="ListViewPaddMarg">8dp</dimen>
     <dimen name="WelcomePadding">24dp</dimen>
     <dimen name="DeviceDetailsPadding">16dp</dimen>
+
+    <!-- View Groups -->
+    <integer name="GridColumns">3</integer>
 </resources>

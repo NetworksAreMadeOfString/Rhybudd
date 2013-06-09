@@ -41,9 +41,6 @@ import com.bugsense.trace.BugSenseHandler;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Gareth on 30/05/13.
- */
 public class ZaasSettingsFragment extends Fragment
 {
 

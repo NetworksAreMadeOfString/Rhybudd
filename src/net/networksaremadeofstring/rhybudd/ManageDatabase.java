@@ -22,7 +22,6 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,7 +33,6 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 

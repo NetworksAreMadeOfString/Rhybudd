@@ -18,7 +18,6 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
-import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -37,9 +36,6 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Gareth on 31/05/13.
- */
 public class ZenossAPIZaas extends ZenossAPI
 {
 
@@ -61,12 +57,6 @@ public class ZenossAPIZaas extends ZenossAPI
     {
         this.PrepareSSLHTTPClient();
 
-        Log.e("Login","LoginLoginLoginLoginLoginLoginLogin");
-        Log.e("Login","LoginLoginLoginLoginLoginLoginLogin");
-        Log.e("Login","LoginLoginLoginLoginLoginLoginLogin");
-        Log.e("Login","LoginLoginLoginLoginLoginLoginLogin");
-        Log.e("Login","LoginLoginLoginLoginLoginLoginLogin");
-
         HttpPost httpost = new HttpPost(credentials.URL + "/zport/acl_users/cookieAuthHelper/login");
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -84,13 +74,13 @@ public class ZenossAPIZaas extends ZenossAPI
         // Consume so we can reuse httpclient
         response.getEntity().consumeContent();
 
-        Log.e("ZAASLogin",credentials.URL);
+        //Log.e("ZAASLogin",credentials.URL);
         //Set the variables for later
         this.ZENOSS_INSTANCE = credentials.URL;
         this.ZENOSS_USERNAME = credentials.UserName;
         this.ZENOSS_PASSWORD = credentials.Password;
 
-        Log.e("CheckLoggedIn", Integer.toString(response.getStatusLine().getStatusCode()));
+        //Log.e("CheckLoggedIn", Integer.toString(response.getStatusLine().getStatusCode()));
 
         return this.CheckLoggedIn();
     }

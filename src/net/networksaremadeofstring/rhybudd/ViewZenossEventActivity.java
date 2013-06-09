@@ -23,13 +23,8 @@ import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import com.bugsense.trace.BugSenseHandler;
-
 import java.util.ArrayList;
-import java.util.Locale;
 
-/**
- * Created by Gareth on 02/06/13.
- */
 public class ViewZenossEventActivity extends FragmentActivity
 {
     SectionsPagerAdapter mSectionsPagerAdapter;

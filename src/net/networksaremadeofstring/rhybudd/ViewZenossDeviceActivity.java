@@ -25,8 +25,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 
 import java.util.ArrayList;
@@ -75,10 +73,10 @@ public class ViewZenossDeviceActivity extends FragmentActivity
 
         for(String str : DeviceIDs)
         {
-            Log.e("test","Comparing " + str + " to " + currentDeviceID);
+            //Log.e("test","Comparing " + str + " to " + currentDeviceID);
             if(str.equals(currentDeviceID))
             {
-                Log.e("test", "----------------FOUND---------------");
+                //Log.e("test", "----------------FOUND---------------");
                 currentIndex = i;
                 break;
             }

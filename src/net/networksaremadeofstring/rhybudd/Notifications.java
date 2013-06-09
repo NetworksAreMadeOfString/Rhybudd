@@ -34,9 +34,6 @@ import android.support.v4.app.NotificationCompat;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * Created by Gareth on 01/06/13.
- */
 public class Notifications
 {
     public static int NOTIFICATION_POLLED_ALERTS = 43523;

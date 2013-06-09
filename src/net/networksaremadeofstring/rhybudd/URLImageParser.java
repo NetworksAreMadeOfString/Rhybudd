@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -31,14 +30,12 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Html.ImageGetter;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -146,7 +143,7 @@ public class URLImageParser implements ImageGetter
 	    	    httpClient.setCredentialsProvider(credProvider);
             }
             
-            Log.i("fetchString",urlString);
+            //Log.i("fetchString",urlString);
             URL url = null;
             URI uri = null;
             

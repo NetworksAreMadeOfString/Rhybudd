@@ -16,7 +16,7 @@ public class DeviceListWelcomeFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.device_list_welcome_fragment, null);
         ((TextView) view.findViewById(R.id.WelcomeTitle)).setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
-        ((TextView) view.findViewById(R.id.WelcomeIntro)).setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        ((TextView) view.findViewById(R.id.DeviceListWelcomeIntro)).setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         return view;
     }
 }

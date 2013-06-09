@@ -25,7 +25,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +76,7 @@ public class AddDeviceFragment extends Fragment
                             {
                                 if(null == mService.API || null == mService.API.ZENOSS_INSTANCE || !mService.API.LoginSuccessful)
                                 {
-                                    Log.e("onlick","Either the API or Zenoss Instance was wrong");
+                                    //Log.e("onlick","Either the API or Zenoss Instance was wrong");
                                     mService.PrepAPI(true,true);
                                 }
 

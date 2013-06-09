@@ -25,10 +25,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +37,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-/**
- * Created by Gareth on 30/05/13.
- */
 public class PushSettingsFragment extends Fragment
 {
     /**
@@ -66,15 +61,15 @@ public class PushSettingsFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        Log.e("onResume","Hello");
+        //Log.e("onResume","Hello");
         if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
         {
-            Log.e("onResume","Set visible");
+            //Log.e("onResume","Set visible");
             ExitButton.setVisibility(View.VISIBLE);
         }
         else
         {
-            Log.e("onResume","Set invisible");
+            //Log.e("onResume","Set invisible");
         }
     }
 

@@ -21,12 +21,8 @@ package net.networksaremadeofstring.rhybudd;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
 
-/**
- * Created by Gareth on 31/05/13.
- */
 public class ZenossCredentials
 {
     String UserName = "";
@@ -55,11 +51,11 @@ public class ZenossCredentials
         this.BAUser = settings.getString("BAUser", "");
         this.BAPassword = settings.getString("BAPassword", "");
 
-        Log.e("ZenossCredentials", UserName);
+        /*Log.e("ZenossCredentials", UserName);
         Log.e("ZenossCredentials", Password);
         Log.e("ZenossCredentials", URL);
         Log.e("ZenossCredentials", BAUser);
-        Log.e("ZenossCredentials", BAPassword);
+        Log.e("ZenossCredentials", BAPassword);*/
     }
 
     public ZenossCredentials(String username, String password, String url)

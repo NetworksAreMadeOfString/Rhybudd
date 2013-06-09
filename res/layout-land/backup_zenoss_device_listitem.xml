@@ -1,0 +1,63 @@
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="6dp"
+        android:paddingTop="4dp" >
+
+        <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:text="TextView" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:id="@+id/DeviceName" android:layout_marginLeft="8dp"></TextView>
+        <LinearLayout android:id="@+id/linearLayout1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/DeviceName" android:layout_alignParentRight="true" android:layout_marginRight="24dp">
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/CriticalImage" android:src="@drawable/severity_critical"></ImageView>
+
+            <TextView
+                android:id="@+id/CriticalCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20px"
+                android:shadowColor="@color/RhybuddTextShadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/WarningRed" >
+
+</TextView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/ErrorImage" android:src="@drawable/severity_error"></ImageView>
+
+            <TextView
+                android:id="@+id/ErrorCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20px"
+                android:shadowColor="@color/RhybuddTextShadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/WarningOrange" >
+
+</TextView>
+            <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/WarningImage" android:src="@drawable/severity_warning"></ImageView>
+
+            <TextView
+                android:id="@+id/WarningCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20px"
+                android:shadowColor="@color/RhybuddTextShadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="0"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/WarningYellow" >
+
+</TextView>
+        </LinearLayout>
+    </RelativeLayout>

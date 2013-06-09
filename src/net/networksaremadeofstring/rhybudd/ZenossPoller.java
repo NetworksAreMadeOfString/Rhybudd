@@ -19,28 +19,22 @@
 package net.networksaremadeofstring.rhybudd;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
-
 import android.os.*;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.bugsense.trace.BugSenseHandler;
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class ZenossPoller extends Service
 {
@@ -102,12 +96,12 @@ public class ZenossPoller extends Service
             //There are some minor differences here
             if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
             {
-                Log.e("PrepAPI","Am ZAAS");
+                //Log.e("PrepAPI","Am ZAAS");
                 API = new ZenossAPIZaas();
             }
             else
             {
-                Log.e("PrepAPI","Am not ZAAS");
+                //Log.e("PrepAPI","Am not ZAAS");
                 API = new ZenossAPICore();
             }
 
@@ -153,7 +147,7 @@ public class ZenossPoller extends Service
 	public void onCreate() 
 	{
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		Log.i("ServiceThread","Service Starting");
+		//Log.i("ServiceThread","Service Starting");
 	
         BugSenseHandler.initAndStartSession(ZenossPoller.this, "44a76a8c");
 
@@ -225,7 +219,7 @@ public class ZenossPoller extends Service
             BugSenseHandler.sendExceptionMessage("ZenossPoller","onDestroy",e);
         }
 
-        Log.e("ZenossPoller","I GOT DESTROYED WTF?!?!?!?!??!?!?!");
+        //Log.e("ZenossPoller","I GOT DESTROYED WTF?!?!?!?!??!?!?!");
 	}
 
 	/*@Override
@@ -239,24 +233,24 @@ public class ZenossPoller extends Service
 	{
 		if(intent != null && intent.getBooleanExtra("events", false))
 		{
-			Log.i("onStartCommand","Received an intent to check for events");
+			//Log.i("onStartCommand","Received an intent to check for events");
 			CheckForEvents();
 		}
 		else if(intent != null && intent.getBooleanExtra("refreshCache", false))
 		{
-			Log.i("onStartCommand","Received an intent to refresh the cache");
+			//Log.i("onStartCommand","Received an intent to refresh the cache");
 			RefreshCache();
 		}
 		else if(intent != null && intent.getBooleanExtra("settingsUpdate", false))
 		{
 			//Refresh our reference to the settings just in case something changed
 			settings = PreferenceManager.getDefaultSharedPreferences(this);
-			Log.i("onStartCommand","Received an intent from the settings Activity");
+			//Log.i("onStartCommand","Received an intent from the settings Activity");
 			PollerCheck();
 		}
 		else
 		{
-			Log.i("onStartCommand","I got started for no particular reason. I should probably do a refresh (but I'm not going too");
+			//Log.i("onStartCommand","I got started for no particular reason. I should probably do a refresh (but I'm not going too");
 			//PollerCheck();
 		}
 
@@ -290,7 +284,7 @@ public class ZenossPoller extends Service
 		}
 		else
 		{
-			Log.i("PollerCheck","Background scanning disabled!");
+			//Log.i("PollerCheck","Background scanning disabled!");
 			Poller.putExtra("events", true);
 			PendingIntent Monitoring = PendingIntent.getService(this, 0, Poller, PendingIntent.FLAG_UPDATE_CURRENT);//PendingIntent.FLAG_UPDATE_CURRENT
 			am.cancel(Monitoring);
@@ -300,7 +294,7 @@ public class ZenossPoller extends Service
 		
 		if(settings.getBoolean("refreshCache", true))
 		{
-			Log.i("PollerCheck","Background cache refresh enabled!");
+			//Log.i("PollerCheck","Background cache refresh enabled!");
 			
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -308,7 +302,7 @@ public class ZenossPoller extends Service
 		}
 		else
 		{
-			Log.i("PollerCheck","Background cache refresh disabled!");
+			//Log.i("PollerCheck","Background cache refresh disabled!");
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
 			am.cancel(CacheRefresh);
@@ -366,7 +360,7 @@ public class ZenossPoller extends Service
 	{
 		if(EventsRefreshInProgress)
 		{
-			Log.i("CheckForEvents","Lock flag in place, skipping this iteration");
+			//Log.i("CheckForEvents","Lock flag in place, skipping this iteration");
 			return;
 		}
 		//Flag must have been false let's set it!

@@ -60,6 +60,13 @@
                   android:label="@string/app_name">
         </activity>
 
+        <activity android:name=".ViewZenossGroupsActivity"
+                  android:label="@string/app_name"
+                  android:parentActivityName=".RhybuddHome">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".RhybuddHome" />
+        </activity>
+
         <activity android:name=".AddDeviceActivity"
                   android:parentActivityName=".DeviceList"
                   android:label="@string/AddDeviceTitle">

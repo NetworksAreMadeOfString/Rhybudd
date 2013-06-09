@@ -21,21 +21,14 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.ListFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by Gareth on 04/06/13.
- */
+
 public class ViewZenossDeviceListActivity extends FragmentActivity implements ViewZenossDeviceListFragment.Callbacks
 {
     private boolean mTwoPane;

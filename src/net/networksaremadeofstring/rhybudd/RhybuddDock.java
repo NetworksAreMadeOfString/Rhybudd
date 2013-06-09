@@ -21,7 +21,6 @@ package net.networksaremadeofstring.rhybudd;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -45,12 +44,10 @@ import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -236,12 +233,12 @@ public class RhybuddDock extends FragmentActivity
 							//The first time this will have ran it'll be null
 							if(adapter == null)
 							{
-								Log.i("APIThread","Sending 0");
+								//Log.i("APIThread","Sending 0");
 								handler.sendEmptyMessage(0);
 							}
 							else
 							{
-								Log.i("APIThread","Sending 0");
+								//Log.i("APIThread","Sending 0");
 								handler.sendEmptyMessage(1);
 							}	
 						}
@@ -303,7 +300,7 @@ public class RhybuddDock extends FragmentActivity
 				}
 				else if(msg.what == 2)
 				{
-					Log.i("Handler","Calling Refresh again!");
+					//Log.i("Handler","Calling Refresh again!");
 					Refresh();
 				}
 				else

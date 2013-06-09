@@ -20,16 +20,13 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
@@ -198,7 +195,7 @@ public class ViewZenossDeviceFragment extends Fragment
     {
         super.onSaveInstanceState(outState);
 
-        Log.e("Saving", "Saving some data");
+        //Log.e("Saving", "Saving some data");
 
         outState.putString("json", deviceJSON.toString());
 

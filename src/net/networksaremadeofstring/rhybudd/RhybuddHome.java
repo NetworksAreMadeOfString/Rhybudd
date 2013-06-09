@@ -51,10 +51,11 @@ public class RhybuddHome extends FragmentActivity
 {
     private static final int INFRASTRUCTURE = 0;
     private static final int MANAGEDATABASE = 1;
-    private static final int SETTINGS = 2;
-    private static final int CONFIGURERHYBUDDPUSH = 3;
-    private static final int HELP = 4;
-    private static final int FEEDBACK = 5;
+    private static final int GROUPS = 2;
+    private static final int SETTINGS = 3;
+    private static final int CONFIGURERHYBUDDPUSH = 4;
+    private static final int HELP = 5;
+    private static final int FEEDBACK = 6;
 
 	SharedPreferences settings = null;
 	ZenossAPIv2 API = null;
@@ -266,6 +267,13 @@ public class RhybuddHome extends FragmentActivity
             {
                 Intent DeviceList = new Intent(RhybuddHome.this, ViewZenossDeviceListActivity.class);
                 RhybuddHome.this.startActivity(DeviceList);
+            }
+            break;
+
+            case GROUPS:
+            {
+                Intent GroupsIntent = new Intent(RhybuddHome.this, ViewZenossGroupsActivity.class);
+                RhybuddHome.this.startActivity(GroupsIntent);
             }
             break;
 

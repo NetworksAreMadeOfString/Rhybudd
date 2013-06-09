@@ -19,32 +19,23 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import org.apache.http.conn.ConnectTimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Gareth on 04/06/13.
- */
 public class ViewZenossDeviceListFragment extends ListFragment
 {
 
