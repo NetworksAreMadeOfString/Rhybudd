@@ -18,6 +18,7 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.bugsense.trace.BugSenseHandler;
@@ -39,7 +41,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-public class ViewZenossEventFragment extends Fragment {
+public class ViewZenossEventFragment extends Fragment
+{
     JSONObject EventObject = null;
     JSONObject EventDetails = null;
     private SharedPreferences settings = null;
@@ -63,6 +66,7 @@ public class ViewZenossEventFragment extends Fragment {
     TextView agent;
     ProgressBar progressbar;
     Boolean isAcknowledged = false;
+    private Callbacks mCallbacks = sDummyCallbacks;
 
     public ViewZenossEventFragment()
     {
@@ -121,8 +125,27 @@ public class ViewZenossEventFragment extends Fragment {
                                     {
                                         progressbar.setVisibility(View.INVISIBLE);
                                         ackIcon.setImageResource(R.drawable.ic_acknowledged);
+                                        mCallbacks.onItemAcknowledged(getArguments().getInt("position"));
                                     }
                                 });
+
+                                RhybuddDataSource datasource = null;
+                                try
+                                {
+                                    datasource = new RhybuddDataSource(getActivity());
+                                    datasource.open();
+                                    datasource.ackEvent(getArguments().getString("EventID"));
+                                }
+                                catch(Exception e)
+                                {
+                                    e.printStackTrace();
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragmentUpdate", "DBUpdate", e);
+                                }
+                                finally
+                                {
+                                    if(null != datasource)
+                                        datasource.close();
+                                }
                             }
                             else
                             {
@@ -153,6 +176,39 @@ public class ViewZenossEventFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    public interface Callbacks
+    {
+        public void onItemAcknowledged(int position);
+    }
+
+    private static Callbacks sDummyCallbacks = new Callbacks()
+    {
+        public void onItemAcknowledged(int position)
+        {
+        }
+    };
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof Callbacks))
+        {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+        Log.e("onAttach", "Attached");
+        mCallbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        // Reset the active callbacks interface to the dummy implementation.
+        mCallbacks = sDummyCallbacks;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -357,17 +413,6 @@ public class ViewZenossEventFragment extends Fragment {
 
         settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        /*try
-        {
-            ((TextView) findViewById(R.id.EventTitle)).setText(getIntent().getStringExtra("Device"));
-            ((TextView) findViewById(R.id.Summary)).setText(Html.fromHtml(getIntent().getStringExtra("Summary")));
-            ((TextView) findViewById(R.id.LastTime)).setText(getIntent().getStringExtra("LastTime"));
-            ((TextView) findViewById(R.id.EventCount)).setText("Count: " + Integer.toString(getIntent().getIntExtra("Count", 0)));
-        } catch (Exception e) {
-            //We don't need to much more than report it because the direct API request will sort it out for us.
-            BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "OnCreate", e);
-        }*/
-
         firstLoadHandler = new Handler()
         {
             public void handleMessage(Message msg)
@@ -526,41 +571,6 @@ public class ViewZenossEventFragment extends Fragment {
                 }
             }
         };
-
-        /*dialog = new ProgressDialog(getActivity());
-        dialog.setTitle("Contacting Zenoss");
-        dialog.setMessage("Please wait:\nLoading Event details....");
-        dialog.show();
-        dataPreload = new Thread() {
-        public void run() {
-            try
-            {
-                if (settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
-                {
-                    API = new ZenossAPIZaas();
-                }
-                else
-                {
-                    API = new ZenossAPICore();
-                }
-
-                ZenossCredentials credentials = new ZenossCredentials(getActivity());
-                API.Login(credentials);
-                EventObject = API.GetEvent(getArguments().getString("EventID"));
-            }
-            catch (Exception e)
-            {
-                firstLoadHandler.sendEmptyMessage(0);
-                BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "DataPreloadThread", e);
-            }
-            finally
-            {
-                firstLoadHandler.sendEmptyMessage(1);
-            }
-        }
-        };
-
-        dataPreload.start();*/
     }
 
     private void preLoadData()

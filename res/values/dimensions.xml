@@ -11,6 +11,9 @@
     <!-- Zenoss Device List Two Pane -->
     <dimen name="FragmentMargins">8dp</dimen>
 
+    <!-- Zenoss Event List Two Pane -->
+    <dimen name="EventListFragmentMargins">0dp</dimen>
+
     <!-- View Zenoss Event -->
     <dimen name="ImageMinHeight">80dp</dimen>
 

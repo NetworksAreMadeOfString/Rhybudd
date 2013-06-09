@@ -80,9 +80,9 @@ public class ZenossAPI
     public static String PREFERENCE_IS_ZAAS = "isZaas";
     public static String SETTINGS_PUSH = "push";
 
-    public static int HANDLER_REDOREFRESH = 800;
+    public static final int HANDLER_REDOREFRESH = 800;
 
-    public static int ACTIVITYRESULT_PUSHCONFIG = 900;
+    public static final int ACTIVITYRESULT_PUSHCONFIG = 900;
 
 
     private String lastException = "";

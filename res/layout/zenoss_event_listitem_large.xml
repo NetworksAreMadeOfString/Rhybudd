@@ -4,7 +4,8 @@
     android:layout_height="fill_parent"
     android:minHeight="64dp"
     android:padding="4dp"
-    android:background="@color/ZenossWhite">
+    android:background="@color/ZenossWhite"
+    android:descendantFocusability="blocksDescendants">
 
     <ImageView
         android:id="@+id/fragment_indicator"

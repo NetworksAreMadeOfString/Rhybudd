@@ -78,7 +78,13 @@
     <string name="deviceDetailsSNMPLocation">SNMP Location</string>
     <string name="deviceDetailsSNMPContact">SNMP Contact</string>
     <string name="deviceDetailsEventsTitle">Events</string>
-    
+
+    <!-- Event List -->
+    <string name="EventListWelcomeTitle">Events Dashboard</string>
+    <string name="EventListWelcomeIntro">The tablet dashboard enables you to interact with your events in several ways.\n\nThe action bar allows you to acknowledge all open events, escalate the details or run a manual refresh.\n\nTapping an event on the left will load the event into this pane. From there you can tap the status icon (a gray circle or green tick) to acknowledge the event and see further details. If the event message contains a html img tag it\'ll be rendered at the top.</string>
+
+
+    <!-- Event Detail -->
     <string name="eventDetailsTitle">Event Details</string>
     <string name="eventDetailsComponentLabel">Component:</string>
     <string name="eventDetailsEventClassLabel">Event Class:</string>

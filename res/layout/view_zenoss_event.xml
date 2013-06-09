@@ -59,7 +59,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ackIcon"
-            android:src="@drawable/ic_unacknowledged"/>
+            android:src="@drawable/ic_unacknowledged"
+            />
     </FrameLayout>
 
     <FrameLayout

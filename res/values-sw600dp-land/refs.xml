@@ -1,3 +1,5 @@
 <resources>
     <item name="view_zenoss_device_list" type="layout">@layout/view_zenoss_device_list_twopane</item>
+
+    <item name="view_zenoss_events_list" type="layout">@layout/view_zenoss_events_list_twopane</item>
 </resources>

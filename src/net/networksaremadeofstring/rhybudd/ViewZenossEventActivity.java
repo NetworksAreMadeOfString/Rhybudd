@@ -25,7 +25,7 @@ import android.support.v4.view.ViewPager;
 import com.bugsense.trace.BugSenseHandler;
 import java.util.ArrayList;
 
-public class ViewZenossEventActivity extends FragmentActivity
+public class ViewZenossEventActivity extends FragmentActivity implements ViewZenossEventFragment.Callbacks
 {
     SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -80,6 +80,13 @@ public class ViewZenossEventActivity extends FragmentActivity
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(currentIndex);
 
+    }
+
+    @Override
+    public void onItemAcknowledged(int position)
+    {
+        //TODO Set the intent on exit so we know to do a refresh
+        //Might not be neccessary because the ACK should be in the DB anyway
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {

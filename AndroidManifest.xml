@@ -14,6 +14,8 @@
     <application android:theme="@style/Theme.Rhybudd_default" android:icon="@drawable/icon"
         android:label="@string/app_name" android:allowClearUserData="true" android:description="@string/Description"
         android:backupAgent="RhybuddBackupAgent" android:allowBackup="true">
+
+        <!--
         <activity android:name=".RhybuddHome"
                   android:label="@string/app_name"
                   android:uiOptions="splitActionBarWhenNarrow"
@@ -25,6 +27,20 @@
             </intent-filter>
             <meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
         </activity>
+        -->
+
+        <activity android:name=".ViewZenossEventsListActivity"
+                  android:label="@string/app_name"
+                  android:uiOptions="splitActionBarWhenNarrow"
+                  android:launchMode="singleTop"
+                  android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
+        </activity>
+
 
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
@@ -62,9 +78,9 @@
 
         <activity android:name=".ViewZenossGroupsActivity"
                   android:label="@string/app_name"
-                  android:parentActivityName=".RhybuddHome">
+                  android:parentActivityName=".ViewZenossEventsListActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value=".RhybuddHome" />
+                       android:value=".ViewZenossEventsListActivity" />
         </activity>
 
         <activity android:name=".AddDeviceActivity"
@@ -95,10 +111,10 @@
         </activity>
 
         <activity android:name=".ViewZenossDeviceActivity"
-                  android:parentActivityName=".RhybuddHome"
+                  android:parentActivityName=".ViewZenossEventsListActivity"
                   android:label="Rhybudd - View Device">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value=".RhybuddHome" />
+                       android:value=".ViewZenossEventsListActivity" />
         </activity>
 		
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
