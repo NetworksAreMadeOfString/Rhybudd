@@ -46,6 +46,14 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
         Bundle extras = intent.getExtras();
         String purpose = extras.getString("purpose","push");
 
+        try
+        {
+            ZenossAPI.updateLastChecked(arg0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         if(purpose.equals("push"))
         {
             //GCM Payload

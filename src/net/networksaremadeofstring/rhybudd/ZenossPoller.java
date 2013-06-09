@@ -328,6 +328,8 @@ public class ZenossPoller extends Service
                         datasource.open();
                         datasource.UpdateRhybuddDevices(listOfZenossDevices);
                         datasource.close();
+
+                        ZenossAPI.updateLastChecked(ZenossPoller.this);
 					}
 					else
 					{

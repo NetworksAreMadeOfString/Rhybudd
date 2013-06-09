@@ -25,6 +25,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
+import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -108,6 +110,16 @@ public class ZenossAPI
         {
             return true;
         }
+    }
+
+    public static void updateLastChecked(Context mContext)
+    {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        Time now = new Time();
+        now.setToNow();
+        Log.e("toMillis", Long.toString(now.toMillis(true)));
+        editor.putLong("lastCheck", now.toMillis(true));
+        editor.commit();
     }
 
     public static String getPushKey() throws IOException, JSONException

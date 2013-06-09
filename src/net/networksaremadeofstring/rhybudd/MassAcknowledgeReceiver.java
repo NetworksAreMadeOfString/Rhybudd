@@ -75,6 +75,25 @@ public class MassAcknowledgeReceiver extends BroadcastReceiver
                         }
 
                         API.AcknowledgeEvents(EventIDs);
+
+
+                        RhybuddDataSource datasource = null;
+                        try
+                        {
+                            datasource = new RhybuddDataSource(context);
+                            datasource.open();
+                            datasource.ackAllEvents(EventIDs);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("MassAcknowledgeReceiver", "DBUpdate", e);
+                        }
+                        finally
+                        {
+                            if(null != datasource)
+                                datasource.close();
+                        }
                     }
                 }
                 catch (Exception e)

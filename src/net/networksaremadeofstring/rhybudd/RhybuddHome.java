@@ -36,6 +36,7 @@ import android.provider.Settings;
 import android.support.v4.app.*;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
@@ -130,7 +131,6 @@ public class RhybuddHome extends FragmentActivity
         //Can't hurt to try and start the service just in case
         startService(new Intent(this, ZenossPoller.class));
 
-        Log.e("-----------------------------------------","OnResume");
         //User is about to see the list of events - no need for them to hang around
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
@@ -158,11 +158,27 @@ public class RhybuddHome extends FragmentActivity
         }
         else
         {
+            boolean lastCheckRequired = false;
+
+            if(null != settings && settings.contains("lastCheck"))
+            {
+                Time now = new Time();
+                now.setToNow();
+                Long timesinceLastRefresh = (now.toMillis(true) - settings.getLong("lastCheck",0));
+                Log.e("timesinceLastRefresh",Long.toString(timesinceLastRefresh));
+                if(timesinceLastRefresh > 900000)
+                {
+                    lastCheckRequired = true;
+                }
+            }
+
             //If we've resumed from one of our own activities we probably don't want to do a full refresh
             //finishStart will force a full refresh if backgroundPolling isn't enabled
+            //if(resumeOnResultPollAPI || lastCheckRequired)
             if(resumeOnResultPollAPI)
             {
                 finishStart(false);
+                //Refresh();
             }
             else
             {
@@ -259,28 +275,28 @@ public class RhybuddHome extends FragmentActivity
             {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
-                startActivity(i);
+                startActivityForResult(i,20);
             }
             break;
 
             case INFRASTRUCTURE:
             {
                 Intent DeviceList = new Intent(RhybuddHome.this, ViewZenossDeviceListActivity.class);
-                RhybuddHome.this.startActivity(DeviceList);
+                RhybuddHome.this.startActivityForResult(DeviceList,20);
             }
             break;
 
             case GROUPS:
             {
                 Intent GroupsIntent = new Intent(RhybuddHome.this, ViewZenossGroupsActivity.class);
-                RhybuddHome.this.startActivity(GroupsIntent);
+                RhybuddHome.this.startActivityForResult(GroupsIntent,20);
             }
             break;
 
             case MANAGEDATABASE:
             {
                 Intent MangeDBIntent = new Intent(RhybuddHome.this, ManageDatabase.class);
-                RhybuddHome.this.startActivity(MangeDBIntent);
+                RhybuddHome.this.startActivityForResult(MangeDBIntent,20);
             }
             break;
 
@@ -462,6 +478,16 @@ public class RhybuddHome extends FragmentActivity
                             datasource.open();
                             datasource.UpdateRhybuddEvents(listOfZenossEvents);
                             datasource.close();
+
+                            try
+                            {
+                                ZenossAPI.updateLastChecked(RhybuddHome.this);
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("RhybuddHome","Updating last setting",e);
+                            }
+
                         }
                         else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
                         {
@@ -476,7 +502,7 @@ public class RhybuddHome extends FragmentActivity
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","General success path",e);
+                        BugSenseHandler.sendExceptionMessage("RhybuddHome","Refresh",e);
                         handler.sendEmptyMessage(999);
                     }
                 }
@@ -510,9 +536,7 @@ public class RhybuddHome extends FragmentActivity
 		ConfigureHandlers();
 
         //In certain cases it's perfectly safe to rely that the DB is up to date.
-        if(settings.getBoolean("AllowBackgroundService", false) ||
-           getIntent().getBooleanExtra("forceRefresh", false) == false ||
-           (!regId.equals("") && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals("")))
+        if(settings.getBoolean("AllowBackgroundService", false) || getIntent().getBooleanExtra("forceRefresh", false) == false || (!regId.equals("") && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals("")))
         {
             Log.i("RhybuddHome","Background polling is enabled OR we are GCM enabled AND we haven't been asked to force a refresh so we're safe to query the DB");
             DBGetThread();
@@ -1024,7 +1048,7 @@ public class RhybuddHome extends FragmentActivity
             case R.id.devices:
             {
                 Intent DeviceList = new Intent(RhybuddHome.this, ViewZenossDeviceListActivity.class);
-                RhybuddHome.this.startActivity(DeviceList);
+                RhybuddHome.this.startActivityForResult(DeviceList,20);
                 return true;
             }
 
@@ -1318,7 +1342,7 @@ public class RhybuddHome extends FragmentActivity
 
                 ViewEventIntent.putStringArrayListExtra("eventnames",EventNames);
                 ViewEventIntent.putStringArrayListExtra("evids",EVIDs);
-                RhybuddHome.this.startActivity(ViewEventIntent);
+                RhybuddHome.this.startActivityForResult(ViewEventIntent,20);
 			}
 		});
 
