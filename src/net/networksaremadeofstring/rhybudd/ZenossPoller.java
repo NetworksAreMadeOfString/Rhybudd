@@ -168,20 +168,27 @@ public class ZenossPoller extends Service
     				Boolean alertsEnabled = settings.getBoolean("AllowBackgroundService", true);
     				if(  null != listOfZenossEvents && listOfZenossEvents.size() > 0)
     				{
-    					EventCount = 0;
-    					for(ZenossEvent event : listOfZenossEvents)
-    					{
-    						if(alertsEnabled && event.isNew() && ZenossAPI.CheckIfNotify(event.getProdState(), event.getDevice(),getApplicationContext(),settings.getBoolean("onlyProductionAlerts", true)))
-    	    				{
-    							EventDetails.add(event.getDevice() + ": " + event.getSummary());
-    	    					EventCount++;
-    	    				}
-    					}
-    					
-    					if(EventCount > 0)
-    					{
-                            Notifications.SendPollNotification(EventCount,EventDetails,getApplicationContext());
-    					}
+                        try
+                        {
+                            EventCount = 0;
+                            for(ZenossEvent event : listOfZenossEvents)
+                            {
+                                if(alertsEnabled && event.isNew() && ZenossAPI.CheckIfNotify(event.getProdState(), event.getDevice(),getApplicationContext(),settings.getBoolean("onlyProductionAlerts", true)))
+                                {
+                                    EventDetails.add(event.getDevice() + ": " + event.getSummary());
+                                    EventCount++;
+                                }
+                            }
+
+                            if(EventCount > 0)
+                            {
+                                Notifications.SendPollNotification(EventCount,EventDetails,getApplicationContext());
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
     				}
     				else
         			{

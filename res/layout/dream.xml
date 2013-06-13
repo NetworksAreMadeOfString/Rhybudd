@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridView
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/DreamGrid"
+    android:numColumns="2"
+    android:stretchMode="columnWidth"
+    android:gravity="center|center_vertical|center_horizontal"
+    android:padding="4dp"
+    android:background="@color/RhybuddOffWhite"></GridView>

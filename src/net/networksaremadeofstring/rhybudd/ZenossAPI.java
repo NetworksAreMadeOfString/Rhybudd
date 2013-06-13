@@ -1024,7 +1024,7 @@ public class ZenossAPI
         HttpResponse response = httpclient.execute(httpost);
         String test = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
-        //Log.e("GetDeviceEvents",test);
+        Log.e("GetDeviceGraphs",test);
         JSONObject json = new JSONObject(test);
         return json;
     }
@@ -1094,7 +1094,7 @@ public class ZenossAPI
             bitmap.compress(Bitmap.CompressFormat.JPEG, 10, out);
 
             return new BitmapDrawable(BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray())));*/
-
+            is.close();
             return new BitmapDrawable(bitmap);
         }
         else

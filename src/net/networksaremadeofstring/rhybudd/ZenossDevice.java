@@ -118,7 +118,8 @@ public class ZenossDevice
 	
 	public String getname()
     {
-    	return this.name;
+        return this.name;
+    	//return (ZenossAPI.md5(this.name).substring(4,12)) + ".networksaremadeofstring.net";
     }
 	
 	public String getuid()

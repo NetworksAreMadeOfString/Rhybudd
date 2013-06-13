@@ -163,6 +163,15 @@
             </intent-filter>
         </receiver>
 
+
+        <service android:name=".RhybuddDream" android:exported="true"
+                 android:icon="@drawable/ic_acknowledged" android:label="Rhybudd Dream" >
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
         <!-- <receiver android:name="ManageUpdate">
 		  <intent-filter>
 		    <action android:name="android.intent.action.PACKAGE_REPLACED" />
