@@ -771,7 +771,7 @@ public class RhybuddHome extends FragmentActivity
                         catch(Exception e)
                         {
                             e.printStackTrace();
-                            BugSenseHandler.sendExceptionMessage("RhybuddHome","AckEventHandler",e);
+                            BugSenseHandler.sendExceptionMessage("RhybuddHome","AckEventsHandler",e);
                         }
                         finally
                         {
@@ -819,7 +819,7 @@ public class RhybuddHome extends FragmentActivity
 				}
 				catch(Exception e)
 				{
-					//BugSenseHandler.log("AckEventHandler", e);
+					//BugSenseHandler.log("AckEventsHandler", e);
 				}
 			}
 		};

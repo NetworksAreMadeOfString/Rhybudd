@@ -27,46 +27,50 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ZenossWidget extends AppWidgetProvider 
 {
-
-	ZenossAPIv2 API = null;
 	private SharedPreferences settings = null;
-	/*JSONObject EventsObject = null;
-	JSONArray Events = null;*/
 	private int EventCount = 0;
 	Thread dataPreload;
 	volatile Handler handler = null;
 	private int CritCount = 0, ErrCount = 0, WarnCount = 0;
 	List<ZenossEvent> tempZenossEvents = new ArrayList<ZenossEvent>();
-	
+	private final static String CRITCOUNT = "CRITCOUNT";
+    private final static String WARNCOUNT = "WARNCOUNT";
+    private final static String ERRCOUNT = "ERRCOUNT";
+    private final static int WHAT = 0;
+
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) 
     {
         final int N = appWidgetIds.length;
         
-        if(settings == null)
-			settings = PreferenceManager.getDefaultSharedPreferences(context);
+        /*if(settings == null)
+			settings = PreferenceManager.getDefaultSharedPreferences(context);*/
         
         handler = new Handler() 
     	{
     		public void handleMessage(Message msg) 
     		{
+                Log.e("Widget", "handleMessage");
+
 				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
-				Intent intent = new Intent(context, RhybuddHome.class);
+				Intent intent = new Intent(context, ViewZenossEventsListActivity.class);
 				intent.putExtra("forceRefresh", true);
 	            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	            
 				for (int i=0; i<N; i++) 
 		        {
 					int appWidgetId = appWidgetIds[i];
-					views.setTextViewText(R.id.CriticalCount, Integer.toString(CritCount));
-					views.setTextViewText(R.id.WarningCount, Integer.toString(WarnCount));
-					views.setTextViewText(R.id.ErrorCount, Integer.toString(ErrCount));
+					views.setTextViewText(R.id.CriticalCount, Integer.toString(msg.getData().getInt(CRITCOUNT,0)));
+					views.setTextViewText(R.id.WarningCount, Integer.toString(msg.getData().getInt(WARNCOUNT,0)));
+					views.setTextViewText(R.id.ErrorCount, Integer.toString(msg.getData().getInt(ERRCOUNT,0)));
 					
 					views.setOnClickPendingIntent(R.id.linearLayout1, pendingIntent);
 					views.setOnClickPendingIntent(R.id.CriticalCount, pendingIntent);
@@ -75,87 +79,28 @@ public class ZenossWidget extends AppWidgetProvider
 					
 					
 					appWidgetManager.updateAppWidget(appWidgetId, views);
-					//Log.i("handler","Told the widget to update");
+					Log.i("handler","Told the widget to update");
 		        }
     		}
     	};
     	
-    	Refresh();
+    	Refresh(context);
     }
     
-    private void Refresh()
+    private void Refresh(final Context context)
     {
-    	CritCount = 0;
-    	ErrCount = 0;
-    	WarnCount = 0;
-    	
-    	((Thread) new Thread() 
+    	new Thread()
 		{  
 			public void run() 
 			{
-				try
-				{
-					//tempZenossEvents = rhybuddCache.GetRhybuddEvents();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					//tempZenossEvents.clear();
-					tempZenossEvents = null;
-				}
+                CritCount = 0;
+                ErrCount = 0;
+                WarnCount = 0;
 
-				if(tempZenossEvents!= null)
-				{
-					//Log.i("CountWidget","Found DB Data!");
-					handler.sendEmptyMessage(1);
-				}
-				else
-				{
-					//Log.i("CountWidget","No DB data found, querying API directly");
-					//handler.sendEmptyMessage(2);
-					try
-					{
-						if(API == null)
-						{
-							if(settings.getBoolean("httpBasicAuth", false))
-							{
-								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
-							}
-							else
-							{
-								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							}
-						}
-						
-						try 
-						{
-							if(API != null)
-							{
-								tempZenossEvents = API.GetRhybuddEvents(true,
-										true,
-										true,
-										false,
-										false,
-										true,
-										null,
-										null);
-							}
-							else
-							{
-								tempZenossEvents = null;
-								handler.sendEmptyMessage(999);
-							}
-						}
-						catch(Exception e)
-						{
-							handler.sendEmptyMessage(999);
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
+                RhybuddDataSource datasource = new RhybuddDataSource(context);
+                datasource.open();
+                tempZenossEvents = datasource.GetRhybuddEvents();
+                datasource.close();
 				
 				if(tempZenossEvents != null)
 				{
@@ -173,12 +118,19 @@ public class ZenossWidget extends AppWidgetProvider
 	    					WarnCount++;
 	    			}
 					tempZenossEvents = null;
-					API = null;
 				}
-				
+
+                Bundle bundle = new Bundle();
+                Message msg = new Message();
+                bundle.putInt(CRITCOUNT,CritCount);
+                bundle.putInt(ERRCOUNT,ErrCount);
+                bundle.putInt(WARNCOUNT,WarnCount);
+                msg.setData(bundle);
+                msg.what = WHAT;
+
 				//No matter what send an update
-				handler.sendEmptyMessage(0);
+				handler.sendMessage(msg);
 			}
-		}).start();
+		}.start();
     }
 }

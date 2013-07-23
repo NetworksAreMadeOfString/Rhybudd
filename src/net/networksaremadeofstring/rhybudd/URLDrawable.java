@@ -18,6 +18,7 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +28,11 @@ public class URLDrawable extends BitmapDrawable
     // the drawable that you need to set, you could set the initial drawing
     // with the loading image if you need to
     protected Drawable drawable;
+
+    public URLDrawable(Context c)
+    {
+        drawable = c.getResources().getDrawable(R.drawable.nack);
+    }
 
     @Override
     public void draw(Canvas canvas) 

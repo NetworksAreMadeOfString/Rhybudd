@@ -255,6 +255,7 @@ public class ZenossEvent
     
     public void setAcknowledged()
     {
+        this.inProgress = false;
     	this.eventState = "Acknowledged";
     }
     

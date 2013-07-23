@@ -36,6 +36,7 @@ public class MassAcknowledgeReceiver extends BroadcastReceiver
     {
         //Log.e("MassAcknowledgeReceiver", "Acknowledging all");
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
+        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
         settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         ((Thread) new Thread()

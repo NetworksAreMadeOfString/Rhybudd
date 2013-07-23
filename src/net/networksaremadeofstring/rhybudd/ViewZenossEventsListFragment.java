@@ -19,8 +19,6 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.*;
 import android.os.Bundle;
@@ -28,7 +26,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.*;
@@ -66,7 +63,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     private int mActivatedPosition = ListView.INVALID_POSITION;
     ProgressDialog dialog;
     int retryCount = 0;
-    Handler eventsListHandler, AckEventHandler;
+    Handler eventsListHandler, AckEventsHandler, AckSingleEventHandler;
     ZenossEventsAdaptor adapter;
 
     public List<ZenossEvent> getListOfEvents()
@@ -96,6 +93,76 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         listOfZenossEvents.get(position).setAcknowledged();
         adapter.notifyDataSetChanged();
+    }
+
+    public void setInProgress(int position)
+    {
+        listOfZenossEvents.get(position).setProgress(true);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void acknowledgeSingleEvent(final int position)
+    {
+        Log.e("acknowledgeSingleEvent","Am in acknowledgeSingleEvent with position " + Integer.toString(position));
+
+        setInProgress(position);
+
+        new Thread()
+        {
+            public void run()
+            {
+                Message msg = new Message();
+                Bundle bndle = new Bundle();
+                msg.what = ACKEVENTHANDLER_FAILURE;
+                bndle.putInt("position",position);
+                msg.setData(bndle);
+                try
+                {
+                    if (null != mService && mBound)
+                    {
+                        try
+                        {
+                            if(null == mService.API)
+                            {
+                                Log.e("acknowledgeSingleEvent","mService.API was null");
+                                mService.PrepAPI(true,true);
+                            }
+                            Log.e("acknowledgeSingleEvent","Logging in...");
+                            ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                            mService.API.Login(credentials);
+
+                            Log.e("acknowledgeSingleEvent","Acknowledging event");
+                            mService.API.AcknowledgeEvent(listOfZenossEvents.get(position).getEVID());
+
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                            msg.what = ACKEVENTHANDLER_FAILURE;
+                        }
+                    }
+                    else
+                    {
+                        //AckSingleEventHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                        msg.what = ACKEVENTHANDLER_FAILURE;
+                    }
+
+                    //TODO Check it actually succeeded
+                    //AckSingleEventHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                    msg.what = ACKEVENTHANDLER_SUCCESS;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    //AckSingleEventHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                    msg.what = ACKEVENTHANDLER_FAILURE;
+                }
+
+                Log.e("acknowledgeSingleEvent","Sending Handler message");
+                AckSingleEventHandler.sendMessage(msg);
+            }
+        }.start();
     }
 
     public ViewZenossEventsListFragment(){}
@@ -156,6 +223,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             case R.id.resolveall:
             {
+                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_PROGRESS);
                 final List<String> EventIDs = new ArrayList<String>();
 
 
@@ -164,13 +232,10 @@ public class ViewZenossEventsListFragment extends ListFragment
                     if(!evt.getEventState().equals("Acknowledged"))
                     {
                         evt.setProgress(true);
-                        //AckEventHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                        //AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
                         EventIDs.add(evt.getEVID());
                     }
                 }
-
-
-                AckEventHandler.sendEmptyMessage(ACKEVENTHANDLER_PROGRESS);
 
                 new Thread()
                 {
@@ -200,16 +265,16 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                             else
                             {
-                                AckEventHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
                             }
 
                             //TODO Check it actually succeeded
-                            AckEventHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                            AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
-                            AckEventHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                            AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
                         }
                     }
                 }.start();
@@ -307,21 +372,17 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     private void configureHandlers()
     {
-        AckEventHandler = new Handler()
+        AckSingleEventHandler = new Handler()
         {
             public void handleMessage(Message msg)
             {
+                Log.e("AckSingleEventHandler",Integer.toString(msg.what) + " / " + Integer.toString(msg.getData().getInt("position")));
                 switch(msg.what)
                 {
                     case ACKEVENTHANDLER_PROGRESS:
                     {
-                        /*for (ZenossEvent evt : listOfZenossEvents)
-                        {
-                            if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
-                            {
-                                evt.setProgress(true);
-                            }
-                        }*/
+                        listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(true);
+
                         if(adapter != null)
                             adapter.notifyDataSetChanged();
                     }
@@ -329,14 +390,9 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_SUCCESS:
                     {
-                        for (ZenossEvent evt : listOfZenossEvents)
-                        {
-                            if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
-                            {
-                                evt.setProgress(false);
-                                evt.setAcknowledged();
-                            }
-                        }
+                        listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
+                        listOfZenossEvents.get(msg.getData().getInt("position")).setAcknowledged();
+                        listOfZenossEvents.get(msg.getData().getInt("position")).setownerID("by you");
 
                         RhybuddDataSource datasource = null;
 
@@ -366,6 +422,81 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_FAILURE:
                     {
+                        listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
+
+                        if(adapter != null)
+                            adapter.notifyDataSetChanged();
+
+                        Toast.makeText(getActivity(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                }
+            }
+        };
+
+
+        AckEventsHandler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                switch(msg.what)
+                {
+                    case ACKEVENTHANDLER_PROGRESS:
+                    {
+                        for (ZenossEvent evt : listOfZenossEvents)
+                        {
+                            if(!evt.getEventState().equals("Acknowledged"))
+                            {
+                                evt.setProgress(true);
+                            }
+                        }
+
+                        if(adapter != null)
+                            adapter.notifyDataSetChanged();
+                    }
+                    break;
+
+
+                    case ACKEVENTHANDLER_SUCCESS:
+                    {
+                        for (ZenossEvent evt : listOfZenossEvents)
+                        {
+                            if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                            {
+                                evt.setProgress(false);
+                                evt.setAcknowledged();
+                                evt.setownerID("by you");
+                            }
+                        }
+
+                        RhybuddDataSource datasource = null;
+
+                        try
+                        {
+                            //TODO maybe do this with the bunch of ack id's we have in the thread?
+                            datasource = new RhybuddDataSource(getActivity());
+                            datasource.open();
+                            datasource.UpdateRhybuddEvents(listOfZenossEvents);
+
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("RhybuddHome","AckEventsHandler",e);
+                        }
+                        finally
+                        {
+                            if(null != datasource)
+                                datasource.close();
+                        }
+
+                        if(adapter != null)
+                            adapter.notifyDataSetChanged();
+                    }
+                    break;
+
+                    case ACKEVENTHANDLER_FAILURE:
+                    {
                         for (ZenossEvent evt : listOfZenossEvents)
                         {
                             if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
@@ -377,7 +508,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                         if(adapter != null)
                             adapter.notifyDataSetChanged();
 
-                        Toast.makeText(getActivity(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 }
@@ -546,8 +677,15 @@ public class ViewZenossEventsListFragment extends ListFragment
                             tempZenossEvents.clear();
 
                         //Can we get away with just calling refresh now?
-                        //TODO This needs to be sent as a runnable or something
-                        Refresh();
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            public void run()
+                            {
+                                //TODO This needs to be sent as a runnable or something
+                                Refresh();
+                            }
+                        });
+
                     }
                     catch(Exception e)
                     {

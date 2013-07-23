@@ -3,7 +3,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/RhybuddOffWhite" >
-    
+    
+
+
     <View
         android:id="@+id/Background"
         android:layout_width="4dp"
@@ -12,7 +14,11 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/event_fragment_border"
         android:visibility="visible" />
-
+
+
+
+
+
     <TextView
         android:id="@+id/EventTitle"
         android:layout_width="wrap_content"
@@ -30,7 +36,13 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/ComponantLabel"
         android:layout_width="wrap_content"
@@ -44,7 +56,12 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
+
     <TextView
         android:id="@+id/Componant"
         android:layout_width="wrap_content"
@@ -57,7 +74,13 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/EventClassLabel"
         android:layout_width="wrap_content"
@@ -71,7 +94,11 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/EventClass"
         android:layout_width="wrap_content"
@@ -83,7 +110,13 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/SummaryLabel"
         android:layout_width="wrap_content"
@@ -97,7 +130,11 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/Summary"
         android:layout_width="wrap_content"
@@ -105,11 +142,18 @@
         android:layout_alignLeft="@+id/EventClass"
         android:layout_below="@+id/SummaryLabel"
         android:text="TextView"
+        android:textColorLink="@color/ZenossDarkBlue"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/StartTimeLabel"
         android:layout_width="wrap_content"
@@ -124,7 +168,13 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/EndTimeLabel"
         android:layout_width="wrap_content"
@@ -138,7 +188,11 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/FirstTime"
         android:layout_width="wrap_content"
@@ -151,7 +205,11 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/LastTime"
         android:layout_width="wrap_content"
@@ -165,7 +223,13 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/EventCountLabel"
         android:layout_width="wrap_content"
@@ -180,7 +244,11 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/EventCount"
         android:layout_width="wrap_content"
@@ -194,7 +262,13 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
+
+
+
+
+
     <TextView
         android:id="@+id/AgentLabel"
         android:layout_width="wrap_content"
@@ -209,7 +283,11 @@
         android:textStyle="bold" >
 
 </TextView>
-
+
+
+
+
+
     <TextView
         android:id="@+id/Agent"
         android:layout_width="wrap_content"
@@ -223,14 +301,17 @@
         android:textColor="@color/RhybuddStdText" >
 
 </TextView>
-
+
+
     <LinearLayout
         android:id="@+id/ButtonHolder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Agent"
         android:layout_centerHorizontal="true" >
-
+
+
+
         <Button
             android:id="@+id/AcknowledgeEvent"
             android:layout_width="wrap_content"

@@ -1199,7 +1199,7 @@ public class ZenossAPI
         response.getEntity().consumeContent();
 
         JSONObject json = new JSONObject(ackEventReturnJSON);
-        //Log.i("AcknowledgeEvent",json.toString(2));
+        Log.i("AcknowledgeEvent",json.toString(2));
         return json;
     }
 

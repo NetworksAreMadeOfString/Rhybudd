@@ -443,7 +443,10 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             {
                 public void onClick(DialogInterface arg0, int arg1)
                 {
-                    //AcknowledgeSingleEvent(Position);
+                    //AcknowledgeSingleEvent(position);
+                    ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+                    Log.e("Activity","ack with position " + Integer.toString(position));
+                    listFrag.acknowledgeSingleEvent(position);
                 }
             });
 
@@ -481,6 +484,35 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             alertbox.show();
         }
     }
+
+    /*public void AcknowledgeSingleEvent(final int Position)
+    {
+        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+        listFrag.setInProgress(Position);
+
+        ((Thread) new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    //TODO This needs moving to the new API model
+                    ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+                    ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
+
+                    listOfZenossEvents.get(Position).setProgress(false);
+                    listOfZenossEvents.get(Position).setAcknowledged();
+                    AckEventsHandler.sendEmptyMessage(1);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("RhybuddHome","AcknowledgeSingleEvent",e);
+                    AckEventsHandler.sendEmptyMessage(99);
+                }
+            }
+        }).start();
+    }*/
 
     private void doGCMRegistration(final String PushKey)
     {

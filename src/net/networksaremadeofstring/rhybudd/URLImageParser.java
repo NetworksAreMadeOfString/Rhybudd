@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+
+import android.widget.TextView;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -45,21 +47,23 @@ public class URLImageParser implements ImageGetter
     Context c;
     View container;
     Drawable drawable;
-    
+    TextView Summary;
+
     /***
      * Construct the URLImageParser which will execute AsyncTask and refresh the container
      * @param t
      * @param c
      */
-    public URLImageParser(View t, Context c) 
+    public URLImageParser(View t, Context c, TextView summary)
     {
         this.c = c;
         this.container = t;
+        this.Summary = summary;
     }
 
     public Drawable getDrawable(String source) 
     {
-        URLDrawable urlDrawable = new URLDrawable();
+        URLDrawable urlDrawable = new URLDrawable(this.c);
 
         // get the actual source
         ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask( urlDrawable);
@@ -106,6 +110,7 @@ public class URLImageParser implements ImageGetter
             // redraw the image by invalidating the container
             ((ImageView) URLImageParser.this.container).setImageDrawable(result);
             URLImageParser.this.container.invalidate();
+            Summary.invalidate();
         }
 
         /***
@@ -146,9 +151,20 @@ public class URLImageParser implements ImageGetter
             //Log.i("fetchString",urlString);
             URL url = null;
             URI uri = null;
-            
+            int size = container.getWidth();
+
             try
             {
+                urlString = urlString.replaceAll("width=\\d+","width=" + Integer.toString(size));
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+
 	            url = new URL(urlString);
 	            uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 	            //url = uri.toURL();

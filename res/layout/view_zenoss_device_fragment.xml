@@ -90,7 +90,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/SNMPContainer"
             android:paddingLeft="@dimen/DeviceDetailsPadding"
-            android:paddingRight="@dimen/DeviceDetailsPadding">
+            android:paddingRight="@dimen/DeviceDetailsPadding"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -120,9 +122,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text="Uptime: Unknown"
             android:id="@+id/uptime"
-            android:padding="@dimen/DeviceDetailsPadding"/>
+            android:padding="@dimen/DeviceDetailsPadding"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -131,13 +135,15 @@
             android:gravity="center_horizontal"
             android:showDividers="middle"
             android:divider="?android:dividerVertical"
-            android:dividerPadding="8dp">
+            android:dividerPadding="2dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
+                android:text="RAM: ?? GB"
                 android:id="@+id/memory_ram"
                 android:layout_marginRight="12dp"/>
 
@@ -145,7 +151,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
+                android:text="Swap: ? GB"
                 android:id="@+id/memory_swap"
                 android:layout_marginLeft="12dp"/>
         </LinearLayout>
@@ -154,9 +160,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text="Last Collected: Unknown"
             android:id="@+id/lastCollected"
-            android:paddingLeft="@dimen/DeviceDetailsPadding"/>
+            android:paddingLeft="@dimen/DeviceDetailsPadding"
+            android:layout_marginTop="12dp"/>
 
     </LinearLayout>
 

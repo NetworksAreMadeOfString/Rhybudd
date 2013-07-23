@@ -183,6 +183,7 @@
                     android:text="@string/eventDetailsSummaryLabel"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/ZenossLightBlack"
+
                     android:textStyle="bold" >
                 </TextView>
 
@@ -194,6 +195,7 @@
                     android:gravity="bottom"
                     android:linksClickable="true"
                     android:text="TextView"
+                    android:textColorLink="@color/ZenossDarkBlue"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/RhybuddStdText"
                     android:layout_marginLeft="8dp"

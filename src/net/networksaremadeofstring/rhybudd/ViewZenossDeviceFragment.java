@@ -150,20 +150,35 @@ public class ViewZenossDeviceFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.view_zenoss_device_fragment, container, false);
+
+        Typeface titlesTypeFace = Typeface.create("sans-serif-light", Typeface.BOLD);
+
         deviceTitle = (TextView) rootView.findViewById(R.id.DeviceTitle);
-        deviceTitle.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
+        deviceTitle.setTypeface(titlesTypeFace);
+
         loadAverageGraphView = (ImageView) rootView.findViewById(R.id.loadAverageGraph);
         CPUGraphView = (ImageView) rootView.findViewById(R.id.CPUGraph);
         MemoryGraphView = (ImageView) rootView.findViewById(R.id.MemoryGraph);
 
         snmpAgent = (TextView) rootView.findViewById(R.id.snmpAgent);
+        snmpAgent.setTypeface(titlesTypeFace);
         snmpContact = (TextView) rootView.findViewById(R.id.snmpContact);
+        snmpContact.setTypeface(titlesTypeFace);
         snmpLocation = (TextView) rootView.findViewById(R.id.snmpLocation);
+        snmpLocation.setTypeface(titlesTypeFace);
         Uptime = (TextView) rootView.findViewById(R.id.uptime);
+        Uptime.setTypeface(titlesTypeFace);
         MemoryRAM = (TextView) rootView.findViewById(R.id.memory_ram);
+        MemoryRAM.setTypeface(titlesTypeFace);
         MemorySwap = (TextView) rootView.findViewById(R.id.memory_swap);
+        MemorySwap.setTypeface(titlesTypeFace);
         LastCollected = (TextView) rootView.findViewById(R.id.lastCollected);
+        LastCollected.setTypeface(titlesTypeFace);
+
         hsv = (HorizontalScrollView) rootView.findViewById(R.id.horizontalScrollView);
+
+
+
 
         return rootView;
     }
@@ -177,7 +192,7 @@ public class ViewZenossDeviceFragment extends Fragment
             snmpAgent.setText(data.getString("snmpAgent"));
             snmpContact.setText(data.getString("snmpContact"));
             snmpLocation.setText(data.getString("snmpLocation"));
-            Uptime.setText(data.getString("uptime"));
+            Uptime.setText("Uptime:" + data.getString("uptime"));
             MemoryRAM.setText("RAM: " + data.getJSONObject("memory").getString("ram"));
             MemorySwap.setText("Swap: " + data.getJSONObject("memory").getString("swap"));
             LastCollected.setText("Last Collected: " + data.getString("lastCollected"));
@@ -194,8 +209,6 @@ public class ViewZenossDeviceFragment extends Fragment
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-
-        //Log.e("Saving", "Saving some data");
 
         outState.putString("json", deviceJSON.toString());
 
@@ -286,7 +299,6 @@ public class ViewZenossDeviceFragment extends Fragment
                     {
                         credentials = new ZenossCredentials(getActivity());
                         API.Login(credentials);
-                        //API.getDe
                         deviceJSON = API.GetDevice(getArguments().getString(ARG_UID));
 
                         getActivity().runOnUiThread(new Runnable() {
@@ -303,80 +315,85 @@ public class ViewZenossDeviceFragment extends Fragment
                     }
                 }
             }).start();
+        }
 
-            ((Thread) new Thread()
+        getGraphs();
+
+        super.onActivityCreated(bundle);
+    }
+
+    private void getGraphs()
+    {
+        ((Thread) new Thread()
+        {
+            public void run()
             {
-                public void run()
+                try
                 {
-                    try
+                    ZenossAPI API;
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+
+
+                    if( PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
                     {
-                        ZenossAPI API;
-                        Message msg = new Message();
-                        Bundle bundle = new Bundle();
+                        API = new ZenossAPIZaas();
+                    }
+                    else
+                    {
+                        API = new ZenossAPICore();
+                    }
 
 
-                        if( PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
+                    credentials = new ZenossCredentials(getActivity());
+                    API.Login(credentials);
+
+                    JSONObject graphURLs = API.GetDeviceGraphs(getArguments().getString(ARG_UID));
+
+                    int urlCount = graphURLs.getJSONObject("result").getJSONArray("data").length();
+
+                    if(urlCount == 0)
+                    {
+                        errorHandler.sendEmptyMessage(GRAPH_LOAD_FAILURE);
+                    }
+                    else
+                    {
+                        for(int i = 0; i < urlCount; i++)
                         {
-                            API = new ZenossAPIZaas();
-                        }
-                        else
-                        {
-                            API = new ZenossAPICore();
-                        }
-
-
-                        credentials = new ZenossCredentials(getActivity());
-                        API.Login(credentials);
-
-                        JSONObject graphURLs = API.GetDeviceGraphs(getArguments().getString(ARG_UID));
-
-                        int urlCount = graphURLs.getJSONObject("result").getJSONArray("data").length();
-
-                        if(urlCount == 0)
-                        {
-                            errorHandler.sendEmptyMessage(GRAPH_LOAD_FAILURE);
-                        }
-                        else
-                        {
-                            for(int i = 0; i < urlCount; i++)
+                            JSONObject currentGraph = null;
+                            try
                             {
-                                JSONObject currentGraph = null;
-                                try
-                                {
-                                    currentGraph = graphURLs.getJSONObject("result").getJSONArray("data").getJSONObject(i);
+                                currentGraph = graphURLs.getJSONObject("result").getJSONArray("data").getJSONObject(i);
 
-                                    if(currentGraph.getString("title").equals("Load Average"))
-                                    {
-                                        loadAverageGraph = API.GetGraph(currentGraph.getString("url"));
-                                        loadAverageHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
-                                    }
-                                    else if(currentGraph.getString("title").equals("CPU Utilization"))
-                                    {
-                                        CPUGraph = API.GetGraph(currentGraph.getString("url"));
-                                        CPUGraphHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
-                                    }
-                                    else if(currentGraph.getString("title").equals("Memory Utilization"))
-                                    {
-                                        MemoryGraph = API.GetGraph(currentGraph.getString("url"));
-                                        MemoryGraphHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
-                                    }
-                                }
-                                catch(Exception e)
+                                if(currentGraph.getString("title").equals("Load Average"))
                                 {
-                                    e.printStackTrace();
+                                    loadAverageGraph = API.GetGraph(currentGraph.getString("url"));
+                                    loadAverageHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
                                 }
+                                else if(currentGraph.getString("title").equals("CPU Utilization"))
+                                {
+                                    CPUGraph = API.GetGraph(currentGraph.getString("url"));
+                                    CPUGraphHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
+                                }
+                                else if(currentGraph.getString("title").equals("Memory Utilization"))
+                                {
+                                    MemoryGraph = API.GetGraph(currentGraph.getString("url"));
+                                    MemoryGraphHandler.sendEmptyMessage(GRAPH_LOAD_SUCCESS);
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                e.printStackTrace();
                             }
                         }
                     }
-                    catch(Exception e)
-                    {
-                        e.printStackTrace();
-                    }
                 }
-            }).start();
-        }
-
-        super.onActivityCreated(bundle);
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
 

@@ -220,7 +220,7 @@ public class ViewZenossEvent extends Activity
 						{
 							ImageView img = (ImageView) findViewById(R.id.summaryImage);
 							
-							URLImageParser p = new URLImageParser(img, ViewZenossEvent.this);
+							URLImageParser p = new URLImageParser(img, ViewZenossEvent.this, Summary);
 							Spanned htmlSpan = Html.fromHtml(EventDetails.getString("message"), p, null);
 							
 							Summary.setText(htmlSpan);

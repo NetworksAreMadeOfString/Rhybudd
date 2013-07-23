@@ -26,6 +26,5 @@
         android:paddingLeft="16dp"
         android:background="@color/PartialBlackTransparancy"
         android:textColor="@color/RhybuddWhite"
-        android:lines="1"
-        android:ellipsize="end"/>
+        />
 </RelativeLayout>

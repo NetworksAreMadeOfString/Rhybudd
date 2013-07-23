@@ -24,6 +24,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,6 +90,18 @@ public class ViewZenossEventFragment extends Fragment
         agent = (TextView) rootView.findViewById(R.id.Agent);
         logList = (LinearLayout) rootView.findViewById(R.id.LogList);
         progressbar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+
+        Typeface Titles = Typeface.create("sans-serif-light", Typeface.NORMAL);
+        Typeface Subtitles = Typeface.create("sans-serif", Typeface.BOLD);
+
+        Title.setTypeface(Titles);
+        /*EventCount.setTypeface(Titles);
+        ((TextView) rootView.findViewById(R.id.ComponantLabel)).setTypeface(Subtitles);
+        ((TextView) rootView.findViewById(R.id.EventClassLabel)).setTypeface(Subtitles);
+        ((TextView) rootView.findViewById(R.id.StartTimeLabel)).setTypeface(Subtitles);
+        ((TextView) rootView.findViewById(R.id.EndTimeLabel)).setTypeface(Subtitles);
+        ((TextView) rootView.findViewById(R.id.AgentLabel)).setTypeface(Subtitles);
+        ((TextView) rootView.findViewById(R.id.LogLabel)).setTypeface(Subtitles);*/
 
         ackIcon.setOnClickListener(new View.OnClickListener()
         {
@@ -452,9 +465,19 @@ public class ViewZenossEventFragment extends Fragment
                             Component.setText("Unknown Component");
                         }
 
-                        try {
-                            EventClass.setText(EventDetails.getString("eventClassKey"));
-                        } catch (Exception e) {
+                        try
+                        {
+                            if(!EventDetails.getString("eventClassKey").equals(""))
+                            {
+                                EventClass.setText(EventDetails.getString("eventClassKey"));
+                            }
+                            else
+                            {
+                                EventClass.setText("Unknown Event Class");
+                            }
+                        }
+                        catch (Exception e)
+                        {
                             EventClass.setText("Unknown Event Class");
                         }
 
@@ -462,11 +485,16 @@ public class ViewZenossEventFragment extends Fragment
                         {
                             //ImageView img = (ImageView) findViewById(R.id.summaryImage);
 
-                            URLImageParser p = new URLImageParser(img, getActivity());
+                            URLImageParser p = new URLImageParser(img, getActivity(),Summary);
 
-                            Spanned htmlSpan = Html.fromHtml(EventDetails.getString("message"), p, null);
+                            String summaryText = EventDetails.getString("message");
+                            Spanned htmlSpan = Html.fromHtml(summaryText, p, null);
 
-                            Summary.setText(Html.fromHtml(EventDetails.getString("message"), null, null));
+                            Log.e("summary",summaryText);
+                            summaryText = summaryText.replaceAll("<img\\s*src=('|\")([^'>]+)'\\s*/>","");
+                            Log.e("summary2",summaryText);
+
+                            Summary.setText(Html.fromHtml(summaryText, null, null));
 
                             //Log.i("Summary", EventDetails.getString("message"));
 
@@ -476,11 +504,13 @@ public class ViewZenossEventFragment extends Fragment
                             }
                             catch (Exception e)
                             {
+                                e.printStackTrace();
                                 //Worth a shot
                             }
                         }
                         catch (Exception e)
                         {
+                            e.printStackTrace();
                             Summary.setText("No Summary available");
                         }
 
@@ -554,7 +584,12 @@ public class ViewZenossEventFragment extends Fragment
                     }
                     else
                     {
-                        Toast.makeText(getActivity(), "There was an error loading the Event details", Toast.LENGTH_LONG).show();
+                        Log.e("EventObject",EventObject.toString(3));
+                        String errMsg = ".";
+                        if(EventObject.has("type") && EventObject.getString("type").equals("exception") && EventObject.has("message"))
+                            errMsg = ":\n" + EventObject.getString("message");
+
+                        Toast.makeText(getActivity(), "There was an error refreshing the Event details from Zenoss" + errMsg, Toast.LENGTH_LONG).show();
                     }
                 }
                 catch (Exception e)
