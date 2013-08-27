@@ -203,95 +203,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 			}
 		}).start();
     }
-	
-	/*private void ProcessEvents()
-	{
-		dataPreload = new Thread() 
-    	{  
-    		public void run() 
-    		{
-    			//Log.i("Widget","Started!");
-    			CritCount = 0;
-    			WarnCount = 0;
-    			ErrCount = 0;
-    			ZenossAPIv2 API;
-    			
-    			try 
-    			{
-    				API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-    				
-    				EventsObject = API.GetEventsHistory();
-    				
-	    			Events = EventsObject.getJSONObject("result").getJSONArray("events");
-				} 
-    			catch (Exception e) 
-    			{
-    				Log.e("Thread","Fuck up");
-    				handler.sendEmptyMessage(0);
-    				e.printStackTrace();
-				}
-    			
-				try 
-				{
-					if(EventsObject != null)
-					{
-						EventCount = EventsObject.getJSONObject("result").getInt("totalCount");
-						
-						for(int i = 0; i < EventCount; i++)
-		    			{
-		    				JSONObject CurrentEvent = null;
-		    				try 
-		    				{
-			    				CurrentEvent = Events.getJSONObject(i);
 
-			    				if(CurrentEvent.getString("severity").equals("5"))
-			    					CritCount++;
-			    				
-			    				if(CurrentEvent.getString("severity").equals("4"))
-			    					ErrCount++;
-			    				
-			    				if(CurrentEvent.getString("severity").equals("3"))
-			    					WarnCount++;
-		    				}
-		    				catch (JSONException e) 
-		    				{
-		    					//e.printStackTrace();
-		    				}
-		    			}
-					}
-					else
-					{
-	    				//handler.sendEmptyMessage(0);
-					}
-				} 
-				catch (JSONException e) 
-				{
-    				handler.sendEmptyMessage(0);
-    				//e.printStackTrace();
-				}
-
-				Message Msg = new Message();
-				Bundle data = new Bundle();
-				data.putInt("CritCount", CritCount);
-				data.putInt("ErrCount", ErrCount);
-				data.putInt("WarnCount", WarnCount);
-				Msg.setData(data);
-				Msg.what = 1;
-		    	//handler.sendEmptyMessage(0);
-				handler.sendMessage(Msg);
-		    	
-				//Help out the garbage collector
-				EventsObject = null;
-				Events = null;
-				API = null;
-				dataPreload = null;
-				//Log.i("Widget-Thread", Integer.toString(CritCount) + " / " + Integer.toString(ErrCount) + " / " +  Integer.toString(WarnCount));
-    		}
-    	};
-    	
-    	
-    	dataPreload.start();
-	}*/
 	
 	private Bitmap RenderBarGraph(int CritCount, int ErrCount, int WarnCount)
 	{
@@ -332,6 +244,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 		
 		if(Max > 1)
 			canvas.drawText(Integer.toString(Max / 2),  0, 75 , paint );
+
 		canvas.drawText("0",  0, 148 , paint);
 		
 		double divisor = 148 / (double)Max;
