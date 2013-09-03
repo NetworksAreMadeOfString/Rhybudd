@@ -33,6 +33,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -58,6 +61,8 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     private static final int CONFIGURERHYBUDDPUSH = 4;
     private static final int HELP = 5;
     private static final int FEEDBACK = 6;
+    private static final int SEARCH = 7;
+
 
     SharedPreferences settings = null;
 
@@ -82,10 +87,12 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-        getActionBar().setTitle("Rhybudd Events List");
+        getActionBar().setTitle("Zenoss Events List");
         getActionBar().setSubtitle(settings.getString("URL", ""));
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+
+
 
         if (findViewById(R.id.event_detail_container) != null)
         {
@@ -139,6 +146,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
+
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener
     {
@@ -236,6 +244,12 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 {
                     Toast.makeText(ViewZenossEventsListActivity.this, "There was a problem launching your email client.\n\nPlease email Gareth@DataSift.com with your feedback.", Toast.LENGTH_LONG).show();
                 }
+            }
+            break;
+
+            case SEARCH:
+            {
+                onSearchRequested();
             }
             break;
         }

@@ -66,6 +66,10 @@ public class ViewZenossEventsListFragment extends ListFragment
     Handler eventsListHandler, AckEventsHandler, AckSingleEventHandler;
     ZenossEventsAdaptor adapter;
 
+    MenuItem refreshStatus = null;
+    View abprogress = null;
+
+
     public List<ZenossEvent> getListOfEvents()
     {
         return listOfZenossEvents;
@@ -172,6 +176,9 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         super.onCreate(savedInstanceState);
 
+        LayoutInflater inflater2 = (LayoutInflater) getActivity().getSystemService(ViewZenossEventsListActivity.LAYOUT_INFLATER_SERVICE);
+        abprogress = inflater2.inflate(R.layout.progress_wheel, null);
+
         configureHandlers();
     }
 
@@ -214,6 +221,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         inflater.inflate(R.menu.home_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        refreshStatus = menu.findItem(R.id.refresh);
     }
 
     @Override
@@ -529,21 +537,40 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case EVENTSLISTHANDLER_DIALOGUPDATE:
                     {
-                        dialog.setMessage("Refresh Complete!");
-                        this.sendEmptyMessageDelayed(EVENTSLISTHANDLER_SUCCESS,1000);
+                        if(dialog != null && dialog.isShowing())
+                        {
+                            dialog.setMessage("Refresh Complete!");
+                            this.sendEmptyMessageDelayed(EVENTSLISTHANDLER_SUCCESS,1000);
+                        }
+                        else
+                        {
+                            if(null != refreshStatus)
+                            {
+                                refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                                getActivity().invalidateOptionsMenu();
+                            }
+                        }
                     }
                     break;
 
                     case EVENTSLISTHANDLER_SUCCESS:
                     {
-                        try
+                        if(null != refreshStatus)
                         {
-                            if(null != dialog && dialog.isShowing())
-                                dialog.dismiss();
+                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                            getActivity().invalidateOptionsMenu();
                         }
-                        catch (Exception e)
+
+                        if(dialog != null && dialog.isShowing())
                         {
-                            e.printStackTrace();
+                            try
+                            {
+                                dialog.dismiss();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
 
                         adapter = new ZenossEventsAdaptor(getActivity(), listOfZenossEvents);
@@ -553,29 +580,48 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case EVENTSLISTHANDLER_DB_EMPTY:
                     {
-                        if(dialog != null && dialog.isShowing())
+                        if(null != refreshStatus)
                         {
-                            dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                            refreshStatus.setActionView(abprogress);
+                            getActivity().invalidateOptionsMenu();
                         }
                         else
                         {
-                            dialog = new ProgressDialog(getActivity());
-                            dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
-                            //dialog.setCancelable(false);
-                            dialog.show();
+                            Log.e("refreshStatus","refreshStatus was null reverting to using dialog");
+
+                            if(dialog != null && dialog.isShowing())
+                            {
+                                dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                            }
+                            else
+                            {
+                                dialog = new ProgressDialog(getActivity());
+                                dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                                //dialog.setCancelable(false);
+                                dialog.show();
+                            }
                         }
                     }
                     break;
 
                     case EVENTSLISTHANDLER_NO_EVENTS:
                     {
-                        try
+                        if(null != refreshStatus)
                         {
-                            dialog.dismiss();
+                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                            getActivity().invalidateOptionsMenu();
                         }
-                        catch (Exception e)
+
+                        if(dialog != null && dialog.isShowing())
                         {
-                            e.printStackTrace();
+                            try
+                            {
+                                dialog.dismiss();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
 
                         Toast.makeText(getActivity(), "No events found. Must be a quiet day!", Toast.LENGTH_LONG).show();
@@ -584,13 +630,22 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case EVENTSLISTHANDLER_TOTAL_FAILURE:
                     {
-                        try
+                        if(null != refreshStatus)
                         {
-                            dialog.dismiss();
+                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                            getActivity().invalidateOptionsMenu();
                         }
-                        catch (Exception e)
+
+                        if(dialog != null && dialog.isShowing())
                         {
-                            e.printStackTrace();
+                            try
+                            {
+                                dialog.dismiss();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
 
                         mCallbacks.fetchError();
@@ -599,13 +654,22 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case EVENTSLISTHANDLER_SERVICE_FAILURE:
                     {
-                        try
+                        if(null != refreshStatus)
                         {
-                            dialog.dismiss();
+                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                            getActivity().invalidateOptionsMenu();
                         }
-                        catch (Exception e)
+
+                        if(dialog != null && dialog.isShowing())
                         {
-                            e.printStackTrace();
+                            try
+                            {
+                                dialog.dismiss();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
 
                         Toast.makeText(getActivity(), "Rhybudd was unable to reach its internal service.\n\nThis will cause some issues with fetching events", Toast.LENGTH_LONG).show();
@@ -625,6 +689,16 @@ public class ViewZenossEventsListFragment extends ListFragment
     public void DBGetThread()
     {
         Log.e("DBGetThread", "Doing a DB lookup");
+
+        if(null != refreshStatus)
+        {
+            refreshStatus.setActionView(abprogress);
+        }
+        else
+        {
+            Log.e("DBGetThread", "refreshStatus was null!");
+        }
+
         listOfZenossEvents.clear();
         new Thread()
         {
@@ -704,17 +778,24 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         try
         {
-            if(dialog == null || !dialog.isShowing())
+            if(null != refreshStatus)
             {
-                dialog = new ProgressDialog(getActivity());
+                refreshStatus.setActionView(abprogress);
             }
+            else
+            {
+                if(dialog == null || !dialog.isShowing())
+                {
+                    dialog = new ProgressDialog(getActivity());
+                }
 
-            dialog.setTitle("Querying Zenoss Directly");
-            dialog.setMessage("Refreshing Events...");
-            //ToDo set cancellable
+                dialog.setTitle("Querying Zenoss Directly");
+                dialog.setMessage("Refreshing Events...");
+                //ToDo set cancellable
 
-            if(!dialog.isShowing())
-                dialog.show();
+                if(!dialog.isShowing())
+                    dialog.show();
+            }
         }
         catch(Exception e)
         {
@@ -818,8 +899,22 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
                 else
                 {
-                    Log.e("Refresh","The service wasn't running for some reason");
-                    dialog.setMessage("The backend service wasn't running.\n\nStarting...");
+                    if(null == refreshStatus)
+                    {
+                        if(dialog == null || !dialog.isShowing())
+                        {
+                            dialog = new ProgressDialog(getActivity());
+
+                            dialog.setTitle("Querying Zenoss Directly");
+                            Log.e("Refresh","The service wasn't running for some reason");
+                            dialog.setMessage("The backend service wasn't running.\n\nStarting...");
+                            //ToDo set cancellable
+
+                            if(!dialog.isShowing())
+                                dialog.show();
+                        }
+                    }
+
                     Intent intent = new Intent(getActivity(), ZenossPoller.class);
                     getActivity().startService(intent);
                     retryCount++;

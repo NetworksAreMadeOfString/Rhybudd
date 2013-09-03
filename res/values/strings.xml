@@ -157,6 +157,7 @@
         <item>Configure Rhybudd Push</item>
         <item>Help</item>
         <item>Feedback</item>
+        <item>Search</item>
     </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
