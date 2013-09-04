@@ -598,6 +598,8 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 dialog = new ProgressDialog(getActivity());
                                 dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
                                 //dialog.setCancelable(false);
+                                Log.e("EVENTSLISTHANDLER_DB_EMPTY", "Showing a dialog");
+
                                 dialog.show();
                             }
                         }
@@ -690,6 +692,14 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         Log.e("DBGetThread", "Doing a DB lookup");
 
+        if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
+        {
+            Log.e("DBGetThread", "Well we can't do this because we don't have any credentials ");
+            return;
+        }
+
         if(null != refreshStatus)
         {
             refreshStatus.setActionView(abprogress);
@@ -776,6 +786,14 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     public void Refresh()
     {
+        if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
+        {
+            Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
+            return;
+        }
+
         try
         {
             if(null != refreshStatus)
@@ -879,6 +897,8 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 BugSenseHandler.sendExceptionMessage("RhybuddHome","Updating last setting",e);
                             }
 
+                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SUCCESS);
+
                         }
                         else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
                         {
@@ -970,8 +990,38 @@ public class ViewZenossEventsListFragment extends ListFragment
     public void onPause()
     {
         super.onPause();
+
         // Unbind from the service
         doUnbindService();
+
+        try
+        {
+            Log.e("onPause","Checking if dialog is null");
+            if(null != dialog)
+            {
+                Log.e("onPause","it wasn't");
+                try
+                {
+                    Log.e("onPause","Dismissing");
+                    dialog.dismiss();
+                    Log.e("onPause","dismissed");
+                }
+                catch (Exception e)
+                {
+                    Log.e("onPause","uhoh stack trace");
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                Log.e("onPause","dialog was null");
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     private ServiceConnection mConnection = new ServiceConnection()

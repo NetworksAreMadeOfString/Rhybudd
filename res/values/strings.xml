@@ -28,12 +28,13 @@
 
     <!-- Preference Push Simple -->
     <string name="PushCategoryTitle">Rhybudd Push Settings</string>
-    <string name="PushCategorySummary">Rhybudd Push is a ZenPack powered feature that enables Zenoss to push Events directly to your device without the need for polling. This massively reduces battery drain &amp; decreases data usage too.\n\nAverage latency is only ~700ms.\n\nSee http://bit.ly/ZenossPush for more details.</string>
+    <string name="PushSubtitle">Near instant alert delivery</string>
+    <string name="PushCategorySummary">Rhybudd Push is a ZenPack powered feature that enables Zenoss to push Events directly to your device without the need for polling.\n\nSee http://bit.ly/ZenossPush for more details.</string>
     <string name="PushEnableSwitch">Enable Push</string>
     <string name="PushIDDesc">This is your Push key for use with the ZenPack.rhybudd.alerts ZenPack.\n\nThis key has been saved to this device, you\'re ready to start receiving pushed events!</string>
-    <string name="PushAddExistingButton">Add Existing Key</string>
-    <string name="PushCreateIDButton">Create new Key</string>
-    <string name="PushSaveID">Save</string>
+    <string name="PushAddExistingButton">Use Existing Key</string>
+    <string name="PushCreateIDButton">Get New Key</string>
+    <string name="PushSaveID">Save &amp; Exit</string>
     <string name="PushKeyHint">e.g. AABBCC0012FF</string>
     <string name="PushKeyLengthError">Push keys are 32 characters long</string>
 

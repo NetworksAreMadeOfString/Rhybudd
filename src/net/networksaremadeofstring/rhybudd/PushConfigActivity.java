@@ -28,5 +28,7 @@ public class PushConfigActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_push_config);
+        getActionBar().setTitle(getString(R.string.PushCategoryTitle));
+        getActionBar().setSubtitle(getString(R.string.PushSubtitle));
     }
 }

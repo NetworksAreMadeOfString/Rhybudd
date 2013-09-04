@@ -80,7 +80,7 @@ public class PushSettingsFragment extends Fragment
 
         PushKey = (EditText) rootView.findViewById(R.id.pushKeyEditText);
         PushKeyDesc = (TextView) rootView.findViewById(R.id.pushIDDesc);
-        SaveKey = (Button) rootView.findViewById(R.id.saveKeyButton);
+        //SaveKey = (Button) rootView.findViewById(R.id.saveKeyButton);
 
         ExitButton = (Button) rootView.findViewById(R.id.exitButton);
 
@@ -161,7 +161,7 @@ public class PushSettingsFragment extends Fragment
             }
         });
 
-        SaveKey.setOnClickListener(new View.OnClickListener() {
+        /*SaveKey.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
                 progressbar.setVisibility(View.VISIBLE);
@@ -177,7 +177,7 @@ public class PushSettingsFragment extends Fragment
                 }
                 progressbar.setVisibility(View.GONE);
             }
-        });
+        });*/
 
         Button setID = (Button) rootView.findViewById(R.id.setPushIDButton);
         setID.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +197,7 @@ public class PushSettingsFragment extends Fragment
         getID.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
-                SaveKey.setVisibility(View.GONE);
+                //SaveKey.setVisibility(View.GONE);
                 PushKey.setText("");
                 progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
                 progressbar.setVisibility(View.VISIBLE);
@@ -249,6 +249,10 @@ public class PushSettingsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        /*SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, "");
+        editor.commit();*/
 
         getIDhandler = new Handler()
         {

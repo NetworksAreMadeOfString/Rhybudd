@@ -4,6 +4,7 @@
     <dimen name="SettingsMargin">10dp</dimen>
     <dimen name="SettingsTopMargin">20dp</dimen>
     <dimen name="SettingEditPadding">12dp</dimen>
+    <dimen name="SettingsPushETMargin">30dp</dimen>
 
     <!-- Generic List View Fragment -->
     <dimen name="ListViewPaddMarg">8dp</dimen>

@@ -35,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class ZenossPoller extends Service
 {
@@ -128,14 +129,22 @@ public class ZenossPoller extends Service
                     public void run()
                     {
                         ZenossCredentials credentials = new ZenossCredentials(ZenossPoller.this);
-                        try
+
+                        if(!credentials.UserName.equals("") && !credentials.URL.equals(""))
                         {
-                            loginSuccessful = API.Login(credentials);
+                            try
+                            {
+                                loginSuccessful = API.Login(credentials);
+                            }
+                            catch(Exception e)
+                            {
+                                e.printStackTrace();
+                                loginSuccessful = false;
+                            }
                         }
-                        catch(Exception e)
+                        else
                         {
-                            e.printStackTrace();
-                            loginSuccessful = false;
+                            Log.e("ZenossPoller", "No credentials yet");
                         }
                     }
                 }).start();

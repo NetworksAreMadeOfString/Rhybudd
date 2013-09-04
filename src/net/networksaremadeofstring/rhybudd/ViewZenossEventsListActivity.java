@@ -281,6 +281,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         //Might as well update GCM whilst we're here
         if(settings.contains(ZenossAPI.PREFERENCE_PUSHKEY) && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals(""))
         {
+            Log.e("onResume","Doing a GCM Registration");
             doGCMRegistration(settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,""));
         }
 
@@ -429,6 +430,23 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     {
         ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
         listFrag.onItemAcknowledged(position);
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        try
+        {
+            if(null != alertDialog)
+                alertDialog.dismiss();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

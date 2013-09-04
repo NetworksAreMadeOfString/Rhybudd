@@ -13,21 +13,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:padding="12dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="4dp"
         android:autoLink="web"
         android:textColorLink="@color/LightBlue"/>
 
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/PushAddExistingButton"
-        android:id="@+id/setPushIDButton"
-        android:layout_marginLeft="@dimen/SettingsTopMargin"
-        android:layout_below="@+id/pushSummary"
-        style="@style/ButtonText"
-        android:background="@drawable/dark_blue_button"/>
+
 
 
     <EditText
@@ -37,15 +29,13 @@
         android:lines="1"
         android:typeface="monospace"
         android:gravity="center_horizontal"
-        android:layout_below="@+id/setPushIDButton"
+        android:layout_below="@+id/pushSummary"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible"
         android:hint="@string/PushKeyHint"
-        android:layout_marginTop="@dimen/SettingsTopMargin"
-        android:layout_marginBottom="@dimen/SettingsTopMargin"
-        android:layout_marginLeft="@dimen/SettingsMargin"
-        android:layout_marginRight="@dimen/SettingsMargin"/>
+        android:layout_marginLeft="@dimen/SettingsPushETMargin"
+        android:layout_marginRight="@dimen/SettingsPushETMargin"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,32 +49,10 @@
         android:visibility="invisible"
         android:autoLink="web"
         android:paddingLeft="@dimen/SettingEditPadding"
-        android:paddingRight="@dimen/SettingEditPadding"/>
+        android:paddingRight="@dimen/SettingEditPadding"
+        android:layout_marginTop="@dimen/SettingsMargin"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/PushCreateIDButton"
-        android:id="@+id/GenerateNewIDButton"
-        android:layout_below="@+id/pushSummary"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="20dp"
-        style="@style/ButtonText"
-        android:background="@drawable/light_blue_button"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/PushSaveID"
-        android:id="@+id/saveKeyButton"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/pushKeyEditText"
-        android:layout_below="@+id/pushKeyEditText"
-        android:layout_marginTop="@dimen/SettingsTopMargin"
-        android:visibility="gone"
-        style="@style/ButtonText"
-        android:background="@drawable/light_blue_button"
-        android:layout_marginRight="20dp"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -94,16 +62,38 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save and Exit"
-        android:id="@+id/exitButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        style="@style/ButtonText"
-        android:background="@drawable/light_blue_button"
-        android:layout_marginBottom="@dimen/SettingsMargin"
-        android:visibility="visible"/>
 
+
+    <LinearLayout style="?android:buttonBarStyle"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentBottom="true">
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/PushAddExistingButton"
+                android:id="@+id/setPushIDButton"
+                android:layout_marginLeft="@dimen/SettingsTopMargin"
+                android:layout_below="@+id/pushSummary"
+                style="?android:buttonBarButtonStyle"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/PushCreateIDButton"
+                android:id="@+id/GenerateNewIDButton"
+                style="?android:buttonBarButtonStyle"/>
+
+
+        <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/PushSaveID"
+                android:id="@+id/exitButton"
+                style="?android:buttonBarButtonStyle"
+                android:visibility="visible"/>
+            </LinearLayout>
 </RelativeLayout>

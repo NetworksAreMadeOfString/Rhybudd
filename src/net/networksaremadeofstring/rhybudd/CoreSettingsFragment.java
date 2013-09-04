@@ -215,29 +215,41 @@ public class CoreSettingsFragment extends Fragment
                         BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Dismissing dialog in msg_caching_complete",e);
                     }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
-                            .setTitle("Extra Configuration")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    ((FirstRunSettings) getActivity()).setPushTab(2);
-                                    alertDialog.cancel();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    alertDialog.cancel();
-                                    Intent in = new Intent();
-                                    in.putExtra("forceRefresh",true);
-                                    getActivity().setResult(1,in);
-                                    getActivity().finish();
-                                }
-                            });
-                    alertDialog = builder.create();
-                    alertDialog.show();
+                    String pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSHKEY, "");
+
+                    if(pushKey.equals(""))
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
+                                .setTitle("Extra Configuration")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        ((FirstRunSettings) getActivity()).setPushTab(2);
+                                        alertDialog.cancel();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        alertDialog.cancel();
+                                        Intent in = new Intent();
+                                        in.putExtra("forceRefresh",true);
+                                        getActivity().setResult(1,in);
+                                        getActivity().finish();
+                                    }
+                                });
+                        alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    else
+                    {
+                        Intent in = new Intent();
+                        in.putExtra("forceRefresh",true);
+                        getActivity().setResult(1,in);
+                        getActivity().finish();
+                    }
 
                 }
                 else if(msg.what == RhybuddHandlers.msg_caching_complete)
