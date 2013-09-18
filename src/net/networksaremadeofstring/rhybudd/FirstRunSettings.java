@@ -159,6 +159,9 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
                 case 2:
                 {
                     fragment = new PushSettingsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("checkZPImmediately",false);
+                    fragment.setArguments(bundle);
                 }
                 break;
             }

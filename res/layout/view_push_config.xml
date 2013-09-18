@@ -1,0 +1,9 @@
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:name="net.networksaremadeofstring.rhybudd.PushSettingsFragment"
+android:id="@+id/fragment"
+android:layout_gravity="center"
+tools:context=".PushConfigActivity"
+tools:layout="@layout/fragment_push_first_settings"/>

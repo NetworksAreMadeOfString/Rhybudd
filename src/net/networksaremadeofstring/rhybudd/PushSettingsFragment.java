@@ -26,13 +26,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.*;
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gcm.GCMRegistrar;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -49,20 +54,33 @@ public class PushSettingsFragment extends Fragment
     {
     }
 
-    EditText PushKey;
+    EditText FilterKey;
     TextView PushKeyDesc;
     Button SaveKey;
-    Button ExitButton;
-    Handler getIDhandler;
+    Handler getIDhandler, checkZPHandler;
     ProgressBar progressbar;
     AlertDialog alertDialog;
+    Switch enabledSwitch;
+    Button registerWithZenPack, checkZenPack, exitButton;
+    ImageView ZPInstalledImg;
+    ImageView ZPDeviceRegistered;
+    TextView ZPVersion;
+    String regId = "";
+    Boolean checkZPImmediately = true;
+    ZenossAPI API = null;
+
+    Boolean pushEnabled = false;
+    String pushKey = "";
+    String senderID = "";
+    boolean hasZenPack = false;
+    ZenPack zp = new ZenPack();
 
     @Override
     public void onResume()
     {
         super.onResume();
         //Log.e("onResume","Hello");
-        if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
+        /*if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
         {
             //Log.e("onResume","Set visible");
             ExitButton.setVisibility(View.VISIBLE);
@@ -70,38 +88,74 @@ public class PushSettingsFragment extends Fragment
         else
         {
             //Log.e("onResume","Set invisible");
-        }
+        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View rootView = inflater.inflate(R.layout.fragment_push_first_settings, container, false);
-
-        PushKey = (EditText) rootView.findViewById(R.id.pushKeyEditText);
-        PushKeyDesc = (TextView) rootView.findViewById(R.id.pushIDDesc);
-        //SaveKey = (Button) rootView.findViewById(R.id.saveKeyButton);
-
-        ExitButton = (Button) rootView.findViewById(R.id.exitButton);
-
-        /*Log.i("forceRefreshonCreateView","setting forceRefresh to " + Boolean.toString(getArguments().getBoolean("forceRefresh")));
-        if(getArguments().getBoolean("forceRefresh"))
-        {
-            ExitButton.setVisibility(View.VISIBLE);
-        }*/
+        View rootView = inflater.inflate(R.layout.fragment_push_config, container, false);
 
         progressbar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSHKEY, "");
+        pushEnabled = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPIv2.PREFERENCE_PUSH_ENABLED,false);
+        senderID = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSH_SENDERID, "");
 
-        String pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSHKEY, "");
+        FilterKey = (EditText) rootView.findViewById(R.id.pushFilterEditText);
+        enabledSwitch = (Switch) rootView.findViewById(R.id.PushEnabledSwitch);
+        registerWithZenPack = (Button) rootView.findViewById(R.id.RegisterButton);
+        checkZenPack = (Button) rootView.findViewById(R.id.CheckButton);
+        exitButton = (Button) rootView.findViewById(R.id.ExitButton);
 
+        ZPInstalledImg = (ImageView) rootView.findViewById(R.id.ZPInstalledStatusImg);
+        ZPDeviceRegistered = (ImageView) rootView.findViewById(R.id.ZPDevRegStatusImg);
+        ZPVersion = (TextView) rootView.findViewById(R.id.ZenPackVersion);
+
+        Log.e("pushKey",pushKey);
+
+        //Set the filter
         if(!pushKey.equals(""))
         {
-            PushKey.setText(pushKey);
-            PushKey.setVisibility(View.VISIBLE);
-            PushKeyDesc.setVisibility(View.VISIBLE);
+            FilterKey.setText(pushKey);
         }
 
-        ExitButton.setOnClickListener(new View.OnClickListener() {
+        if(checkZPImmediately)
+        {
+            checkZenPack.setVisibility(View.GONE);
+            exitButton.setVisibility(View.GONE);
+            registerWithZenPack.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            checkZenPack.setVisibility(View.VISIBLE);
+            exitButton.setVisibility(View.VISIBLE);
+            registerWithZenPack.setVisibility(View.GONE);
+        }
+
+        //Set the enabled setting
+        enabledSwitch.setChecked(pushEnabled);
+
+        enabledSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                editor.putBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED, b);
+                editor.commit();
+
+                if(b)
+                {
+                    RegisterWithZenPack();
+                }
+                else
+                {
+                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
+                    GCMRegistrar.unregister(getActivity());
+                }
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
                 if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
@@ -137,63 +191,53 @@ public class PushSettingsFragment extends Fragment
                 }
                 else
                 {
-                    progressbar.setVisibility(View.VISIBLE);
+                    /*progressbar.setVisibility(View.VISIBLE);
 
                     //if(PushKey.getText().length() == 32)
                    // {
-                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                        editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, PushKey.getText().toString());
-                        editor.commit();
-                    /*}
-                    else
-                    {
-                        Toast.makeText(getActivity(), getString(R.string.PushKeyLengthError), Toast.LENGTH_SHORT).show();
-                    }*/
-                    progressbar.setVisibility(View.GONE);
-
-                    Intent in = new Intent();
-                    in.putExtra("forceRefresh",true);
-                    in.putExtra(ZenossAPI.PREFERENCE_PUSHKEY,PushKey.getText().toString());
-                    getActivity().setResult(1,in);
-                    getActivity().finish();
-                }
-
-            }
-        });
-
-        /*SaveKey.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                progressbar.setVisibility(View.VISIBLE);
-                if(PushKey.getText().length() == 32)
-                {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                     editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, PushKey.getText().toString());
                     editor.commit();
-                }
-                else
-                {
-                    Toast.makeText(getActivity(), getString(R.string.PushKeyLengthError), Toast.LENGTH_SHORT).show();
-                }
-                progressbar.setVisibility(View.GONE);
-            }
-        });*/
 
-        Button setID = (Button) rootView.findViewById(R.id.setPushIDButton);
-        setID.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                PushKey.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.GONE);*/
 
-                /*SaveKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                SaveKey.setVisibility(View.VISIBLE);*/
-                PushKeyDesc.setVisibility(View.INVISIBLE);
-                PushKey.setText("");
+                    Intent in = new Intent();
+                    in.putExtra("forceRefresh",true);
+                    //in.putExtra(ZenossAPI.PREFERENCE_PUSHKEY,PushKey.getText().toString());
+                    getActivity().setResult(1,in);
+                    getActivity().finish();
+                }
             }
         });
 
-        Button getID = (Button) rootView.findViewById(R.id.GenerateNewIDButton);
+
+        checkZenPack.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                checkZP();
+            }
+        });
+
+
+        registerWithZenPack.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if(hasZenPack)
+                {
+                    RegisterWithZenPack();
+                }
+                else
+                {
+                    Toast.makeText(getActivity(), getString(R.string.PushZPErrorNoZP), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+
+        /*Button getID = (Button) rootView.findViewById(R.id.GenerateNewIDButton);
         getID.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v)
             {
@@ -240,9 +284,154 @@ public class PushSettingsFragment extends Fragment
                     }
                 }).start();
             }
-        });
+        });*/
 
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        if(checkZPImmediately)
+        {
+            Log.i("PushSettings","Checking ZenPack immediately");
+            checkZP();
+        }
+        else
+        {
+            Log.i("PushSettings","Waiting for a button press to check ZenPack");
+        }
+    }
+
+    private void RegisterWithZenPack()
+    {
+        progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+        progressbar.setVisibility(View.VISIBLE);
+
+        (new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    if(null == API)
+                    {
+                        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+
+                        API.Login(credentials);
+                    }
+
+                    GCMRegistrar.checkDevice(getActivity());
+                    GCMRegistrar.checkManifest(getActivity());
+                    regId = GCMRegistrar.getRegistrationId(getActivity());
+
+                    if (regId.equals(""))
+                    {
+                        int i = 10;
+
+                        GCMRegistrar.register(getActivity(), zp.SenderID);
+
+                        //I *really* want that regid
+                        while(regId.equals("") || i > 0)
+                        {
+                            Log.i("pushsettings","sleeping");
+                            regId = GCMRegistrar.getRegistrationId(getActivity());
+                            i--;
+                            sleep(500);
+                        }
+                    }
+
+                    if(regId.equals(""))
+                    {
+                        checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
+                    }
+                    else
+                    {
+                        if(API.RegisterWithZenPack(ZenossAPI.md5(Settings.Secure.getString(getActivity().getContentResolver(),Settings.Secure.ANDROID_ID)),regId))
+                        {
+                            checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_registered);
+                        }
+                        else
+                        {
+                            checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    //firstLoadHandler.sendEmptyMessage(0);
+                    BugSenseHandler.sendExceptionMessage("PushSettingsFragment", "RegisterWithZenPack", e);
+                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
+                }
+            }
+        }).start();
+    }
+
+    private void checkZP()
+    {
+        Log.i("PushSettings","Checking for ZenPack!");
+        progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+        progressbar.setVisibility(View.VISIBLE);
+
+        (new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                    {
+                        API = new ZenossAPIZaas();
+                    }
+                    else
+                    {
+                        API = new ZenossAPICore();
+                    }
+
+                    ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                    API.Login(credentials);
+                    zp = API.CheckZenPack();
+
+                    if(null != zp && zp.Installed)
+                    {
+                        Log.e("ZP",zp.SenderID);
+
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                        editor.putString("SenderID", zp.SenderID);
+                        editor.commit();
+
+                        checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_is_installed);
+
+                        if(checkZPImmediately)
+                            RegisterWithZenPack();
+                    }
+                    else
+                    {
+                        checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_installed);
+                    }
+
+                }
+                catch(IllegalStateException i)
+                {
+                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_generic_http_transport_error);
+                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_installed);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_installed);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -250,9 +439,66 @@ public class PushSettingsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        /*SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-        editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, "");
-        editor.commit();*/
+        if(null != getArguments() && getArguments().containsKey("checkZPImmediately"))
+            checkZPImmediately = getArguments().getBoolean("checkZPImmediately");
+
+        checkZPHandler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+                progressbar.setVisibility(View.GONE);
+
+                switch(msg.what)
+                {
+                    case RhybuddHandlers.msg_generic_http_transport_error:
+                    {
+                        Toast.makeText(getActivity(), getActivity().getString(R.string.PushZPNoHost), Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                    case RhybuddHandlers.msg_zp_is_installed:
+                    {
+                        hasZenPack = true;
+                        ZPInstalledImg.setImageResource(R.drawable.ic_acknowledged);
+                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                        ZPVersion.setText("1.0.1");
+                        enabledSwitch.setEnabled(hasZenPack);
+                        registerWithZenPack.setEnabled(hasZenPack);
+
+                        if(!checkZPImmediately)
+                        {
+                            checkZenPack.setVisibility(View.VISIBLE);
+                            registerWithZenPack.setVisibility(View.GONE);
+                        }
+                    }
+                    break;
+
+                    case RhybuddHandlers.msg_zp_not_installed:
+                    {
+                        hasZenPack = false;
+                        ZPInstalledImg.setImageResource(R.drawable.ic_unacknowledged);
+                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                        ZPVersion.setText("----");
+                        enabledSwitch.setEnabled(hasZenPack);
+                        registerWithZenPack.setEnabled(hasZenPack);
+                    }
+                    break;
+
+                    case RhybuddHandlers.msg_zp_registered:
+                    {
+                        ZPDeviceRegistered.setImageResource(R.drawable.ic_acknowledged);
+                    }
+                    break;
+
+                    case RhybuddHandlers.msg_zp_not_registered:
+                    {
+                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                    }
+                    break;
+                }
+            }
+        };
 
         getIDhandler = new Handler()
         {
@@ -265,11 +511,11 @@ public class PushSettingsFragment extends Fragment
                         String pushKey = msg.getData().getString(ZenossAPIv2.PREFERENCE_PUSHKEY);
 
                         progressbar.setVisibility(View.GONE);
-                        PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                        PushKey.setVisibility(View.VISIBLE);
+                        //PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+                        //PushKey.setVisibility(View.VISIBLE);
                         PushKeyDesc.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
                         PushKeyDesc.setVisibility(View.VISIBLE);
-                        PushKey.setText(pushKey);
+                        //PushKey.setText(pushKey);
 
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                         editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, pushKey);
@@ -301,4 +547,32 @@ public class PushSettingsFragment extends Fragment
             }
         };
     }
+
+    /*@Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        Log.e("onOptionsItemSelected","Called");
+
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                if(checkZPImmediately)
+                {
+                    Log.e("onOptionsItemSelected","Calling exit");
+                    getActivity().finish();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            default:
+            {
+                return false;
+            }
+        }
+    }*/
 }

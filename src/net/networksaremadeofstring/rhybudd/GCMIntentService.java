@@ -22,6 +22,10 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.util.Log;
+
 import com.bugsense.trace.BugSenseHandler;
 
 
@@ -99,7 +103,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 
             try
             {
-                /*Log.v("GCMPayload",alertCount + " / " +
+                Log.v("GCMPayload",alertCount + " / " +
                         evid + " / " +
                         device + " / " +
                         summary + " / " +
@@ -108,10 +112,10 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                         event_class + " / " +
                         event_class_key + " / " +
                         sent
-                );*/
+                );
 
                 //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
-                ZenossEvent gcmEvent = new ZenossEvent( evid,   99999, prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
+                ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
                 //ZenossEvent gcmEvent = new ZenossEvent(evid,summary);
 
                 RhybuddDataSource datasource = new RhybuddDataSource(arg0);
@@ -177,15 +181,77 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     }
 
     @Override
-    protected void onRegistered(Context arg0, String arg1)
+    protected void onRegistered(final Context arg0, final String regid)
     {
-        //Log.e("GCMIntentService","onRegistered");
+        Log.e("GCMIntentService", "onRegistered");
+
+        (new Thread()
+        {
+            public void run()
+            {
+                ZenossAPI API = null;
+                try
+                {
+                        if (PreferenceManager.getDefaultSharedPreferences(arg0).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(arg0);
+
+                        if(API.Login(credentials))
+                        {
+                            API.RegisterWithZenPack(ZenossAPI.md5(Settings.Secure.getString(arg0.getContentResolver(),Settings.Secure.ANDROID_ID)),regid);
+                        }
+                        else
+                        {
+                            //Need to do something here
+                            Log.e("onRegistered","API Login failed");
+                        }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
-    protected void onUnregistered(Context arg0, String arg1)
+    protected void onUnregistered(final Context arg0, String arg1)
     {
-        //Log.e("GCMIntentService","onUnregistered");
+        Log.e("GCMIntentService","onUnregistered");
+
+        ((Thread) new Thread(){
+            public void run()
+            {
+                try
+                {
+                    ZenossAPI API = null;
+
+                    if (PreferenceManager.getDefaultSharedPreferences(arg0).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                    {
+                        API = new ZenossAPIZaas();
+                    }
+                    else
+                    {
+                        API = new ZenossAPICore();
+                    }
+
+                    ZenossCredentials credentials = new ZenossCredentials(arg0);
+                    API.Login(credentials);
+                    API.UnregisterWithZenPack(ZenossAPI.md5(Settings.Secure.getString(arg0.getContentResolver(),Settings.Secure.ANDROID_ID)));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /*@Override

@@ -983,7 +983,17 @@ public class ViewZenossEventsListFragment extends ListFragment
         doBindService();
 
         //If we've binded let's try and do a refresh
-        DBGetThread();
+        //If it's been more than 15 minutes since we last updated we should do a full refresh
+        if(ZenossAPI.shouldRefresh(getActivity()))
+        {
+            Log.i("onResume","shouldRefresh() says we should do a full refresh");
+            Refresh();
+        }
+        else
+        {
+            Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
+            DBGetThread();
+        }
     }
 
     @Override

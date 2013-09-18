@@ -71,6 +71,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     private ActionBarDrawerToggle mDrawerToggle;
     private String[] mDrawerTitles;
     String regId = "";
+    //String SenderID = "";
     boolean firstRun = false;
     AlertDialog alertDialog;
     int requestCode = 0;
@@ -92,7 +93,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
-
+        //SenderID = settings.getString("SenderID",ZenossAPI.SENDER_ID);
 
         if (findViewById(R.id.event_detail_container) != null)
         {
@@ -279,7 +280,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
 
         //Might as well update GCM whilst we're here
-        if(settings.contains(ZenossAPI.PREFERENCE_PUSHKEY) && !settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,"").equals(""))
+        if(settings.contains(ZenossAPI.PREFERENCE_PUSH_ENABLED) && settings.getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
         {
             Log.e("onResume","Doing a GCM Registration");
             doGCMRegistration(settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,""));
@@ -549,41 +550,34 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     private void doGCMRegistration(final String PushKey)
     {
         //TODO check for freshness so as to not waste too much data / bandwidth on every resume!
-        if(!PushKey.equals(""))
+        GCMRegistrar.checkDevice(this);
+        GCMRegistrar.checkManifest(this);
+        regId = GCMRegistrar.getRegistrationId(this);
+
+        if (regId.equals(""))
         {
-            GCMRegistrar.checkDevice(this);
-            GCMRegistrar.checkManifest(this);
-            regId = GCMRegistrar.getRegistrationId(this);
-
-            if (regId.equals(""))
-            {
-                //Log.e("GCM", "Registering");
-                GCMRegistrar.register(this, ZenossAPI.SENDER_ID);
-            }
-            else
-            {
-                //Log.e("GCM", "Already registered");
-            }
-
-
-            ((Thread) new Thread()
-            {
-                public void run()
-                {
-                    if(!ZenossAPI.registerPushKey(PushKey,regId,ZenossAPI.md5(Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID))))
-                    {
-                        runOnUiThread(new Runnable()
-                        {
-                            public void run() {
-                                Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                    }
-                }
-            }).start();
-
+            //Log.e("GCM", "Registering");
+            GCMRegistrar.register(this, settings.getString("SenderID",ZenossAPI.SENDER_ID));
         }
+
+
+        ((Thread) new Thread()
+        {
+            public void run()
+            {
+                if(!ZenossAPI.registerPushKey(PushKey,regId,ZenossAPI.md5(Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID))))
+                {
+                    runOnUiThread(new Runnable()
+                    {
+                        public void run() {
+                            Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+            }
+        }).start();
+
     }
 
     @Override

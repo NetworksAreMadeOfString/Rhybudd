@@ -82,6 +82,8 @@ public class ZenossAPIZaas extends ZenossAPI
 
         //Log.e("CheckLoggedIn", Integer.toString(response.getStatusLine().getStatusCode()));
 
+        reqCount++;
+
         return this.CheckLoggedIn();
     }
 
@@ -134,6 +136,8 @@ public class ZenossAPIZaas extends ZenossAPI
         reqData.put("tid", String.valueOf(this.reqCount++));
 
         httpost.setEntity(new StringEntity(reqData.toString()));
+
+        reqCount++;
 
         if(null == httpclient || null == ZENOSS_INSTANCE)
             return null;

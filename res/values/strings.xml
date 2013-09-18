@@ -32,11 +32,20 @@
     <string name="PushCategorySummary">Rhybudd Push is a ZenPack powered feature that enables Zenoss to push Events directly to your device without the need for polling.\n\nSee http://bit.ly/ZenossPush for more details.</string>
     <string name="PushEnableSwitch">Enable Push</string>
     <string name="PushIDDesc">This is your Push key for use with the ZenPack.rhybudd.alerts ZenPack.\n\nThis key has been saved to this device, you\'re ready to start receiving pushed events!</string>
-    <string name="PushAddExistingButton">Use Existing Key</string>
+    <string name="PushAddExistingButton">Existing Key</string>
     <string name="PushCreateIDButton">Get New Key</string>
     <string name="PushSaveID">Save &amp; Exit</string>
-    <string name="PushKeyHint">e.g. AABBCC0012FF</string>
+    <string name="PushExit">Exit</string>
+    <string name="PushKeyHint">Filter e.g. "Critical"</string>
     <string name="PushKeyLengthError">Push keys are 32 characters long</string>
+    <string name="PushRegisterZenpack">Register with ZenPack</string>
+    <string name="PushCheckZenpack">Check ZenPack is Installed</string>
+    <string name="PushZPStatusLabel">ZenPack Installed</string>
+    <string name="PushZPDevRegStatus">Registered with ZenPack</string>
+    <string name="PushZPErrorNoZP">The ZenPacks.rhybudd.alerts ZenPack is not installed on your Server. Please install the ZenPack then try again.</string>
+    <string name="PushZPNoHost">It appears there was an issue resolving the Zenoss Host name (this is not guaranteed to be the exact error)</string>
+
+
 
     <string name="mangeDatabaseTitle">Manage Cache</string>
     <string name="mangeDatabaseDBSizeTitle">Current DB Size:</string>

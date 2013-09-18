@@ -20,6 +20,7 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 
 public class PushConfigActivity extends FragmentActivity
 {
@@ -27,8 +28,28 @@ public class PushConfigActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_push_config);
+        setContentView(R.layout.view_push_config);
         getActionBar().setTitle(getString(R.string.PushCategoryTitle));
         getActionBar().setSubtitle(getString(R.string.PushSubtitle));
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                finish();
+                return true;
+            }
+
+            default:
+            {
+                return false;
+            }
+        }
     }
 }

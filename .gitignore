@@ -1,3 +1,6 @@
+.idea
+originals/*
+Rhybudd.iml
 bin/*
 gen/*
 .project

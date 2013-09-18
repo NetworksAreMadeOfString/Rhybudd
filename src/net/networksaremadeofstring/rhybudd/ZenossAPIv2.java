@@ -81,6 +81,8 @@ public class ZenossAPIv2
 
     public static String SENDER_ID = "228666382181";
     public static String PREFERENCE_PUSHKEY = "pushkey";
+    public static String PREFERENCE_PUSH_ENABLED = "pushkey_enabled";
+    public static String PREFERENCE_PUSH_SENDERID = "pushkey_senderid";
 
     //These don't get used directly
   	private DefaultHttpClient client;

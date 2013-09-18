@@ -30,4 +30,9 @@ public class RhybuddHandlers
     public static final int msg_json_error = 7;
     public static final int msg_generic_http_transport_error = 8;
     public static final int msg_generic_show_progressbar = 9;
+    public static final int msg_zp_not_installed = 10;
+    public static final int msg_zp_is_installed = 11;
+    public static final int msg_zp_wrong_version = 12;
+    public static final int msg_zp_registered = 13;
+    public static final int msg_zp_not_registered = 14;
 }

@@ -25,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.text.format.Time;
 import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
@@ -79,6 +80,8 @@ public class ZenossAPI
     public static String PREFERENCE_BASIC_AUTH_PASSWORD = "BAPassword";
     public static String PREFERENCE_IS_ZAAS = "isZaas";
     public static String SETTINGS_PUSH = "push";
+    public static String PREFERENCE_PUSH_ENABLED = "pushkey_enabled";
+    public static String PREFERENCE_PUSH_SENDERID = "pushkey_senderid";
 
     public static final int HANDLER_REDOREFRESH = 800;
 
@@ -122,6 +125,21 @@ public class ZenossAPI
         editor.commit();
     }
 
+    public static boolean shouldRefresh(Context mContext)
+    {
+        Time now = new Time();
+        now.setToNow();
+
+        if((now.toMillis(true) - PreferenceManager.getDefaultSharedPreferences(mContext).getLong("lastCheck",now.toMillis(true))) > 900000)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public static String getPushKey() throws IOException, JSONException
     {
         DefaultHttpClient client = new DefaultHttpClient();
@@ -150,6 +168,190 @@ public class ZenossAPI
         {
             return null;
         }
+    }
+
+    public boolean UnregisterWithZenPack(String DeviceID)
+    {
+        try
+        {
+            HttpPost httpost = new HttpPost(getURL() + "/zport/dmd/rhybudd_gcm_router");
+
+            httpost.addHeader("Content-type", "application/json; charset=utf-8");
+            httpost.setHeader("Accept", "application/json");
+
+            JSONObject dataContents = new JSONObject();
+            dataContents.put("device_id", DeviceID);
+
+            JSONArray data = new JSONArray();
+            data.put(dataContents);
+
+            JSONObject reqData = new JSONObject();
+            reqData.put("action", "RhybuddGCMRouter");
+            reqData.put("method", "remove_gcm_regid");
+            reqData.put("data", data);
+            reqData.put("type", "rpc");
+            reqData.put("tid", String.valueOf(this.reqCount++));
+            httpost.setEntity(new StringEntity(reqData.toString()));
+            HttpResponse response = httpclient.execute(httpost);
+            String RawJSON = EntityUtils.toString(response.getEntity());
+
+            try
+            {
+                JSONObject json = new JSONObject(RawJSON);
+                if(json.has("uuid") || json.has("result") && json.has("success") && json.getBoolean("success"))
+                {
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    public boolean RegisterWithZenPack(String DeviceID, String GCMID)
+    {
+        try
+        {
+            HttpPost httpost = new HttpPost(getURL() + "/zport/dmd/rhybudd_gcm_router");
+
+            httpost.addHeader("Content-type", "application/json; charset=utf-8");
+            httpost.setHeader("Accept", "application/json");
+
+            JSONObject dataContents = new JSONObject();
+            dataContents.put("gcm_reg_id",GCMID);
+            dataContents.put("device_id", DeviceID);
+
+            JSONArray data = new JSONArray();
+            data.put(dataContents);
+
+            JSONObject reqData = new JSONObject();
+            reqData.put("action", "RhybuddGCMRouter");
+            reqData.put("method", "update_gcm_regid");
+            reqData.put("data", data);
+            reqData.put("type", "rpc");
+            reqData.put("tid", String.valueOf(this.reqCount++));
+            httpost.setEntity(new StringEntity(reqData.toString()));
+            HttpResponse response = httpclient.execute(httpost);
+            String RawJSON = EntityUtils.toString(response.getEntity());
+
+            try
+            {
+                JSONObject json = new JSONObject(RawJSON);
+                if(json.has("uuid") || json.has("result"))
+                {
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    public ZenPack CheckZenPack()
+    {
+        ZenPack zp = new ZenPack();
+
+        try
+        {
+            HttpPost httpost = new HttpPost(getURL() + "/zport/dmd/rhybudd_gcm_router");
+
+            httpost.addHeader("Content-type", "application/json; charset=utf-8");
+            httpost.setHeader("Accept", "application/json");
+            JSONObject dataContents = new JSONObject();
+            JSONArray data = new JSONArray();
+            data.put(dataContents);
+
+            JSONObject reqData = new JSONObject();
+            reqData.put("action", "RhybuddGCMRouter");
+            reqData.put("method", "ping");
+            //reqData.put("data", "[{}]");
+            reqData.put("data",data);
+            reqData.put("type", "rpc");
+            reqData.put("tid", String.valueOf(this.reqCount++));
+            httpost.setEntity(new StringEntity(reqData.toString()));
+            HttpResponse response = httpclient.execute(httpost);
+            String RawJSON = EntityUtils.toString(response.getEntity());
+            Log.i("API",RawJSON);
+            try
+            {
+                JSONObject json = new JSONObject(RawJSON);
+                if(json.has("uuid") || json.has("result"))
+                {
+                    if(json.getJSONObject("result").getJSONObject("data").getBoolean("pong"))
+                    {
+                        try
+                        {
+                            zp.GCMID = json.getJSONObject("result").getJSONObject("data").getString("gcmid");
+                        }
+                        catch (Exception e)
+                        {
+                            zp.GCMID = null;
+                        }
+
+                        try
+                        {
+                            zp.SenderID = json.getJSONObject("result").getJSONObject("data").getString("senderid");
+
+                            if(zp.SenderID.equals(""))
+                                zp.SenderID = ZenossAPI.SENDER_ID;
+                        }
+                        catch (Exception e)
+                        {
+                            zp.SenderID = ZenossAPI.SENDER_ID;
+                        }
+
+                        zp.Installed = true;
+                    }
+                    else
+                    {
+                        zp.Installed = false;
+                    }
+                }
+                else
+                {
+                    zp.Installed = false;
+                    zp.Msg = "Payload didn't indicate a correct response";
+                }
+            }
+            catch(JSONException j)
+            {
+                if(j.getMessage().contains("Value <html> of type java.lang.String cannot"))
+                {
+                    zp.Msg = "Login failed, the Zenoss login page was returned";
+                }
+                else
+                {
+                    zp.Msg = j.getMessage();
+                }
+
+                j.printStackTrace();
+                zp.Installed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            zp.Msg = e.getMessage();
+            zp.Installed = false;
+        }
+
+        return zp;
     }
 
     public void AddDevice(String FQDN, String Title, String DeviceClass, String ProductionState,String DevicePriority) throws JSONException, IOException {
@@ -1222,6 +1424,7 @@ public class ZenossAPI
     //                      Dummy objects
     public boolean Login(ZenossCredentials credentials) throws Exception
     {
+        reqCount++;
         return false;
     }
 }

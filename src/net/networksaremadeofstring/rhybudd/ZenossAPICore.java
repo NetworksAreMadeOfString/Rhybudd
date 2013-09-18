@@ -85,6 +85,7 @@ public class ZenossAPICore extends ZenossAPI
 
         Log.e("CheckLoggedIn", Integer.toString(response.getStatusLine().getStatusCode()));
 
+        reqCount++;
         return this.CheckLoggedIn();
     }
 }

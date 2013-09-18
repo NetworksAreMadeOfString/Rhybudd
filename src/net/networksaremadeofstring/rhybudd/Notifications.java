@@ -48,7 +48,7 @@ public class Notifications
     public static int NOTIFICATION_GCM_COLLAPSE = 960;
     public static int NOTIFICATION_GCM_GENERIC = 970;
 
-    @TargetApi(16)
+    /*@TargetApi(16)
     public static void SendInboxStyleNotification(int EventCount, List<String> EventDetails, Context context)
     {
         NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -104,16 +104,34 @@ public class Notifications
         }
 
         mNM.notify(NOTIFICATION_POLLED_ALERTS, notification);
-    }
+    }*/
 
 
 
     public static void SendGCMNotification(ZenossEvent Event, Context context)
     {
-        Intent notificationIntent = new Intent(context, RhybuddHome.class);
+        Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        Uri soundURI;
+        if(settings.getString("notificationSoundChoice", "").equals(""))
+        {
+            soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        }
+        else
+        {
+            try
+            {
+                soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
+            }
+            catch(Exception e)
+            {
+                soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            }
+        }
 
         String notifTitle = "New Events Received";
         int notifPriority = Notification.PRIORITY_DEFAULT;
@@ -161,6 +179,7 @@ public class Notifications
                             .setContentTitle(notifTitle)
                             .setPriority(notifPriority)
                             .setAutoCancel(true)
+                            .setSound(soundURI)
                             .setContentText(Event.getDevice())
                             .setContentIntent(contentIntent)
                             .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastDownload)
@@ -169,6 +188,11 @@ public class Notifications
                                     Event.getComponentText() + "\r\n" +
                                     Event.geteventClass())
                     .build();
+
+            if(settings.getBoolean("notificationSoundInsistent", false))
+                noti.flags |= Notification.FLAG_INSISTENT;
+
+            noti.tickerText = notifTitle;
 
             NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNM.notify(NOTIFICATION_GCM_GENERIC, noti);
@@ -181,6 +205,7 @@ public class Notifications
                             .setContentTitle(notifTitle)
                             .setContentText(Event.getDevice() + ": " + Event.getSummary())
                             .setContentIntent(contentIntent)
+                            .setSound(soundURI)
                             .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastDownload)
                             .setAutoCancel(true)
                             .setPriority(notifPriority);
@@ -254,6 +279,7 @@ public class Notifications
                         .setPriority(Notification.PRIORITY_HIGH);
 
         Notification notif = mBuilder.build();
+        notif.tickerText = Integer.toString(EventCount) + " new Zenoss Events!";
 
         if(settings.getBoolean("notificationSoundInsistent", false))
             notif.flags |= Notification.FLAG_INSISTENT;
