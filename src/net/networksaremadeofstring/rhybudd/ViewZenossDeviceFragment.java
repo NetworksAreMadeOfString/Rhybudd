@@ -18,6 +18,8 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -26,12 +28,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bugsense.trace.BugSenseHandler;
 import org.json.JSONObject;
 
@@ -77,6 +85,50 @@ public class ViewZenossDeviceFragment extends Fragment
     public ViewZenossDeviceFragment()
     {
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC))
+        {
+            inflater.inflate(R.menu.view_device, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        //Log.e("ViewZenossDeviceFragment", Integer.toString(item.getItemId()) + " / " + Integer.toString(R.id.writenfc));
+
+        switch (item.getItemId())
+        {
+            case R.id.writenfc:
+            {
+                //Log.e("ViewZenossDeviceFragment", "Menu to write NFC");
+                //Log.e("deviceJSON",deviceJSON.toString());
+                if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC))
+                {
+                    Intent NFCIntent = new Intent(getActivity(), WriteNFCActivity.class);
+                    try
+                    {
+                        NFCIntent.putExtra(WriteNFCActivity.PAYLOAD_UID,deviceJSON.getJSONObject("result").getJSONObject("data").getString("uid"));
+                        this.startActivity(NFCIntent);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(),"Sorry there was error parsing the UID for this device",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return true;
+            }
+            default:
+                break;
+        }
+
+        return false;
     }
 
     @Override

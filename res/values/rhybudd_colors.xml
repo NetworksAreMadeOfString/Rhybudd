@@ -47,6 +47,8 @@
         <color name="MetaEdge">#d9d9d9</color>
 
 
-
+        <!-- Tag Writer -->
+        <color name="WriterReady">#339933</color>
+        <color name="WriterIO">#FF6600</color>
 
 </resources>

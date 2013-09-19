@@ -228,4 +228,13 @@
         <item>Lowest</item>
         <item>Trivial</item>
     </string-array>
+
+
+    <!-- Write Activity Layout -->
+    <string name="NFCTitle">NFC + Rhybudd = Zenoss info by tapping a tag</string>
+    <string name="ServerWait">Contacting Zenoss server…</string>
+    <string name="TagIOWait">Writing to tag…</string>
+    <string name="TagReadyFirst">Ready to write to an NFC tag!</string>
+    <string name="TagReadyNext">Ready for the next NFC tag!</string>
+    <string name="WriteWarning">Any swiped NFC tag will automatically be converted into a Rhybudd Device tag and locked</string>
 </resources>

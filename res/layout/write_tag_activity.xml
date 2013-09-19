@@ -1,0 +1,83 @@
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/WriteTagContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/RhybuddWhite" >
+
+
+
+
+
+
+
+            <RelativeLayout
+                android:id="@+id/WriteTagIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="false"
+                android:layout_marginTop="64dp"
+                android:background="@drawable/writetag_working"
+                android:minHeight="164dp"
+                android:minWidth="164dp"
+                android:padding="6dp" >
+
+
+                <ProgressBar
+                    android:id="@+id/IOProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true" />
+
+
+
+
+                <ImageView
+                    android:id="@+id/instructionImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/tap_tag"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+
+
+            <TextView
+                android:id="@+id/IODesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/WriteTagIndicator"
+                android:layout_centerHorizontal="true"
+                android:text="@string/ServerWait"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/writeWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/IODesc"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="18dp"
+                android:gravity="center"
+                android:text="@string/WriteWarning"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/WriterIO" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Small Text"
+                    android:id="@+id/SizesText"
+                    android:layout_below="@+id/writeWarning"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_horizontal"/>
+
+        </RelativeLayout>

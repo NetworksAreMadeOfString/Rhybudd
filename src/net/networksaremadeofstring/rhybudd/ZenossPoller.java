@@ -124,7 +124,7 @@ public class ZenossPoller extends Service
             }
             else
             {
-                ((Thread) new Thread()
+                (new Thread()
                 {
                     public void run()
                     {
@@ -327,7 +327,7 @@ public class ZenossPoller extends Service
 
 	private void RefreshCache()
 	{
-		((Thread) new Thread(){
+		(new Thread(){
 			public void run()
 			{
 				try 
