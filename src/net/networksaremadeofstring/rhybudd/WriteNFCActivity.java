@@ -71,7 +71,7 @@ public class WriteNFCActivity extends FragmentActivity
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         setContentView(R.layout.write_tag_activity);
-
+        //Quick test
         try
         {
             UID = getIntent().getExtras().getString(PAYLOAD_UID).replace("/zport/dmd/Devices/","");
