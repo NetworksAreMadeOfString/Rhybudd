@@ -43,7 +43,6 @@ public class WriteNFCActivity extends FragmentActivity
     public static String PAYLOAD_UID = "uid";
     IntentFilter[] intentFiltersArray = null;
     String[][] techListsArray;
-    JSONObject tagMetaData;
     private NfcAdapter mAdapter;
     private PendingIntent pendingIntent;
     String UID = "";
@@ -288,7 +287,7 @@ public class WriteNFCActivity extends FragmentActivity
                     if(thisNdef.isWritable())
                     {
                             //Final Tag Payload;
-                            Log.i("WriteTag-Payload", tagMetaData.toString());
+                            //Log.i("WriteTag-Payload", tagMetaData.toString());
 
                             //Is this a 203 or larger?
                             if(thisNdef.getMaxSize() < aaRecord.toByteArray().length + idRecord.toByteArray().length)
