@@ -140,6 +140,37 @@ public class ZenossAPI
         }
     }
 
+    public Boolean DismissEvent(String EVID) throws JSONException, IOException {
+        HttpPost httpost = new HttpPost(ZENOSS_INSTANCE + "/zport/dmd/Events/evconsole_router");
+
+        httpost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpost.setHeader("Accept", "application/json");
+
+        JSONObject dataContents = new JSONObject();
+        JSONArray evids = new JSONArray();
+        evids.put(EVID);
+        dataContents.put("evids",evids);
+        dataContents.put("excludeIds",new JSONObject());
+
+        JSONArray data = new JSONArray();
+        data.put(dataContents);
+
+        JSONObject reqData = new JSONObject();
+        reqData.put("action", "EventsRouter");
+        reqData.put("method", "close");
+        reqData.put("data", data);
+        reqData.put("type", "rpc");
+        reqData.put("tid", String.valueOf(this.reqCount++));
+
+        httpost.setEntity(new StringEntity(reqData.toString()));
+        HttpResponse response = httpclient.execute(httpost);
+        String rawJSON = EntityUtils.toString(response.getEntity());
+        response.getEntity().consumeContent();
+        Log.e("DismissEvent",rawJSON);
+
+        return true;
+    }
+
     public static String getPushKey() throws IOException, JSONException
     {
         DefaultHttpClient client = new DefaultHttpClient();

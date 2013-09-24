@@ -49,6 +49,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     private static final int EVENTSLISTHANDLER_NO_EVENTS = 5;
     private static final int EVENTSLISTHANDLER_SERVICE_FAILURE = 6;
     private static final int EVENTSLISTHANDLER_REDOREFRESH = 7;
+    private static final int EVENTSLISTHANDLER_DISMISS = 8;
 
     private static final int ACKEVENTHANDLER_SUCCESS = 9;
     private static final int ACKEVENTHANDLER_FAILURE = 10;
@@ -65,6 +66,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     int retryCount = 0;
     Handler eventsListHandler, AckEventsHandler, AckSingleEventHandler;
     ZenossEventsAdaptor adapter;
+    SwipeDismissListViewTouchListener touchListener = null;
 
     MenuItem refreshStatus = null;
     View abprogress = null;
@@ -192,6 +194,35 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
+
+        ListView listView = getListView();
+
+        touchListener =
+                new SwipeDismissListViewTouchListener(
+                        listView,
+                        new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(ListView listView, int[] reverseSortedPositions)
+                            {
+                                for (int position : reverseSortedPositions)
+                                {
+                                    Log.e("onDismiss",Integer.toString(position));
+                                    DimissEvent((ZenossEvent) adapter.getItem(position));
+                                    adapter.remove(position);
+                                }
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+
+        listView.setOnTouchListener(touchListener);
+        // Setting this scroll listener is required to ensure that during ListView scrolling,
+        // we don't look for swipes.
+        listView.setOnScrollListener(touchListener.makeScrollListener());
     }
 
     @Override
@@ -529,6 +560,12 @@ public class ViewZenossEventsListFragment extends ListFragment
             {
                 switch(msg.what)
                 {
+                    case EVENTSLISTHANDLER_DISMISS:
+                    {
+
+                    }
+                    break;
+
                     case EVENTSLISTHANDLER_ERROR:
                     {
                         Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
@@ -779,6 +816,59 @@ public class ViewZenossEventsListFragment extends ListFragment
                         msg.what = EVENTSLISTHANDLER_ERROR;
                         eventsListHandler.sendMessage(msg);
                     }
+                }
+            }
+        }.start();
+    }
+
+    private void DimissEvent(final ZenossEvent thisEvent)
+    {
+        new Thread()
+        {
+            public void run()
+            {
+                //This is a bit dirty but hell it saves an extra API call
+                if (null == mService && !mBound)
+                {
+                    Log.e("Refresh","Service was dead or something so sleeping");
+                    try
+                    {
+                        sleep(500);
+                    }
+                    catch(Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("RhybuddHome","RefreshThreadSleep",e);
+                    }
+                }
+
+                if (null != mService && mBound)
+                {
+                    Log.e("Refresh","yay not dead");
+                    try
+                    {
+                        if(null == mService.API)
+                        {
+                            mService.PrepAPI(true,true);
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                        mService.API.Login(credentials);
+
+                        mService.API.DismissEvent(thisEvent.getEVID());
+                        //TODO maybe do something?
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","DimissEvent",e);
+                        //TODO Create a handler
+                        //eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                    }
+                }
+                else
+                {
+                    //TODO Lets warn them with a host
+                    //TODO Or make it more resiliant
                 }
             }
         }.start();

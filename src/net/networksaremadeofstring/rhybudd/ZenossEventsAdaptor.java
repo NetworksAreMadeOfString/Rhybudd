@@ -74,7 +74,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
         this.cablistener = _cablistener;
     }
     
-    
+    public void remove(int position)
+    {
+        listZenossEvents.remove(position);
+    }
+
     @Override
 	public int getCount() 
     {
