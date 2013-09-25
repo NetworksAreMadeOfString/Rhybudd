@@ -32,6 +32,8 @@
         <color name="ZaasLightGray">#6f6f6f</color>
         <color name="ZaasDarkGray">#343434</color>
 
+        <color name="CABSelected">#d6dfea</color>
+
         <color name="pressed_rhybudd_default">#CC66C1DE</color>
 
         <color name="transparant">#00000000</color>

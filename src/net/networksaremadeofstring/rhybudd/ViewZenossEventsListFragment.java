@@ -29,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.*;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
@@ -67,9 +68,11 @@ public class ViewZenossEventsListFragment extends ListFragment
     Handler eventsListHandler, AckEventsHandler, AckSingleEventHandler;
     ZenossEventsAdaptor adapter;
     SwipeDismissListViewTouchListener touchListener = null;
+    ActionMode mActionMode;
 
     MenuItem refreshStatus = null;
     View abprogress = null;
+    int cabNumSelected = 0;
 
 
     public List<ZenossEvent> getListOfEvents()
@@ -200,9 +203,11 @@ public class ViewZenossEventsListFragment extends ListFragment
         touchListener =
                 new SwipeDismissListViewTouchListener(
                         listView,
-                        new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                        new SwipeDismissListViewTouchListener.DismissCallbacks()
+                        {
                             @Override
-                            public boolean canDismiss(int position) {
+                            public boolean canDismiss(int position)
+                            {
                                 return true;
                             }
 
@@ -214,6 +219,25 @@ public class ViewZenossEventsListFragment extends ListFragment
                                     Log.e("onDismiss",Integer.toString(position));
                                     DimissEvent((ZenossEvent) adapter.getItem(position));
                                     adapter.remove(position);
+
+                                    //listOfZenossEvents.remove(position);
+                                    RhybuddDataSource datasource = null;
+                                    try
+                                    {
+                                        datasource = new RhybuddDataSource(getActivity());
+                                        datasource.open();
+                                        datasource.UpdateRhybuddEvents(listOfZenossEvents);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        //TODO Report to Bugsense
+                                        e.printStackTrace();
+                                    }
+                                    finally
+                                    {
+                                        if(null != datasource)
+                                            datasource.close();
+                                    }
                                 }
                                 adapter.notifyDataSetChanged();
                             }
@@ -223,6 +247,43 @@ public class ViewZenossEventsListFragment extends ListFragment
         // Setting this scroll listener is required to ensure that during ListView scrolling,
         // we don't look for swipes.
         listView.setOnScrollListener(touchListener.makeScrollListener());
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                Log.e("setOnItemLongClickListener","In long click!");
+                try
+                {
+                    if(listOfZenossEvents.get(i).isSelected())
+                    {
+                        cabNumSelected--;
+                        listOfZenossEvents.get(i).SetSelected(false);
+                    }
+                    else
+                    {
+                        cabNumSelected++;
+                        listOfZenossEvents.get(i).SetSelected(true);
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    if(null == mActionMode)
+                    {
+                        mActionMode = getActivity().startActionMode(mActionModeCallback);
+                    }
+                    else
+                    {
+                        mActionMode.invalidate();
+                    }
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    Toast.makeText(getActivity(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        });
     }
 
     @Override
@@ -500,7 +561,8 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         for (ZenossEvent evt : listOfZenossEvents)
                         {
-                            if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                            //if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                            if(evt.getProgress())
                             {
                                 evt.setProgress(false);
                                 evt.setAcknowledged();
@@ -873,6 +935,144 @@ public class ViewZenossEventsListFragment extends ListFragment
             }
         }.start();
     }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback()
+    {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.events_cab, menu);
+            mode.setTitle("Manage "+ cabNumSelected +" Events");
+            mode.setSubtitle("Select multiple events for mass acknowledgement");
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+        {
+            mode.setTitle("Manage "+ cabNumSelected +" Events");
+            mode.setSubtitle("Select multiple events for mass acknowledgement");
+            return true;
+            //return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item)
+        {
+            switch (item.getItemId())
+            {
+                case R.id.Acknowledge:
+                {
+                    //AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_PROGRESS);
+                    final List<String> EventIDs = new ArrayList<String>();
+
+
+                    for (ZenossEvent evt : listOfZenossEvents)
+                    {
+                        if(evt.isSelected())
+                        {
+                            evt.setProgress(true);
+                            evt.SetSelected(false);
+                            EventIDs.add(evt.getEVID());
+                        }
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                    new Thread()
+                    {
+                        public void run()
+                        {
+                            try
+                            {
+                                if (null != mService && mBound)
+                                {
+                                    try
+                                    {
+                                        if(null == mService.API)
+                                        {
+                                            mService.PrepAPI(true,true);
+                                        }
+
+                                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                                        mService.API.Login(credentials);
+
+                                        mService.API.AcknowledgeEvents(EventIDs);
+
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                                    }
+                                }
+                                else
+                                {
+                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                }
+
+                                //TODO Check it actually succeeded
+                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                            }
+                        }
+                    }.start();
+                    mode.finish();
+                    return true;
+                }
+
+                case R.id.escalate:
+                {
+                    Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+                    // Add data to the intent, the receiving app will decide what to do with it.
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ cabNumSelected +" Zenoss Events");
+                    String Events = "Escalated events;";
+                    int size = listOfZenossEvents.size();
+                    for (Integer i = 0; i < size; i++ )
+                    {
+                        if(listOfZenossEvents.get(i).isSelected())
+                            Events += "\r\n" + listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary();
+                    }
+
+                    intent.putExtra(Intent.EXTRA_TEXT, Events);
+                    startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+                    mode.finish();
+                    return true;
+                }
+
+                default:
+                {
+                    adapter.notifyDataSetChanged();
+                    return false;
+                }
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode)
+        {
+            Log.e("onDestroyActionMode","Called");
+            int size = listOfZenossEvents.size();
+            for (Integer i = 0; i < size; i++ )
+            {
+                listOfZenossEvents.get(i).SetSelected(false);
+            }
+            adapter.notifyDataSetChanged();
+            cabNumSelected = 0;
+            mActionMode = null;
+        }
+    };
 
     public void Refresh()
     {

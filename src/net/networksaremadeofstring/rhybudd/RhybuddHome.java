@@ -636,7 +636,7 @@ public class RhybuddHome extends FragmentActivity
 						}
 					};
 
-					adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents,listener,listenerLong,addCAB);
+					//adapter = new ZenossEventsAdaptor(RhybuddHome.this, listOfZenossEvents,listener,listenerLong,addCAB);
 					list.setAdapter(adapter);
 				}
 				else if(msg.what == 1)

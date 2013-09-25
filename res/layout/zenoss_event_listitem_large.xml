@@ -72,7 +72,8 @@
             android:layout_marginTop="4dp"
             android:background="@drawable/event_list_cab_button"
             android:textOn="@string/empty"
-            android:textOff="@string/empty" />
+            android:textOff="@string/empty"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

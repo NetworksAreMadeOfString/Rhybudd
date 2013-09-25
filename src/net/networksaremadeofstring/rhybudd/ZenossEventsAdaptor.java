@@ -41,16 +41,15 @@ public class ZenossEventsAdaptor extends BaseAdapter
 	private Context context;
     private List<ZenossEvent> listZenossEvents;
     boolean isRhestr = true;
-    private OnClickListener listener;
+    /*private OnClickListener listener;
     private OnLongClickListener listenerLong;
-    private OnClickListener cablistener;
+    private OnClickListener cablistener;*/
     
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	Calendar date;
 	String strDate = "";
 	Date today = Calendar.getInstance().getTime();
-	String[] shortMonths = new DateFormatSymbols().getShortMonths();
-
+	//String[] shortMonths = new DateFormatSymbols().getShortMonths();
 
     public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents)
     {
@@ -65,14 +64,14 @@ public class ZenossEventsAdaptor extends BaseAdapter
         this.isRhestr = _isRhestr;
     }
     
-    public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, OnClickListener _listener, OnLongClickListener _listenerLong, OnClickListener _cablistener) 
+    /*public ZenossEventsAdaptor(Context context, List<ZenossEvent> _listZenossEvents, OnClickListener _listener, OnLongClickListener _listenerLong, OnClickListener _cablistener)
     {
         this.context = context;
         this.listZenossEvents = _listZenossEvents;
         this.listener = _listener;
         this.listenerLong = _listenerLong;
         this.cablistener = _cablistener;
-    }
+    }*/
     
     public void remove(int position)
     {
@@ -141,11 +140,11 @@ public class ZenossEventsAdaptor extends BaseAdapter
         {
 	        if(Event.isFragmentDisplayed())
 	        {
-	        	((ImageView) convertView.findViewById(R.id.fragment_indicator)).setVisibility(View.VISIBLE);
+	        	convertView.findViewById(R.id.fragment_indicator).setVisibility(View.VISIBLE);
 	        }
 	        else
 	        {
-	        	((ImageView) convertView.findViewById(R.id.fragment_indicator)).setVisibility(View.GONE);
+	        	convertView.findViewById(R.id.fragment_indicator).setVisibility(View.GONE);
 	        }
         }
         catch(Exception e)
@@ -183,12 +182,12 @@ public class ZenossEventsAdaptor extends BaseAdapter
 
         if(Event.getProgress())
         {
-        	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(0);
+        	convertView.findViewById(R.id.inProgressBar).setVisibility(View.VISIBLE);
             AckImage.setVisibility(View.INVISIBLE);
         }
         else
         {
-        	((ProgressBar) convertView.findViewById(R.id.inProgressBar)).setVisibility(4);
+        	convertView.findViewById(R.id.inProgressBar).setVisibility(View.INVISIBLE);
             AckImage.setVisibility(View.VISIBLE);
         }
 
@@ -283,7 +282,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
             eventCount.setTypeface(acknowledged);
             ackAuthor.setTypeface(acknowledged);
 
-            ((RelativeLayout) convertView.findViewById(R.id.relativeLayout1)).setBackgroundResource(R.color.FlatGray);
+            convertView.findViewById(R.id.relativeLayout1).setBackgroundResource(R.color.FlatGray);
         }
         else
         {
@@ -299,12 +298,16 @@ public class ZenossEventsAdaptor extends BaseAdapter
             prodState.setTypeface(open);
             eventCount.setTypeface(open);
             ackAuthor.setTypeface(open);
-            ((RelativeLayout) convertView.findViewById(R.id.relativeLayout1)).setBackgroundResource(R.color.ZenossWhite);
+            convertView.findViewById(R.id.relativeLayout1).setBackgroundResource(R.color.ZenossWhite);
         }
 
-
-        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.id.EVENTPOSITIONINLIST,position);
-        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());
+        //Selected
+        /*((ToggleButton) convertView.findViewById(R.id.cabSelect)).setTag(R.id.EVENTPOSITIONINLIST,position);
+        ((ToggleButton) convertView.findViewById(R.id.cabSelect)).setChecked(Event.isSelected());*/
+        if(Event.isSelected())
+        {
+            convertView.findViewById(R.id.relativeLayout1).setBackgroundResource(R.color.CABSelected);
+        }
 
         convertView.setTag(R.id.EVENTID,Event.getEVID());
         convertView.setTag(R.id.EVENTPOSITIONINLIST,position);

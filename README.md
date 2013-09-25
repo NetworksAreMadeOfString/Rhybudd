@@ -8,16 +8,20 @@ The source code has been released under the GPL version 3 license.
 
 Features:
 --------
-* GCM enabled for 'push' delivery of events
+* GCM enabled for 'push' delivery of events via ZenPack (instant alert delivery for free!)
 * Full ZaaS support
 * List Events
-* Acknowledge Event
+* Acknowledge individual Event
 * Acknowledge all events
 * Escalate / Share event details via Email / SMS etc
+* Swipe to close events
+* NFC support to 'tag' servers and tap to view details
 * View Event Details
     * Events History
     * Add to Events log
     * Renders inline images
+* Dream Mode support
+* Lock Screen widgets
 * Settings
     * Zenoss details
     * HTTP Basic Auth
