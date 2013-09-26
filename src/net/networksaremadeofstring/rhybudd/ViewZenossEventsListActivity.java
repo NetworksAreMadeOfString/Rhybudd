@@ -18,6 +18,8 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -53,6 +55,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 {
     private boolean mTwoPane;
     final static int LAUNCHDETAILACTIVITY = 2;
+    final static int LAUNCHSETTINGS = 99;
 
     private static final int INFRASTRUCTURE = 0;
     private static final int MANAGEDATABASE = 1;
@@ -62,8 +65,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     private static final int HELP = 5;
     private static final int FEEDBACK = 6;
     private static final int SEARCH = 7;
-
-
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = "net.networksaremadeofstring.rhybudd.provider";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "zenoss.com";
+    // The account name
+    public static final String ACCOUNT = "Zenoss Sync";
+    // Instance fields
+    Account mAccount;
+    ContentResolver mResolver;
     SharedPreferences settings = null;
 
     private DrawerLayout mDrawerLayout;
@@ -146,8 +156,42 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        // Create the dummy account
+        mAccount = CreateSyncAccount(this);
     }
 
+    public static Account CreateSyncAccount(Context context)
+    {
+        // Create the account type and default account
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager =(AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+        if (accountManager.addAccountExplicitly(newAccount, null, null))
+        {
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+            Log.e("CreateSyncAccount","Success!");
+        }
+        else
+        {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+            Log.e("CreateSyncAccount","Fail!");
+        }
+
+        return newAccount;
+    }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener
     {
@@ -171,7 +215,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             case R.id.settings:
             {
                 Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
-                this.startActivityForResult(SettingsIntent, 99);
+                this.startActivityForResult(SettingsIntent, LAUNCHSETTINGS);
                 return true;
             }
 
@@ -317,7 +361,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
         switch(requestCode)
         {
-            case 99:
+            case LAUNCHSETTINGS:
             {
                 settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -325,6 +369,33 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 intent.putExtra("settingsUpdate", true);
                 startService(intent);
                 bm.dataChanged();
+
+                //Lets assume that one day we'll re-add a setting to disable this
+                //SyncAdapter stuff
+                if(null != mAccount)
+                {
+                    mResolver = getContentResolver();
+                    Bundle bndle = new Bundle();
+                    ContentResolver.addPeriodicSync(
+                            mAccount,
+                            AUTHORITY,
+                            bndle,
+                            86400);
+
+                    ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+
+                    /*bndle.putBoolean(
+                            ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                    bndle.putBoolean(
+                            ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+                    Log.e("addPeriodicSync","Requesting a full sync!");
+                    ContentResolver.requestSync(mAccount, AUTHORITY, bndle);*/
+                }
+                else
+                {
+                    Log.e("addPeriodicSync","mAccount was null");
+                }
             }
             break;
 
@@ -337,7 +408,6 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             }
             break;
 
-            //We assume that settings
             default:
             {
                 if(resultCode == 1)

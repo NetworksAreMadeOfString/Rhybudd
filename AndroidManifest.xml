@@ -11,6 +11,9 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <permission android:name="net.networksaremadeofstring.rhybudd.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="net.networksaremadeofstring.rhybudd.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application android:theme="@style/Theme.Rhybudd_default" android:icon="@drawable/icon"
         android:label="@string/app_name" android:allowClearUserData="true" android:description="@string/Description"
@@ -154,6 +157,31 @@
             </intent-filter>
         </receiver>
 
+        <service
+                android:name="net.networksaremadeofstring.rhybudd.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.accounts.AccountAuthenticator"
+                    android:resource="@xml/authenticator" />
+        </service>
+
+        <provider
+                android:name="net.networksaremadeofstring.rhybudd.StubProvider"
+                android:authorities="net.networksaremadeofstring.rhybudd.provider"
+                android:exported="false"
+                android:syncable="true"/>
+
+        <service
+                android:name="net.networksaremadeofstring.rhybudd.SyncService"
+                android:exported="true"
+                android:process=":sync">
+            <intent-filter>net.networksaremadeofstring.rhybudd.provider
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/syncadapter" />
+        </service>
 
         <service android:name=".RhybuddDream" android:exported="true"
                  android:icon="@drawable/ic_acknowledged" android:label="Rhybudd Dream" >

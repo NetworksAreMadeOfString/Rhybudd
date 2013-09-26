@@ -237,4 +237,7 @@
     <string name="TagReadyFirst">Ready to write to an NFC tag!</string>
     <string name="TagReadyNext">Ready for the next NFC tag!</string>
     <string name="WriteWarning">Any swiped NFC tag will automatically be converted into a Rhybudd Device tag and locked</string>
+
+    <!-- Sync Adapter -->
+    <string name="SyncAccountName">Zenoss Periodic Sync Account</string>
 </resources>

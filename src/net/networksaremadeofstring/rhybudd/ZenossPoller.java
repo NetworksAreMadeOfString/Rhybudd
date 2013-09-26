@@ -252,11 +252,11 @@ public class ZenossPoller extends Service
 			//Log.i("onStartCommand","Received an intent to check for events");
 			CheckForEvents();
 		}
-		else if(intent != null && intent.getBooleanExtra("refreshCache", false))
+		/*else if(intent != null && intent.getBooleanExtra("refreshCache", false))
 		{
 			//Log.i("onStartCommand","Received an intent to refresh the cache");
 			RefreshCache();
-		}
+		}*/
 		else if(intent != null && intent.getBooleanExtra("settingsUpdate", false))
 		{
 			//Refresh our reference to the settings just in case something changed
@@ -308,7 +308,7 @@ public class ZenossPoller extends Service
 		}
 
 		
-		if(settings.getBoolean("refreshCache", true))
+		/*if(settings.getBoolean("refreshCache", true))
 		{
 			//Log.i("PollerCheck","Background cache refresh enabled!");
 			
@@ -322,10 +322,28 @@ public class ZenossPoller extends Service
 			Poller.putExtra("refreshCache", true);
 			PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
 			am.cancel(CacheRefresh);
-		}
+		}*/
+
+        //We use a SyncAdapter now like good citizens
+        try
+        {
+            if(settings.getBoolean("refreshCache", true))
+            {
+                Poller.putExtra("refreshCache", true);
+                PendingIntent CacheRefresh = PendingIntent.getService(this, 1, Poller, PendingIntent.FLAG_UPDATE_CURRENT);
+                am.cancel(CacheRefresh);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("refreshCache", false);
+                editor.commit();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 	}
 
-	private void RefreshCache()
+	/*private void RefreshCache()
 	{
 		(new Thread(){
 			public void run()
@@ -350,12 +368,6 @@ public class ZenossPoller extends Service
 					else
 					{
 						//TODO Send Warning
-						/*Message msg = new Message();
-    					Bundle bundle = new Bundle();
-    					bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices");
-    					msg.setData(bundle);
-    					msg.what = 0;
-    					handler.sendMessage(msg);*/
 					}
 					
 				} 
@@ -363,16 +375,10 @@ public class ZenossPoller extends Service
 				{
 					//TODO Send Warning
                     BugSenseHandler.sendExceptionMessage("ZenossPoller","onDestroy",e);
-					/*Message msg = new Message();
-					Bundle bundle = new Bundle();
-					bundle.putString("exception",e.getMessage());
-					msg.setData(bundle);
-					msg.what = 0;
-					handler.sendMessage(msg);*/
 				}
 			}
 		}).start();
-	}
+	}*/
 	
 	private void CheckForEvents()
 	{
