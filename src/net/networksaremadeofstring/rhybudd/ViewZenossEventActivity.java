@@ -22,6 +22,8 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
+
 import com.bugsense.trace.BugSenseHandler;
 import java.util.ArrayList;
 
@@ -128,6 +130,24 @@ public class ViewZenossEventActivity extends FragmentActivity implements ViewZen
             }
             return null;*/
             return EventNames.get(position);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                finish();
+                return true;
+            }
+
+            default:
+            {
+                return false;
+            }
         }
     }
 }

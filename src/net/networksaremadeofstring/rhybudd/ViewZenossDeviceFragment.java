@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -91,7 +92,7 @@ public class ViewZenossDeviceFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC))
+        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         {
             inflater.inflate(R.menu.view_device, menu);
         }
@@ -108,7 +109,7 @@ public class ViewZenossDeviceFragment extends Fragment
             {
                 //Log.e("ViewZenossDeviceFragment", "Menu to write NFC");
                 //Log.e("deviceJSON",deviceJSON.toString());
-                if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC))
+                if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
                 {
                     Intent NFCIntent = new Intent(getActivity(), WriteNFCActivity.class);
                     try
@@ -121,9 +122,14 @@ public class ViewZenossDeviceFragment extends Fragment
                         e.printStackTrace();
                         Toast.makeText(getActivity(),"Sorry there was error parsing the UID for this device",Toast.LENGTH_SHORT).show();
                     }
+                    return true;
                 }
-                return true;
+                else
+                {
+                    return false;
+                }
             }
+
             default:
                 break;
         }

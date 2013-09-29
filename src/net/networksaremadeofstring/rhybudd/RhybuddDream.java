@@ -353,6 +353,8 @@ public class RhybuddDream extends DreamService
             ImageView groupImg = ((ImageView) convertView.findViewById(R.id.groupImage));
             //groupImg.setLayoutParams(new ViewGroup.LayoutParams(imgWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
             groupImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            groupImg.setMinimumHeight(imgHeight);
+            groupImg.setMinimumWidth(imgWidth);
             Animation fadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
 
             if(null == thisGraphObject.thisGraph)

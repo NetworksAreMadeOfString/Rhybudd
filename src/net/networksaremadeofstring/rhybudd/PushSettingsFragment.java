@@ -22,9 +22,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
@@ -42,7 +47,9 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-public class PushSettingsFragment extends Fragment
+import static android.nfc.NdefRecord.createMime;
+
+public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback
 {
     /**
      * The fragment argument representing the section number for this
@@ -68,7 +75,7 @@ public class PushSettingsFragment extends Fragment
     String regId = "";
     Boolean checkZPImmediately = true;
     ZenossAPI API = null;
-
+    NfcAdapter mNfcAdapter;
     Boolean pushEnabled = false;
     String pushKey = "";
     String senderID = "";
@@ -89,6 +96,21 @@ public class PushSettingsFragment extends Fragment
         {
             //Log.e("onResume","Set invisible");
         }*/
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction())) {
+            processIntent(getActivity().getIntent());
+        }
+    }
+
+
+    void processIntent(Intent intent)
+    {
+        //textView = (TextView) findViewById(R.id.textView);
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        // only one message sent during the beam
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+
+        // record 0 contains the MIME type, record 1 is the AAR, if present
+        FilterKey.setText(new String(msg.getRecords()[0].getPayload()));
     }
 
     @Override
@@ -442,6 +464,20 @@ public class PushSettingsFragment extends Fragment
         if(null != getArguments() && getArguments().containsKey("checkZPImmediately"))
             checkZPImmediately = getArguments().getBoolean("checkZPImmediately");
 
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+        if (mNfcAdapter == null)
+        {
+            /*Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;*/
+        }
+        else
+        {
+            // Register callback
+            mNfcAdapter.setNdefPushMessageCallback(this, getActivity());
+        }
+
         checkZPHandler = new Handler()
         {
             public void handleMessage(Message msg)
@@ -548,31 +584,14 @@ public class PushSettingsFragment extends Fragment
         };
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent)
     {
-        Log.e("onOptionsItemSelected","Called");
-
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-            {
-                if(checkZPImmediately)
-                {
-                    Log.e("onOptionsItemSelected","Calling exit");
-                    getActivity().finish();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            default:
-            {
-                return false;
-            }
-        }
-    }*/
+        NdefMessage msg = new NdefMessage(
+                new NdefRecord[] { createMime(
+                        "application/vnd.net.networksaremadeofstring.rhybudd.push", FilterKey.getText().toString().getBytes())
+                        //,NdefRecord.createApplicationRecord("com.example.android.beam")
+                });
+        return msg;
+    }
 }

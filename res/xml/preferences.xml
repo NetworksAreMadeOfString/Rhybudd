@@ -2,18 +2,18 @@
 
     <PreferenceCategory android:title="Background Polling">
 
-        <!--<CheckBoxPreference
+        <CheckBoxPreference
                 android:key="refreshCache"
-                android:title="Cache Refresh"
-                android:summary="Checks Zenoss every hour or so for new devices etc"
+                android:title="Periodic Cache Refresh"
+                android:summary="An Android Sync Adapter that checks for new devices, groups etc every 24 hours"
                 android:defaultValue="true"
-                />-->
+                />
         
         <CheckBoxPreference
                 android:key="AllowBackgroundService"
                 android:title="Events Alerting"
                 android:summary="Checks Zenoss for new events and raises notifications based on filters below" 
-                android:defaultValue="true"
+                android:defaultValue="false"
                 />
         
         <ListPreference
@@ -117,7 +117,8 @@
 		    android:key="notificationSoundChoice"
 		    android:title="Notification Sound"
 		    android:ringtoneType="all"
-		    android:summary="Choose the Zenoss Event alert sound." 
+		    android:summary="Choose the Zenoss Event alert sound."
+            android:defaultValue="content://settings/system/notification_sound"
 		    android:dependency="notificationSound"
 		    />
 		

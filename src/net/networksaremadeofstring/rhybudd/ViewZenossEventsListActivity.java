@@ -27,6 +27,8 @@ import android.app.backup.BackupManager;
 import android.content.*;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -370,7 +372,6 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 startService(intent);
                 bm.dataChanged();
 
-                //Lets assume that one day we'll re-add a setting to disable this
                 //SyncAdapter stuff
                 if(null != mAccount)
                 {
@@ -382,7 +383,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                             bndle,
                             86400);
 
-                    ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+                    ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, settings.getBoolean("refreshCache", true));
 
                     /*bndle.putBoolean(
                             ContentResolver.SYNC_EXTRAS_MANUAL, true);

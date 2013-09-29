@@ -19,7 +19,13 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.ActionBar;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +34,7 @@ import android.support.v4.view.ViewPager;
 import com.bugsense.trace.BugSenseHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ViewZenossDeviceActivity extends FragmentActivity
@@ -37,6 +44,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity
     /**
      * The {@link android.support.v4.view.ViewPager} that will host the section contents.
      */
+    private static int UI_POPULATE = 0;
     ViewPager mViewPager;
     String currentDeviceID = "";
     String currentDeviceName = "";
@@ -44,12 +52,25 @@ public class ViewZenossDeviceActivity extends FragmentActivity
     ArrayList<String> DeviceIDs;
     int currentIndex = 0;
     ActionBar actionbar;
+    Handler triggerUIHandler = null;
+    /*Tag intentTag;
+    NdefMessage[] msgs;
+    Parcelable[] rawMsgs = null;
+    NfcAdapter mNfcAdapter;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_zenoss_event_activity);
+
+        triggerUIHandler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                PopulatePager();
+            }
+        };
 
         try
         {
@@ -64,11 +85,61 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         }
 
         currentDeviceID = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_UID);
-        currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
+        //currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
 
         DeviceNames = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES);
         DeviceIDs = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS);
 
+        //TODO Differentiate between a search intent and an NFC intent
+        if(null == DeviceNames || DeviceNames.size() == 0)
+        {
+            try
+            {
+                Parcelable[] rawMsgs = getIntent().getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+                NdefMessage msg = (NdefMessage) rawMsgs[0];
+                currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();
+
+                (new Thread()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            RhybuddDataSource datasource = new RhybuddDataSource(ViewZenossDeviceActivity.this);
+                            datasource.open();
+                            List<ZenossDevice> listOfDevices = datasource.GetRhybuddDevices();
+                            datasource.close();
+
+                            DeviceNames = new ArrayList<String>();
+                            DeviceIDs = new ArrayList<String>();
+
+                            for(ZenossDevice device : listOfDevices)
+                            {
+                                DeviceNames.add(device.getname());
+                                DeviceIDs.add(device.getuid());
+                            }
+                            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+        }
+    }
+
+    private void PopulatePager()
+    {
         int i = 0;
 
         for(String str : DeviceIDs)
@@ -91,7 +162,6 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(currentIndex);
-
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {

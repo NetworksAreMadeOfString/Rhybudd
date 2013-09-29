@@ -78,12 +78,15 @@ public class WriteNFCActivity extends FragmentActivity
             aaRecord = NdefRecord.createApplicationRecord("net.networksaremadeofstring.rhybudd");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             {
-                idRecord = NdefRecord.createExternal("rhybudd:tag", "z", UID.getBytes(Charset.forName("US-ASCII")));
+                //idRecord = NdefRecord.createExternal("rhybudd:tag", "z", UID.getBytes(Charset.forName("US-ASCII")));
+                idRecord = NdefRecord.createMime("application/vnd.rhybudd.device", UID.getBytes());
             }
             else
             {
-                idRecord = NdefRecord.createUri("z://"+UID);
+                idRecord = NdefRecord.createUri("rhybudd://"+UID);
             }
+
+
 
             ((TextView) findViewById(R.id.SizesText)).setText("This payload is " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " bytes.\n\nAn ultralight can store up to 46 bytes.\nAn Ultralight C or NTAG203 can store up to 137 bytes.\nDespite the name a 1K can only store up to 716 bytes.");
         }

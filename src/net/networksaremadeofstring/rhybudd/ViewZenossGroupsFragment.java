@@ -37,14 +37,21 @@ public class ViewZenossGroupsFragment extends Fragment
         {
             public void handleMessage(Message msg)
             {
-                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                        Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                try
+                {
+                    gridview.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                            Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-
-                gridview.setAdapter(new ZenossGroupsGridAdapter(getActivity(),groups));
+                    gridview.setAdapter(new ZenossGroupsGridAdapter(getActivity(),groups));
+                }
+                catch(Exception e)
+                {
+                    Toast.makeText(getActivity(), "There was a problem getting the list of groups or rendering the grid", Toast.LENGTH_LONG).show();
+                }
             }
         };
 
