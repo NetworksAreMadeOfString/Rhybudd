@@ -51,7 +51,7 @@ public class ManageUpdate extends BroadcastReceiver
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+                        BugSenseHandler.sendExceptionMessage("ManageUpdate", "onReceive", e);
 					}
 
 					SharedPreferences.Editor editor = settings.edit();
@@ -91,7 +91,7 @@ public class ManageUpdate extends BroadcastReceiver
 		}
 		catch(Exception e)
 		{
-			//BugSenseHandler.log("UpdateReceiver", e);
+            BugSenseHandler.sendExceptionMessage("ManageUpdate", "onReceive", e);
 		}
 	}
 }

@@ -74,7 +74,7 @@ public class DeviceList extends Activity
 		}
 		catch(Exception e)
 		{
-			//BugSenseHandler.log("DeviceList-OnDestroy", e);
+            BugSenseHandler.sendExceptionMessage("DeviceList", "onDestroy", e);
 		}
 	}
 	
@@ -98,7 +98,7 @@ public class DeviceList extends Activity
 		}
 		catch(Exception e)
 		{
-			//BugSenseHandler.log("DeviceList-onRetainNonConfigurationInstance", e);
+            BugSenseHandler.sendExceptionMessage("DeviceList", "onRetainNonConfigurationInstance", e);
 		}
 	
 	    return listOfZenossDevices;

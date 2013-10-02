@@ -132,6 +132,7 @@ public class ZaasSettingsFragment extends Fragment
                         }
                         catch(Exception e)
                         {
+                            BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "LoginButton", e);
                             e.printStackTrace();
                             //HandleException(e, "Initialising the API Failed. An error message has been logged.");
                             if(null != e.getMessage())
@@ -188,7 +189,7 @@ public class ZaasSettingsFragment extends Fragment
                     }
                     catch(Exception e)
                     {
-                        //BugSenseHandler.log("InitialSettings", e);
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "OnCreate", e);
                         Toast.makeText(getActivity(), "Logged in Successfully. Preparing Database!", Toast.LENGTH_SHORT).show();
                     }
 

@@ -166,6 +166,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                     e.printStackTrace();
                     //AckSingleEventHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
                     msg.what = ACKEVENTHANDLER_FAILURE;
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread outer catch",e);
                 }
 
                 Log.e("acknowledgeSingleEvent","Sending Handler message");
@@ -230,7 +231,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                                     }
                                     catch (Exception e)
                                     {
-                                        //TODO Report to Bugsense
+                                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","SwipetoDismiss",e);
                                         e.printStackTrace();
                                     }
                                     finally
@@ -280,6 +281,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 catch(Exception e)
                 {
                     Toast.makeText(getActivity(), "There was an internal error. A report has been sent.", Toast.LENGTH_SHORT).show();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","long item press",e);
                     return false;
                 }
             }
@@ -375,6 +377,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                         {
                             e.printStackTrace();
                             AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolve all outer catch",e);
                         }
                     }
                 }.start();
@@ -827,6 +830,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
                 catch(Exception e)
                 {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","DBGetThread",e);
                     e.printStackTrace();
                     if(tempZenossEvents != null)
                         tempZenossEvents.clear();
@@ -1308,8 +1312,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
                 catch (Exception e)
                 {
-                    Log.e("onPause","uhoh stack trace");
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onPause",e);
                 }
             }
             else
@@ -1319,6 +1322,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         }
         catch(Exception e)
         {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onPause outer",e);
             e.printStackTrace();
         }
 

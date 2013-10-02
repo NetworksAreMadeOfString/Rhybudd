@@ -68,12 +68,12 @@ public class RhybuddOpenHelper extends SQLiteOpenHelper
         }
         catch(SQLiteException s)
         {
-            //BugSenseHandler.log("Database-onCreate", s);
+            BugSenseHandler.sendExceptionMessage("RhybuddOpenHelper", "onCreate", s);
             s.printStackTrace();
         }
         catch(Exception e)
         {
-            //BugSenseHandler.log("Database-onCreate", e);
+            BugSenseHandler.sendExceptionMessage("RhybuddOpenHelper", "onCreate", e);
             e.printStackTrace();
         }
     }

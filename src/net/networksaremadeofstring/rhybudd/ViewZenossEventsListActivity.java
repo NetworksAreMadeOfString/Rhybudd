@@ -290,6 +290,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 catch(Exception e)
                 {
                     Toast.makeText(ViewZenossEventsListActivity.this, "There was a problem launching your email client.\n\nPlease email Gareth@DataSift.com with your feedback.", Toast.LENGTH_LONG).show();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick FEEDBACK",e);
                 }
             }
             break;
@@ -440,6 +441,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                     catch(Exception e)
                     {
                         finishStart();
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","OnActivityResult welcomedialog",e);
                     }
 
                     bm.dataChanged();
@@ -493,6 +495,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             catch(Exception e)
             {
                 //BugSenseHandler.log("alertDialog", e);
+                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","fetcherror alertdialog",e);
             }
         }
     }
@@ -517,6 +520,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         catch (Exception e)
         {
             e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onpause",e);
         }
 
     }

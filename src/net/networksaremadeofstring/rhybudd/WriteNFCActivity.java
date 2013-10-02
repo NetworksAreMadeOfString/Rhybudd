@@ -92,6 +92,7 @@ public class WriteNFCActivity extends FragmentActivity
         }
         catch(Exception e)
         {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate", e);
             e.printStackTrace();
             Toast.makeText(this, "Sorry there was error parsing the passed UID, we cannot continue.", Toast.LENGTH_SHORT).show();
             finish();
@@ -110,6 +111,7 @@ public class WriteNFCActivity extends FragmentActivity
         }
         catch (IntentFilter.MalformedMimeTypeException e)
         {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate", e);
             throw new RuntimeException("fail", e);
         }
 
@@ -256,6 +258,7 @@ public class WriteNFCActivity extends FragmentActivity
                 }
                 catch(Exception e)
                 {
+                    BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "WriteTag", e);
                     e.printStackTrace();
                 }
 
@@ -271,6 +274,7 @@ public class WriteNFCActivity extends FragmentActivity
                     }
                     catch(Exception d)
                     {
+                        BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "WriteTag", d);
                         d.printStackTrace();
                         tagHandler.sendEmptyMessage(FORMATEXCEPTION);
                     }
@@ -319,10 +323,12 @@ public class WriteNFCActivity extends FragmentActivity
                 }
                 catch (IOException e)
                 {
+                    BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "WriteTag", e);
                     tagHandler.sendEmptyMessage(IOEXCEPTION);
                 }
                 catch (FormatException e)
                 {
+                    BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "WriteTag", e);
                     e.printStackTrace();
                     tagHandler.sendEmptyMessage(FORMATEXCEPTION);
                 }

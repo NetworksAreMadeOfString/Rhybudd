@@ -119,6 +119,7 @@ public class ZenossPoller extends Service
                 catch(Exception e)
                 {
                     e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ZenossPoller","PrepAPI",e);
                     loginSuccessful = false;
                 }
             }
@@ -138,6 +139,7 @@ public class ZenossPoller extends Service
                             }
                             catch(Exception e)
                             {
+                                BugSenseHandler.sendExceptionMessage("ZenossPoller","PrepAPI",e);
                                 e.printStackTrace();
                                 loginSuccessful = false;
                             }
@@ -196,6 +198,7 @@ public class ZenossPoller extends Service
                         }
                         catch(Exception e)
                         {
+                            BugSenseHandler.sendExceptionMessage("ZenossPoller","eventsHandler",e);
                             e.printStackTrace();
                         }
     				}
@@ -340,6 +343,7 @@ public class ZenossPoller extends Service
         catch (Exception e)
         {
             e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ZenossPoller","cancel refresh cache poller",e);
         }
 	}
 
@@ -367,13 +371,11 @@ public class ZenossPoller extends Service
 					}
 					else
 					{
-						//TODO Send Warning
 					}
 					
 				} 
 				catch (Exception e) 
 				{
-					//TODO Send Warning
                     BugSenseHandler.sendExceptionMessage("ZenossPoller","onDestroy",e);
 				}
 			}

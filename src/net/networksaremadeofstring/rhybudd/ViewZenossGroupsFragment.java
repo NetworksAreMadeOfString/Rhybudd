@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 
 public class ViewZenossGroupsFragment extends Fragment
 {
@@ -51,6 +53,7 @@ public class ViewZenossGroupsFragment extends Fragment
                 catch(Exception e)
                 {
                     Toast.makeText(getActivity(), "There was a problem getting the list of groups or rendering the grid", Toast.LENGTH_LONG).show();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossGroupsFragment", "onCreate", e);
                 }
             }
         };
@@ -58,20 +61,21 @@ public class ViewZenossGroupsFragment extends Fragment
         ((Thread) new Thread(){
             public void run()
             {
-                ZenossCredentials credentials = null;
-                ZenossAPI API = null;
-
-                if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
-                {
-                    API = new ZenossAPIZaas();
-                }
-                else
-                {
-                    API = new ZenossAPICore();
-                }
-
                 try
                 {
+                    ZenossCredentials credentials = null;
+                    ZenossAPI API = null;
+
+                    if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                    {
+                        API = new ZenossAPIZaas();
+                    }
+                    else
+                    {
+                        API = new ZenossAPICore();
+                    }
+
+
                     credentials = new ZenossCredentials(getActivity());
                     API.Login(credentials);
 
@@ -80,7 +84,9 @@ public class ViewZenossGroupsFragment extends Fragment
                 }
                 catch(Exception e)
                 {
+                    //Toast.makeText(getActivity(), "There was a problem getting the list of groups or rendering the grid", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossGroupsFragment", "onCreate", e);
                 }
 
                 handler.sendEmptyMessage(1);

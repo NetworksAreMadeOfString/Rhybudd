@@ -174,6 +174,8 @@ public class ViewZenossEventFragment extends Fragment
                                     Toast.makeText(getActivity(),"Unable to acknowledge alert",Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "outer try", e);
                         }
                     }
                 }).start();
@@ -313,6 +315,7 @@ public class ViewZenossEventFragment extends Fragment
         catch(Exception e)
         {
             e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "onsaveinstance", e);
         }
 
         try
@@ -322,6 +325,7 @@ public class ViewZenossEventFragment extends Fragment
         catch(Exception e)
         {
             e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "onsaveinstance", e);
         }
     }
 
@@ -380,6 +384,7 @@ public class ViewZenossEventFragment extends Fragment
                 catch(Exception e)
                 {
                     e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "oncreate bundle", e);
                 }
             }
 
@@ -393,6 +398,7 @@ public class ViewZenossEventFragment extends Fragment
                 catch(Exception e)
                 {
                     e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "oncreate bundle image", e);
                 }
             }
 
@@ -449,6 +455,7 @@ public class ViewZenossEventFragment extends Fragment
                         catch (Exception e)
                         {
                             e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "loadhandler ack image", e);
                         }
 
                         //Log.e("EventDetails", EventDetails.toString(3));
@@ -505,6 +512,7 @@ public class ViewZenossEventFragment extends Fragment
                             catch (Exception e)
                             {
                                 e.printStackTrace();
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "set Summary MovementMethod", e);
                                 //Worth a shot
                             }
                         }
@@ -603,6 +611,8 @@ public class ViewZenossEventFragment extends Fragment
                         e.printStackTrace();
                         e2.printStackTrace();
                     }
+
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "uncaught exception within firstload", e);
                 }
             }
         };

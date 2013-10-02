@@ -39,6 +39,8 @@ import android.widget.ListView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class Search extends Activity
 {
 	//private SharedPreferences settings = null;
@@ -159,7 +161,7 @@ public class Search extends Activity
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("Search", "PerformSearch", e);
 					listOfZenossDevices.clear();
 				}
 

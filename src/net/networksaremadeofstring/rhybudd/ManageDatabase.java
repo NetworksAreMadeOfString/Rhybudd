@@ -36,6 +36,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class ManageDatabase extends Activity
 {
 	Thread FlushDBThread;
@@ -57,7 +59,7 @@ public class ManageDatabase extends Activity
 		}
 		catch(Exception e)
 		{
-			//BugSenseHandler.log("ManageDatabase", e);
+            BugSenseHandler.sendExceptionMessage("ManageDatabase", "OnCreate", e);
 		}
         
         
@@ -81,7 +83,7 @@ public class ManageDatabase extends Activity
 				}
 				catch(Exception e)
 				{
-					//BugSenseHandler.log("ManageDatabase", e);
+                    BugSenseHandler.sendExceptionMessage("ManageDatabase", "UIUpdate", e);
 				}
 			}
         };
@@ -135,7 +137,7 @@ public class ManageDatabase extends Activity
 		        	    			}
 		        					catch(Exception e)
 		        					{
-		        						//BugSenseHandler.log("emptyDBButton", e);
+                                        BugSenseHandler.sendExceptionMessage("ManageDatabase", "UIUpdate", e);
 		        					}
 		        	    		}
 		        	    	}).start();
