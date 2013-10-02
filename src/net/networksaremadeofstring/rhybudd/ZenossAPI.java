@@ -25,7 +25,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.provider.CalendarContract;
 import android.text.format.Time;
 import android.util.Log;
 import com.bugsense.trace.BugSenseHandler;
@@ -79,9 +78,9 @@ public class ZenossAPI
     public static String PREFERENCE_BASIC_AUTH_USER = "BAUser";
     public static String PREFERENCE_BASIC_AUTH_PASSWORD = "BAPassword";
     public static String PREFERENCE_IS_ZAAS = "isZaas";
-    public static String SETTINGS_PUSH = "push";
+    //public static String SETTINGS_PUSH = "push";
     public static String PREFERENCE_PUSH_ENABLED = "pushkey_enabled";
-    public static String PREFERENCE_PUSH_SENDERID = "pushkey_senderid";
+    //public static String PREFERENCE_PUSH_SENDERID = "pushkey_senderid";
 
     public static final int HANDLER_REDOREFRESH = 800;
 
@@ -171,7 +170,7 @@ public class ZenossAPI
         return true;
     }
 
-    public static String getPushKey() throws IOException, JSONException
+    /*public static String getPushKey() throws IOException, JSONException
     {
         DefaultHttpClient client = new DefaultHttpClient();
         SchemeRegistry registry = new SchemeRegistry();
@@ -199,7 +198,7 @@ public class ZenossAPI
         {
             return null;
         }
-    }
+    }*/
 
     public boolean UnregisterWithZenPack(String DeviceID)
     {
@@ -394,10 +393,26 @@ public class ZenossAPI
         dataContents.put("deviceName",FQDN);
         dataContents.put("deviceClass", DeviceClass);
         dataContents.put("title", Title);
-        //Look this up
-        dataContents.put("productionState", 1000);
 
-        //Look this up
+        //ToDo This actually needs to check the values against the strings and pass the right thing
+        dataContents.put("productionState", 1000);
+        /*if(ProductionState.equals(""))
+        {
+            dataContents.put("productionState", 1000);
+        }
+        else
+        {
+            try
+            {
+                dataContents.put("productionState", Integer.valueOf(ProductionState));
+            }
+            catch(Exception e)
+            {
+                dataContents.put("productionState", 1000);
+            }
+        }*/
+
+        //ToDo This actually needs to check the values against the strings and pass the right thing
         dataContents.put("priority", 3);
 
         //Defaults
@@ -428,7 +443,7 @@ public class ZenossAPI
 
         httpost.setEntity(new StringEntity(reqData.toString()));
         HttpResponse response = httpclient.execute(httpost);
-        String rawJSON = EntityUtils.toString(response.getEntity());
+        //String rawJSON = EntityUtils.toString(response.getEntity());
         response.getEntity().consumeContent();
         //Log.e("rawJSON",rawJSON);
         //JSONObject json = new JSONObject(rawJSON);
@@ -530,8 +545,7 @@ public class ZenossAPI
     {
         client = new DefaultHttpClient();
         SchemeRegistry registry = new SchemeRegistry();
-        SocketFactory socketFactory = null;
-        socketFactory = TrustAllSSLSocketFactory.getDefault();
+        SocketFactory socketFactory = TrustAllSSLSocketFactory.getDefault();
         registry.register(new Scheme("https", socketFactory, 443));
         mgr = new ThreadSafeClientConnManager(client.getParams(), registry);
         httpclient = new DefaultHttpClient(mgr, client.getParams());
@@ -716,9 +730,9 @@ public class ZenossAPI
         int DeviceCount = devices.getJSONObject("result").getInt("totalCount");
         try
         {
-            if(((int) devices.getJSONObject("result").getJSONArray("devices").length()) < DeviceCount)
+            if(( devices.getJSONObject("result").getJSONArray("devices").length()) < DeviceCount)
             {
-                DeviceCount = (int) devices.getJSONObject("result").getJSONArray("devices").length();
+                DeviceCount = devices.getJSONObject("result").getJSONArray("devices").length();
             }
         }
         catch(Exception e)
@@ -728,7 +742,7 @@ public class ZenossAPI
 
         for(int i = 0; i < DeviceCount; i++)
         {
-            JSONObject CurrentDevice = null;
+            JSONObject CurrentDevice;
             int IPAddress = 0;
 
             try
@@ -990,7 +1004,7 @@ public class ZenossAPI
         boolean hideAckd = settings.getBoolean("hideAckdAlerts", false);
         String severityString = createSeverityString(Critical,Error,Warning,Info,Debug);
         List<ZenossEvent> listofZenossEvents = new ArrayList<ZenossEvent>();
-        JSONArray Events = null;
+        JSONArray Events;
         JSONObject jsonEvents;
 
         try
@@ -1038,7 +1052,7 @@ public class ZenossAPI
 
         try
         {
-            if(jsonEvents != null)
+            if(null != jsonEvents)
                 EventCount = jsonEvents.getJSONObject("result").getInt("totalCount");
         }
         catch(Exception e)
@@ -1052,7 +1066,7 @@ public class ZenossAPI
         //If EventCount is 0 this will never process
         for(int i = 0; i < EventCount; i++)
         {
-            JSONObject CurrentEvent = null;
+            JSONObject CurrentEvent;
             try
             {
                 CurrentEvent = Events.getJSONObject(i);

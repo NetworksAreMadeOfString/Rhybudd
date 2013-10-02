@@ -45,19 +45,10 @@ import android.widget.*;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gcm.GCMRegistrar;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-
 import static android.nfc.NdefRecord.createMime;
 
 public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback
 {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-    public static final String ARG_SECTION_NUMBER = "section_number";
     private static final int MENU_UNDO = 238768;
 
     public PushSettingsFragment()
@@ -66,7 +57,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
     EditText FilterKey;
     TextView PushKeyDesc;
-    Button SaveKey;
+    //Button SaveKey;
     Handler getIDhandler, checkZPHandler;
     ProgressBar progressbar;
     AlertDialog alertDialog;
@@ -373,8 +364,15 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
     private void RegisterWithZenPack()
     {
-        progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-        progressbar.setVisibility(View.VISIBLE);
+        try
+        {
+            progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+            progressbar.setVisibility(View.VISIBLE);
+        }
+        catch (NullPointerException NPE)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","RegisterWithZenPack",NPE);
+        }
 
         (new Thread()
         {
@@ -512,13 +510,8 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
         // Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
-        if (mNfcAdapter == null)
-        {
-            /*Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-            finish();
-            return;*/
-        }
-        else
+
+        if (null != mNfcAdapter)
         {
             // Register callback
             mNfcAdapter.setNdefPushMessageCallback(this, getActivity());

@@ -24,7 +24,6 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -214,9 +213,13 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         try
         {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            NdefMessage msg = (NdefMessage) rawMsgs[0];
 
-            currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();
+            if(rawMsgs.length > 0)
+            {
+                NdefMessage msg = (NdefMessage) rawMsgs[0];
+
+                currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();
+            }
         }
         catch (Exception e)
         {

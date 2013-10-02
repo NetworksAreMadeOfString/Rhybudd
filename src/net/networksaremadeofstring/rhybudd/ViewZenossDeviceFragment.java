@@ -29,7 +29,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,16 +39,10 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bugsense.trace.BugSenseHandler;
 import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.Random;
 
-/**
- * Created by Gareth on 04/06/13.
- */
 public class ViewZenossDeviceFragment extends Fragment
 {
     public static String ARG_HOSTNAME = "hostname";
@@ -99,9 +92,17 @@ public class ViewZenossDeviceFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        try
         {
-            inflater.inflate(R.menu.view_device, menu);
+            if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+            {
+                inflater.inflate(R.menu.view_device, menu);
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onCreateOptionsMenu",e);
         }
     }
 
@@ -114,25 +115,31 @@ public class ViewZenossDeviceFragment extends Fragment
         {
             case R.id.writenfc:
             {
-                //Log.e("ViewZenossDeviceFragment", "Menu to write NFC");
-                //Log.e("deviceJSON",deviceJSON.toString());
-                if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+                try
                 {
-                    Intent NFCIntent = new Intent(getActivity(), WriteNFCActivity.class);
-                    try
+                    if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
                     {
-                        NFCIntent.putExtra(WriteNFCActivity.PAYLOAD_UID,deviceJSON.getJSONObject("result").getJSONObject("data").getString("uid"));
-                        this.startActivity(NFCIntent);
+                        Intent NFCIntent = new Intent(getActivity(), WriteNFCActivity.class);
+                        try
+                        {
+                            NFCIntent.putExtra(WriteNFCActivity.PAYLOAD_UID,deviceJSON.getJSONObject("result").getJSONObject("data").getString("uid"));
+                            this.startActivity(NFCIntent);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Toast.makeText(getActivity(),"Sorry there was error parsing the UID for this device",Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
                     }
-                    catch (Exception e)
+                    else
                     {
-                        e.printStackTrace();
-                        Toast.makeText(getActivity(),"Sorry there was error parsing the UID for this device",Toast.LENGTH_SHORT).show();
+                        return false;
                     }
-                    return true;
                 }
-                else
+                catch(Exception e)
                 {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onOptionsItemSelected",e);
                     return false;
                 }
             }
@@ -355,7 +362,7 @@ public class ViewZenossDeviceFragment extends Fragment
         }
         else
         {
-            ((Thread) new Thread(){
+            (new Thread(){
                 public void run()
                 {
                     ZenossAPI API;
@@ -398,16 +405,15 @@ public class ViewZenossDeviceFragment extends Fragment
 
     private void getGraphs()
     {
-        ((Thread) new Thread()
+        (new Thread()
         {
             public void run()
             {
                 try
                 {
                     ZenossAPI API;
-                    Message msg = new Message();
-                    Bundle bundle = new Bundle();
-
+                    /*Message msg = new Message();
+                    Bundle bundle = new Bundle();*/
 
                     if( PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
                     {
