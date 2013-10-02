@@ -19,8 +19,11 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,13 +34,17 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.widget.Toast;
+
 import com.bugsense.trace.BugSenseHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.nfc.NdefRecord.createMime;
 
-public class ViewZenossDeviceActivity extends FragmentActivity
+
+public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAdapter.CreateNdefMessageCallback
 {
     SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -95,9 +102,9 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         {
             try
             {
-                Parcelable[] rawMsgs = getIntent().getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+                /*Parcelable[] rawMsgs = getIntent().getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
                 NdefMessage msg = (NdefMessage) rawMsgs[0];
-                currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();
+                currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();*/
 
                 (new Thread()
                 {
@@ -118,7 +125,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity
                                 DeviceNames.add(device.getname());
                                 DeviceIDs.add(device.getuid());
                             }
-                            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+
+                            processIntent(getIntent());
                         }
                         catch(Exception e)
                         {
@@ -144,10 +152,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity
 
         for(String str : DeviceIDs)
         {
-            //Log.e("test","Comparing " + str + " to " + currentDeviceID);
             if(str.equals(currentDeviceID))
             {
-                //Log.e("test", "----------------FOUND---------------");
                 currentIndex = i;
                 break;
             }
@@ -164,6 +170,69 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         mViewPager.setCurrentItem(currentIndex);
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        //We handle the intents in the onCreate
+        /*if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
+        {
+            processIntent(getIntent());
+        }*/
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent)
+    {
+        try
+        {
+            String UID = currentDeviceID.replace("/zport/dmd/Devices/","");
+            NdefMessage msg = new NdefMessage(
+                    new NdefRecord[] { createMime(
+                            "application/vnd.net.networksaremadeofstring.rhybudd.devicepage", UID.getBytes())
+                            //,NdefRecord.createApplicationRecord("com.example.android.beam")
+                    });
+            return msg;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
+            return null;
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        processIntent(getIntent());
+    }
+
+    void processIntent(Intent intent)
+    {
+        try
+        {
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            NdefMessage msg = (NdefMessage) rawMsgs[0];
+
+            currentDeviceID = "/zport/dmd/Devices/" + msg.getRecords()[0].getPayload().toString();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
+            Toast.makeText(this, "There was a problem trying to find the device ID that was beamed", Toast.LENGTH_SHORT).show();
+        }
+        finally
+        {
+            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+        }
+    }
+
+    /**
+     *
+     */
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm)
@@ -176,6 +245,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         {
             Fragment fragment = new ViewZenossDeviceFragment();
             Bundle args = new Bundle();
+            currentDeviceID = DeviceIDs.get(position);
+            currentDeviceName = DeviceNames.get(position);
             args.putString(ViewZenossDeviceFragment.ARG_UID, DeviceIDs.get(position));
             args.putString(ViewZenossDeviceFragment.ARG_HOSTNAME, DeviceNames.get(position));
             fragment.setArguments(args);
@@ -192,36 +263,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity
         @Override
         public CharSequence getPageTitle(int position)
         {
-            /*Locale l = Locale.getDefault();
-            switch (position)
-            {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-            }
-            return null;*/
             return DeviceNames.get(position);
         }
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-            {
-                finish();
-                return true;
-            }
-
-            default:
-            {
-                return false;
-            }
-        }
-    }*/
 }

@@ -967,7 +967,17 @@ public class ZenossAPI
 
     public List<ZenossEvent> GetRhybuddEvents(Context context) throws JSONException, ClientProtocolException, IOException, SocketTimeoutException, SocketException
     {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences settings;
+        try
+        {
+            settings = PreferenceManager.getDefaultSharedPreferences(context);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
 
         boolean Critical = settings.getBoolean("SeverityCritical", true);
         boolean Error = settings.getBoolean("SeverityError", true);

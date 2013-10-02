@@ -45,6 +45,7 @@ import com.bugsense.trace.BugSenseHandler;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by Gareth on 04/06/13.
@@ -64,7 +65,6 @@ public class ViewZenossDeviceFragment extends Fragment
     Drawable MemoryGraph;
 
     Handler firstLoadHandler, eventsHandler, errorHandler,loadAverageHandler,CPUGraphHandler,MemoryGraphHandler;
-
     //Per fragment UI elements
     TextView deviceTitle = null;
     ImageView loadAverageGraphView;
@@ -78,10 +78,17 @@ public class ViewZenossDeviceFragment extends Fragment
     TextView MemorySwap = null;
     TextView LastCollected = null;
     HorizontalScrollView hsv = null;
-
     JSONObject deviceJSON = null;
-
     ZenossCredentials credentials = null;
+    private Integer[] mThumbIds = {
+            R.drawable.groups_a, R.drawable.groups_b,
+            R.drawable.groups_c, R.drawable.groups_d,
+            R.drawable.groups_e, R.drawable.groups_f,
+            R.drawable.groups_g, R.drawable.groups_h,
+            R.drawable.groups_i, R.drawable.groups_j,
+            R.drawable.groups_k, R.drawable.groups_l
+    };
+
 
     public ViewZenossDeviceFragment()
     {
@@ -235,8 +242,17 @@ public class ViewZenossDeviceFragment extends Fragment
 
         hsv = (HorizontalScrollView) rootView.findViewById(R.id.horizontalScrollView);
 
-
-
+        try
+        {
+            ImageView deviceRepImg = ((ImageView) rootView.findViewById(R.id.deviceRepImg));
+            deviceRepImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            Random r = new Random();
+            deviceRepImg.setImageResource(mThumbIds[r.nextInt(mThumbIds.length)]);
+        }
+        catch(Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","ImageRand",e);
+        }
 
         return rootView;
     }

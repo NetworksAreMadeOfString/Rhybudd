@@ -35,6 +35,8 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +58,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
      * fragment.
      */
     public static final String ARG_SECTION_NUMBER = "section_number";
+    private static final int MENU_UNDO = 238768;
 
     public PushSettingsFragment()
     {
@@ -81,6 +84,9 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     String senderID = "";
     boolean hasZenPack = false;
     ZenPack zp = new ZenPack();
+    String prevFilterKey = "";
+    Menu menu;
+    MenuItem undoMenuItem;
 
     @Override
     public void onResume()
@@ -101,6 +107,12 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu m, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu = m;
+    }
 
     void processIntent(Intent intent)
     {
@@ -109,8 +121,42 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         // only one message sent during the beam
         NdefMessage msg = (NdefMessage) rawMsgs[0];
 
+        //Backup our current key
+        prevFilterKey = FilterKey.getText().toString();
+
         // record 0 contains the MIME type, record 1 is the AAR, if present
         FilterKey.setText(new String(msg.getRecords()[0].getPayload()));
+        try
+        {
+            if(null == menu.findItem(MENU_UNDO))
+            {
+                menu.add(Menu.NONE,MENU_UNDO,Menu.NONE,"Undo");
+                undoMenuItem = menu.findItem(MENU_UNDO);
+                undoMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                undoMenuItem.setIcon(R.drawable.ic_action_content_undo);
+            }
+        }
+        catch(Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case MENU_UNDO:
+            {
+                FilterKey.setText(prevFilterKey);
+                menu.removeItem(MENU_UNDO);
+                return true;
+            }
+
+            default:
+                return false;
+        }
     }
 
     @Override
