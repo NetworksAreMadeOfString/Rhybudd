@@ -344,6 +344,23 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     }
 
     @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        try
+        {
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+            editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, FilterKey.getText().toString());
+            editor.commit();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment", "onPause", e);
+        }
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         if(checkZPImmediately)
@@ -518,8 +535,19 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         {
             public void handleMessage(Message msg)
             {
-                progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-                progressbar.setVisibility(View.GONE);
+                try
+                {
+                    progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+                    progressbar.setVisibility(View.GONE);
+                }
+                catch (NullPointerException npe)
+                {
+                    npe.printStackTrace();
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler",e);
+                }
 
                 switch(msg.what)
                 {

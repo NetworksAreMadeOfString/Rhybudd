@@ -145,7 +145,7 @@ public class ZenossPoller extends Service
                         }
                         else
                         {
-                            Log.e("ZenossPoller", "No credentials yet");
+                            //Log.e("ZenossPoller", "No credentials yet");
                         }
                     }
                 }).start();
