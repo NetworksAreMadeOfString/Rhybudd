@@ -20,10 +20,12 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ZenossDeviceAdaptor extends BaseAdapter
@@ -89,6 +91,42 @@ public class ZenossDeviceAdaptor extends BaseAdapter
             {
                 ((TextView) convertView.findViewById(R.id.IPAddressTextView)).setText("");
             }
+        }
+
+        try
+        {
+            if(null != Device.getos())
+            {
+                Log.e("Adapter", Device.getos());
+                if(Device.getos().contains("indows"))
+                {
+                    ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_windows_icon);
+                }
+                else if(Device.getos().contains("inux") || Device.getos().contains("redhat") || Device.getos().contains("buntu"))
+                {
+                    ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_linux_icon);
+                }
+                else if(Device.getos().contains("cisco") || Device.getos().contains("IOS"))
+                {
+                    ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_cisco);
+                }
+                else if(Device.getos().contains("arista") || Device.getos().contains("EOS"))
+                {
+                    ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_arista_icon);
+                }
+                else
+                {
+                    ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_default_icon);
+                }
+            }
+            else
+            {
+                ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_default_icon);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
         convertView.setTag(Device.getuid());

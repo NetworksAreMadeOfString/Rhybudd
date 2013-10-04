@@ -291,7 +291,15 @@ public class ViewZenossDeviceFragment extends Fragment
     {
         super.onSaveInstanceState(outState);
 
-        outState.putString("json", deviceJSON.toString());
+        try
+        {
+            outState.putString("json", deviceJSON.toString());
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onSaveInstanceState",e);
+        }
 
         /*outState.putParcelable("cpuimg",((BitmapDrawable) CPUGraphView.getDrawable()).getBitmap());
         outState.putParcelable("loadavgimg",((BitmapDrawable) loadAverageGraphView.getDrawable()).getBitmap());

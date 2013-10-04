@@ -260,13 +260,11 @@ public class RhybuddDock extends FragmentActivity
 				} 
 				catch (JSONException e) 
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				} 
 				catch (IOException e) 
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
 				}

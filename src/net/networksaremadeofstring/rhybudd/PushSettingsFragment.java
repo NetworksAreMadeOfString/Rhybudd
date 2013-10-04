@@ -107,27 +107,36 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
     void processIntent(Intent intent)
     {
-        //textView = (TextView) findViewById(R.id.textView);
-        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        // only one message sent during the beam
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-
-        //Backup our current key
-        prevFilterKey = FilterKey.getText().toString();
-
-        // record 0 contains the MIME type, record 1 is the AAR, if present
-        FilterKey.setText(new String(msg.getRecords()[0].getPayload()));
         try
         {
-            if(null == menu.findItem(MENU_UNDO))
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            // only one message sent during the beam
+            NdefMessage msg = (NdefMessage) rawMsgs[0];
+
+            //Backup our current key
+            prevFilterKey = FilterKey.getText().toString();
+
+            // record 0 contains the MIME type, record 1 is the AAR, if present
+            FilterKey.setText(new String(msg.getRecords()[0].getPayload()));
+            try
             {
-                menu.add(Menu.NONE,MENU_UNDO,Menu.NONE,"Undo");
+                if(null == menu.findItem(MENU_UNDO))
+                {
+                    menu.add(Menu.NONE,MENU_UNDO,Menu.NONE,"Undo");
+                }
+
                 undoMenuItem = menu.findItem(MENU_UNDO);
-                undoMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                undoMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 undoMenuItem.setIcon(R.drawable.ic_action_content_undo);
+
+                getActivity().invalidateOptionsMenu();
+            }
+            catch(Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
         }
@@ -140,6 +149,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         {
             case MENU_UNDO:
             {
+                Log.e("onOptionsItemSelected","Removing");
                 FilterKey.setText(prevFilterKey);
                 menu.removeItem(MENU_UNDO);
                 return true;
@@ -504,7 +514,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
         if(null != getArguments() && getArguments().containsKey("checkZPImmediately"))
             checkZPImmediately = getArguments().getBoolean("checkZPImmediately");
 

@@ -72,8 +72,7 @@ public class ManageUpdate extends BroadcastReceiver
 		            editor.putBoolean("onlyProductionAlerts", oldSettings.getBoolean("onlyProductionAlerts", true));
 		            editor.putBoolean("notificationSound", oldSettings.getBoolean("notificationSound", true));
 		            editor.commit();
-		            
-		            //TODO In the next version we'll release this to clear out space
+
 		            SharedPreferences.Editor oldSettingsFlush = oldSettings.edit();
 		            oldSettingsFlush.clear();
 		            oldSettingsFlush.commit();

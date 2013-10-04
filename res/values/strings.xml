@@ -111,7 +111,7 @@
     <string name="deviceListIconDesc">Image depicting 3 servers on a network</string>
     <string name="ViewDeviceActivitySubtitle">Swipe to see other devices</string>
     <string name="DeviceListWelcomeTitle">Infrastructure List</string>
-    <string name="DeviceListWelcome">Hello this is a shorter string</string>
+    <string name="DeviceListWelcome">The Infrastructure List shows all devices currently modelled by Zenoss, their current Alert counts (at last sync), Production State, IP address and Operating system.\n\nSelect a device to see more details including Graphs and SNMP data.</string>
     
     <!-- Manage Database -->
     <string name="mgeDBRefreshDesc">Image depicting the refreshing of the local cache</string>
@@ -240,4 +240,6 @@
 
     <!-- Sync Adapter -->
     <string name="SyncAccountName">Zenoss Periodic Sync Account</string>
+
+    <string name="DeviceFooterText">New Devices can be added from the Actionbar</string>
 </resources>

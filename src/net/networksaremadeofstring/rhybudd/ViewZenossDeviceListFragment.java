@@ -20,7 +20,9 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +32,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bugsense.trace.BugSenseHandler;
+
 import org.apache.http.conn.ConnectTimeoutException;
 
 import java.util.ArrayList;
@@ -133,6 +139,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
             DeviceIDs.add(device.getuid());
         }
     }
+
     public void DBGetThread()
     {
         dialog = new ProgressDialog(getActivity());
@@ -326,6 +333,22 @@ public class ViewZenossDeviceListFragment extends ListFragment
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
         {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+        }
+
+        /*TextView textView = new TextView(getActivity());
+        textView.setText("New Devices can be added from the ActionBar");
+        textView.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
+        textView.setGravity(View.TEXT_ALIGNMENT_CENTER);*/
+        try
+        {
+            View footerView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.device_list_footer, null, false);
+            ((TextView) footerView.findViewById(R.id.DeviceFooterText)).setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
+            getListView().addFooterView(footerView, null, false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "AddFooter", e);
         }
     }
 

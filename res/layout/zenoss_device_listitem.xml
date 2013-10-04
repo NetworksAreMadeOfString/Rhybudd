@@ -9,52 +9,68 @@
     android:layout_height="fill_parent"
     android:layout_marginBottom="4dp"
     android:layout_marginTop="4dp"
-    android:background="@drawable/device_grid_background">
+    android:background="@drawable/device_grid_background"
+    android:paddingBottom="20dp">
 
-    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_height="wrap_content" android:layout_width="fill_parent"
-              android:layout_alignParentLeft="true" android:id="@+id/DeviceName"
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/serverOS"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_default_icon"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"/>
+
+        <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_height="wrap_content" android:layout_width="fill_parent"
+              android:id="@+id/DeviceName"
               android:ellipsize="end"
               android:layout_alignParentTop="true"
-              android:paddingLeft="8dp"
               android:paddingTop="4dp"
-              android:background="@drawable/device_grid_title_background"
-              android:textColor="@color/RhybuddWhite"
-              android:paddingBottom="4dp"
-              android:layout_marginBottom="6dp"></TextView>
+              android:textColor="@color/ZaasDarkGray"
+              android:layout_toRightOf="@+id/serverOS"
+              android:layout_marginTop="6dp"
+              android:layout_marginLeft="8dp"></TextView>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/metaContainer"
-            android:gravity="center_vertical|center_horizontal"
-            android:textAlignment="center"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/linearLayout1"
-            android:layout_marginTop="6dp"
-            android:layout_marginLeft="1dp"
-            android:layout_marginRight="1dp"
-            android:layout_marginBottom="1dp"
-            android:padding="4dp"
-            >
 
-            <TextView
+        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="Production"
                 android:id="@+id/prodStateTextView"
-                android:layout_marginRight="12dp"/>
+                android:layout_toRightOf="@+id/serverOS"
+                android:layout_below="@+id/DeviceName"
+                android:textColor="@color/ZaasLightGray"
+                android:layout_marginLeft="8dp"/>
 
-            <TextView
+        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="127.0.0.1"
                 android:id="@+id/IPAddressTextView"
-                android:layout_marginLeft="12dp"/>
-        </LinearLayout>
+                android:layout_below="@+id/DeviceName"
+                android:layout_toRightOf="@+id/prodStateTextView"
+                android:paddingLeft="20dp"
+                android:textColor="@color/ZaasLightGray"/>
+
+
+
+
+        <View style="@style/Divider"
+              android:layout_alignParentTop="false"
+              android:layout_centerHorizontal="true"
+              android:layout_width="fill_parent"
+              android:id="@+id/DividerView"
+              android:layout_marginTop="6dp"
+              android:layout_below="@+id/serverOS"
+              android:layout_marginBottom="8dp"
+              android:layout_height="1dp"
+              android:paddingLeft="12dp"
+              android:paddingRight="12dp"
+              android:layout_marginLeft="20dp"
+              android:layout_marginRight="20dp"/>
 
         <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/linearLayout1"
                       android:layout_centerHorizontal="true"
@@ -65,7 +81,7 @@
                       android:paddingRight="8dp"
                       android:background="@drawable/event_details_meta_container"
                       android:layout_marginBottom="8dp"
-                      android:layout_below="@+id/DeviceName"
+                      android:layout_below="@+id/DividerView"
                       android:layout_marginTop="8dp">
 
             <TextView android:layout_width="wrap_content" android:drawableLeft="@drawable/ic_critical" android:textAppearance="?android:attr/textAppearanceSmall" android:layout_height="wrap_content" android:id="@+id/CriticalCount" android:text="0" android:layout_marginRight="20px" android:textColor="#FF00"
@@ -86,6 +102,8 @@
                       android:gravity="center_vertical"
                       android:minWidth="40dp"></TextView>
         </LinearLayout>
+
+
 
     </RelativeLayout>
 </FrameLayout>

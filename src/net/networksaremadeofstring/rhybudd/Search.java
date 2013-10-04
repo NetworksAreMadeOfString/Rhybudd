@@ -176,7 +176,7 @@ public class Search extends Activity
 					//Log.i("DeviceList","No DB data found, querying API directly");
 					Message msg = new Message();
 					Bundle bundle = new Bundle();
-					bundle.putString("exception","A query to both the local DB returned no devices");
+					bundle.putString("exception","A query to the local DB returned no devices");
 					msg.setData(bundle);
 					msg.what = 1;
 					searchResultsHandler.sendMessage(msg);

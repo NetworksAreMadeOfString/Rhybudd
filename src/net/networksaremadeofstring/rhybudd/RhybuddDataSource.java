@@ -370,6 +370,7 @@ public class RhybuddDataSource
                     values.put("productionState",CurrentDevice.getproductionState());
                     values.put("ipAddress", CurrentDevice.getipAddress());
                     values.put("name", CurrentDevice.getname());
+                    values.put("os", CurrentDevice.getos());
                     values.put("uid", CurrentDevice.getuid());
 
                     HashMap<String, Integer> events = CurrentDevice.getevents();
