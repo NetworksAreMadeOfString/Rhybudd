@@ -22,7 +22,6 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,7 +74,7 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
     {
         selectedUID = device.getuid();
         selectedDevice = device.getname();
-        Log.e("selectedUID", selectedUID);
+        //Log.e("selectedUID", selectedUID);
         if (mTwoPane)
         {
             // In two-pane mode, show the detail view in this activity by

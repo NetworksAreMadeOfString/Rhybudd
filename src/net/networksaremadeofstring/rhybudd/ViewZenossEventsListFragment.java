@@ -27,7 +27,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -112,7 +111,7 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     public void acknowledgeSingleEvent(final int position)
     {
-        Log.e("acknowledgeSingleEvent","Am in acknowledgeSingleEvent with position " + Integer.toString(position));
+        //Log.e("acknowledgeSingleEvent","Am in acknowledgeSingleEvent with position " + Integer.toString(position));
 
         setInProgress(position);
 
@@ -133,14 +132,14 @@ public class ViewZenossEventsListFragment extends ListFragment
                         {
                             if(null == mService.API)
                             {
-                                Log.e("acknowledgeSingleEvent","mService.API was null");
+                                //Log.e("acknowledgeSingleEvent","mService.API was null");
                                 mService.PrepAPI(true,true);
                             }
-                            Log.e("acknowledgeSingleEvent","Logging in...");
+                            //Log.e("acknowledgeSingleEvent","Logging in...");
                             ZenossCredentials credentials = new ZenossCredentials(getActivity());
                             mService.API.Login(credentials);
 
-                            Log.e("acknowledgeSingleEvent","Acknowledging event");
+                            //Log.e("acknowledgeSingleEvent","Acknowledging event");
                             mService.API.AcknowledgeEvent(listOfZenossEvents.get(position).getEVID());
 
                         }
@@ -169,7 +168,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                     BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread outer catch",e);
                 }
 
-                Log.e("acknowledgeSingleEvent","Sending Handler message");
+                //Log.e("acknowledgeSingleEvent","Sending Handler message");
                 AckSingleEventHandler.sendMessage(msg);
             }
         }.start();
@@ -217,7 +216,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                             {
                                 for (int position : reverseSortedPositions)
                                 {
-                                    Log.e("onDismiss",Integer.toString(position));
+                                    //Log.e("onDismiss",Integer.toString(position));
                                     DimissEvent((ZenossEvent) adapter.getItem(position));
                                     adapter.remove(position);
 
@@ -253,7 +252,7 @@ public class ViewZenossEventsListFragment extends ListFragment
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
             {
-                Log.e("setOnItemLongClickListener","In long click!");
+                //Log.e("setOnItemLongClickListener","In long click!");
                 try
                 {
                     if(listOfZenossEvents.get(i).isSelected())
@@ -298,7 +297,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
-        Log.e("onAttach","Attached");
+        //Log.e("onAttach","Attached");
         mCallbacks = (Callbacks) activity;
     }
 
@@ -419,7 +418,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     {
         super.onListItemClick(listView, view, position, id);
 
-        Log.e("onListItemClick","I got clicked");
+        //Log.e("onListItemClick","I got clicked");
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
@@ -479,7 +478,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             public void handleMessage(Message msg)
             {
-                Log.e("AckSingleEventHandler",Integer.toString(msg.what) + " / " + Integer.toString(msg.getData().getInt("position")));
+                //Log.e("AckSingleEventHandler",Integer.toString(msg.what) + " / " + Integer.toString(msg.getData().getInt("position")));
                 switch(msg.what)
                 {
                     case ACKEVENTHANDLER_PROGRESS:
@@ -689,7 +688,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                         }
                         else
                         {
-                            Log.e("refreshStatus","refreshStatus was null reverting to using dialog");
+                           // Log.e("refreshStatus","refreshStatus was null reverting to using dialog");
 
                             if(dialog != null && dialog.isShowing())
                             {
@@ -700,7 +699,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 dialog = new ProgressDialog(getActivity());
                                 dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
                                 //dialog.setCancelable(false);
-                                Log.e("EVENTSLISTHANDLER_DB_EMPTY", "Showing a dialog");
+                                //Log.e("EVENTSLISTHANDLER_DB_EMPTY", "Showing a dialog");
 
                                 dialog.show();
                             }
@@ -792,13 +791,13 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     public void DBGetThread()
     {
-        Log.e("DBGetThread", "Doing a DB lookup");
+        //Log.e("DBGetThread", "Doing a DB lookup");
 
         if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
         {
-            Log.e("DBGetThread", "Well we can't do this because we don't have any credentials ");
+            //Log.e("DBGetThread", "Well we can't do this because we don't have any credentials ");
             return;
         }
 
@@ -808,7 +807,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         }
         else
         {
-            Log.e("DBGetThread", "refreshStatus was null!");
+            //Log.e("DBGetThread", "refreshStatus was null!");
         }
 
         listOfZenossEvents.clear();
@@ -855,7 +854,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
                 else
                 {
-                    Log.i("EventList","No DB data found, querying API directly");
+                    //Log.i("EventList","No DB data found, querying API directly");
                     try
                     {
                         eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_DB_EMPTY);
@@ -896,7 +895,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 //This is a bit dirty but hell it saves an extra API call
                 if (null == mService && !mBound)
                 {
-                    Log.e("Refresh","Service was dead or something so sleeping");
+                    //Log.e("Refresh","Service was dead or something so sleeping");
                     try
                     {
                         sleep(500);
@@ -909,7 +908,7 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                 if (null != mService && mBound)
                 {
-                    Log.e("Refresh","yay not dead");
+                    //Log.e("Refresh","yay not dead");
                     try
                     {
                         if(null == mService.API)
@@ -1066,7 +1065,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
-            Log.e("onDestroyActionMode","Called");
+            //Log.e("onDestroyActionMode","Called");
             int size = listOfZenossEvents.size();
             for (Integer i = 0; i < size; i++ )
             {
@@ -1084,7 +1083,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
         {
-            Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
+            //Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
             return;
         }
 
@@ -1125,7 +1124,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 //This is a bit dirty but hell it saves an extra API call
                 if (null == mService && !mBound)
                 {
-                    Log.e("Refresh","Service was dead or something so sleeping");
+                    //Log.e("Refresh","Service was dead or something so sleeping");
                     try
                     {
                         sleep(500);
@@ -1138,7 +1137,7 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                 if (null != mService && mBound)
                 {
-                    Log.e("Refresh","yay not dead");
+                    //Log.e("Refresh","yay not dead");
                     try
                     {
                         if(null == mService.API)
@@ -1153,7 +1152,7 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                         if(null == tempZenossEvents)
                         {
-                            Log.e("Refresh","We got a null return from the service API, lets try ourselves");
+                            //Log.e("Refresh","We got a null return from the service API, lets try ourselves");
                             ZenossAPI API;
 
                             if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
@@ -1220,7 +1219,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                             dialog = new ProgressDialog(getActivity());
 
                             dialog.setTitle("Querying Zenoss Directly");
-                            Log.e("Refresh","The service wasn't running for some reason");
+                            //Log.e("Refresh","The service wasn't running for some reason");
                             dialog.setMessage("The backend service wasn't running.\n\nStarting...");
                             //ToDo set cancellable
 
@@ -1280,12 +1279,12 @@ public class ViewZenossEventsListFragment extends ListFragment
         //If it's been more than 15 minutes since we last updated we should do a full refresh
         if(ZenossAPI.shouldRefresh(getActivity()))
         {
-            Log.i("onResume","shouldRefresh() says we should do a full refresh");
+            //Log.i("onResume","shouldRefresh() says we should do a full refresh");
             Refresh();
         }
         else
         {
-            Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
+            //Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
             DBGetThread();
         }
     }
@@ -1300,15 +1299,15 @@ public class ViewZenossEventsListFragment extends ListFragment
 
         try
         {
-            Log.e("onPause","Checking if dialog is null");
+            //Log.e("onPause","Checking if dialog is null");
             if(null != dialog)
             {
-                Log.e("onPause","it wasn't");
+                //Log.e("onPause","it wasn't");
                 try
                 {
-                    Log.e("onPause","Dismissing");
+                    //Log.e("onPause","Dismissing");
                     dialog.dismiss();
-                    Log.e("onPause","dismissed");
+                    //Log.e("onPause","dismissed");
                 }
                 catch (Exception e)
                 {
@@ -1317,7 +1316,7 @@ public class ViewZenossEventsListFragment extends ListFragment
             }
             else
             {
-                Log.e("onPause","dialog was null");
+                //Log.e("onPause","dialog was null");
             }
         }
         catch(Exception e)

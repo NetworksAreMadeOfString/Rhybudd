@@ -250,7 +250,6 @@ public class CoreSettingsFragment extends Fragment
                         getActivity().setResult(1,in);
                         getActivity().finish();
                     }
-
                 }
                 else if(msg.what == RhybuddHandlers.msg_caching_complete)
                 {
@@ -258,9 +257,20 @@ public class CoreSettingsFragment extends Fragment
                 }
                 else if(msg.what == RhybuddHandlers.msg_initial_verify_debug_output)
                 {
-                    EditText debugOutput = (EditText) getActivity().findViewById(R.id.debugOutput);
-
-                    debugOutput.setText(debugOutput.getText() + s.format(new Date()) + " " + msg.getData().getString(ZenossAPI.MSG_DEBUG) + "\r\n");
+                    try
+                    {
+                        EditText debugOutput = (EditText) getActivity().findViewById(R.id.debugOutput);
+                        debugOutput.setText(debugOutput.getText() + s.format(new Date()) + " " + msg.getData().getString(ZenossAPI.MSG_DEBUG) + "\r\n");
+                    }
+                    catch (NullPointerException npe)
+                    {
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Displaying toast with error message",npe);
+                        Toast.makeText(getActivity(), "An unknown error occured trying to display some debug output. It has been reported", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","msg_initial_verify_debug_output went very wrong",e);
+                    }
                 }
                 else if(msg.what == RhybuddHandlers.msg_initial_verify_error)
                 {

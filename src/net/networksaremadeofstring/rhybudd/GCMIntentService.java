@@ -24,8 +24,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.util.Log;
-
 import com.bugsense.trace.BugSenseHandler;
 
 
@@ -103,7 +101,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 
             try
             {
-                Log.v("GCMPayload",alertCount + " / " +
+                /*Log.v("GCMPayload",alertCount + " / " +
                         evid + " / " +
                         device + " / " +
                         summary + " / " +
@@ -112,7 +110,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                         event_class + " / " +
                         event_class_key + " / " +
                         sent
-                );
+                );*/
 
                 //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
                 ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
@@ -183,7 +181,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     @Override
     protected void onRegistered(final Context arg0, final String regid)
     {
-        Log.e("GCMIntentService", "onRegistered");
+        //Log.e("GCMIntentService", "onRegistered");
 
         (new Thread()
         {
@@ -210,7 +208,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                         else
                         {
                             //Need to do something here
-                            Log.e("onRegistered","API Login failed");
+                            //Log.e("onRegistered","API Login failed");
                         }
                 }
                 catch (Exception e)
@@ -224,7 +222,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     @Override
     protected void onUnregistered(final Context arg0, String arg1)
     {
-        Log.e("GCMIntentService","onUnregistered");
+       // Log.e("GCMIntentService","onUnregistered");
 
         ((Thread) new Thread(){
             public void run()

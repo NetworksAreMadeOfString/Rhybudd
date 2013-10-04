@@ -105,6 +105,7 @@
     <string name="eventDetailsEventCountLabel">Event Count:</string>
     <string name="eventDetailsAgentLabel">Agent:</string>
     <string name="eventDetailsLogLabel">Log:</string>
+    <string name="eventDetailsTitlePlaceholder">Getting event details...</string>
     
     <!-- DeviceList -->
     <string name="deviceListServerCount">Calculating server count&#8230;</string>

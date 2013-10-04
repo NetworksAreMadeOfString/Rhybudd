@@ -20,15 +20,12 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.backup.BackupManager;
 import android.content.*;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.nfc.NdefMessage;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -36,10 +33,6 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -181,7 +174,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
              * then call context.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
-            Log.e("CreateSyncAccount","Success!");
+            //Log.e("CreateSyncAccount","Success!");
         }
         else
         {
@@ -189,7 +182,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
              * The account exists or some other error occurred. Log this, report it,
              * or handle it internally.
              */
-            Log.e("CreateSyncAccount","Fail!");
+            //Log.e("CreateSyncAccount","Fail!");
         }
 
         return newAccount;
@@ -329,7 +322,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         //Might as well update GCM whilst we're here
         if(settings.contains(ZenossAPI.PREFERENCE_PUSH_ENABLED) && settings.getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
         {
-            Log.e("onResume","Doing a GCM Registration");
+            //Log.e("onResume","Doing a GCM Registration");
             doGCMRegistration(settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,""));
         }
 
@@ -396,7 +389,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 }
                 else
                 {
-                    Log.e("addPeriodicSync","mAccount was null");
+                    //Log.e("addPeriodicSync","mAccount was null");
                 }
             }
             break;
@@ -465,7 +458,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     @Override
     public void fetchError()
     {
-        Log.e("fetchError","fetchError");
+        //Log.e("fetchError","fetchError");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Unable to get any events from the DB or from the API.\nCheck settings?")
@@ -528,7 +521,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     @Override
     public void onItemSelected(final ZenossEvent event, final int position)
     {
-        Log.e("onItemSelected", "touched in activity");
+        //Log.e("onItemSelected", "touched in activity");
         if (mTwoPane)
         {
             // In two-pane mode, show the detail view in this activity by
@@ -536,6 +529,8 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             // fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putString("EventID", event.getEVID());
+            arguments.putString("EventTitle", event.getDevice());
+            arguments.putInt("EventCount", event.getCount());
             arguments.putBoolean(ViewZenossDeviceFragment.ARG_2PANE, true);
             arguments.putInt("position",position);
             ViewZenossEventFragment fragment = new ViewZenossEventFragment();
@@ -553,7 +548,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 {
                     //AcknowledgeSingleEvent(position);
                     ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-                    Log.e("Activity","ack with position " + Integer.toString(position));
+                    //Log.e("Activity","ack with position " + Integer.toString(position));
                     listFrag.acknowledgeSingleEvent(position);
                 }
             });
@@ -565,6 +560,8 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                     Intent ViewEventIntent = new Intent(ViewZenossEventsListActivity.this, ViewZenossEventActivity.class);
                     ViewEventIntent.putExtra("EventID", event.getEVID());
                     ViewEventIntent.putExtra("position",position);
+                    ViewEventIntent.putExtra("EventTitle", event.getDevice());
+                    ViewEventIntent.putExtra("EventCount", event.getCount());
                     ArrayList<String> EventNames = new ArrayList<String>();
                     ArrayList<String> EVIDs = new ArrayList<String>();
 

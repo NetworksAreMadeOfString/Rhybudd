@@ -33,7 +33,6 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,7 +99,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
     void processIntent(Intent intent)
     {
-        Log.e("processIntent","processIntent");
+        //Log.e("processIntent","processIntent");
         try
         {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -135,7 +134,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         {
             case MENU_UNDO:
             {
-                Log.e("onOptionsItemSelected","Removing");
+                //Log.e("onOptionsItemSelected","Removing");
                 FilterKey.setText(prevFilterKey);
                 menu.removeItem(MENU_UNDO);
                 return true;
@@ -166,7 +165,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         ZPDeviceRegistered = (ImageView) rootView.findViewById(R.id.ZPDevRegStatusImg);
         ZPVersion = (TextView) rootView.findViewById(R.id.ZenPackVersion);
 
-        Log.e("pushKey",pushKey);
+       //Log.e("pushKey",pushKey);
 
         //Set the filter
         if(!pushKey.equals(""))
@@ -349,12 +348,12 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     {
         if(checkZPImmediately)
         {
-            Log.i("PushSettings","Checking ZenPack immediately");
+            //Log.i("PushSettings","Checking ZenPack immediately");
             checkZP();
         }
         else
         {
-            Log.i("PushSettings","Waiting for a button press to check ZenPack");
+            //Log.i("PushSettings","Waiting for a button press to check ZenPack");
         }
     }
 
@@ -405,7 +404,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
                         //I *really* want that regid
                         while(regId.equals("") || i > 0)
                         {
-                            Log.i("pushsettings","sleeping");
+                            //Log.i("pushsettings","sleeping");
                             regId = GCMRegistrar.getRegistrationId(getActivity());
                             i--;
                             sleep(500);
@@ -440,7 +439,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
     private void checkZP()
     {
-        Log.i("PushSettings","Checking for ZenPack!");
+        //Log.i("PushSettings","Checking for ZenPack!");
         progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
         progressbar.setVisibility(View.VISIBLE);
 
@@ -465,7 +464,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
                     if(null != zp && zp.Installed)
                     {
-                        Log.e("ZP",zp.SenderID);
+                        //Log.e("ZP",zp.SenderID);
 
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                         editor.putString("SenderID", zp.SenderID);
@@ -501,7 +500,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     {
         super.onCreate(savedInstanceState);
 
-        Log.e("onCreate","onCreate");
+        //Log.e("onCreate","onCreate");
         setHasOptionsMenu(true);
         if(null != getArguments() && getArguments().containsKey("checkZPImmediately"))
             checkZPImmediately = getArguments().getBoolean("checkZPImmediately");

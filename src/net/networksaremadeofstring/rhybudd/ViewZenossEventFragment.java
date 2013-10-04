@@ -34,7 +34,6 @@ import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.bugsense.trace.BugSenseHandler;
@@ -95,6 +94,47 @@ public class ViewZenossEventFragment extends Fragment
         Typeface Subtitles = Typeface.create("sans-serif", Typeface.BOLD);
 
         Title.setTypeface(Titles);
+
+        try
+        {
+            if(getActivity().getIntent().hasExtra("EventCount"))
+            {
+                EventCount.setText("Count: " + Integer.toString(getActivity().getIntent().getIntExtra("EventCount",0)));
+            }
+            else if(getArguments().getInt("EventCount",0) != 0)
+            {
+                EventCount.setText("Count: " + Integer.toString(getArguments().getInt("EventCount",0)));
+            }
+            else
+            {
+                EventCount.setText("Count: 0");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if(getActivity().getIntent().hasExtra("EventTitle"))
+            {
+                Title.setText(getActivity().getIntent().getStringExtra("EventTitle"));
+            }
+            else if(!getArguments().getString("EventTitle").equals(""))
+            {
+                Title.setText(getArguments().getString("EventTitle"));
+            }
+            else
+            {
+                Title.setText(getActivity().getString(R.string.eventDetailsTitlePlaceholder));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         /*EventCount.setTypeface(Titles);
         ((TextView) rootView.findViewById(R.id.ComponantLabel)).setTypeface(Subtitles);
         ((TextView) rootView.findViewById(R.id.EventClassLabel)).setTypeface(Subtitles);
@@ -213,7 +253,7 @@ public class ViewZenossEventFragment extends Fragment
         {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
-        Log.e("onAttach", "Attached");
+        //Log.e("onAttach", "Attached");
         mCallbacks = (Callbacks) activity;
     }
 
@@ -320,7 +360,14 @@ public class ViewZenossEventFragment extends Fragment
 
         try
         {
-            outState.putParcelable("img",((BitmapDrawable) img.getDrawable()).getBitmap());
+            if( img.getDrawable() instanceof android.graphics.drawable.BitmapDrawable )
+            {
+                outState.putParcelable("img",((BitmapDrawable) img.getDrawable()).getBitmap());
+            }
+        }
+        catch (ClassCastException cce)
+        {
+            //Don't care
         }
         catch(Exception e)
         {
@@ -497,9 +544,9 @@ public class ViewZenossEventFragment extends Fragment
                             String summaryText = EventDetails.getString("message");
                             Spanned htmlSpan = Html.fromHtml(summaryText, p, null);
 
-                            Log.e("summary",summaryText);
+                            //Log.e("summary",summaryText);
                             summaryText = summaryText.replaceAll("<img\\s*src=('|\")([^'>]+)'\\s*/>","");
-                            Log.e("summary2",summaryText);
+                            //Log.e("summary2",summaryText);
 
                             Summary.setText(Html.fromHtml(summaryText, null, null));
 
@@ -592,7 +639,7 @@ public class ViewZenossEventFragment extends Fragment
                     }
                     else
                     {
-                        Log.e("EventObject",EventObject.toString(3));
+                        //Log.e("EventObject",EventObject.toString(3));
                         String errMsg = ".";
                         if(EventObject.has("type") && EventObject.getString("type").equals("exception") && EventObject.has("message"))
                             errMsg = ":\n" + EventObject.getString("message");

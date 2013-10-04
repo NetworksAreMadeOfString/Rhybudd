@@ -18,7 +18,6 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,8 +26,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
@@ -241,7 +238,8 @@ public class ZenossEventsAdaptor extends BaseAdapter
             String count = "";
             if(Event.getCount() > 9999)
             {
-                count = "-";
+                //count = "10k+";
+                count = Integer.toString(Event.getCount() / 1000) + "k+";
             }
             else
             {

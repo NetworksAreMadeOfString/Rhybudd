@@ -30,8 +30,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class ZenossWidget extends AppWidgetProvider 
@@ -58,7 +56,7 @@ public class ZenossWidget extends AppWidgetProvider
     	{
     		public void handleMessage(Message msg) 
     		{
-                Log.e("Widget", "handleMessage");
+                //Log.e("Widget", "handleMessage");
 
 				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
 				Intent intent = new Intent(context, ViewZenossEventsListActivity.class);
@@ -79,7 +77,7 @@ public class ZenossWidget extends AppWidgetProvider
 					
 					
 					appWidgetManager.updateAppWidget(appWidgetId, views);
-					Log.i("handler","Told the widget to update");
+					//Log.i("handler","Told the widget to update");
 		        }
     		}
     	};

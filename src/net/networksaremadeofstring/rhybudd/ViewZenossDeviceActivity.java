@@ -19,7 +19,6 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;

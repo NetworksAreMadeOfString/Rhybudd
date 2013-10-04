@@ -23,8 +23,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,9 +90,9 @@ public class RhybuddDataSource
         }
 
         EventIDsAsString = EventIDsAsString.substring(0,EventIDsAsString.length() -1);
-        Log.e("EventIDsAsString", EventIDsAsString);
+        //Log.e("EventIDsAsString", EventIDsAsString);
         int rows = database.update ("events", values,"evid in ("+EventIDsAsString+")",null);
-        Log.e("Rows",Integer.toString(rows));
+        //Log.e("Rows",Integer.toString(rows));
         if(rows > 0)
         {
             return true;

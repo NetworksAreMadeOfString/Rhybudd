@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import com.bugsense.trace.BugSenseHandler;
 
 import java.util.List;
@@ -70,7 +68,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
             ContentProviderClient provider,
             SyncResult syncResult)
     {
-        Log.e("onPerformSync", "----- PERFORMING SYNC!! ---------");
+        //Log.e("onPerformSync", "----- PERFORMING SYNC!! ---------");
 
         try
         {

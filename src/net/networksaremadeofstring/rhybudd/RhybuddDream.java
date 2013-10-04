@@ -30,7 +30,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.service.dreams.DreamService;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -60,6 +60,7 @@ public class RhybuddDream extends DreamService
     Random r = new Random();
     private ArrayList<HostGraph> mGraphs = new ArrayList<HostGraph>();
     DreamGridAdapter adapter;
+    int errors = 0;
 
     public void onDreamingStarted()
     {
@@ -155,7 +156,7 @@ public class RhybuddDream extends DreamService
                     try
                     {
                         Thread.sleep(500);
-                        Log.i("Sleeping","Sleeping");
+                        //Log.i("Sleeping","Sleeping");
                     }
                     catch (Exception e)
                     {
@@ -165,11 +166,17 @@ public class RhybuddDream extends DreamService
 
                 for(int i = 0; i < numGraphs; i++)
                 {
-                    ZenossDevice thisDevice = listOfDevices.get(r.nextInt(listOfDevices.size()));
-                    //Log.e("Processing",Integer.toString(i) + " / " + thisDevice.getname());
+                    if(errors > 10)
+                    {
+                        Toast.makeText(RhybuddDream.this,"There was an error trying to display the graphs",Toast.LENGTH_LONG);
+                        finish();
+                    }
 
                     try
                     {
+                        ZenossDevice thisDevice = listOfDevices.get(r.nextInt(listOfDevices.size()));
+                        //Log.e("Processing",Integer.toString(i) + " / " + thisDevice.getname());
+
                         JSONObject graphURLs = mService.API.GetDeviceGraphs(thisDevice.getuid());
 
                         int urlCount = graphURLs.getJSONObject("result").getJSONArray("data").length();
@@ -210,6 +217,7 @@ public class RhybuddDream extends DreamService
                     {
                         e.printStackTrace();
                         //mGraphs.add(new HostGraph(null,"..."));
+                        errors++;
                         i--;
                     }
                 }

@@ -21,8 +21,6 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.NotificationManager;
 import android.content.*;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import com.bugsense.trace.BugSenseHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,7 @@ public class MassAcknowledgeReceiver extends BroadcastReceiver
     @Override
     public void onReceive(final Context context, Intent intent)
     {
-        Log.e("MassAcknowledgeReceiver", "Acknowledging all");
+        //Log.e("MassAcknowledgeReceiver", "Acknowledging all");
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
         settings = PreferenceManager.getDefaultSharedPreferences(context);

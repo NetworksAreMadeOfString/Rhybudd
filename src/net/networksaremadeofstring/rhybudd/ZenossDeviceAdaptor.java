@@ -20,7 +20,6 @@ package net.networksaremadeofstring.rhybudd;
 
 import java.util.List;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class ZenossDeviceAdaptor extends BaseAdapter
         {
             if(null != Device.getos())
             {
-                Log.e("Adapter", Device.getos());
+                //Log.e("Adapter", Device.getos());
                 if(Device.getos().contains("indows"))
                 {
                     ((ImageView) convertView.findViewById(R.id.serverOS)).setImageResource(R.drawable.ic_windows_icon);
