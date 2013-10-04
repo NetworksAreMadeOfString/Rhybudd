@@ -431,8 +431,7 @@ public class RhybuddDataSource
         {
             HashMap<String, Integer> events = new HashMap<String, Integer>();
 
-            //TODO This could do with being a bit more granular
-            try
+            /*try
             {
                 events.put("info", cursor.getInt(5));
                 events.put("debug", cursor.getInt(6));
@@ -446,6 +445,51 @@ public class RhybuddDataSource
                 events.put("debug", 0);
                 events.put("warning", 0);
                 events.put("error", 0);
+                events.put("critical", 0);
+            }*/
+
+            try
+            {
+                events.put("info", cursor.getInt(5));
+            }
+            catch(Exception e)
+            {
+                events.put("info", 0);
+            }
+
+            try
+            {
+                events.put("debug", cursor.getInt(6));
+            }
+            catch(Exception e)
+            {
+                events.put("debug", 0);
+            }
+
+            try
+            {
+                events.put("warning", cursor.getInt(7));
+            }
+            catch(Exception e)
+            {
+                events.put("warning", 0);
+            }
+
+            try
+            {
+                events.put("error", cursor.getInt(8));
+            }
+            catch(Exception e)
+            {
+                events.put("error", 0);
+            }
+
+            try
+            {
+                events.put("critical", cursor.getInt(9));
+            }
+            catch(Exception e)
+            {
                 events.put("critical", 0);
             }
 

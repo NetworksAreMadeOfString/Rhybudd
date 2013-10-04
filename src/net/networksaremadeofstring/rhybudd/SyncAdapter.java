@@ -107,7 +107,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
         catch (Exception e)
         {
             //TODO Send Warning
-            //BugSenseHandler.sendExceptionMessage("ZenossPoller", "onDestroy", e);
+            //BugSenseHandler.sendExceptionMessage("SyncAdapter", "onPerformSync", e);
         }
     }
 

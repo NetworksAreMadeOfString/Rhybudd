@@ -74,6 +74,8 @@ public class RhybuddDream extends DreamService
         setContentView(R.layout.dream);
         theGrid = (GridView) findViewById(R.id.DreamGrid);
 
+        //numGraphs = getResources().getInteger(R.integer.DreamGraphs);
+
         newGraphHandler = new Handler()
         {
             public void handleMessage(Message msg)
@@ -336,10 +338,13 @@ public class RhybuddDream extends DreamService
         {
             HostGraph thisGraphObject = mGraphs.get(position);
 
+            int columns = mContext.getResources().getInteger(R.integer.GridColumns);
+
             if(imgWidth == 0)
             {
-                imgWidth = (parent.getMeasuredWidth() / mContext.getResources().getInteger(R.integer.GridColumns));
-                imgHeight = (300 * (imgWidth / 500));
+                imgWidth = (parent.getMeasuredWidth() / columns);
+                //imgHeight = (219 * (imgWidth / 597));
+                imgHeight = ((parent.getMeasuredHeight() - 48) / 3);
             }
 
 
@@ -352,9 +357,10 @@ public class RhybuddDream extends DreamService
             //((RelativeLayout) convertView.findViewById(R.id.gridItemContainer)).set
             ImageView groupImg = ((ImageView) convertView.findViewById(R.id.groupImage));
             //groupImg.setLayoutParams(new ViewGroup.LayoutParams(imgWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
-            groupImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            groupImg.setScaleType(ImageView.ScaleType.FIT_XY);
             groupImg.setMinimumHeight(imgHeight);
             groupImg.setMinimumWidth(imgWidth);
+
             Animation fadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
 
             if(null == thisGraphObject.thisGraph)

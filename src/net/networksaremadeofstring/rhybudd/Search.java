@@ -228,8 +228,8 @@ public class Search extends Activity
 
 	public void ViewDevice(String UID)
 	{
-		Intent ViewDeviceIntent = new Intent(Search.this, ViewZenossDevice.class);
-		ViewDeviceIntent.putExtra("UID", UID);
+		Intent ViewDeviceIntent = new Intent(Search.this, ViewZenossDeviceActivity.class);
+		ViewDeviceIntent.putExtra(ViewZenossDeviceFragment.ARG_UID, UID);
 		startActivity(ViewDeviceIntent);
 	}
 	

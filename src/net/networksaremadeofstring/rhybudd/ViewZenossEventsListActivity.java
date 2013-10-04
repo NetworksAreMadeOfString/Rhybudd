@@ -604,7 +604,6 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             {
                 try
                 {
-                    //TODO This needs moving to the new API model
                     ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
                     ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
 
@@ -624,7 +623,6 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
     private void doGCMRegistration(final String PushKey)
     {
-        //TODO check for freshness so as to not waste too much data / bandwidth on every resume!
         GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
         regId = GCMRegistrar.getRegistrationId(this);

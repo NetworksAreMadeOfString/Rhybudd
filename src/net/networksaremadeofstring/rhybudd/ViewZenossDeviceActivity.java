@@ -19,6 +19,7 @@
 package net.networksaremadeofstring.rhybudd;
 
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -33,7 +34,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
@@ -62,8 +62,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
     Handler triggerUIHandler = null;
     /*Tag intentTag;
     NdefMessage[] msgs;
-    Parcelable[] rawMsgs = null;
-    NfcAdapter mNfcAdapter;*/
+    Parcelable[] rawMsgs = null;*/
+    NfcAdapter mNfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -91,18 +91,33 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
             BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "OnCreate", e);
         }
 
+        try
+        {
+            // Check for available NFC Adapter
+            mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+            if (null != mNfcAdapter)
+            {
+                // Register callback
+                mNfcAdapter.setNdefPushMessageCallback(this, this);
+            }
+        }
+        catch(Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "NFC", e);
+        }
+
         currentDeviceID = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_UID);
         //currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
 
         DeviceNames = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES);
         DeviceIDs = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS);
 
-        Log.e("ViewZenossDevice", "Checking...");
+        //Log.e("ViewZenossDevice", "Checking...");
 
-        //TODO Differentiate between a search intent and an NFC intent
-        if(null == DeviceNames || DeviceNames.size() == 0)
+        if(null == DeviceNames || DeviceNames.size() == 0 || null == currentDeviceID || currentDeviceID == "")
         {
-            Log.e("ViewZenossDevice", "No device names, fancy that!");
+            //Log.e("ViewZenossDevice", "No device names, fancy that!");
             try
             {
                 /*Parcelable[] rawMsgs = getIntent().getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -200,6 +215,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
             return null;
         }
@@ -216,21 +232,19 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
     {
         try
         {
-            Log.e("ProcessIntent","About to process an intent");
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
             if(rawMsgs.length > 0)
             {
                 NdefMessage msg = (NdefMessage) rawMsgs[0];
 
-                for(NdefRecord nR : msg.getRecords())
+                /*for(NdefRecord nR : msg.getRecords())
                 {
                     String tmpString = new String(nR.getPayload());
                     Log.e("Found: ", tmpString);
-                }
+                }*/
 
                 currentDeviceID = "/zport/dmd/Devices/" + new String(msg.getRecords()[0].getPayload());
-                Log.e("Processintent","found : " + currentDeviceID);
             }
         }
         catch (Exception e)

@@ -23,13 +23,15 @@
     <dimen name="deviceRepImgHeight">160dp</dimen>
     <dimen name="DeviceTitlePadding">16dp</dimen>
     <dimen name="DeviceTitleVertPadding">4dp</dimen>
-    <dimen name="DeviceGraphHeight">180dp</dimen>
-    <dimen name="DeviceGraphPadding">0dp</dimen>
+    <dimen name="DeviceGraphHeight">219dp</dimen>
+    <dimen name="DeviceGraphWidth">597dp</dimen>
+    <dimen name="DeviceGraphPadding">10dp</dimen>
     <dimen name="HorizDivPadding">0dp</dimen>
     <dimen name="WelcomePadding">16dp</dimen>
     <dimen name="DeviceDetailsPadding">8dp</dimen>
 
     <!-- View Groups -->
     <integer name="GridColumns">2</integer>
+    <integer name="DreamGraphs">10</integer>
 
 </resources>

@@ -76,23 +76,14 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     boolean hasZenPack = false;
     ZenPack zp = new ZenPack();
     String prevFilterKey = "";
-    Menu menu;
-    MenuItem undoMenuItem;
+    Menu menu = null;
+    MenuItem undoMenuItem = null;
 
     @Override
     public void onResume()
     {
         super.onResume();
-        //Log.e("onResume","Hello");
-        /*if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
-        {
-            //Log.e("onResume","Set visible");
-            ExitButton.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            //Log.e("onResume","Set invisible");
-        }*/
+
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction())) {
             processIntent(getActivity().getIntent());
         }
@@ -102,11 +93,14 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     public void onCreateOptionsMenu(Menu m, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        menu = m;
+
+        /*if(null == menu)
+            menu = m;*/
     }
 
     void processIntent(Intent intent)
     {
+        Log.e("processIntent","processIntent");
         try
         {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -118,26 +112,18 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
             // record 0 contains the MIME type, record 1 is the AAR, if present
             FilterKey.setText(new String(msg.getRecords()[0].getPayload()));
-            try
-            {
-                if(null == menu.findItem(MENU_UNDO))
-                {
-                    menu.add(Menu.NONE,MENU_UNDO,Menu.NONE,"Undo");
-                }
 
-                undoMenuItem = menu.findItem(MENU_UNDO);
-                undoMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                undoMenuItem.setIcon(R.drawable.ic_action_content_undo);
+            /*Message message = Message.obtain();
+            Bundle bundle = new Bundle();
+            bundle.putString("newfilterkey",new String(msg.getRecords()[0].getPayload()));
+            message.setData(bundle);
+            message.what = RhybuddHandlers.msg_push_show_undo;
+            checkZPHandler.sendMessageDelayed(message,600);*/
 
-                getActivity().invalidateOptionsMenu();
-            }
-            catch(Exception e)
-            {
-                BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
-            }
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
         }
     }
@@ -514,6 +500,8 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        Log.e("onCreate","onCreate");
         setHasOptionsMenu(true);
         if(null != getArguments() && getArguments().containsKey("checkZPImmediately"))
             checkZPImmediately = getArguments().getBoolean("checkZPImmediately");
@@ -536,6 +524,29 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
                 switch(msg.what)
                 {
+                    /*case RhybuddHandlers.msg_push_show_undo:
+                    {
+                        FilterKey.setText(msg.getData().getString("newfilterkey"));
+                        try
+                        {
+                            if(null == undoMenuItem)
+                            {
+                                menu.add(Menu.NONE,MENU_UNDO,Menu.NONE,"Undo");
+                                undoMenuItem = menu.findItem(MENU_UNDO);
+                                undoMenuItem.setIcon(R.drawable.ic_action_content_undo);
+                                undoMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                            }
+
+                            getActivity().invalidateOptionsMenu();
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","processIntent",e);
+                        }
+                    }
+                    break;*/
+
                     case RhybuddHandlers.msg_generic_http_transport_error:
                     {
                         Toast.makeText(getActivity(), getActivity().getString(R.string.PushZPNoHost), Toast.LENGTH_LONG).show();

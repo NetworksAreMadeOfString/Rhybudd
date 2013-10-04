@@ -89,8 +89,9 @@ public class ZenossSearchAdaptor extends BaseAdapter implements OnClickListener,
 	}
 
 	@Override
-	public boolean onLongClick(View v) {
-		// TODO Auto-generated method stub
+	public boolean onLongClick(View v)
+    {
+        //We don't support long click for search items
 		return false;
 	}
 

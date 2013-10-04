@@ -204,7 +204,7 @@ public class ZenossPoller extends Service
     				}
     				else
         			{
-    					//TODO Possibly warn if null (something went wrong) ignore if 0 (all is good (lucky oncall person!))
+    					//This should never happen but also people should stop using the Poller and move to Rhybudd Push
         			}
     				
     				if(alertsEnabled)

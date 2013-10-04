@@ -35,4 +35,5 @@ public class RhybuddHandlers
     public static final int msg_zp_wrong_version = 12;
     public static final int msg_zp_registered = 13;
     public static final int msg_zp_not_registered = 14;
+    public static final int msg_push_show_undo = 15;
 }

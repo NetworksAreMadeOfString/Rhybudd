@@ -55,31 +55,31 @@
                 android:paddingTop="@dimen/DeviceTitleVertPadding">
                 <ImageView
                     android:id="@+id/loadAverageGraph"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
+                    android:layout_width="@dimen/DeviceGraphWidth"
+                    android:layout_height="@dimen/DeviceGraphHeight"
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
-                    android:scaleType="centerInside"
-                    android:paddingLeft="@dimen/DeviceGraphPadding"/>
+                    android:scaleType="fitStart"
+                    android:paddingLeft="@dimen/DeviceGraphPadding" />
 
                 <ImageView
                     android:id="@+id/CPUGraph"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
+                    android:layout_width="@dimen/DeviceGraphWidth"
+                    android:layout_height="@dimen/DeviceGraphHeight"
                     android:layout_below="@+id/loadAverageGraph"
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
-                    android:scaleType="centerInside"
+                    android:scaleType="fitStart"
                     android:paddingLeft="@dimen/DeviceGraphPadding"/>
 
                 <ImageView
                     android:id="@+id/MemoryGraph"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
+                    android:layout_width="@dimen/DeviceGraphWidth"
+                    android:layout_height="@dimen/DeviceGraphHeight"
                     android:layout_below="@+id/CPUGraph"
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
-                    android:scaleType="centerInside"
+                    android:scaleType="fitStart"
                     android:paddingLeft="@dimen/DeviceGraphPadding"
                     android:paddingRight="@dimen/DeviceGraphPadding"/>
             </LinearLayout>

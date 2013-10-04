@@ -23,7 +23,13 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.scheme.SocketFactory;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -33,14 +39,17 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ZenossAPIZaas extends ZenossAPI
 {
 
-    //TODO Uncomment this for release
-    /*@Override
+    @Override
     protected void PrepareSSLHTTPClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
     {
         client = new DefaultHttpClient();
@@ -50,7 +59,7 @@ public class ZenossAPIZaas extends ZenossAPI
         mgr = new ThreadSafeClientConnManager(client.getParams(), registry);
         httpclient = new DefaultHttpClient(mgr, client.getParams());
         this.setTimeouts();
-    }*/
+    }
 
     @Override
     public boolean Login(ZenossCredentials credentials) throws Exception
