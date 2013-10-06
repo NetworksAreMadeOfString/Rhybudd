@@ -141,6 +141,69 @@ public class ZenossEvent
             {
             	this.prodState = "Unknown";
             }
+
+            try
+            {
+                this.Count = Event.getInt("count");
+            }
+            catch(Exception e)
+            {
+                this.Count = 0;
+            }
+
+            try
+            {
+                this.firstTime = Event.getString("firstTime");
+            }
+            catch(Exception e)
+            {
+                this.firstTime = "Unknown";
+            }
+
+            try
+            {
+                this.component_text = Event.getJSONObject("component").getString("text");
+            }
+            catch(Exception e)
+            {
+                this.component_text = "Unknown";
+            }
+
+            try
+            {
+                this.component_uid = Event.getJSONObject("component").getString("uid");
+            }
+            catch(Exception e)
+            {
+                this.component_uid = "unknown";
+            }
+
+            try
+            {
+                this.eventClass = Event.getJSONObject("eventClass").getString("text");
+            }
+            catch(Exception e)
+            {
+                this.eventClass = "unknown";
+            }
+
+            try
+            {
+                this.lastTime = Event.getString("lastTime");
+            }
+            catch(Exception e)
+            {
+                this.lastTime = "unknown";
+            }
+
+            try
+            {
+                this.ownerID = Event.getString("ownerid");
+            }
+            catch(Exception e)
+            {
+                this.ownerID = "unknown";
+            }
     }
     
     // Constructor for the Ticket class
