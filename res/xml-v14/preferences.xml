@@ -3,7 +3,7 @@
     <PreferenceCategory android:title="Background Polling">
 
        <SwitchPreference
-                android:key="refreshCache"
+                android:key="syncCache"
                 android:title="Periodic Cache Refresh"
                 android:summary="An Android Sync Adapter that checks for new devices, groups etc every 24 hours"
                 android:defaultValue="true"

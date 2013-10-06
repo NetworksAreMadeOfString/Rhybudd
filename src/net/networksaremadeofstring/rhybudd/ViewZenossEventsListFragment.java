@@ -767,11 +767,10 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(null != refreshStatus)
                         {
-                            try {
-
-
-                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
-                            getActivity().invalidateOptionsMenu();
+                            try
+                            {
+                                refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                                getActivity().invalidateOptionsMenu();
                             }
                             catch (NullPointerException npe)
                             {
@@ -792,6 +791,22 @@ public class ViewZenossEventsListFragment extends ListFragment
                             catch (Exception e)
                             {
                                 e.printStackTrace();
+                            }
+                        }
+
+                        try
+                        {
+                            Toast.makeText(getActivity(),"Last Error: " + API.getLastException(),Toast.LENGTH_LONG);
+                        }
+                        catch (Exception e)
+                        {
+                            try
+                            {
+                                Toast.makeText(getActivity(),"Attempted to show the last received error but it was null.",Toast.LENGTH_LONG);
+                            }
+                            catch (Exception e1)
+                            {
+                                BugSenseHandler.sendExceptionMessage("EventsListFragment","Error toast",e1);
                             }
                         }
 
@@ -1217,60 +1232,66 @@ public class ViewZenossEventsListFragment extends ListFragment
                         }
 
                         ZenossCredentials credentials = new ZenossCredentials(getActivity());
-                        mService.API.Login(credentials);
 
-                        tempZenossEvents = mService.API.GetRhybuddEvents(getActivity());
-
-                        if(null == tempZenossEvents)
+                        if(mService.API.Login(credentials))
                         {
-                            //Log.e("Refresh","We got a null return from the service API, lets try ourselves");
-                            ZenossAPI API;
+                            tempZenossEvents = mService.API.GetRhybuddEvents(getActivity());
 
-                            if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                            if(null == tempZenossEvents)
                             {
-                                API = new ZenossAPIZaas();
+                                //Log.e("Refresh","We got a null return from the service API, lets try ourselves");
+                                ZenossAPI API;
+
+                                if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                                {
+                                    API = new ZenossAPIZaas();
+                                }
+                                else
+                                {
+                                    API = new ZenossAPICore();
+                                }
+
+                                credentials = new ZenossCredentials(getActivity());
+                                API.Login(credentials);
+
+                                tempZenossEvents = API.GetRhybuddEvents(getActivity());
+                            }
+
+                            if(tempZenossEvents != null && tempZenossEvents.size() > 0)
+                            {
+                                retryCount = 0;
+                                listOfZenossEvents = tempZenossEvents;
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_DIALOGUPDATE);
+
+                                RhybuddDataSource datasource = new RhybuddDataSource(getActivity());
+                                datasource.open();
+                                datasource.UpdateRhybuddEvents(listOfZenossEvents);
+                                datasource.close();
+
+                                try
+                                {
+                                    ZenossAPI.updateLastChecked(getActivity());
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("RhybuddHome","Updating last setting",e);
+                                }
+
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SUCCESS);
+
+                            }
+                            else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
+                            {
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_NO_EVENTS);
                             }
                             else
                             {
-                                API = new ZenossAPICore();
+                                // TODO Send a proper message
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
                             }
-
-                            credentials = new ZenossCredentials(getActivity());
-                            API.Login(credentials);
-
-                            tempZenossEvents = API.GetRhybuddEvents(getActivity());
-                        }
-
-                        if(tempZenossEvents != null && tempZenossEvents.size() > 0)
-                        {
-                            retryCount = 0;
-                            listOfZenossEvents = tempZenossEvents;
-                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_DIALOGUPDATE);
-
-                            RhybuddDataSource datasource = new RhybuddDataSource(getActivity());
-                            datasource.open();
-                            datasource.UpdateRhybuddEvents(listOfZenossEvents);
-                            datasource.close();
-
-                            try
-                            {
-                                ZenossAPI.updateLastChecked(getActivity());
-                            }
-                            catch (Exception e)
-                            {
-                                BugSenseHandler.sendExceptionMessage("RhybuddHome","Updating last setting",e);
-                            }
-
-                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SUCCESS);
-
-                        }
-                        else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
-                        {
-                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_NO_EVENTS);
                         }
                         else
                         {
-                            // TODO Send a proper message
                             eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
                         }
                     }

@@ -2,50 +2,60 @@
     android:id="@+id/relativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/background_gradient_3" >
-
-     <RelativeLayout
-         android:id="@+id/searchContainer"
+    android:background="@drawable/background_gradient_3"
+    android:paddingLeft="@dimen/EventListFragmentMargins"
+    android:paddingRight="@dimen/EventListFragmentMargins">
+
+
+
+
+
+    <LinearLayout
+            android:id="@+id/searchContainer"
          android:layout_width="fill_parent"
-         android:layout_height="64dp"
+         android:layout_height="wrap_content"
          android:layout_centerHorizontal="true"
-         android:background="@color/ZenossLightGray" >
-
+         android:background="@drawable/device_grid_background"
+         android:layout_marginTop="8dp"
+         android:orientation="horizontal"
+    android:showDividers="middle"
+    android:divider="?android:dividerVertical"
+    android:dividerPadding="8dp"
+    android:baselineAligned="false"
+    android:layout_marginLeft="2dp"
+    android:layout_marginRight="2dp">
+
+
+
          <EditText
              android:id="@+id/searchTermEditText"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:layout_alignParentLeft="true"
-             android:layout_marginLeft="4dp"
+             android:layout_marginLeft="12dp"
              android:layout_marginTop="6dp"
-             android:layout_toLeftOf="@+id/SearchButton"
              android:hint="@string/searchHint"
              android:inputType="text"
-             android:lines="1" >
+             android:lines="1"
+             android:paddingRight="20dp"
+             android:layout_weight="4"
+             android:layout_marginRight="12dp">
 
              <requestFocus>
              </requestFocus>
          </EditText>
-
-         <View
-             android:id="@+id/BottomTile"
-             android:layout_width="fill_parent"
-             android:layout_height="2dp"
-             android:layout_alignParentBottom="true"
-             android:layout_centerHorizontal="true"
-             android:background="@color/ZenossDarkGray" >
 
-         </View>
 
          <Button
+             style="?android:buttonBarButtonStyle"
              android:id="@+id/SearchButton"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:layout_alignParentRight="true"
-             android:layout_alignTop="@+id/searchTermEditText"
-             android:text="@string/searchButton" />
-     </RelativeLayout>
-     
+             android:text="@string/searchButton"
+             android:layout_marginRight="8dp"
+             android:layout_marginLeft="8dp"/>
+     </LinearLayout>
+     
+
      <ListView
          android:id="@+id/searchResultsListView"
          android:layout_width="match_parent"
@@ -53,8 +63,6 @@
          android:layout_below="@+id/searchContainer"
          android:layout_centerHorizontal="true"
          android:cacheColorHint="#929ba4"
-         android:divider="#6b7681"
-         android:dividerHeight="2dp"
          android:fadingEdge="none" >
 </ListView>
      

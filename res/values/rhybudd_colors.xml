@@ -41,6 +41,7 @@
         <color name="PartialGreyTransparancy">#DFd4d4d4</color>
         <color name="PartialBlackTransparancy">#AA000000</color>
         <color name="FlatGray">#e5e5e5</color>
+        <color name="EventViewGray">@color/FlatGray</color>
 
         <!-- Reply Colors -->
         <color name="MetaTop">#fbfbfc</color>

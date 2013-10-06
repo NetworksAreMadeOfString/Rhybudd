@@ -3,7 +3,7 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scrollViewFragmentContainer"
-    android:background="@color/FlatGray">
+    android:background="@color/EventViewGray">
 
     <LinearLayout android:orientation="vertical"
                   android:layout_width="match_parent"

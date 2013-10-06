@@ -130,7 +130,7 @@ public class ZenossEvent
             }
             catch(Exception e)
             {
-            	this.severity = "Debug";
+            	this.severity = "5";
             }
             
             try

@@ -1078,7 +1078,7 @@ public class ZenossAPI
                 }
                 else
                 {
-                    listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
+                    /*listofZenossEvents.add(new ZenossEvent(CurrentEvent.getString("evid"),
                             CurrentEvent.getInt("count"),
                             CurrentEvent.getString("prodState"),
                             CurrentEvent.getString("firstTime"),
@@ -1090,7 +1090,8 @@ public class ZenossAPI
                             CurrentEvent.getJSONObject("device").getString("text"),
                             CurrentEvent.getJSONObject("eventClass").getString("text"),
                             CurrentEvent.getString("lastTime"),
-                            CurrentEvent.getString("ownerid")));
+                            CurrentEvent.getString("ownerid")));*/
+                    listofZenossEvents.add(new ZenossEvent(CurrentEvent));
                 }
             }
             catch(Exception e)

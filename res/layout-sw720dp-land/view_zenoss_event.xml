@@ -272,9 +272,9 @@
                         android:textStyle="bold"
                         android:paddingBottom="12dp"
                         android:minWidth="120dp"
-                        android:layout_alignBaseline="@+id/LastTime"
-                        android:layout_toRightOf="@+id/LastTime"
-                        android:layout_marginLeft="20dp">
+                        android:layout_alignLeft="@+id/StartTimeLabel"
+                        android:layout_below="@+id/StartTimeLabel"
+                        android:layout_marginTop="12dp">
                 </TextView>
 
                 <TextView
