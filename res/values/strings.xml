@@ -8,7 +8,8 @@
     <string name="DefaultStatusMessageText">Refreshing..</string>
     <string name="deviceListTitle">Infrastructure</string>
     <string name="eventListTitle">Events List</string>
-    
+    <string name="DrawerTitle">Additional Rhybudd Functions</string>
+
     <string name="productionStateNotificationLabel">Only raise alerts for Production devices</string>
     <string name="notificationSoundLabel">Notification Sound</string>
     
@@ -169,6 +170,7 @@
         <item>Help</item>
         <item>Feedback</item>
         <item>Search</item>
+        <item>Diagnostic Tool</item>
     </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -243,4 +245,6 @@
     <string name="SyncAccountName">Zenoss Periodic Sync Account</string>
 
     <string name="DeviceFooterText">New Devices can be added from the Actionbar</string>
+
+    <string name="DiagnosticAdvice">If you are having trouble with Rhybudd this should show where the problem is.\n\nPlease ensure you read any output (e.g. user names and URLs) fully before raising a bug report.\n\nThe debug output supports long press to select and copy.</string>
 </resources>

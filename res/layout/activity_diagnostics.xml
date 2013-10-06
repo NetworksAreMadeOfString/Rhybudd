@@ -1,0 +1,80 @@
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/DiagnosticAdvice"
+        android:id="@+id/ExplainText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:padding="8dp"/>
+
+        <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center"
+        android:layout_marginLeft="20dp"
+        android:max="20"
+        android:progress="1"
+        android:layout_below="@+id/ExplainText"
+        android:secondaryProgress="2"
+        android:layout_toLeftOf="@+id/progressBar2"
+        android:layout_marginRight="10dp"
+        android:layout_above="@+id/scrollView"/>
+<ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
+        android:id="@+id/scrollView"
+        android:layout_above="@+id/linearLayout"
+        android:layout_below="@+id/progressBar2">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Diagnostic output will appear here..."
+                android:id="@+id/DiagOutput"
+                android:layout_below="@+id/ExplainText"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:textIsSelectable="true"
+                android:layout_marginBottom="8dp"
+                android:typeface="monospace"/>
+    </LinearLayout>
+</ScrollView>
+<LinearLayout style="?android:buttonBarStyle"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentBottom="true"
+              android:id="@+id/linearLayout">
+
+<Button style="?android:buttonBarButtonStyle"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Start Diagnostics"
+        android:id="@+id/StartDiagButton"/>
+</LinearLayout>
+
+    <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar2"
+            android:layout_below="@+id/ExplainText"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:visibility="invisible"/>
+</RelativeLayout>

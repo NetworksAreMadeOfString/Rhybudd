@@ -3,4 +3,5 @@
     <integer name="GridColumns">5</integer>
     <dimen name="FirstSettingsPadding">200dp</dimen>
     <integer name="DreamGraphs">6</integer>
+    <dimen name="EventListFragmentMargins">160dp</dimen>
 </resources>

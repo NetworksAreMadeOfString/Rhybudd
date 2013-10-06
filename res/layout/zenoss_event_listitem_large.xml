@@ -152,12 +152,13 @@
         android:dividerPadding="8dp"
         android:gravity="center_vertical|center_horizontal"
         android:showDividers="middle"
-        android:minHeight="40dp">
+        android:minHeight="40dp"
+            >
 
         <TextView
             android:id="@+id/ackAuthor"
             android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:gravity="center_vertical|center_horizontal"
             android:padding="8dp"
             android:text="none"
@@ -167,7 +168,7 @@
         <TextView
             android:id="@+id/EventCount"
             android:layout_width="110dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:gravity="center_horizontal"
             android:padding="8dp"
             android:text="0"
@@ -177,7 +178,7 @@
         <TextView
             android:id="@+id/prodState"
             android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:gravity="center_vertical|center_horizontal"
             android:padding="8dp"
             android:text="Production"

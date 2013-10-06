@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gcm.GCMRegistrar;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +61,8 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     private static final int HELP = 5;
     private static final int FEEDBACK = 6;
     private static final int SEARCH = 7;
+    private static final int DIAGNOSTIC = 8;
+
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "net.networksaremadeofstring.rhybudd.provider";
     // An account type, in the form of a domain name
@@ -140,14 +143,14 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         {
             public void onDrawerClosed(View view)
             {
-                //getActionBar().setTitle(mTitle);
-                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                getActionBar().setTitle("Zenoss Events List");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView)
             {
-                // getActionBar().setTitle(mDrawerTitle);
-                // invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                getActionBar().setTitle(getString(R.string.DrawerTitle));
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -293,10 +296,25 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 onSearchRequested();
             }
             break;
+
+            case DIAGNOSTIC:
+            {
+                Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
+                ViewZenossEventsListActivity.this.startActivity(DiagIntent);
+            }
+            break;
         }
 
         // update selected item and title, then close the drawer
-        //mDrawerList.setItemChecked(position, true);
+        try
+        {
+            mDrawerList.setItemChecked(position, false);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick setitemchecked false",e);
+        }
+
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
@@ -471,6 +489,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                         alertDialog.cancel();
                     }
                 })
+                .setNeutralButton("Run Diagnostics", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
+                        startActivity(DiagIntent);
+                        alertDialog.cancel();
+                    }
+                })
                 .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id)
                     {
@@ -540,9 +567,10 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         else
         {
             AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+            alertbox.setTitle("Event Management");
             alertbox.setMessage("What would you like to do?");
 
-            alertbox.setPositiveButton("Ack Event", new DialogInterface.OnClickListener()
+            alertbox.setPositiveButton("Acknowledge", new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface arg0, int arg1)
                 {
@@ -553,7 +581,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 }
             });
 
-            alertbox.setNeutralButton("View Event", new DialogInterface.OnClickListener()
+            alertbox.setNeutralButton("View Details", new DialogInterface.OnClickListener()
             {
                 public void onClick(DialogInterface arg0, int arg1)
                 {

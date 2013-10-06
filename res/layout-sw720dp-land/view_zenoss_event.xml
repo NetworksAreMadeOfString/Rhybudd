@@ -1,0 +1,332 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout2"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ImageView
+        android:id="@+id/summaryImage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/ImageMinHeight"
+        android:src="@color/transparant"
+        android:cropToPadding="false"
+        android:scaleType="matrix"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        />
+
+    <TextView
+        android:id="@+id/EventTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="..."
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/ZenossDarkBlack"
+        android:textStyle="bold"
+        android:paddingLeft="12dp"
+        android:layout_alignParentRight="true"
+        android:background="@color/PartialWhiteTransparancy"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
+    </TextView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:text="Acknowledge"
+        android:id="@+id/button"
+        android:layout_alignParentRight="true"
+        style="@style/SmallRhybuddButton"
+        android:background="@drawable/small_blue_button"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_alignBottom="@+id/summaryImage"
+        android:visibility="invisible"/>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seperator"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/event_details_meta_container"
+        android:padding="4dp"
+        android:layout_margin="10dp"
+        android:id="@+id/frameLayout">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ackIcon"
+            android:src="@drawable/ic_unacknowledged"
+            />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/frameLayout"
+        android:background="@drawable/event_details_meta_container"
+        android:layout_alignTop="@+id/frameLayout"
+        android:layout_marginLeft="10dp"
+        android:layout_alignBottom="@+id/frameLayout"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:id="@+id/EventCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/EventCountLabel"
+            android:layout_alignBottom="@+id/EventCountLabel"
+            android:text="Count: 0"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/RhybuddStdText"
+            android:layout_toRightOf="@+id/EventCountLabel"/>
+    </FrameLayout>
+
+    <View android:id="@+id/seperator"
+          android:layout_width="fill_parent"
+          android:layout_height="2dp"
+          android:background="@color/ZaasDarkBlue"
+          android:layout_below="@+id/summaryImage"
+          android:layout_alignParentLeft="false"
+          android:layout_centerHorizontal="true"/>
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/FlatGray"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:fillViewport="false"
+        android:layout_below="@+id/seperator">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:showDividers="middle"
+            android:divider="?android:attr/listDivider"
+            android:dividerPadding="8dp"
+            android:padding="8dp">
+
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/ComponantLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/eventDetailsComponentLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+                    android:textStyle="bold" >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/Componant"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/ComponantLabel"
+                    android:layout_marginLeft="8dp"
+                    android:text="..."
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/RhybuddStdText"
+                    android:paddingBottom="12dp">
+                </TextView>
+            </RelativeLayout>
+
+
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/EventClassLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    
+                   
+                    
+                    
+                    android:text="@string/eventDetailsEventClassLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+                    android:textStyle="bold" >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/EventClass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/EventClassLabel"
+                    android:text="..."
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/RhybuddStdText"
+                    android:layout_marginLeft="8dp"
+                    android:paddingBottom="12dp">
+                </TextView>
+            </RelativeLayout>
+
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/SummaryLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    
+                   
+                    
+                    
+                    android:text="@string/eventDetailsSummaryLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+
+                    android:textStyle="bold" >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/Summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/SummaryLabel"
+                    android:gravity="bottom"
+                    android:linksClickable="true"
+                    android:text="..."
+                    android:textColorLink="@color/ZenossDarkBlue"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/RhybuddStdText"
+                    android:layout_marginLeft="8dp"
+                    android:paddingBottom="12dp">
+
+                </TextView>
+
+            </RelativeLayout>
+
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/StartTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+
+                    android:text="@string/eventDetailsFirstSeenLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+                    android:textStyle="bold"
+                    android:minWidth="120dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"/>
+
+                <TextView
+                    android:id="@+id/EndTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="false"
+
+
+                    android:text="@string/eventDetailslastSeenLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+                    android:textStyle="bold"
+                    android:paddingBottom="12dp"
+                    android:minWidth="120dp"
+                    android:layout_toRightOf="@+id/FirstTime"
+                    android:layout_alignBaseline="@+id/StartTimeLabel"
+                    android:layout_marginLeft="40dp">
+                </TextView>
+
+                <TextView
+                    android:id="@+id/FirstTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/StartTimeLabel"
+                    android:layout_toRightOf="@+id/StartTimeLabel"
+                    android:text="...."
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/RhybuddStdText" >
+                </TextView>
+
+                <TextView
+                    android:id="@+id/LastTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/EndTimeLabel"
+                    android:layout_alignBottom="@+id/EndTimeLabel"
+                    android:layout_toRightOf="@+id/EndTimeLabel"
+                    android:text="...."
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/RhybuddStdText" >
+                </TextView>
+
+                <TextView
+                        android:id="@+id/AgentLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="false"
+                        android:text="@string/eventDetailsAgentLabel"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/ZenossLightBlack"
+                        android:textStyle="bold"
+                        android:paddingBottom="12dp"
+                        android:minWidth="120dp"
+                        android:layout_alignBaseline="@+id/LastTime"
+                        android:layout_toRightOf="@+id/LastTime"
+                        android:layout_marginLeft="20dp">
+                </TextView>
+
+                <TextView
+                        android:id="@+id/Agent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/AgentLabel"
+                        android:layout_alignBottom="@+id/AgentLabel"
+                        android:layout_toRightOf="@+id/AgentLabel"
+                        android:text="..."
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/RhybuddStdText" >
+                </TextView>
+            </RelativeLayout>
+
+
+
+
+            <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/LogLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/eventDetailsLogLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/ZenossLightBlack"
+                    android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/LogList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:showDividers="middle"
+                        android:divider="?android:attr/listDivider"
+                        android:layout_below="@+id/LogLabel"
+                        android:cacheColorHint="@color/RhybuddWhite"
+                        android:layout_marginLeft="12dp"
+                        android:dividerPadding="20dp">
+                   </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
+        
+

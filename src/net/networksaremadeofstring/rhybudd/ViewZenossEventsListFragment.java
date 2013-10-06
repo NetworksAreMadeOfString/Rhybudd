@@ -27,6 +27,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -50,10 +51,11 @@ public class ViewZenossEventsListFragment extends ListFragment
     private static final int EVENTSLISTHANDLER_SERVICE_FAILURE = 6;
     private static final int EVENTSLISTHANDLER_REDOREFRESH = 7;
     private static final int EVENTSLISTHANDLER_DISMISS = 8;
-
     private static final int ACKEVENTHANDLER_SUCCESS = 9;
     private static final int ACKEVENTHANDLER_FAILURE = 10;
     private static final int ACKEVENTHANDLER_PROGRESS = 11;
+    private static final int EVENTSLISTHANDLER_DELAYED_AB_STATUS = 12;
+    private static final int EVENTSLISTHANDLER_SERVICE_NOT_STARTED = 13;
 
     ZenossAPI API = null;
     List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
@@ -310,7 +312,7 @@ public class ViewZenossEventsListFragment extends ListFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater)
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.home_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -630,6 +632,36 @@ public class ViewZenossEventsListFragment extends ListFragment
                     }
                     break;
 
+                    case EVENTSLISTHANDLER_DELAYED_AB_STATUS:
+                    {
+                        try
+                        {
+                            if(null != refreshStatus)
+                            {
+                                refreshStatus.setActionView(abprogress);
+                            }
+                            else
+                            {
+                                if(dialog == null || !dialog.isShowing())
+                                {
+                                    dialog = new ProgressDialog(getActivity());
+                                }
+
+                                dialog.setTitle("Querying Zenoss Directly");
+                                dialog.setMessage("Refreshing Events...");
+                                //ToDo set cancellable
+
+                                if(!dialog.isShowing())
+                                    dialog.show();
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_DELAYED_AB_STATUS",e);
+                        }
+                    }
+                    break;
+
                     case EVENTSLISTHANDLER_ERROR:
                     {
                         Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
@@ -735,8 +767,20 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(null != refreshStatus)
                         {
+                            try {
+
+
                             refreshStatus.setIcon(R.drawable.ic_action_refresh);
                             getActivity().invalidateOptionsMenu();
+                            }
+                            catch (NullPointerException npe)
+                            {
+                                //Don't care
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("EventsListFragment","RefreshThreadSleep",e);
+                            }
                         }
 
                         if(dialog != null && dialog.isShowing())
@@ -752,6 +796,20 @@ public class ViewZenossEventsListFragment extends ListFragment
                         }
 
                         mCallbacks.fetchError();
+                    }
+                    break;
+
+                    case EVENTSLISTHANDLER_SERVICE_NOT_STARTED:
+                    {
+                        dialog = new ProgressDialog(getActivity());
+
+                        dialog.setTitle("Querying Zenoss Directly");
+                        //Log.e("Refresh","The service wasn't running for some reason");
+                        dialog.setMessage("The backend service wasn't running.\n\nStarting...");
+                        //ToDo set cancellable
+
+                        if(!dialog.isShowing())
+                            dialog.show();
                     }
                     break;
 
@@ -1095,7 +1153,9 @@ public class ViewZenossEventsListFragment extends ListFragment
             }
             else
             {
-                if(dialog == null || !dialog.isShowing())
+                Log.e("Refresh", "refreshStatus was null");
+                eventsListHandler.sendEmptyMessageDelayed(EVENTSLISTHANDLER_DELAYED_AB_STATUS,500);
+                /*if(dialog == null || !dialog.isShowing())
                 {
                     dialog = new ProgressDialog(getActivity());
                 }
@@ -1105,7 +1165,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 //ToDo set cancellable
 
                 if(!dialog.isShowing())
-                    dialog.show();
+                    dialog.show();*/
             }
         }
         catch(Exception e)
@@ -1119,6 +1179,17 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             public void run()
             {
+
+                //If we wait just a little bit then the UI should catch up
+                try
+                {
+                    sleep(500);
+                }
+                catch (InterruptedException ie)
+                {
+                    ie.printStackTrace();
+                }
+
                 List<ZenossEvent> tempZenossEvents = null;
 
                 //This is a bit dirty but hell it saves an extra API call
@@ -1131,13 +1202,13 @@ public class ViewZenossEventsListFragment extends ListFragment
                     }
                     catch(Exception e)
                     {
-                        BugSenseHandler.sendExceptionMessage("RhybuddHome","RefreshThreadSleep",e);
+                        BugSenseHandler.sendExceptionMessage("EventsListFragment","RefreshThreadSleep",e);
                     }
                 }
 
                 if (null != mService && mBound)
                 {
-                    //Log.e("Refresh","yay not dead");
+                    Log.e("Refresh","yay not dead");
                     try
                     {
                         if(null == mService.API)
@@ -1216,15 +1287,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(dialog == null || !dialog.isShowing())
                         {
-                            dialog = new ProgressDialog(getActivity());
-
-                            dialog.setTitle("Querying Zenoss Directly");
-                            //Log.e("Refresh","The service wasn't running for some reason");
-                            dialog.setMessage("The backend service wasn't running.\n\nStarting...");
-                            //ToDo set cancellable
-
-                            if(!dialog.isShowing())
-                                dialog.show();
+                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SERVICE_NOT_STARTED);
                         }
                     }
 

@@ -168,7 +168,7 @@ public class RhybuddDream extends DreamService
                 {
                     if(errors > 10)
                     {
-                        Toast.makeText(RhybuddDream.this,"There was an error trying to display the graphs",Toast.LENGTH_LONG);
+                        //Toast.makeText(RhybuddDream.this,"There was an error trying to display the graphs",Toast.LENGTH_LONG);
                         finish();
                     }
 
@@ -218,6 +218,14 @@ public class RhybuddDream extends DreamService
                         e.printStackTrace();
                         //mGraphs.add(new HostGraph(null,"..."));
                         errors++;
+                        try
+                        {
+                            sleep(5000);
+                        }
+                        catch (InterruptedException ie)
+                        {
+                            ie.printStackTrace();
+                        }
                         i--;
                     }
                 }

@@ -4,5 +4,8 @@
           android:name="net.networksaremadeofstring.rhybudd.ViewZenossDeviceListFragment"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
+          android:layout_marginLeft="@dimen/EventListFragmentMargins"
+          android:layout_marginRight="@dimen/EventListFragmentMargins"
           tools:context=".ViewZenossDeviceListActivity"
+          android:background="@color/FlatGray"
           tools:layout="@android:layout/list_content" />
