@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.view.MenuItem;
 
 public class SettingsFragment extends PreferenceActivity 
 {
@@ -43,5 +44,28 @@ public class SettingsFragment extends PreferenceActivity
             //prefs = PreferenceManager.getDefaultSharedPreferences(this);
             addPreferencesFromResource(R.xml.preferences);
         }*/
+
+        getActionBar().setTitle(getString(R.string.SettingsTitle));
+        getActionBar().setSubtitle(getString(R.string.SettingsSubTitle));
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+            {
+                finish();
+                return true;
+            }
+
+            default:
+            {
+                return false;
+            }
+        }
     }
 }

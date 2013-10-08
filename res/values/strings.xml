@@ -25,6 +25,10 @@
     <string name="FirstRunPush">[Optional]\nRhybudd Push</string>
     <string name="FirstRunDebug">Debug Output:</string>
 
+
+    <!-- Normal Settings -->
+    <string name="SettingsTitle">Rhybudd Settings</string>
+    <string name="SettingsSubTitle">See http://wiki.zenoss.org/Android for help</string>
     <string name="testtest">test test test \ntest2 test2 test2</string>
 
     <!-- Preference Push Simple -->

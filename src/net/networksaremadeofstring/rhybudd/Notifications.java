@@ -217,7 +217,7 @@ public class Notifications
 
     public static void SendPollNotification(int EventCount, List<String> EventDetails, Context context)
     {
-        Intent notificationIntent = new Intent(context, RhybuddHome.class);
+        Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
@@ -302,7 +302,7 @@ public class Notifications
             strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
         }
 
-        Intent notificationIntent = new Intent(context, RhybuddHome.class);
+        Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);

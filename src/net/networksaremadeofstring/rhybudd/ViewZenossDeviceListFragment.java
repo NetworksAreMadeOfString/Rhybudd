@@ -87,21 +87,28 @@ public class ViewZenossDeviceListFragment extends ListFragment
         {
             public void handleMessage(Message msg)
             {
-                if(msg.what == 0)
+                try
                 {
-                    Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                    if(msg.what == 0)
+                    {
+                        Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                    }
+                    else if(msg.what == 1)
+                    {
+                        dialog.setMessage("Refresh Complete!");
+                        this.sendEmptyMessageDelayed(2,1000);
+                    }
+                    else if(msg.what == 2)
+                    {
+                        dialog.dismiss();
+                        adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
+                        //((TextView) findViewById(R.id.ServerCountLabel)).setText("Monitoring " + DeviceCount + " servers");
+                        setListAdapter(adapter);
+                    }
                 }
-                else if(msg.what == 1)
+                catch (Exception e)
                 {
-                    dialog.setMessage("Refresh Complete!");
-                    this.sendEmptyMessageDelayed(2,1000);
-                }
-                else if(msg.what == 2)
-                {
-                    dialog.dismiss();
-                    adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
-                    //((TextView) findViewById(R.id.ServerCountLabel)).setText("Monitoring " + DeviceCount + " servers");
-                    setListAdapter(adapter);
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "HandleMessage", e);
                 }
             }
         };
@@ -186,25 +193,32 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
     public void Refresh()
     {
-        if(dialog != null)
+        try
         {
-            dialog.setTitle("Contacting Zenoss...");
-            dialog.setMessage("Please wait:\nLoading Infrastructure....");
-            //TODO make cancelable
-            dialog.setCancelable(false);
-
-            if(!dialog.isShowing())
+            if(null != dialog)
             {
+                dialog.setTitle("Contacting Zenoss...");
+                dialog.setMessage("Please wait:\nLoading Infrastructure....");
+                //TODO make cancelable
+                dialog.setCancelable(false);
+
+                if(!dialog.isShowing())
+                {
+                    dialog.show();
+                }
+            }
+            else
+            {
+                dialog = new ProgressDialog(getActivity());
+                dialog.setTitle("Contacting Zenoss...");
+                dialog.setMessage("Please wait:\nLoading Infrastructure....");
+                dialog.setCancelable(false);
                 dialog.show();
             }
         }
-        else
+        catch (Exception e)
         {
-            dialog = new ProgressDialog(getActivity());
-            dialog.setTitle("Contacting Zenoss...");
-            dialog.setMessage("Please wait:\nLoading Infrastructure....");
-            dialog.setCancelable(false);
-            dialog.show();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "Refresh", e);
         }
 
         if(listOfDevices != null)

@@ -759,6 +759,16 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                         }
 
+                        try
+                        {
+                            listOfZenossEvents.clear();
+                            adapter.notifyDataSetChanged();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("EventsListFragment","no events adapter notify",e);
+                        }
+
                         Toast.makeText(getActivity(), "No events found. Must be a quiet day!", Toast.LENGTH_LONG).show();
                     }
                     break;
@@ -1152,11 +1162,34 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     public void Refresh()
     {
+        try {
+
+
         if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
                 PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
         {
             //Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
+            return;
+        }
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                if(null == getActivity())
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Refresh getActivity was null",e);
+                }
+                else
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Refresh getActivity not null",e);
+                }
+            }
+            catch (Exception ie)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Refresh checking activity",e);
+            }
             return;
         }
 
