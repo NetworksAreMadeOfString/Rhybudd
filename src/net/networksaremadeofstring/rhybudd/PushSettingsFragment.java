@@ -151,9 +151,9 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         View rootView = inflater.inflate(R.layout.fragment_push_config, container, false);
 
         progressbar = (ProgressBar) rootView.findViewById(R.id.progressBar);
-        pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSHKEY, "");
-        pushEnabled = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPIv2.PREFERENCE_PUSH_ENABLED,false);
-        senderID = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSH_SENDERID, "");
+        pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_PUSHKEY, "");
+        pushEnabled = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false);
+        senderID = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_PUSH_SENDERID, "");
 
         FilterKey = (EditText) rootView.findViewById(R.id.pushFilterEditText);
         enabledSwitch = (Switch) rootView.findViewById(R.id.PushEnabledSwitch);
@@ -484,13 +484,14 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
                         //Log.e("ZP",zp.SenderID);
 
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                        editor.putString("SenderID", zp.SenderID);
+                        editor.putString(ZenossAPI.PREFERENCE_PUSH_SENDERID, zp.SenderID);
                         editor.commit();
 
                         checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_is_installed);
 
-                        if(checkZPImmediately)
-                            RegisterWithZenPack();
+                        //Moved to the handler above
+                        /*if(checkZPImmediately)
+                            RegisterWithZenPack();*/
                     }
                     else
                     {
@@ -589,7 +590,11 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
                         enabledSwitch.setEnabled(hasZenPack);
                         registerWithZenPack.setEnabled(hasZenPack);
 
-                        if(!checkZPImmediately)
+                        if(checkZPImmediately)
+                        {
+                            RegisterWithZenPack();
+                        }
+                        else
                         {
                             checkZenPack.setVisibility(View.VISIBLE);
                             registerWithZenPack.setVisibility(View.GONE);
@@ -631,7 +636,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
                 {
                     case RhybuddHandlers.msg_generic_success:
                     {
-                        String pushKey = msg.getData().getString(ZenossAPIv2.PREFERENCE_PUSHKEY);
+                        String pushKey = msg.getData().getString(ZenossAPI.PREFERENCE_PUSHKEY);
 
                         progressbar.setVisibility(View.GONE);
                         //PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));

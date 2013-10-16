@@ -75,7 +75,7 @@ import com.bugsense.trace.BugSenseHandler;
 //TODO This needs some serious genericisation to remove all the duplicated code
 public class ZenossAPIv2 
 {
-	String ZENOSS_INSTANCE = null;
+	/*String ZENOSS_INSTANCE = null;
     String ZENOSS_USERNAME = null;
     String ZENOSS_PASSWORD = null;
 
@@ -94,7 +94,7 @@ public class ZenossAPIv2
     private int reqCount = 1;
     private boolean LoginSuccessful = false;
     
-    public ZenossAPIv2(String UserName, String Password, String URL, String BAUser, String BAPassword) throws Exception 
+    public ZenossAPIv2(String UserName, String Password, String URL, String BAUser, String BAPassword) throws Exception
     {
     	if(URL.contains("https://"))
     	{
@@ -158,18 +158,7 @@ public class ZenossAPIv2
 		
         SchemeRegistry registry = new SchemeRegistry();
         SocketFactory socketFactory = null;
-        
-        //Check whether people are self signing or not
-        /*if(AllowSelfSigned == true)
-        {*/
-        	//Log.i("SelfSigned","Allowing Self Signed Certificates");
-			socketFactory = TrustAllSSLSocketFactory.getDefault();
-        /*}
-        else
-        {
-        	Log.i("SelfSigned","Enforcing Certificate checks");
-        	socketFactory = SSLSocketFactory.getSocketFactory();
-        }*/
+	    socketFactory = TrustAllSSLSocketFactory.getDefault();
         
         registry.register(new Scheme("https", socketFactory, 443));
         //mgr = new SingleClientConnManager(client.getParams(), registry); 
@@ -187,58 +176,8 @@ public class ZenossAPIv2
         mgr = new ThreadSafeClientConnManager(params, registry);
         httpclient = new DefaultHttpClient(mgr, client.getParams());
     }
-    
-    /*public boolean getLoggedInStatus()
-    {
-    	return this.LoginSuccessful;
-    }*/
 
-    /*public static String getPushKey() throws IOException, JSONException {
-        DefaultHttpClient client = new DefaultHttpClient();
-        SchemeRegistry registry = new SchemeRegistry();
-        SocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-        registry.register(new Scheme("https", socketFactory, 443));
-        ThreadSafeClientConnManager mgr = new ThreadSafeClientConnManager(client.getParams(), registry);
-        DefaultHttpClient httpclient = new DefaultHttpClient(mgr, client.getParams());
 
-        HttpPost httpost = new HttpPost("https://api.coldstart.io/1/getrhybuddpushkey");
-
-        httpost.addHeader("Content-type", "application/json; charset=utf-8");
-        httpost.setHeader("Accept", "application/json");
-
-        HttpResponse response = httpclient.execute(httpost);
-        String rawJSON = EntityUtils.toString(response.getEntity());
-        response.getEntity().consumeContent();
-        JSONObject json = new JSONObject(rawJSON);
-        Log.i("getPushKey",rawJSON);
-
-        if(json.has("pushkey"))
-        {
-            return json.getString("pushkey");
-        }
-        else
-        {
-            return null;
-        }
-    }*/
-
-	/*public boolean CheckLoggedIn()
-    {
-		//If we got JSON back rather than HTML then we are probably logged in
-		//Why the fuck I can't hit an endpoint and get a 401 or 200 depending
-		//on whether my cookie is valid appears to be waaaay too complicated
-    	try 
-    	{
-			this.GetEvents("5",true,false,null,null);
-			this.LoginSuccessful = true;
-			return true;
-		} 
-    	catch (Exception e) 
-    	{
-			this.LoginSuccessful = false;
-			return false;
-		}
-    }*/
 	
 	
 	public List<ZenossDevice> GetRhybuddDevices() throws JSONException, ClientProtocolException, IOException
@@ -333,11 +272,11 @@ public class ZenossAPIv2
 					events.put("error",0);
 				}
 				
-				/*events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
-				events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
-				events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
-				events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
-				events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));*/
+				//events.put("info", CurrentDevice.getJSONObject("events").getInt("info"));
+				//events.put("debug", CurrentDevice.getJSONObject("events").getInt("debug"));
+				//events.put("critical", CurrentDevice.getJSONObject("events").getInt("critical"));
+				//events.put("warning", CurrentDevice.getJSONObject("events").getInt("warning"));
+				//events.put("error", CurrentDevice.getJSONObject("events").getInt("error"));
 				int IPAddress = 0;
 				
 				try
@@ -748,18 +687,18 @@ public class ZenossAPIv2
     	//dataContents.put("field", "severity");
     	//dataContents.put("asof", (System.currentTimeMillis()/1000));
     	
-    	/*JSONArray evids = new JSONArray();
-    	evids.put(_EventID);
-    	dataContents.put("evids", evids);*/
+    	//JSONArray evids = new JSONArray();
+    	//evids.put(_EventID);
+    	//dataContents.put("evids", evids);
     	dataContents.put("evid",_EventID);
     	
     	//Disabled for 4.1 compatibility
     	//dataContents.put("history", false);
     	
-        /*JSONObject params = new JSONObject();
-        params.put("severity", new JSONArray("[5, 4, 3, 2]"));
-        params.put("eventState", new JSONArray("[0, 1]"));
-        dataContents.put("params", params);*/
+        //JSONObject params = new JSONObject();
+        //params.put("severity", new JSONArray("[5, 4, 3, 2]"));
+        //params.put("eventState", new JSONArray("[0, 1]"));
+        //dataContents.put("params", params);
         
         JSONArray data = new JSONArray();
         	data.put(dataContents);
@@ -1002,5 +941,5 @@ public class ZenossAPIv2
 		{
 		    return null;
 		}
-	}
+	}*/
 }

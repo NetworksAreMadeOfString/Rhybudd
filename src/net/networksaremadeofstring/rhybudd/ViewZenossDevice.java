@@ -44,7 +44,7 @@ import android.widget.Toast;
 
 public class ViewZenossDevice extends Activity
 {
-	ZenossAPIv2 API = null;
+	ZenossAPI API = null;
 	JSONObject DeviceObject = null, EventsObject = null;
 	JSONObject DeviceDetails = null;
 	private SharedPreferences settings = null;
@@ -341,16 +341,16 @@ public class ViewZenossDevice extends Activity
 					{
 						try
 						{
-							if(settings.getBoolean("httpBasicAuth", false))
+							/*if(settings.getBoolean("httpBasicAuth", false))
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
 							}
 							else
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							}
+							}*/
 						}
-						catch(ConnectTimeoutException cte)
+						/*catch(ConnectTimeoutException cte)
 						{
 							if(cte.getMessage() != null)
 							{
@@ -368,7 +368,7 @@ public class ViewZenossDevice extends Activity
 								errorHandler.sendMessage(msg);
 								//Toast.makeText(ViewZenossDevice.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
 							}
-						}
+						}*/
 						catch(Exception e)
 						{
 							if(e.getMessage() != null)
@@ -418,14 +418,25 @@ public class ViewZenossDevice extends Activity
 						
 						try
 						{
-							if(settings.getBoolean("httpBasicAuth", false))
+							/*if(settings.getBoolean("httpBasicAuth", false))
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
 							}
 							else
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							}
+							}*/
+                            if(PreferenceManager.getDefaultSharedPreferences(ViewZenossDevice.this).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                            {
+                                API = new ZenossAPIZaas();
+                            }
+                            else
+                            {
+                                API = new ZenossAPICore();
+                            }
+
+                            ZenossCredentials credentials = new ZenossCredentials(ViewZenossDevice.this);
+                            API.Login(credentials);
 						}
 						catch(Exception e)
 						{
@@ -491,14 +502,25 @@ public class ViewZenossDevice extends Activity
 						
 						try
 						{
-							if(settings.getBoolean("httpBasicAuth", false))
+							/*if(settings.getBoolean("httpBasicAuth", false))
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
 							}
 							else
 							{
 								API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-							}
+							}*/
+                            if(PreferenceManager.getDefaultSharedPreferences(ViewZenossDevice.this).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                            {
+                                API = new ZenossAPIZaas();
+                            }
+                            else
+                            {
+                                API = new ZenossAPICore();
+                            }
+
+                            ZenossCredentials credentials = new ZenossCredentials(ViewZenossDevice.this);
+                            API.Login(credentials);
 						}
 						catch(ConnectTimeoutException cte)
 						{
@@ -535,16 +557,16 @@ public class ViewZenossDevice extends Activity
 						}
 					}
 
-					try
+					/*try
 					{	
 						EventsObject = API.GetDeviceEvents(getIntent().getStringExtra("UID"),false);
 					}
 					catch(Exception e)
 					{
 						e.printStackTrace();
-					}
+					}*/
 					
-					try
+					/*try
 					{
 						if((EventsObject.has("type") && EventsObject.get("type").equals("exception")) || !EventsObject.getJSONObject("result").has("totalCount") )
 						{
@@ -554,7 +576,7 @@ public class ViewZenossDevice extends Activity
 					catch(Exception e)
 					{
 						e.printStackTrace();
-					}
+					}*/
 					
 					if(null != EventsObject && EventsObject.has("result") && EventsObject.getJSONObject("result").getInt("totalCount") > 0)
 					{

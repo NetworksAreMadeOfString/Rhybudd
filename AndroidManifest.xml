@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.networksaremadeofstring.rhybudd"
-      android:installLocation="auto" android:versionCode="28" android:versionName="4.0 (Alpha)">
+      android:installLocation="auto" android:versionCode="29" android:versionName="4.0 (RC1)">
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="17"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -32,7 +32,7 @@
             <meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
         </activity>
 
-
+        <!--
         <receiver
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -45,16 +45,7 @@
         </receiver>
 
         <service android:name=".GCMIntentService" />
-
-  <!--      <activity android:name=".RhybuddDock"  android:label="Rhybudd Dock">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.CAR_DOCK" /> 
-		        <category android:name="android.intent.category.DESK_DOCK" />
-		        <category android:name="android.intent.category.DEFAULT" /> 
-            </intent-filter>
-        </activity>-->
-        
+        -->
         <activity android:name=".SettingsFragment"
 			android:label="@string/app_name">
 		</activity>
@@ -90,10 +81,10 @@
         </activity>
 
         <activity android:name=".AddDeviceActivity"
-                  android:parentActivityName=".DeviceList"
+                  android:parentActivityName=".ViewZenossDeviceListActivity"
                   android:label="@string/AddDeviceTitle">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                       android:value=".DeviceList" />
+                       android:value=".ViewZenossDeviceListActivity" />
         </activity>
 
 		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossEvent"
@@ -105,11 +96,6 @@
                   android:label="Rhybudd - Event Details"
                   android:uiOptions="splitActionBarWhenNarrow">
         </activity>
-		
-		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
-			android:label="Rhybudd - Infrastructure List">
-			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
-		</activity>
 
         <activity android:name=".ViewZenossDeviceListActivity"
                   android:label="Rhybudd - Infrastructure List">
@@ -130,24 +116,11 @@
                 <data android:mimeType="application/vnd.net.networksaremadeofstring.rhybudd.devicepage" />
             </intent-filter>
         </activity>
-		
-		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
-			android:label="Rhybudd - Device Details">
-			<intent-filter>
-			     <action android:name="android.intent.action.VIEW" />
-			     <category android:name="android.intent.category.DEFAULT" />
-			     <category android:name="android.intent.category.BROWSABLE" />
-			     <data android:path="/zport/dmd/Devices/*" />
-			 </intent-filter>
-		</activity>
+
 
         <activity android:name="net.networksaremadeofstring.rhybudd.ManageDatabase"
                   android:label="Rhybudd - Manage Cache">
         </activity>
-
-		<!-- <activity android:name="net.networksaremadeofstring.rhybudd.Search"
-			android:label="Rhybudd - Search">
-		</activity>-->
 
 		<activity android:name="Search" android:label="Search" android:theme="@style/Theme.Rhybudd_default">
             <intent-filter>
@@ -159,14 +132,14 @@
         </activity>
         
 		
-		<!-- 
-		 ______     __  __     ______   ______     ______     ______    
-		/\  ___\   /\_\_\_\   /\__  _\ /\  == \   /\  __ \   /\  ___\   
-		\ \  __\   \/_/\_\/_  \/_/\ \/ \ \  __<   \ \  __ \  \ \___  \  
-		 \ \_____\   /\_\/\_\    \ \_\  \ \_\ \_\  \ \_\ \_\  \/\_____\ 
-		  \/_____/   \/_/\/_/     \/_/   \/_/ /_/   \/_/\/_/   \/_____/ 
-		          
-		          		                                                        
+		<!--
+         ______      _
+        |  ____|    | |
+        | |__  __  _| |_ _ __ __ _ ___
+        |  __| \ \/ / __| '__/ _` / __|
+        | |____ >  <| |_| | | (_| \__ \
+        |______/_/\_\\__|_|  \__,_|___/
+
 		-->
         <service android:name=".ZenossPoller">
         </service>
@@ -204,27 +177,23 @@
         </service>
 
         <service android:name=".RhybuddDream" android:exported="true"
-                 android:icon="@drawable/icon" android:label="Rhybudd Dream" >
+                 android:icon="@drawable/ic_launcher" android:label="Rhybudd Dream" >
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
 
-        <!-- <receiver android:name="ManageUpdate">
-		  <intent-filter>
-		    <action android:name="android.intent.action.PACKAGE_REPLACED" />
-		    <data android:scheme="package"/> 
-		  </intent-filter>
-		</receiver> -->
-		
-		<!-- 
-		 __     __     __     _____     ______     ______     ______   ______       
-		/\ \  _ \ \   /\ \   /\  __-.  /\  ___\   /\  ___\   /\__  _\ /\  ___\      
-		\ \ \/ ".\ \  \ \ \  \ \ \/\ \ \ \ \__ \  \ \  __\   \/_/\ \/ \ \___  \     
- 		 \ \__/".~\_\  \ \_\  \ \____-  \ \_____\  \ \_____\    \ \_\  \/\_____\    
- 		  \/_/   \/_/   \/_/   \/____/   \/_____/   \/_____/     \/_/   \/_____/    
-                                                                            
+
+		<!--
+        __          ___     _            _
+        \ \        / (_)   | |          | |
+         \ \  /\  / / _  __| | __ _  ___| |_ ___
+          \ \/  \/ / | |/ _` |/ _` |/ _ \ __/ __|
+           \  /\  /  | | (_| | (_| |  __/ |_\__ \
+            \/  \/   |_|\__,_|\__, |\___|\__|___/
+                               __/ |
+                              |___/
 		 -->
 		<receiver android:name="net.networksaremadeofstring.rhybudd.ZenossWidget" 
 			android:label="Rhybudd - Current Event Count">
@@ -243,6 +212,54 @@
 		    <meta-data android:name="android.appwidget.provider"
 		               android:resource="@xml/zenoss_widget_graph" />
 		</receiver>
+
+
+        <!--
+         _____                                _           _
+        |  __ \                              | |         | |
+        | |  | | ___ _ __  _ __ ___  ___ __ _| |_ ___  __| |
+        | |  | |/ _ \ '_ \| '__/ _ \/ __/ _` | __/ _ \/ _` |
+        | |__| |  __/ |_) | | |  __/ (_| (_| | ||  __/ (_| |
+        |_____/ \___| .__/|_|  \___|\___\__,_|\__\___|\__,_|
+                    | |
+                    |_|
+        -->
+
+        <!-- <receiver android:name="ManageUpdate">
+		  <intent-filter>
+		    <action android:name="android.intent.action.PACKAGE_REPLACED" />
+		    <data android:scheme="package"/>
+		  </intent-filter>
+		</receiver> -->
+
+        <!-- <activity android:name="net.networksaremadeofstring.rhybudd.Search"
+			android:label="Rhybudd - Search">
+		</activity>-->
+        <!--
+		<activity android:name="net.networksaremadeofstring.rhybudd.ViewZenossDevice"
+			android:label="Rhybudd - Device Details">
+			<intent-filter>
+			     <action android:name="android.intent.action.VIEW" />
+			     <category android:name="android.intent.category.DEFAULT" />
+			     <category android:name="android.intent.category.BROWSABLE" />
+			     <data android:path="/zport/dmd/Devices/*" />
+			 </intent-filter>
+		</activity>
+        -->
+        <!--
+		<activity android:name="net.networksaremadeofstring.rhybudd.DeviceList"
+			android:label="Rhybudd - Infrastructure List">
+			<meta-data android:name="android.app.default_searchable" android:value="net.networksaremadeofstring.rhybudd.Search" />
+		</activity>
+        -->
+        <!--      <activity android:name=".RhybuddDock"  android:label="Rhybudd Dock">
+           <intent-filter>
+               <action android:name="android.intent.action.MAIN" />
+               <category android:name="android.intent.category.CAR_DOCK" />
+               <category android:name="android.intent.category.DESK_DOCK" />
+               <category android:name="android.intent.category.DEFAULT" />
+           </intent-filter>
+       </activity>-->
 
 		<meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAI_p4Fmym8ZBYQy6zNfaz3mQ-mj-C6zPWIFf3WDA" />
     </application>

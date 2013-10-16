@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.bugsense.trace.BugSenseHandler;
+
 
 public class ZenossEventsAdaptor extends BaseAdapter
 {
@@ -96,7 +98,18 @@ public class ZenossEventsAdaptor extends BaseAdapter
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
-		ZenossEvent Event = listZenossEvents.get(position);
+        ZenossEvent Event = new ZenossEvent("","");
+        try
+        {
+            Event = listZenossEvents.get(position);
+        }
+        catch (Exception e)
+        {
+            //TODO We should probably bomb out here
+            BugSenseHandler.sendExceptionMessage("ZenossEventsAdaptor", "getView", e);
+            Event = new ZenossEvent("","None");
+        }
+
         if (convertView == null) 
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

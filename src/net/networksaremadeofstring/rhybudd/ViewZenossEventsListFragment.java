@@ -1307,32 +1307,69 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 }
                                 catch (Exception e)
                                 {
-                                    BugSenseHandler.sendExceptionMessage("RhybuddHome","Updating last setting",e);
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Updating last setting",e);
                                 }
 
-                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SUCCESS);
-
+                                try
+                                {
+                                    eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SUCCESS);
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Sending EVENTSLISTHANDLER_SUCCESS",e);
+                                }
                             }
                             else if(tempZenossEvents!= null && tempZenossEvents.size() == 0)
                             {
-                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_NO_EVENTS);
+                                try
+                                {
+                                    eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_NO_EVENTS);
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Sending EVENTSLISTHANDLER_NO_EVENTS",e);
+                                }
                             }
                             else
                             {
                                 // TODO Send a proper message
-                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+
+                                try
+                                {
+                                    eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Sending EVENTSLISTHANDLER_TOTAL_FAILURE",e);
+                                }
                             }
                         }
                         else
                         {
-                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                            try
+                            {
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Sending EVENTSLISTHANDLER_TOTAL_FAILURE",e);
+                            }
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        BugSenseHandler.sendExceptionMessage("RhybuddHome","Refresh",e);
-                        eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Refresh",e);
+
+                        try
+                        {
+                            if(null != eventsListHandler)
+                                eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_TOTAL_FAILURE);
+                        }
+                        catch (Exception e1)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Sending EVENTSLISTHANDLER_TOTAL_FAILURE from within catch",e1);
+                        }
                     }
                 }
                 else

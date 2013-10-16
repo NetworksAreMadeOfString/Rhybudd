@@ -215,7 +215,7 @@ public class CoreSettingsFragment extends Fragment
                         BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Dismissing dialog in msg_caching_complete",e);
                     }
 
-                    String pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPIv2.PREFERENCE_PUSHKEY, "");
+                    String pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_PUSHKEY, "");
 
                     if(pushKey.equals(""))
                     {

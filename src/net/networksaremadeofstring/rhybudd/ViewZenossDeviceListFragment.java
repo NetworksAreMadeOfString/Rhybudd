@@ -20,11 +20,15 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
@@ -57,6 +61,8 @@ public class ViewZenossDeviceListFragment extends ListFragment
     private ProgressDialog dialog;
     private String mSelectedDevice = null;
     Thread dataLoad;
+    ZenossPoller mService;
+    boolean mBound = false;
 
     public interface Callbacks
     {
@@ -234,12 +240,13 @@ public class ViewZenossDeviceListFragment extends ListFragment
                     Message msg = new Message();
                     Bundle bundle = new Bundle();
 
-                    ZenossAPIv2 API = null;
+                    /*ZenossAPI API = null;
                     SharedPreferences settings = null;
                     settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     try
                     {
                         API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+
                     }
                     catch(ConnectTimeoutException cte)
                     {
@@ -279,50 +286,87 @@ public class ViewZenossDeviceListFragment extends ListFragment
                             handler.sendMessage(msg);
                             //Toast.makeText(DeviceList.this, "An error was encountered but the exception thrown contains no further information.", Toast.LENGTH_LONG).show();
                         }
-                    }
+                    }*/
 
-                    try
+                    if (null == mService && !mBound)
                     {
-                        if(API != null)
+                        //Log.e("Refresh","Service was dead or something so sleeping");
+                        try
                         {
-                            listOfDevices = API.GetRhybuddDevices();
+                            sleep(500);
                         }
-                        else
+                        catch(Exception e)
                         {
-                            listOfDevices = null;
+                            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment","RefreshThreadSleep",e);
                         }
                     }
-                    catch(Exception e)
+
+                    if (null == mService && !mBound)
                     {
-                        if(e.getMessage() != null)
-                            MessageExtra = e.getMessage();
-
-                        listOfDevices = null;
-                    }
-
-                    if(listOfDevices != null && listOfDevices.size() > 0)
-                    {
-                        PopulateMetaLists();
-
-                        //DeviceCount = listOfZenossDevices.size();
-                        Message.obtain();
-                        handler.sendEmptyMessage(1);
-
-                        RhybuddDataSource datasource = new RhybuddDataSource(getActivity());
-                        datasource.open();
-                        datasource.UpdateRhybuddDevices(listOfDevices);
-                        datasource.close();
-                    }
-                    else
-                    {
-                        //Message msg = new Message();
-                        //Bundle bundle = new Bundle();
-                        bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices. " + MessageExtra );
+                        bundle.putString("exception","There was an error binding to the Rhybudd internal service to query the API");
                         msg.setData(bundle);
                         msg.what = 0;
                         handler.sendMessage(msg);
                     }
+                    else
+                    {
+                        try
+                        {
 
+
+                            if(null == mService.API)
+                            {
+                                mService.PrepAPI(true,true);
+                            }
+
+                            ZenossCredentials credentials = new ZenossCredentials(getActivity());
+
+                            if(mService.API.Login(credentials))
+                            {
+                                listOfDevices = mService.API.GetRhybuddDevices();
+                            }
+
+                            /*if(API != null)
+                            {
+                                listOfDevices = API.GetRhybuddDevices();
+                            }*/
+                            else
+                            {
+                                listOfDevices = null;
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            if(e.getMessage() != null)
+                                MessageExtra = e.getMessage();
+
+                            listOfDevices = null;
+                        }
+
+                        if(listOfDevices != null && listOfDevices.size() > 0)
+                        {
+                            PopulateMetaLists();
+
+                            //DeviceCount = listOfZenossDevices.size();
+                            Message.obtain();
+                            handler.sendEmptyMessage(1);
+
+                            RhybuddDataSource datasource = new RhybuddDataSource(getActivity());
+                            datasource.open();
+                            datasource.UpdateRhybuddDevices(listOfDevices);
+                            datasource.close();
+                        }
+                        else
+                        {
+                            //Message msg = new Message();
+                            //Bundle bundle = new Bundle();
+                            bundle.putString("exception","A query to both the local DB and Zenoss API returned no devices. " + MessageExtra );
+                            msg.setData(bundle);
+                            msg.what = 0;
+                            handler.sendMessage(msg);
+                        }
+
+                    }
                 }
                 catch (Exception e)
                 {
@@ -460,4 +504,107 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
         mActivatedPosition = position;
     }
+
+
+
+    //------------------------------------------------------------------//
+    //                                                                  //
+    //               Connection to the the ZenossPoller Service         //
+    //                                                                  //
+    //------------------------------------------------------------------//
+    void doUnbindService()
+    {
+        if (mBound)
+        {
+            // Detach our existing connection.
+            getActivity().unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    void doBindService()
+    {
+        getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
+        mBound = true;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        //Lets try and bind to our service (if it's alive)
+        doBindService();
+
+        //If we've binded let's try and do a refresh
+        //If it's been more than 15 minutes since we last updated we should do a full refresh
+        if(ZenossAPI.shouldRefresh(getActivity()))
+        {
+            //Log.i("onResume","shouldRefresh() says we should do a full refresh");
+            Refresh();
+        }
+        else
+        {
+            //Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
+            DBGetThread();
+        }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        // Unbind from the service
+        doUnbindService();
+
+        try
+        {
+            //Log.e("onPause","Checking if dialog is null");
+            if(null != dialog)
+            {
+                //Log.e("onPause","it wasn't");
+                try
+                {
+                    //Log.e("onPause","Dismissing");
+                    dialog.dismiss();
+                    //Log.e("onPause","dismissed");
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onPause",e);
+                }
+            }
+            else
+            {
+                //Log.e("onPause","dialog was null");
+            }
+        }
+        catch(Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onPause outer",e);
+            e.printStackTrace();
+        }
+
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            //Toast.makeText(RhybuddHome.this, "Connected to Service", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0)
+        {
+            //Toast.makeText(RhybuddHome.this, "Disconnected to Service", Toast.LENGTH_SHORT).show();
+            mBound = false;
+        }
+    };
 }

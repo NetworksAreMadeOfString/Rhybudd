@@ -24,6 +24,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
+
 import com.bugsense.trace.BugSenseHandler;
 
 
@@ -33,7 +35,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 
     public GCMIntentService()
     {
-        super(ZenossAPIv2.SENDER_ID);
+        super(ZenossAPI.SENDER_ID);
     }
 
     @Override
@@ -59,7 +61,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
         if(purpose.equals("push"))
         {
             //GCM Payload
-            String alertCount = extras.getString("count","");
+            String alertCount = extras.getString("count","0");
             String evid = extras.getString("evid","");
             String device = extras.getString("device","");
             String summary = extras.getString("summary","");
@@ -68,53 +70,88 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
             String event_class = extras.getString("event_class","");
             String event_class_key = extras.getString("event_class_key","");
             String sent = extras.getString("sent","");
-
-            //TODO Outstanding from ZenPack
-            String prodState = extras.getString("prodstate","Production");
             String firstTime = extras.getString("firsttime","");
-            String componentText = extras.getString("componenttext","");
             String ownerID = extras.getString("ownerid","");
 
-            if(alertCount == null)
+            //TODO Outstanding from ZenPack
+            String componentText = extras.getString("componenttext","");
+            String prodState = extras.getString("prodstate","Production");
+
+            if(null == alertCount)
                 alertCount = "0";
 
-            if(evid == null)
+            if(null == evid)
                 evid = "0";
 
-            if(severity == null)
+            if(null == severity)
                 severity = "2";
 
-            if(summary == null)
+            if(null == summary)
                 summary = "No summary available";
 
-            if(status == null)
+            if(null == status)
                 status = "unacknowledged";
 
-            if(device == null)
+            if(null == device)
                 device = "localhost.localdomain";
 
-            if(event_class == null)
+            if(null == event_class)
                 event_class = "/Status";
 
-            if(sent == null)
+            if(null == sent)
                 sent = "--/--/---- --:--:--";
+
+            if(null == prodState || prodState.equals(""))
+                prodState = "Production";
+
+            if(null == firstTime)
+                firstTime = "";
+
+            if(null == componentText)
+                componentText = "";
+
+            if(null == ownerID)
+                ownerID = "";
+
 
             try
             {
-                /*Log.v("GCMPayload",alertCount + " / " +
-                        evid + " / " +
-                        device + " / " +
+                /*Log.v("GCMPayload",evid + " / " +
+                        alertCount + " / " +
+                        prodState + " / " +
+                        firstTime + " / " +
+                        severity + " / " +
+                        componentText + " /  /" +
                         summary + " / " +
                         status + " / " +
-                        severity + " / " +
+                        device + " / " +
                         event_class + " / " +
-                        event_class_key + " / " +
+                        ownerID + " / " +
                         sent
                 );*/
 
-                //ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), "Production","",severity,"", "",summary,status,device,event_class,sent ,  "");
-                ZenossEvent gcmEvent = new ZenossEvent( evid,   Integer.getInteger(alertCount), prodState, firstTime, severity,componentText, "",summary,status,device,event_class,sent ,  ownerID);
-                //ZenossEvent gcmEvent = new ZenossEvent(evid,summary);
+                int Count = 0;
+                try
+                {
+                    Count = Integer.valueOf(alertCount);
+                }
+                catch (NullPointerException npe)
+                {
+                    try
+                    {
+                        Count = Integer.getInteger(alertCount,0);
+                    }
+                    catch (Exception e)
+                    {
+                        Count = 0;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Count = 0;
+                }
+
+                ZenossEvent gcmEvent = new ZenossEvent( evid, Count, prodState, firstTime, severity, componentText, "", summary, status, device, event_class, sent,  ownerID);
 
                 RhybuddDataSource datasource = new RhybuddDataSource(arg0);
                 datasource.open();
@@ -129,18 +166,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
             {
                 BugSenseHandler.initAndStartSession(getApplicationContext(), "44a76a8c");
                 BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
-
                 e.printStackTrace();
-                /*Log.e("GCMPayload",alertCount + " / " +
-                        evid + " / " +
-                        device + " / " +
-                        summary + " / " +
-                        status + " / " +
-                        severity + " / " +
-                        event_class + " / " +
-                        event_class_key + " / " +
-                        sent
-                );*/
             }
         }
         else if(purpose.equals("ack"))
@@ -213,6 +239,8 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                 }
                 catch (Exception e)
                 {
+                    BugSenseHandler.initAndStartSession(getApplicationContext(), "44a76a8c");
+                    BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
                     e.printStackTrace();
                 }
             }
@@ -222,7 +250,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     @Override
     protected void onUnregistered(final Context arg0, String arg1)
     {
-       // Log.e("GCMIntentService","onUnregistered");
+       Log.e("GCMIntentService", "onUnregistered");
 
         ((Thread) new Thread(){
             public void run()
@@ -246,6 +274,8 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
                 }
                 catch (Exception e)
                 {
+                    BugSenseHandler.initAndStartSession(getApplicationContext(), "44a76a8c");
+                    BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
                     e.printStackTrace();
                 }
             }

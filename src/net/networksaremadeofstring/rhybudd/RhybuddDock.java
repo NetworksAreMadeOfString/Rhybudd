@@ -62,7 +62,7 @@ public class RhybuddDock extends FragmentActivity
 	public Integer DockMode;
 
 	//New
-	ZenossAPIv2 API = null;
+	ZenossAPI API = null;
 	JSONObject EventsObject = null;
 	JSONArray Events = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
@@ -196,14 +196,14 @@ public class RhybuddDock extends FragmentActivity
 				{
 					if(API == null)
 					{
-						if(settings.getBoolean("httpBasicAuth", false))
+						/*if(settings.getBoolean("httpBasicAuth", false))
 						{
 							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
 						}
 						else
 						{
 							API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-						}
+						}*/
 					}
 				}
 				catch(Exception e)
@@ -216,14 +216,14 @@ public class RhybuddDock extends FragmentActivity
 				{
 					if(API != null)
 					{
-						tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
+						/*tempZenossEvents = API.GetRhybuddEvents(settings.getBoolean("SeverityCritical", true),
 								settings.getBoolean("SeverityError", true),
 								settings.getBoolean("SeverityWarning", true),
 								settings.getBoolean("SeverityInfo", false),
 								settings.getBoolean("SeverityDebug", false),
 								settings.getBoolean("onlyProductionEvents", true),
 								settings.getString("SummaryFilter", ""),
-								settings.getString("DeviceFilter", ""));
+								settings.getString("DeviceFilter", ""));*/
 
 						if(tempZenossEvents!= null)
 						{
@@ -253,7 +253,7 @@ public class RhybuddDock extends FragmentActivity
 						handler.sendEmptyMessage(999);
 					}
 				} 
-				catch (ClientProtocolException e) 
+				/*catch (ClientProtocolException e)
 				{
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
@@ -267,7 +267,7 @@ public class RhybuddDock extends FragmentActivity
 				{
 					e.printStackTrace();
 					handler.sendEmptyMessage(999);
-				}
+				}*/
 				catch(Exception e)
 				{
 					handler.sendEmptyMessage(999);

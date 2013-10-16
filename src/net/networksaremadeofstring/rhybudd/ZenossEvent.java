@@ -224,19 +224,60 @@ public class ZenossEvent
     					String summary, String eventState,  String device, String eventClass, String lastTime, String ownerid) 
     {
 	    super();
-	    this.evid = evid;
-	    this.Count = count;
-	    this.prodState = prodState;
-	    this.firstTime = firstTime;
-	    this.severity = severity;
-	    this.component_text = component_text;
-	    this.component_uid = component_uid;
-	    this.summary = summary;
-	    this.eventState = eventState;
-	    this.device = device;
-	    this.eventClass = eventClass;
-	    this.lastTime = lastTime;
-	    this.ownerID = ownerid;
+
+        if(null != evid)
+	        this.evid = evid;
+
+        try
+        {
+	        this.Count = count;
+        }
+        catch (Exception e)
+        {
+            this.Count = 0;
+        }
+
+        if(null != prodState)
+	        this.prodState = prodState;
+
+        if(null != firstTime)
+            this.firstTime = firstTime;
+
+        if(null != severity)
+            this.severity = severity;
+
+        if(null != component_text)
+            this.component_text = component_text;
+
+        if(null != component_uid)
+            this.component_uid = component_uid;
+
+        if(null != summary)
+            this.summary = summary;
+
+        if(null != eventState)
+            this.eventState = eventState;
+
+        /*if(this.eventState.equals("0"))
+        {
+
+        }
+        else
+        {
+
+        }*/
+
+        if(null != device)
+            this.device = device;
+
+        if(null != eventClass)
+            this.eventClass = eventClass;
+
+        if(null != lastTime)
+	        this.lastTime = lastTime;
+
+        if(null != ownerid)
+	        this.ownerID = ownerid;
     }
     
     public void SetSelected(Boolean _selected)

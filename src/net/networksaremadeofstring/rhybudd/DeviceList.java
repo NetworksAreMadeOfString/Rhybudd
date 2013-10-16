@@ -249,10 +249,21 @@ public class DeviceList extends Activity
 					Message msg = new Message();
 					Bundle bundle = new Bundle();
 					
-					ZenossAPIv2 API = null;
+					ZenossAPI API = null;
 					try
 					{
-						API = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+
+                        if(PreferenceManager.getDefaultSharedPreferences(DeviceList.this).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+
+                        ZenossCredentials credentials = new ZenossCredentials(DeviceList.this);
+                        API.Login(credentials);
 					}
 					catch(ConnectTimeoutException cte)
 					{

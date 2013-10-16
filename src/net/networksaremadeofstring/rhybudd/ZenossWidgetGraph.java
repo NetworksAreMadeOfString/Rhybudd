@@ -118,12 +118,12 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 					tempZenossEvents = null;
 				}
 
-				if(tempZenossEvents!= null)
+				if(null != tempZenossEvents)
 				{
 					//Log.i("CountWidget","Found DB Data!");
 					handler.sendEmptyMessage(1);
 				}
-				else
+				/*else
 				{
 					//Log.i("CountWidget","No DB data found, querying API directly");
 					//handler.sendEmptyMessage(2);
@@ -169,7 +169,7 @@ public class ZenossWidgetGraph extends AppWidgetProvider
 					{
 						e.printStackTrace();
 					}
-				}
+				}*/
 				
 				if(tempZenossEvents != null)
 				{

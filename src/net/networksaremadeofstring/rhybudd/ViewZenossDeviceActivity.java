@@ -233,7 +233,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
-            if(rawMsgs.length > 0)
+            if(null != rawMsgs && rawMsgs.length > 0)
             {
                 NdefMessage msg = (NdefMessage) rawMsgs[0];
 

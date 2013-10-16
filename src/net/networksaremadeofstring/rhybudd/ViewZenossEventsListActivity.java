@@ -341,7 +341,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         if(settings.contains(ZenossAPI.PREFERENCE_PUSH_ENABLED) && settings.getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
         {
             //Log.e("onResume","Doing a GCM Registration");
-            doGCMRegistration(settings.getString(ZenossAPI.PREFERENCE_PUSHKEY,""));
+            doGCMRegistration();
         }
 
         //Refreshes are done in the fragment - Forced login done in the activity
@@ -414,10 +414,11 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
             case ZenossAPI.ACTIVITYRESULT_PUSHCONFIG:
             {
-                if(null != data && data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
-                {
-                    doGCMRegistration(data.getStringExtra(ZenossAPI.PREFERENCE_PUSHKEY));
-                }
+                //if(null != data && data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
+                //{
+                    GCMRegistrar.unregister(this);
+                    doGCMRegistration();
+                //}
             }
             break;
 
@@ -433,10 +434,10 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                     firstRun = false;
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Additional settings and functionality can be found by pressing the action bar overflow (or pressing the menu button).\r\n" +
-                            "\r\nPlease note that this is app is still in Beta. If you experience issues please email;\r\nGareth@NetworksAreMadeOfString.co.uk")
+                    builder.setMessage("Additional settings and functionality can be found by pressing the Action bar overflow.\r\n" +
+                            "\r\nIf you experience issues please email;\r\nGareth@DataSift.com before leaving negative reviews.")
                             .setTitle("Welcome to Rhybudd!")
-                            .setCancelable(false)
+                            .setCancelable(true)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
@@ -646,7 +647,7 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         }).start();
     }*/
 
-    private void doGCMRegistration(final String PushKey)
+    private void doGCMRegistration()
     {
         GCMRegistrar.checkDevice(this);
         GCMRegistrar.checkManifest(this);
@@ -655,26 +656,82 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         if (regId.equals(""))
         {
             //Log.e("GCM", "Registering");
-            GCMRegistrar.register(this, settings.getString("SenderID",ZenossAPI.SENDER_ID));
+            GCMRegistrar.register(this, settings.getString(ZenossAPI.PREFERENCE_PUSH_SENDERID,ZenossAPI.SENDER_ID));
         }
 
 
-        ((Thread) new Thread()
+        try
         {
-            public void run()
+            (new Thread()
             {
-                if(!ZenossAPI.registerPushKey(PushKey,regId,ZenossAPI.md5(Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID))))
+                public void run()
                 {
-                    runOnUiThread(new Runnable()
+                    /*if(!ZenossAPI.registerPushKey(PushKey,regId,ZenossAPI.md5(Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID))))
                     {
-                        public void run() {
-                            Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            runOnUiThread(new Runnable()
+                            {
+                                public void run() {
+                                    Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
-                    });
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration runnable",e);
+                        }
+                    }*/
+                    try
+                    {
+                        ZenossCredentials credentials = new ZenossCredentials(ViewZenossEventsListActivity.this);
+                        ZenossAPI API;
 
+                        if (PreferenceManager.getDefaultSharedPreferences(ViewZenossEventsListActivity.this).getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
+                            API = new ZenossAPIZaas();
+                        }
+                        else
+                        {
+                            API = new ZenossAPICore();
+                        }
+
+                        if(API.Login(credentials))
+                        {
+                            if(API.RegisterWithZenPack(ZenossAPI.md5(Settings.Secure.getString(ViewZenossEventsListActivity.this.getContentResolver(),Settings.Secure.ANDROID_ID)),regId))
+                            {
+                                //Nothing we are happy
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    runOnUiThread(new Runnable()
+                                    {
+                                        public void run() {
+                                            Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.ErrorRegisterGCM), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration runnable",e);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration registerzenpack",e);
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration",e);
+            e.printStackTrace();
+        }
 
     }
 

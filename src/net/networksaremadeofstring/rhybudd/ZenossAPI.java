@@ -80,7 +80,7 @@ public class ZenossAPI
     public static String PREFERENCE_IS_ZAAS = "isZaas";
     //public static String SETTINGS_PUSH = "push";
     public static String PREFERENCE_PUSH_ENABLED = "pushkey_enabled";
-    //public static String PREFERENCE_PUSH_SENDERID = "pushkey_senderid";
+    public static String PREFERENCE_PUSH_SENDERID = "SenderID";
 
     public static final int HANDLER_REDOREFRESH = 800;
 

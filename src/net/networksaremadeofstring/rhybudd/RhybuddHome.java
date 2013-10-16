@@ -59,7 +59,7 @@ public class RhybuddHome extends FragmentActivity
     private static final int FEEDBACK = 6;
 
 	SharedPreferences settings = null;
-	ZenossAPIv2 API = null;
+	ZenossAPI API = null;
 	List<ZenossEvent> listOfZenossEvents = new ArrayList<ZenossEvent>();
 	List<Integer> selectedEvents = new ArrayList<Integer>();
 	Thread dataPreload,AckEvent;
@@ -932,7 +932,7 @@ public class RhybuddHome extends FragmentActivity
 						try 
 						{
 							ZenossAPIv2 ackEventAPI;
-							if(settings.getBoolean("httpBasicAuth", false))
+							/*if(settings.getBoolean("httpBasicAuth", false))
 							{
 								ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
 							}
@@ -940,7 +940,7 @@ public class RhybuddHome extends FragmentActivity
 							{
 								ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
 							}
-							ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
+							ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI*/
 
 							//TODO Check it actually succeeded
 							AckEventHandler.sendEmptyMessage(2);
@@ -1088,7 +1088,7 @@ public class RhybuddHome extends FragmentActivity
                     {
                         try
                         {
-                            ZenossAPIv2 ackEventAPI;
+                           /* ZenossAPIv2 ackEventAPI;
                             if(settings.getBoolean("httpBasicAuth", false))
                             {
                                 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""),settings.getString("BAUser", ""), settings.getString("BAPassword", ""));
@@ -1098,7 +1098,7 @@ public class RhybuddHome extends FragmentActivity
                                 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
                             }
                             ackEventAPI.AcknowledgeEvents(EventIDs);//ackEventAPI
-
+                            */
 
                             //TODO Check it actually succeeded
                             AckEventHandler.sendEmptyMessage(1);
@@ -1366,8 +1366,8 @@ public class RhybuddHome extends FragmentActivity
 				try 
 				{
                     //TODO This needs moving to the new API model
-					ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-					ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
+					/*ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
+					ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI*/
 					listOfZenossEvents.get(Position).setProgress(false);
 					listOfZenossEvents.get(Position).setAcknowledged();
 					AckEventHandler.sendEmptyMessage(1);
