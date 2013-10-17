@@ -50,14 +50,6 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
         Bundle extras = intent.getExtras();
         String purpose = extras.getString("purpose","push");
 
-        try
-        {
-            ZenossAPI.updateLastChecked(arg0);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
         if(purpose.equals("push"))
         {
             //GCM Payload
@@ -201,6 +193,16 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
         else
         {
             //Log.i("GCMIntentService","Unknown message");
+        }
+
+        //For DB freshness / stampede control
+        try
+        {
+            ZenossAPI.updateLastChecked(arg0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

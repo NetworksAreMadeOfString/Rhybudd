@@ -30,6 +30,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.Time;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.List;
@@ -110,12 +112,23 @@ public class Notifications
 
     public static void SendGCMNotification(ZenossEvent Event, Context context)
     {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+        Time now = new Time();
+        now.setToNow();
+
+        //We don't need to overwhelm the user with their notification sound / vibrator
+        if((now.toMillis(true) - PreferenceManager.getDefaultSharedPreferences(context).getLong("lastCheck",now.toMillis(true))) < 3000)
+        {
+            Log.e("SendGCMNotification", "Not publishing a notification due to stampede control");
+            return;
+        }
+
         Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Uri soundURI;
         if(settings.getString("notificationSoundChoice", "").equals(""))
         {

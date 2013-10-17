@@ -272,17 +272,26 @@ public class ZenossAPI
             HttpResponse response = httpclient.execute(httpost);
             String RawJSON = EntityUtils.toString(response.getEntity());
 
-            try
+            if(RawJSON.contains("An error was encountered while publishing this resource."))
             {
-                JSONObject json = new JSONObject(RawJSON);
-                if(json.has("uuid") || json.has("result"))
-                {
-                    return true;
-                }
+                //BAD BAD BAD
+                //TODO We should only ever call this method if we know the ZenPack is there (looking at you onActivityResult)
+                return true;
             }
-            catch (Exception e)
+            else
             {
-                return false;
+                try
+                {
+                    JSONObject json = new JSONObject(RawJSON);
+                    if(json.has("uuid") || json.has("result"))
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
         }
         catch (Exception e)

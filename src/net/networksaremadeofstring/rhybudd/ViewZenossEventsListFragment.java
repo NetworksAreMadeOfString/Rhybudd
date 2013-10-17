@@ -1382,18 +1382,25 @@ public class ViewZenossEventsListFragment extends ListFragment
                         }
                     }
 
-                    Intent intent = new Intent(getActivity(), ZenossPoller.class);
-                    getActivity().startService(intent);
-                    retryCount++;
+                    try
+                    {
+                        Intent intent = new Intent(getActivity(), ZenossPoller.class);
+                        getActivity().startService(intent);
+                        retryCount++;
 
-                    if(retryCount > 5)
-                    {
-                        eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SERVICE_FAILURE);
+                        if(retryCount > 5)
+                        {
+                            eventsListHandler.sendEmptyMessage(EVENTSLISTHANDLER_SERVICE_FAILURE);
+                        }
+                        else
+                        {
+                            doBindService();
+                            eventsListHandler.sendEmptyMessageDelayed(EVENTSLISTHANDLER_REDOREFRESH,300);
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        doBindService();
-                        eventsListHandler.sendEmptyMessageDelayed(EVENTSLISTHANDLER_REDOREFRESH,300);
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","Start Service / bind service",e);
                     }
                 }
             }
