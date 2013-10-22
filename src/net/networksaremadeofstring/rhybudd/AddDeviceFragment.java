@@ -34,6 +34,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 
+import org.apache.http.cookie.CookieAttributeHandler;
+
 public class AddDeviceFragment extends Fragment
 {
     public static final String TWOPANEINDICATOR = "twopane";
@@ -47,19 +49,26 @@ public class AddDeviceFragment extends Fragment
     {
         View rootView = inflater.inflate(R.layout.add_device_fragment, container, false);
 
-        if(isTwoPane)
+        try
         {
-            ((Button) rootView.findViewById(R.id.ExitButton)).setVisibility(View.INVISIBLE);
+            if(isTwoPane)
+            {
+                ((Button) rootView.findViewById(R.id.ExitButton)).setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                ((Button) rootView.findViewById(R.id.ExitButton)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        getActivity().finish();
+                    }
+                });
+            }
         }
-        else
+        catch (Exception e)
         {
-            ((Button) rootView.findViewById(R.id.ExitButton)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view)
-                {
-                    getActivity().finish();
-                }
-            });
+            BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "onCreateView", e);
         }
 
         ((Button) rootView.findViewById(R.id.AddDeviceButton)).setOnClickListener(new View.OnClickListener() {
@@ -106,9 +115,17 @@ public class AddDeviceFragment extends Fragment
                     }
                 }).start();
 
-                Toast.makeText(getActivity(), "Device added to the Zenoss queue", Toast.LENGTH_SHORT).show();
-                ((EditText) getActivity().findViewById(R.id.FQDN)).setText("");
-                ((EditText) getActivity().findViewById(R.id.Title)).setText("");
+                try
+                {
+                    Toast.makeText(getActivity(), "Device added to the Zenoss queue", Toast.LENGTH_SHORT).show();
+
+                    ((EditText) getActivity().findViewById(R.id.FQDN)).setText("");
+                    ((EditText) getActivity().findViewById(R.id.Title)).setText("");
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "Toast and EditText", e);
+                }
             }
         });
         return rootView;
@@ -128,7 +145,7 @@ public class AddDeviceFragment extends Fragment
         }
         catch(Exception e)
         {
-
+            BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "onCreate", e);
         }
     }
 
@@ -136,18 +153,32 @@ public class AddDeviceFragment extends Fragment
 
     void doUnbindService()
     {
-        if (mBound)
+        try
         {
-            // Detach our existing connection.
-            getActivity().unbindService(mConnection);
-            mBound = false;
+            if (mBound)
+            {
+                // Detach our existing connection.
+                getActivity().unbindService(mConnection);
+                mBound = false;
+            }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "doUnbindService", e);
         }
     }
 
     void doBindService()
     {
-        getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
+        try
+        {
+            getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "doBindService", e);
+        }
     }
 
     @Override
@@ -163,11 +194,19 @@ public class AddDeviceFragment extends Fragment
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
         {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            //Toast.makeText(getActivity(), "Connected to Service", Toast.LENGTH_SHORT).show();
+            try
+            {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
+                mService = binder.getService();
+                mBound = true;
+                //Toast.makeText(getActivity(), "Connected to Service", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("AddDeviceFragment", "onServiceConnected", e);
+                mBound = false;
+            }
         }
 
         @Override

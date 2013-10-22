@@ -42,12 +42,26 @@ public class ZenossGroupsGridAdapter  extends BaseAdapter
 
         public int getCount()
         {
-            return groups.length;
+            if(null != groups)
+            {
+                return groups.length;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public Object getItem(int position)
         {
-            return groups[position];
+            if(null != groups)
+            {
+                return groups[position];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public long getItemId(int position)

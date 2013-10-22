@@ -171,7 +171,8 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
 
                 //Log.e("acknowledgeSingleEvent","Sending Handler message");
-                AckSingleEventHandler.sendMessage(msg);
+                if(null != AckSingleEventHandler)
+                    AckSingleEventHandler.sendMessage(msg);
             }
         }.start();
     }
@@ -219,8 +220,11 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 for (int position : reverseSortedPositions)
                                 {
                                     //Log.e("onDismiss",Integer.toString(position));
-                                    DimissEvent((ZenossEvent) adapter.getItem(position));
-                                    adapter.remove(position);
+                                    if(null != adapter)
+                                    {
+                                        DimissEvent((ZenossEvent) adapter.getItem(position));
+                                        adapter.remove(position);
+                                    }
 
                                     //listOfZenossEvents.remove(position);
                                     RhybuddDataSource datasource = null;
@@ -241,7 +245,9 @@ public class ViewZenossEventsListFragment extends ListFragment
                                             datasource.close();
                                     }
                                 }
-                                adapter.notifyDataSetChanged();
+
+                                if(null != adapter)
+                                    adapter.notifyDataSetChanged();
                             }
                         });
 
@@ -250,7 +256,8 @@ public class ViewZenossEventsListFragment extends ListFragment
         // we don't look for swipes.
         listView.setOnScrollListener(touchListener.makeScrollListener());
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
             {
@@ -330,13 +337,22 @@ public class ViewZenossEventsListFragment extends ListFragment
                 final List<String> EventIDs = new ArrayList<String>();
 
 
-                for (ZenossEvent evt : listOfZenossEvents)
+                if(null != listOfZenossEvents)
                 {
-                    if(!evt.getEventState().equals("Acknowledged"))
+                    try
                     {
-                        evt.setProgress(true);
-                        //AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
-                        EventIDs.add(evt.getEVID());
+                        for (ZenossEvent evt : listOfZenossEvents)
+                        {
+                            if(!evt.getEventState().equals("Acknowledged"))
+                            {
+                                evt.setProgress(true);
+                                EventIDs.add(evt.getEVID());
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolveall",e);
                     }
                 }
 
@@ -368,16 +384,20 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                             else
                             {
-                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                if(null != AckEventsHandler)
+                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
                             }
 
                             //TODO Check it actually succeeded
-                            AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                            if(null != AckEventsHandler)
+                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
                         }
                         catch (Exception e)
                         {
-                            e.printStackTrace();
-                            AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                            //e.printStackTrace();
+                            if(null != AckEventsHandler)
+                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+
                             BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolve all outer catch",e);
                         }
                     }
@@ -395,20 +415,27 @@ public class ViewZenossEventsListFragment extends ListFragment
 
             case R.id.escalate:
             {
-                Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-                // Add data to the intent, the receiving app will decide what to do with it.
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
-                String Events = "";
-                for (ZenossEvent evt : listOfZenossEvents)
+                try
                 {
-                    Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
-                }
-                intent.putExtra(Intent.EXTRA_TEXT, Events);
+                    Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-                startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+                    // Add data to the intent, the receiving app will decide what to do with it.
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Events");
+                    String Events = "";
+                    for (ZenossEvent evt : listOfZenossEvents)
+                    {
+                        Events += evt.getDevice() + " - " + evt.getSummary() + "\r\n\r\n";
+                    }
+                    intent.putExtra(Intent.EXTRA_TEXT, Events);
+
+                    startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","escalate",e);
+                }
             }
         }
 
@@ -424,7 +451,14 @@ public class ViewZenossEventsListFragment extends ListFragment
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(listOfZenossEvents.get(position),position);
+        try
+        {
+            mCallbacks.onItemSelected(listOfZenossEvents.get(position),position);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onListItemClick onItemSelected",e);
+        }
 
         //We want to keep track of this for our own purposes
         //mSelectedDevice = listOfZenossEvents.get(position).getname();
@@ -445,7 +479,8 @@ public class ViewZenossEventsListFragment extends ListFragment
         if (mActivatedPosition != ListView.INVALID_POSITION)
         {
             // Serialize and persist the activated item position.
-            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+            if(null != outState)
+                outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
         }
     }
 
@@ -462,16 +497,24 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     private void setActivatedPosition(int position)
     {
-        if (position == ListView.INVALID_POSITION)
+        try
         {
-            getListView().setItemChecked(mActivatedPosition, false);
-        }
-        else
-        {
-            getListView().setItemChecked(position, true);
-        }
 
-        mActivatedPosition = position;
+            if (position == ListView.INVALID_POSITION)
+            {
+                getListView().setItemChecked(mActivatedPosition, false);
+            }
+            else
+            {
+                getListView().setItemChecked(position, true);
+            }
+
+            mActivatedPosition = position;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","setActivatedPosition",e);
+        }
     }
 
     private void configureHandlers()
@@ -494,9 +537,12 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_SUCCESS:
                     {
-                        listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
-                        listOfZenossEvents.get(msg.getData().getInt("position")).setAcknowledged();
-                        listOfZenossEvents.get(msg.getData().getInt("position")).setownerID("by you");
+                        if(null != listOfZenossEvents)
+                        {
+                            listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
+                            listOfZenossEvents.get(msg.getData().getInt("position")).setAcknowledged();
+                            listOfZenossEvents.get(msg.getData().getInt("position")).setownerID("by you");
+                        }
 
                         RhybuddDataSource datasource = null;
 
@@ -526,12 +572,20 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_FAILURE:
                     {
-                        listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
+                        if(null != listOfZenossEvents)
+                            listOfZenossEvents.get(msg.getData().getInt("position")).setProgress(false);
 
                         if(adapter != null)
                             adapter.notifyDataSetChanged();
 
-                        Toast.makeText(getActivity(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "There was an error trying to ACK those events.", Toast.LENGTH_SHORT).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("RhybuddHome","ACKEVENTHANDLER_FAILURE",e);
+                        }
                     }
                     break;
                 }
@@ -547,11 +601,14 @@ public class ViewZenossEventsListFragment extends ListFragment
                 {
                     case ACKEVENTHANDLER_PROGRESS:
                     {
-                        for (ZenossEvent evt : listOfZenossEvents)
+                        if(null != listOfZenossEvents)
                         {
-                            if(!evt.getEventState().equals("Acknowledged"))
+                            for (ZenossEvent evt : listOfZenossEvents)
                             {
-                                evt.setProgress(true);
+                                if(!evt.getEventState().equals("Acknowledged"))
+                                {
+                                    evt.setProgress(true);
+                                }
                             }
                         }
 
@@ -563,14 +620,17 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_SUCCESS:
                     {
-                        for (ZenossEvent evt : listOfZenossEvents)
+                        if(null != listOfZenossEvents)
                         {
-                            //if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
-                            if(evt.getProgress())
+                            for (ZenossEvent evt : listOfZenossEvents)
                             {
-                                evt.setProgress(false);
-                                evt.setAcknowledged();
-                                evt.setownerID("by you");
+                                //if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                                if(evt.getProgress())
+                                {
+                                    evt.setProgress(false);
+                                    evt.setAcknowledged();
+                                    evt.setownerID("by you");
+                                }
                             }
                         }
 
@@ -602,18 +662,28 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case ACKEVENTHANDLER_FAILURE:
                     {
-                        for (ZenossEvent evt : listOfZenossEvents)
+                        if(null != listOfZenossEvents)
                         {
-                            if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                            for (ZenossEvent evt : listOfZenossEvents)
                             {
-                                evt.setProgress(false);
+                                if(!evt.getEventState().equals("Acknowledged") && evt.getProgress())
+                                {
+                                    evt.setProgress(false);
+                                }
                             }
                         }
 
                         if(adapter != null)
                             adapter.notifyDataSetChanged();
 
-                        Toast.makeText(getActivity(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "There was an error trying to ACK that event.", Toast.LENGTH_SHORT).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("RhybuddHome","ACKEVENTHANDLER_FAILURE",e);
+                        }
                     }
                     break;
                 }
@@ -664,7 +734,14 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                     case EVENTSLISTHANDLER_ERROR:
                     {
-                        Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_ERROR",e);
+                        }
                     }
                     break;
 
@@ -672,15 +749,37 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(dialog != null && dialog.isShowing())
                         {
-                            dialog.setMessage("Refresh Complete!");
-                            this.sendEmptyMessageDelayed(EVENTSLISTHANDLER_SUCCESS,1000);
+                            try
+                            {
+                                dialog.setMessage("Refresh Complete!");
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_DIALOGUPDATE",e);
+                            }
+
+                            try
+                            {
+                                this.sendEmptyMessageDelayed(EVENTSLISTHANDLER_SUCCESS,1000);
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_DIALOGUPDATE",e);
+                            }
                         }
                         else
                         {
                             if(null != refreshStatus)
                             {
-                                refreshStatus.setIcon(R.drawable.ic_action_refresh);
-                                getActivity().invalidateOptionsMenu();
+                                try
+                                {
+                                    refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                                    getActivity().invalidateOptionsMenu();
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_DIALOGUPDATE",e);
+                                }
                             }
                         }
                     }
@@ -690,8 +789,15 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(null != refreshStatus)
                         {
-                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
-                            getActivity().invalidateOptionsMenu();
+                            try
+                            {
+                                refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                                getActivity().invalidateOptionsMenu();
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_SUCCESS",e);
+                            }
                         }
 
                         if(dialog != null && dialog.isShowing())
@@ -706,8 +812,15 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                         }
 
-                        adapter = new ZenossEventsAdaptor(getActivity(), listOfZenossEvents);
-                        setListAdapter(adapter);
+                        try
+                        {
+                            adapter = new ZenossEventsAdaptor(getActivity(), listOfZenossEvents);
+                            setListAdapter(adapter);
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_SUCCESS",e);
+                        }
                     }
                     break;
 
@@ -721,19 +834,25 @@ public class ViewZenossEventsListFragment extends ListFragment
                         else
                         {
                            // Log.e("refreshStatus","refreshStatus was null reverting to using dialog");
-
-                            if(dialog != null && dialog.isShowing())
+                            try
                             {
-                                dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                                if(dialog != null && dialog.isShowing())
+                                {
+                                    dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                                }
+                                else
+                                {
+                                    dialog = new ProgressDialog(getActivity());
+                                    dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
+                                    //dialog.setCancelable(false);
+                                    //Log.e("EVENTSLISTHANDLER_DB_EMPTY", "Showing a dialog");
+
+                                    dialog.show();
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                dialog = new ProgressDialog(getActivity());
-                                dialog.setMessage("DB Cache incomplete.\r\nQuerying Zenoss directly.\r\nPlease wait....");
-                                //dialog.setCancelable(false);
-                                //Log.e("EVENTSLISTHANDLER_DB_EMPTY", "Showing a dialog");
-
-                                dialog.show();
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","EVENTSLISTHANDLER_DB_EMPTY",e);
                             }
                         }
                     }
@@ -743,8 +862,16 @@ public class ViewZenossEventsListFragment extends ListFragment
                     {
                         if(null != refreshStatus)
                         {
-                            refreshStatus.setIcon(R.drawable.ic_action_refresh);
-                            getActivity().invalidateOptionsMenu();
+                            try
+                            {
+                                refreshStatus.setIcon(R.drawable.ic_action_refresh);
+                                getActivity().invalidateOptionsMenu();
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("EVENTSLISTHANDLER_NO_EVENTS","invalidateOptionsMenu",e);
+                            }
+
                         }
 
                         if(dialog != null && dialog.isShowing())
@@ -769,7 +896,14 @@ public class ViewZenossEventsListFragment extends ListFragment
                             BugSenseHandler.sendExceptionMessage("EventsListFragment","no events adapter notify",e);
                         }
 
-                        Toast.makeText(getActivity(), "No events found. Must be a quiet day!", Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "No events found. Must be a quiet day!", Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("EventsListFragment","Quiet day Toast",e);
+                        }
                     }
                     break;
 
@@ -792,7 +926,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                         }
 
-                        if(dialog != null && dialog.isShowing())
+                        if(null != dialog && dialog.isShowing())
                         {
                             try
                             {
@@ -820,21 +954,35 @@ public class ViewZenossEventsListFragment extends ListFragment
                             }
                         }
 
-                        mCallbacks.fetchError();
+                        try
+                        {
+                            mCallbacks.fetchError();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("EventsListFragment","Calling mCallbacks.fetchError()",e);
+                        }
                     }
                     break;
 
                     case EVENTSLISTHANDLER_SERVICE_NOT_STARTED:
                     {
-                        dialog = new ProgressDialog(getActivity());
+                        try
+                        {
+                            dialog = new ProgressDialog(getActivity());
 
-                        dialog.setTitle("Querying Zenoss Directly");
-                        //Log.e("Refresh","The service wasn't running for some reason");
-                        dialog.setMessage("The backend service wasn't running.\n\nStarting...");
-                        //ToDo set cancellable
+                            dialog.setTitle("Querying Zenoss Directly");
+                            //Log.e("Refresh","The service wasn't running for some reason");
+                            dialog.setMessage("The backend service wasn't running.\n\nStarting...");
+                            //ToDo set cancellable
 
-                        if(!dialog.isShowing())
-                            dialog.show();
+                            if(!dialog.isShowing())
+                                dialog.show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("EventsListFragment","EVENTSLISTHANDLER_SERVICE_NOT_STARTED",e);
+                        }
                     }
                     break;
 
@@ -846,7 +994,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                             getActivity().invalidateOptionsMenu();
                         }
 
-                        if(dialog != null && dialog.isShowing())
+                        if(null != dialog && dialog.isShowing())
                         {
                             try
                             {
@@ -1015,7 +1163,7 @@ public class ViewZenossEventsListFragment extends ListFragment
                 }
                 else
                 {
-                    //TODO Lets warn them with a host
+                    //TODO Lets warn them with a toast
                     //TODO Or make it more resiliant
                 }
             }
@@ -1057,17 +1205,25 @@ public class ViewZenossEventsListFragment extends ListFragment
                     final List<String> EventIDs = new ArrayList<String>();
 
 
-                    for (ZenossEvent evt : listOfZenossEvents)
+                    try
                     {
-                        if(evt.isSelected())
+                        for (ZenossEvent evt : listOfZenossEvents)
                         {
-                            evt.setProgress(true);
-                            evt.SetSelected(false);
-                            EventIDs.add(evt.getEVID());
+                            if(evt.isSelected())
+                            {
+                                evt.setProgress(true);
+                                evt.SetSelected(false);
+                                EventIDs.add(evt.getEVID());
+                            }
                         }
                     }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onActionItemClicked",e);
+                    }
 
-                    adapter.notifyDataSetChanged();
+                    if(null != adapter)
+                        adapter.notifyDataSetChanged();
 
                     new Thread()
                     {
@@ -1097,48 +1253,79 @@ public class ViewZenossEventsListFragment extends ListFragment
                                 }
                                 else
                                 {
-                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                    try
+                                    {
+                                        AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                                    }
                                 }
 
-                                //TODO Check it actually succeeded
-                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                                try
+                                {
+                                    //TODO Check it actually succeeded
+                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
+                                }
+                                catch (Exception e)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                                }
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
-                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                try
+                                {
+                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+                                }
+                                catch (Exception e1)
+                                {
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e1);
+                                }
                             }
                         }
                     }.start();
+
                     mode.finish();
                     return true;
                 }
 
                 case R.id.escalate:
                 {
-                    Intent intent=new Intent(android.content.Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-                    // Add data to the intent, the receiving app will decide what to do with it.
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ cabNumSelected +" Zenoss Events");
-                    String Events = "Escalated events;";
-                    int size = listOfZenossEvents.size();
-                    for (Integer i = 0; i < size; i++ )
+                    try
                     {
-                        if(listOfZenossEvents.get(i).isSelected())
-                            Events += "\r\n" + listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary();
-                    }
+                        Intent intent=new Intent(android.content.Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-                    intent.putExtra(Intent.EXTRA_TEXT, Events);
-                    startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
-                    mode.finish();
-                    return true;
+                        // Add data to the intent, the receiving app will decide what to do with it.
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of "+ cabNumSelected +" Zenoss Events");
+                        String Events = "Escalated events;";
+                        int size = listOfZenossEvents.size();
+                        for (Integer i = 0; i < size; i++ )
+                        {
+                            if(listOfZenossEvents.get(i).isSelected())
+                                Events += "\r\n" + listOfZenossEvents.get(i).getDevice() + " - " + listOfZenossEvents.get(i).getSummary();
+                        }
+
+                        intent.putExtra(Intent.EXTRA_TEXT, Events);
+                        startActivity(Intent.createChooser(intent, "How would you like to escalate these events?"));
+                        mode.finish();
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","escalate",e);
+                        return false;
+                    }
                 }
 
                 default:
                 {
-                    adapter.notifyDataSetChanged();
+                    if(null != adapter)
+                        adapter.notifyDataSetChanged();
+
                     return false;
                 }
             }
@@ -1148,6 +1335,8 @@ public class ViewZenossEventsListFragment extends ListFragment
         @Override
         public void onDestroyActionMode(ActionMode mode)
         {
+            try
+            {
             //Log.e("onDestroyActionMode","Called");
             int size = listOfZenossEvents.size();
             for (Integer i = 0; i < size; i++ )
@@ -1157,21 +1346,25 @@ public class ViewZenossEventsListFragment extends ListFragment
             adapter.notifyDataSetChanged();
             cabNumSelected = 0;
             mActionMode = null;
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onDestroyActionMode",e);
+            }
         }
     };
 
     public void Refresh()
     {
-        try {
-
-
-        if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
-                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
-                PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
+        try
         {
-            //Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
-            return;
-        }
+            if((PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("URL", "").equals("") ||
+                    PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("userName", "").equals("") ||
+                    PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("passWord", "").equals("")))
+            {
+                //Log.e("Refresh()", "Well we can't do this because we don't have any credentials ");
+                return;
+            }
         }
         catch (Exception e)
         {
@@ -1202,7 +1395,14 @@ public class ViewZenossEventsListFragment extends ListFragment
             else
             {
                 Log.e("Refresh", "refreshStatus was null");
-                eventsListHandler.sendEmptyMessageDelayed(EVENTSLISTHANDLER_DELAYED_AB_STATUS,500);
+                try
+                {
+                    eventsListHandler.sendEmptyMessageDelayed(EVENTSLISTHANDLER_DELAYED_AB_STATUS,500);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","eventsListHandler",e);
+                }
                 /*if(dialog == null || !dialog.isShowing())
                 {
                     dialog = new ProgressDialog(getActivity());
@@ -1218,7 +1418,7 @@ public class ViewZenossEventsListFragment extends ListFragment
         }
         catch(Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
             //TODO Handle this and tell the user
             BugSenseHandler.sendExceptionMessage("RhybuddHome","Refresh",e);
         }
@@ -1256,7 +1456,7 @@ public class ViewZenossEventsListFragment extends ListFragment
 
                 if (null != mService && mBound)
                 {
-                    Log.e("Refresh","yay not dead");
+                    //Log.e("Refresh","yay not dead");
                     try
                     {
                         if(null == mService.API)
@@ -1264,9 +1464,18 @@ public class ViewZenossEventsListFragment extends ListFragment
                             mService.PrepAPI(true,true);
                         }
 
-                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                        ZenossCredentials credentials = null;
 
-                        if(mService.API.Login(credentials))
+                        try
+                        {
+                            credentials = new ZenossCredentials(getActivity());
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("EventsListFragment","ZenossCredentials",e);
+                        }
+
+                        if(null != credentials && mService.API.Login(credentials))
                         {
                             tempZenossEvents = mService.API.GetRhybuddEvents(getActivity());
 
@@ -1414,18 +1623,32 @@ public class ViewZenossEventsListFragment extends ListFragment
     //------------------------------------------------------------------//
     void doUnbindService()
     {
-        if (mBound)
+        try
         {
-            // Detach our existing connection.
-            getActivity().unbindService(mConnection);
-            mBound = false;
+            if (mBound)
+            {
+                // Detach our existing connection.
+                getActivity().unbindService(mConnection);
+                mBound = false;
+            }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","doUnbindService",e);
         }
     }
 
     void doBindService()
     {
-        getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
+        try
+        {
+            getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","doBindService",e);
+        }
     }
 
     @Override
@@ -1493,11 +1716,19 @@ public class ViewZenossEventsListFragment extends ListFragment
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
         {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            //Toast.makeText(RhybuddHome.this, "Connected to Service", Toast.LENGTH_SHORT).show();
+            try
+            {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
+                mService = binder.getService();
+                mBound = true;
+                //Toast.makeText(RhybuddHome.this, "Connected to Service", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onServiceConnected",e);
+                mBound = false;
+            }
         }
 
         @Override

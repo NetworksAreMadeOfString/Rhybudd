@@ -24,6 +24,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class SettingsFragment extends PreferenceActivity 
 {
 	SharedPreferences prefs;
@@ -45,10 +47,17 @@ public class SettingsFragment extends PreferenceActivity
             addPreferencesFromResource(R.xml.preferences);
         }*/
 
-        getActionBar().setTitle(getString(R.string.SettingsTitle));
-        getActionBar().setSubtitle(getString(R.string.SettingsSubTitle));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        try
+        {
+            getActionBar().setTitle(getString(R.string.SettingsTitle));
+            getActionBar().setSubtitle(getString(R.string.SettingsSubTitle));
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("SettingsFragment", "onCreate", e);
+        }
     }
 
     @Override

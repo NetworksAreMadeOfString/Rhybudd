@@ -42,23 +42,41 @@ public class ZenossDeviceAdaptor extends BaseAdapter
 	@Override
 	public int getCount() 
 	{
-		 return listZenossDevices.size();
+        if(null != listZenossDevices)
+        {
+		    return listZenossDevices.size();
+        }
+        else
+        {
+            return 0;
+        }
 	}
 
 	@Override
 	public Object getItem(int position) 
 	{
-		return listZenossDevices.get(position);
+        if(null != listZenossDevices)
+        {
+		    return listZenossDevices.get(position);
+        }
+        else
+        {
+            return null;
+        }
 	}
 
 	@Override
-	public long getItemId(int position) {
+	public long getItemId(int position)
+    {
 		return position;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
+        //if(null == listZenossDevices)
+        //    return null;
+
 		ZenossDevice Device = listZenossDevices.get(position);
         if (convertView == null) 
         {

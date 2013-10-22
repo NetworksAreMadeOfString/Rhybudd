@@ -83,8 +83,16 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     {
         super.onResume();
 
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction())) {
-            processIntent(getActivity().getIntent());
+        try
+        {
+            if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getActivity().getIntent().getAction()))
+            {
+                processIntent(getActivity().getIntent());
+            }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onResume",e);
         }
     }
 
@@ -134,10 +142,18 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
         {
             case MENU_UNDO:
             {
-                //Log.e("onOptionsItemSelected","Removing");
-                FilterKey.setText(prevFilterKey);
-                menu.removeItem(MENU_UNDO);
-                return true;
+                try
+                {
+                    //Log.e("onOptionsItemSelected","Removing");
+                    FilterKey.setText(prevFilterKey);
+                    menu.removeItem(MENU_UNDO);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("PushSettingsFragment","MENU_UNDO",e);
+                    return false;
+                }
             }
 
             default:
@@ -168,126 +184,167 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
        //Log.e("pushKey",pushKey);
 
         //Set the filter
-        if(!pushKey.equals(""))
+        try
         {
-            FilterKey.setText(pushKey);
+            if(!pushKey.equals(""))
+            {
+                FilterKey.setText(pushKey);
+            }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
         }
 
-        if(checkZPImmediately)
+        try
         {
-            checkZenPack.setVisibility(View.GONE);
-            exitButton.setVisibility(View.GONE);
-            registerWithZenPack.setVisibility(View.VISIBLE);
+            if(checkZPImmediately)
+            {
+                checkZenPack.setVisibility(View.GONE);
+                exitButton.setVisibility(View.GONE);
+                registerWithZenPack.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                checkZenPack.setVisibility(View.VISIBLE);
+                exitButton.setVisibility(View.VISIBLE);
+                registerWithZenPack.setVisibility(View.GONE);
+            }
         }
-        else
+        catch (Exception e)
         {
-            checkZenPack.setVisibility(View.VISIBLE);
-            exitButton.setVisibility(View.VISIBLE);
-            registerWithZenPack.setVisibility(View.GONE);
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
         }
 
         //Set the enabled setting
-        enabledSwitch.setChecked(pushEnabled);
+        try
+        {
+            enabledSwitch.setChecked(pushEnabled);
 
-        enabledSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
-            {
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                editor.putBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED, b);
-                editor.commit();
-
-                if(b)
+            enabledSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b)
                 {
-                    RegisterWithZenPack();
-                }
-                else
-                {
-                    checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
-                    GCMRegistrar.unregister(getActivity());
-                }
-            }
-        });
-
-        exitButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v)
-            {
-                if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Rhybudd needs details such as the URL and credentials in order to interact with Zenoss")
-                            .setTitle("Zenoss Credentials Needed")
-                            .setCancelable(false)
-                            .setPositiveButton("Configure Zenoss Core", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    ((FirstRunSettings) getActivity()).setPushTab(0);
-                                    alertDialog.cancel();
-                                }
-                            })
-                            .setNeutralButton("Configure ZaaS", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    ((FirstRunSettings) getActivity()).setPushTab(1);
-                                    alertDialog.cancel();
-                                }
-                            })
-                            .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    Intent in = new Intent();
-                                    getActivity().setResult(2,in);
-                                    getActivity().finish();
-                                }
-                            });
-                    alertDialog = builder.create();
-                    alertDialog.show();
-                }
-                else
-                {
-                    /*progressbar.setVisibility(View.VISIBLE);
-
-                    //if(PushKey.getText().length() == 32)
-                   // {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                    editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, PushKey.getText().toString());
+                    editor.putBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED, b);
                     editor.commit();
 
-                    progressbar.setVisibility(View.GONE);*/
-
-                    Intent in = new Intent();
-                    in.putExtra("forceRefresh",true);
-                    //in.putExtra(ZenossAPI.PREFERENCE_PUSHKEY,PushKey.getText().toString());
-                    getActivity().setResult(1,in);
-                    getActivity().finish();
+                    if(b)
+                    {
+                        RegisterWithZenPack();
+                    }
+                    else
+                    {
+                        checkZPHandler.sendEmptyMessage(RhybuddHandlers.msg_zp_not_registered);
+                        GCMRegistrar.unregister(getActivity());
+                    }
                 }
-            }
-        });
-
-
-        checkZenPack.setOnClickListener(new View.OnClickListener()
+            });
+        }
+        catch (Exception e)
         {
-            public void onClick(View v)
-            {
-                checkZP();
-            }
-        });
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
+        }
 
-
-        registerWithZenPack.setOnClickListener(new View.OnClickListener()
+        try
         {
-            public void onClick(View v)
+            exitButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v)
+                {
+                    if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_URL, "").equals(""))
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Rhybudd needs details such as the URL and credentials in order to interact with Zenoss")
+                                .setTitle("Zenoss Credentials Needed")
+                                .setCancelable(false)
+                                .setPositiveButton("Configure Zenoss Core", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        ((FirstRunSettings) getActivity()).setPushTab(0);
+                                        alertDialog.cancel();
+                                    }
+                                })
+                                .setNeutralButton("Configure ZaaS", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        ((FirstRunSettings) getActivity()).setPushTab(1);
+                                        alertDialog.cancel();
+                                    }
+                                })
+                                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        Intent in = new Intent();
+                                        getActivity().setResult(2,in);
+                                        getActivity().finish();
+                                    }
+                                });
+                        alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    else
+                    {
+                        /*progressbar.setVisibility(View.VISIBLE);
+
+                        //if(PushKey.getText().length() == 32)
+                       // {
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                        editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, PushKey.getText().toString());
+                        editor.commit();
+
+                        progressbar.setVisibility(View.GONE);*/
+
+                        Intent in = new Intent();
+                        in.putExtra("forceRefresh",true);
+                        //in.putExtra(ZenossAPI.PREFERENCE_PUSHKEY,PushKey.getText().toString());
+                        getActivity().setResult(1,in);
+                        getActivity().finish();
+                    }
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
+        }
+
+
+        try
+        {
+            checkZenPack.setOnClickListener(new View.OnClickListener()
             {
-                if(hasZenPack)
+                public void onClick(View v)
                 {
-                    RegisterWithZenPack();
+                    checkZP();
                 }
-                else
+            });
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
+        }
+
+        try
+        {
+            registerWithZenPack.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
                 {
-                    Toast.makeText(getActivity(), getString(R.string.PushZPErrorNoZP), Toast.LENGTH_LONG).show();
+                    if(hasZenPack)
+                    {
+                        RegisterWithZenPack();
+                    }
+                    else
+                    {
+                        Toast.makeText(getActivity(), getString(R.string.PushZPErrorNoZP), Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","onCreateView",e);
+        }
 
 
 
@@ -457,8 +514,15 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     private void checkZP()
     {
         //Log.i("PushSettings","Checking for ZenPack!");
-        progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-        progressbar.setVisibility(View.VISIBLE);
+        try
+        {
+            progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+            progressbar.setVisibility(View.VISIBLE);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZP",e);
+        }
 
         (new Thread()
         {
@@ -577,51 +641,86 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
                     case RhybuddHandlers.msg_generic_http_transport_error:
                     {
-                        Toast.makeText(getActivity(), getActivity().getString(R.string.PushZPNoHost), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.PushZPNoHost), Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler msg_generic_http_transport_error",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_zp_is_installed:
                     {
-                        hasZenPack = true;
-                        ZPInstalledImg.setImageResource(R.drawable.ic_acknowledged);
-                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
-                        ZPVersion.setText("1.0.1");
-                        enabledSwitch.setEnabled(hasZenPack);
-                        registerWithZenPack.setEnabled(hasZenPack);
+                        try
+                        {
+                            hasZenPack = true;
+                            ZPInstalledImg.setImageResource(R.drawable.ic_acknowledged);
+                            ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                            ZPVersion.setText("1.0.1");
+                            enabledSwitch.setEnabled(hasZenPack);
+                            registerWithZenPack.setEnabled(hasZenPack);
 
-                        if(checkZPImmediately)
-                        {
-                            RegisterWithZenPack();
+                            if(checkZPImmediately)
+                            {
+                                RegisterWithZenPack();
+                            }
+                            else
+                            {
+                                checkZenPack.setVisibility(View.VISIBLE);
+                                registerWithZenPack.setVisibility(View.GONE);
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            checkZenPack.setVisibility(View.VISIBLE);
-                            registerWithZenPack.setVisibility(View.GONE);
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler msg_zp_is_installed",e);
                         }
                     }
                     break;
 
                     case RhybuddHandlers.msg_zp_not_installed:
                     {
-                        hasZenPack = false;
-                        ZPInstalledImg.setImageResource(R.drawable.ic_unacknowledged);
-                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
-                        ZPVersion.setText("----");
-                        enabledSwitch.setEnabled(hasZenPack);
-                        registerWithZenPack.setEnabled(hasZenPack);
+                        try
+                        {
+                            hasZenPack = false;
+                            ZPInstalledImg.setImageResource(R.drawable.ic_unacknowledged);
+                            ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                            ZPVersion.setText("----");
+                            enabledSwitch.setEnabled(hasZenPack);
+                            registerWithZenPack.setEnabled(hasZenPack);
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler msg_zp_not_installed",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_zp_registered:
                     {
-                        ZPDeviceRegistered.setImageResource(R.drawable.ic_acknowledged);
+                        try
+                        {
+                            ZPDeviceRegistered.setImageResource(R.drawable.ic_acknowledged);
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler msg_zp_registered",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_zp_not_registered:
                     {
-                        ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                        try
+                        {
+                            ZPDeviceRegistered.setImageResource(R.drawable.ic_unacknowledged);
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","checkZPHandler msg_zp_not_registered",e);
+                        }
                     }
                     break;
                 }
@@ -636,39 +735,67 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
                 {
                     case RhybuddHandlers.msg_generic_success:
                     {
-                        String pushKey = msg.getData().getString(ZenossAPI.PREFERENCE_PUSHKEY);
+                        try
+                        {
+                            String pushKey = msg.getData().getString(ZenossAPI.PREFERENCE_PUSHKEY);
 
-                        progressbar.setVisibility(View.GONE);
-                        //PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                        //PushKey.setVisibility(View.VISIBLE);
-                        PushKeyDesc.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-                        PushKeyDesc.setVisibility(View.VISIBLE);
-                        //PushKey.setText(pushKey);
+                            progressbar.setVisibility(View.GONE);
+                            //PushKey.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+                            //PushKey.setVisibility(View.VISIBLE);
+                            PushKeyDesc.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+                            PushKeyDesc.setVisibility(View.VISIBLE);
+                            //PushKey.setText(pushKey);
 
-                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                        editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, pushKey);
-                        editor.commit();
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                            editor.putString(ZenossAPI.PREFERENCE_PUSHKEY, pushKey);
+                            editor.commit();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","getIDhandler msg_generic_success",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_json_error:
                     {
-                        progressbar.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(), getString(R.string.JSONExceptionMessage), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            progressbar.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), getString(R.string.JSONExceptionMessage), Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","getIDhandler msg_json_error",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_generic_http_transport_error:
                     {
-                        progressbar.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(), getString(R.string.HttpTransportExceptionMessage), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            progressbar.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), getString(R.string.HttpTransportExceptionMessage), Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","getIDhandler msg_json_error",e);
+                        }
                     }
                     break;
 
                     case RhybuddHandlers.msg_generic_failure:
                     {
-                        progressbar.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(), getString(R.string.GenericExceptionMessage), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            progressbar.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), getString(R.string.GenericExceptionMessage), Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","getIDhandler msg_generic_failure",e);
+                        }
                     }
                     break;
                 }
@@ -679,11 +806,19 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
     @Override
     public NdefMessage createNdefMessage(NfcEvent nfcEvent)
     {
-        NdefMessage msg = new NdefMessage(
-                new NdefRecord[] { createMime(
-                        "application/vnd.net.networksaremadeofstring.rhybudd.push", FilterKey.getText().toString().getBytes())
-                        //,NdefRecord.createApplicationRecord("com.example.android.beam")
-                });
-        return msg;
+        try
+        {
+            NdefMessage msg = new NdefMessage(
+                    new NdefRecord[] { createMime(
+                            "application/vnd.net.networksaremadeofstring.rhybudd.push", FilterKey.getText().toString().getBytes())
+                            //,NdefRecord.createApplicationRecord("com.example.android.beam")
+                    });
+            return msg;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("PushSettingsFragment","createNdefMessage",e);
+            return null;
+        }
     }
 }

@@ -60,12 +60,27 @@ public class Search extends Activity
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
+        try
+        {
+		    settings = PreferenceManager.getDefaultSharedPreferences(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("Search", "onCreate", e);
+        }
+
 		setContentView(R.layout.search);
 
-		actionbar = getActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
-		actionbar.setHomeButtonEnabled(true);
+        try
+        {
+            actionbar = getActionBar();
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("Search", "onCreate", e);
+        }
 
 
 		list = (ListView)findViewById(R.id.searchResultsListView);
@@ -83,21 +98,29 @@ public class Search extends Activity
 				);
 
 
-		Intent intent = getIntent();
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) 
-		{
-			//((RelativeLayout) findViewById(R.id.searchContainer)).setVisibility(8);
-			query = intent.getStringExtra(SearchManager.QUERY);
-			((EditText) findViewById(R.id.searchTermEditText)).setText(query);
-			index = "device";
-			ConfigureHandler();
-			PerformSearch(false);
-		}
-		else
-		{
-			//((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
-			//((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
-		}
+        try
+        {
+            Intent intent = getIntent();
+            if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+            {
+                //((RelativeLayout) findViewById(R.id.searchContainer)).setVisibility(8);
+                query = intent.getStringExtra(SearchManager.QUERY);
+                ((EditText) findViewById(R.id.searchTermEditText)).setText(query);
+                index = "device";
+                ConfigureHandler();
+                PerformSearch(false);
+            }
+            else
+            {
+                //((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(4);
+                //((TextView) findViewById(R.id.CurrentTaskLabel)).setVisibility(4);
+            }
+        }
+        catch (Exception e)
+        {
+            //TODO We should probably do something actually useful here
+            BugSenseHandler.sendExceptionMessage("Search", "onCreate", e);
+        }
 	}
 
 	private void ConfigureHandler()
@@ -117,21 +140,32 @@ public class Search extends Activity
 				}
 				else */if (msg.what == 1)
 				{
-					Toast.makeText(Search.this, "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                    try
+                    {
+					    Toast.makeText(Search.this, "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("Search", "ConfigureHandler", e);
+                    }
 				}
 				else
 				{
-					if(listOfZenossDevices.size() > 0)
-					{
-						list.setAdapter(new ZenossSearchAdaptor(Search.this, listOfZenossDevices));
-					}
-					else
-					{
-						Toast.makeText(Search.this, "No matches found", Toast.LENGTH_SHORT).show();
-					}
-
-					//((TextView)findViewById(R.id.CurrentTaskLabel)).setVisibility(8);
-					//((ProgressBar) findViewById(R.id.progressBar1)).setVisibility(8);
+                    try
+                    {
+                        if(null != listOfZenossDevices && listOfZenossDevices.size() > 0)
+                        {
+                            list.setAdapter(new ZenossSearchAdaptor(Search.this, listOfZenossDevices));
+                        }
+                        else
+                        {
+                            Toast.makeText(Search.this, "No matches found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("Search", "ConfigureHandler", e);
+                    }
 				}
 			}
 		};
@@ -139,16 +173,24 @@ public class Search extends Activity
 
 	public void PerformSearch(Boolean Crafted)
 	{
-		dialog = new ProgressDialog(this);
-		dialog.setTitle("Contacting Zenoss");
-		dialog.setMessage("Please wait:\nLoading Infrastructure....");
-		dialog.setCancelable(false);
-		dialog.show();
+        try
+        {
+            dialog = new ProgressDialog(this);
+            dialog.setTitle("Contacting Zenoss");
+            dialog.setMessage("Please wait:\nLoading Infrastructure....");
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("Search", "PerformSearch", e);
+        }
+
 		Thread dataPreload = new Thread() 
 		{  
 			public void run() 
 			{
-				if(listOfZenossDevices != null)
+				if(null != listOfZenossDevices)
 					listOfZenossDevices.clear();
 				
 				try
@@ -228,9 +270,16 @@ public class Search extends Activity
 
 	public void ViewDevice(String UID)
 	{
-		Intent ViewDeviceIntent = new Intent(Search.this, ViewZenossDeviceActivity.class);
-		ViewDeviceIntent.putExtra(ViewZenossDeviceFragment.ARG_UID, UID);
-		startActivity(ViewDeviceIntent);
+        try
+        {
+            Intent ViewDeviceIntent = new Intent(Search.this, ViewZenossDeviceActivity.class);
+            ViewDeviceIntent.putExtra(ViewZenossDeviceFragment.ARG_UID, UID);
+            startActivity(ViewDeviceIntent);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("Search", "ConfigureHandler", e);
+        }
 	}
 	
 	@Override

@@ -54,26 +54,35 @@ public class RhybuddDataSource
 
     public void open() throws SQLException
     {
-        database = dbHelper.getWritableDatabase();
+        if(null != dbHelper)
+            database = dbHelper.getWritableDatabase();
     }
 
     public void close()
     {
-        dbHelper.close();
+        if(null != dbHelper)
+            dbHelper.close();
     }
 
     public boolean ackEvent(String EVID)
     {
-        ContentValues values = new ContentValues();
-        values.put("eventState","Acknowledged");
-
-        int rows = database.update ("events", values,"evid = ?",new String[] {EVID});
-
-        if(rows > 0)
+        try
         {
-            return true;
+            ContentValues values = new ContentValues();
+            values.put("eventState","Acknowledged");
+
+            int rows = database.update ("events", values,"evid = ?",new String[] {EVID});
+
+            if(rows > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch (Exception e)
         {
             return false;
         }
@@ -81,23 +90,30 @@ public class RhybuddDataSource
 
     public boolean ackAllEvents(List<String> EventIDs)
     {
-        ContentValues values = new ContentValues();
-        values.put("eventState","Acknowledged");
-        String EventIDsAsString = "";
-        for(String evt : EventIDs)
+        try
         {
-            EventIDsAsString += "\""+evt+"\"" +",";
-        }
+            ContentValues values = new ContentValues();
+            values.put("eventState","Acknowledged");
+            String EventIDsAsString = "";
+            for(String evt : EventIDs)
+            {
+                EventIDsAsString += "\""+evt+"\"" +",";
+            }
 
-        EventIDsAsString = EventIDsAsString.substring(0,EventIDsAsString.length() -1);
-        //Log.e("EventIDsAsString", EventIDsAsString);
-        int rows = database.update ("events", values,"evid in ("+EventIDsAsString+")",null);
-        //Log.e("Rows",Integer.toString(rows));
-        if(rows > 0)
-        {
-            return true;
+            EventIDsAsString = EventIDsAsString.substring(0,EventIDsAsString.length() -1);
+            //Log.e("EventIDsAsString", EventIDsAsString);
+            int rows = database.update ("events", values,"evid in ("+EventIDsAsString+")",null);
+            //Log.e("Rows",Integer.toString(rows));
+            if(rows > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch (Exception e)
         {
             return false;
         }
@@ -105,30 +121,37 @@ public class RhybuddDataSource
 
     public boolean addEvent(ZenossEvent event)
     {
-        ContentValues values = new ContentValues();
-
-        values.put("evid",event.getEVID());
-        values.put("count",event.getCount());
-        values.put("prodState",event.getProdState());
-        values.put("firstTime",event.getfirstTime());
-        values.put("severity",event.getSeverity());
-        values.put("component_text",event.getComponentText());
-        values.put("component_uid",event.getComponentUID());
-        values.put("summary",event.getSummary());
-        values.put("eventState",event.getEventState());
-        values.put("device",event.getDevice());
-        values.put("eventClass",event.geteventClass());
-        values.put("lastTime",event.getlastTime());
-        values.put("ownerid",event.getownerID());
-
-        //long insertId = database.insert("events", null, values);
-        long insertId = database.insertWithOnConflict ("events", null, values,SQLiteDatabase.CONFLICT_REPLACE);
-
-        if(insertId > -1)
+        try
         {
-            return true;
+            ContentValues values = new ContentValues();
+
+            values.put("evid",event.getEVID());
+            values.put("count",event.getCount());
+            values.put("prodState",event.getProdState());
+            values.put("firstTime",event.getfirstTime());
+            values.put("severity",event.getSeverity());
+            values.put("component_text",event.getComponentText());
+            values.put("component_uid",event.getComponentUID());
+            values.put("summary",event.getSummary());
+            values.put("eventState",event.getEventState());
+            values.put("device",event.getDevice());
+            values.put("eventClass",event.geteventClass());
+            values.put("lastTime",event.getlastTime());
+            values.put("ownerid",event.getownerID());
+
+            //long insertId = database.insert("events", null, values);
+            long insertId = database.insertWithOnConflict ("events", null, values,SQLiteDatabase.CONFLICT_REPLACE);
+
+            if(insertId > -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+        catch (Exception e)
         {
             return false;
         }
@@ -136,6 +159,9 @@ public class RhybuddDataSource
 
     public List<ZenossDevice> SearchRhybuddDevices(String Query)
     {
+        /*if(null == database)
+            return null;*/
+
         String Filter = "name like \"%"+Query.replaceAll(" ", "%")+"%\"";
 
         Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents","os"},  Filter, 	null, 					null, 			null, 			null);
@@ -195,92 +221,106 @@ public class RhybuddDataSource
     {
         List<ZenossEvent> ZenossEvents = new ArrayList<ZenossEvent>();
 
-
-        Cursor cursor = database.query("events", EventColumns,  null, 	null, 					null, 			null, 			"severity DESC");
-
-        cursor.moveToFirst();
-
-        while (!cursor.isAfterLast())
+        try
         {
-            try
-            {
-                ZenossEvents.add(new ZenossEvent(cursor.getString(0),
-                    cursor.getInt(1),
-                    cursor.getString(2),
-                    cursor.getString(3),
-                    cursor.getString(4),
-                    cursor.getString(5),
-                    cursor.getString(6),
-                    cursor.getString(7),
-                    cursor.getString(8),
-                    cursor.getString(9),
-                    cursor.getString(10),
-                    cursor.getString(11),
-                    cursor.getString(12))
-                );
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
-            cursor.moveToNext();
-        }
+            Cursor cursor = database.query("events", EventColumns,  null, 	null, 					null, 			null, 			"severity DESC");
 
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast())
+            {
+                try
+                {
+                    ZenossEvents.add(new ZenossEvent(cursor.getString(0),
+                        cursor.getInt(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getString(4),
+                        cursor.getString(5),
+                        cursor.getString(6),
+                        cursor.getString(7),
+                        cursor.getString(8),
+                        cursor.getString(9),
+                        cursor.getString(10),
+                        cursor.getString(11),
+                        cursor.getString(12))
+                    );
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+                cursor.moveToNext();
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
         return ZenossEvents;
     }
 
 
     public List<ZenossDevice> GetRhybuddDevices()
     {
-        Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents","os"},  null, 	null, 					null, 			null, 			null);
-
         List<ZenossDevice> ZenossDevices = new ArrayList<ZenossDevice>();
-        if(dbResults.getCount() > 0)
+        try
         {
-            while(dbResults.moveToNext())
+            Cursor dbResults = database.query("devices", new String[]{"rhybuddDeviceID","productionState","ipAddress","name","uid","infoEvents","debugEvents","warningEvents","errorEvents","criticalEvents","os"},  null, 	null, 					null, 			null, 			null);
+
+
+            if(dbResults.getCount() > 0)
             {
-                HashMap<String, Integer> events = new HashMap<String, Integer>();
-                try
+                while(dbResults.moveToNext())
                 {
-                    events.put("info", dbResults.getInt(5));
-                    events.put("debug", dbResults.getInt(6));
-                    events.put("warning", dbResults.getInt(7));
-                    events.put("error", dbResults.getInt(8));
-                    events.put("critical", dbResults.getInt(9));
-                }
-                catch(Exception e)
-                {
-                    events.put("info", 0);
-                    events.put("debug", 0);
-                    events.put("warning", 0);
-                    events.put("error", 0);
-                    events.put("critical", 0);
+                    HashMap<String, Integer> events = new HashMap<String, Integer>();
+                    try
+                    {
+                        events.put("info", dbResults.getInt(5));
+                        events.put("debug", dbResults.getInt(6));
+                        events.put("warning", dbResults.getInt(7));
+                        events.put("error", dbResults.getInt(8));
+                        events.put("critical", dbResults.getInt(9));
+                    }
+                    catch(Exception e)
+                    {
+                        events.put("info", 0);
+                        events.put("debug", 0);
+                        events.put("warning", 0);
+                        events.put("error", 0);
+                        events.put("critical", 0);
+                    }
+
+                    try
+                    {
+                        ZenossDevices.add(new ZenossDevice(dbResults.getString(1),
+                                dbResults.getInt(2),
+                                events,
+                                dbResults.getString(3),
+                                dbResults.getString(4),
+                                dbResults.getString(10)));
+                    }
+                    catch(Exception e)
+                    {
+                        //BugSenseHandler.log("DB-GetRhybuddDevices", e);
+                    }
                 }
 
-                try
-                {
-                    ZenossDevices.add(new ZenossDevice(dbResults.getString(1),
-                            dbResults.getInt(2),
-                            events,
-                            dbResults.getString(3),
-                            dbResults.getString(4),
-                            dbResults.getString(10)));
-                }
-                catch(Exception e)
-                {
-                    //BugSenseHandler.log("DB-GetRhybuddDevices", e);
-                }
+                if(dbResults != null)
+                    dbResults.close();
+
+                return ZenossDevices;
             }
-
-            if(dbResults != null)
-                dbResults.close();
-
-            return ZenossDevices;
+            else
+            {
+                if(dbResults != null)
+                    dbResults.close();
+                return null;
+            }
         }
-        else
+        catch (Exception e)
         {
-            if(dbResults != null)
-                dbResults.close();
+            e.printStackTrace();
             return null;
         }
     }
@@ -290,7 +330,7 @@ public class RhybuddDataSource
     {
         int EventCount = 0;
 
-        if(ZenossEvents != null)
+        if(null != ZenossEvents)
             EventCount = ZenossEvents.size();
 
         try
@@ -349,7 +389,7 @@ public class RhybuddDataSource
     {
         int DeviceCount = 0;
 
-        if(ZenossDevices != null)
+        if(null != ZenossDevices)
             DeviceCount = ZenossDevices.size();
 
         try

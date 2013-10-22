@@ -1,31 +1,36 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Background Polling">
+    <PreferenceCategory android:title="Rhybudd Services">
 
-       <SwitchPreference
-                android:key="syncCache"
-                android:title="Periodic Cache Refresh"
-                android:summary="An Android Sync Adapter that checks for new devices, groups etc every 24 hours"
-                android:defaultValue="true"
-                />
-        
-        <SwitchPreference
-                android:key="AllowBackgroundService"
-                android:title="Events Alerting"
-                android:summary="Checks Zenoss for new events and raises notifications based on filters below" 
-                android:defaultValue="false"
-                />
-        
-        <ListPreference
-                android:key="BackgroundServiceDelay"
-                android:dependency="AllowBackgroundService"
-                android:title="Poll Cycle"
-                android:summary="Duration between polling for new events"
-                android:entries="@array/BackgroundServiceDelay_preference"
-                android:entryValues="@array/BackgroundServiceDelay_preference_values"
-                android:defaultValue="60"
-                android:dialogTitle="Delay between Alerting Poll" />
+        <PreferenceScreen
+                android:key="background_polling"
+                android:title="Background Polling"
+                android:summary="Allows the configuration of Rhybudd background services e.g. Synching and Alert polling">
 
+               <SwitchPreference
+                        android:key="syncCache"
+                        android:title="Periodic Cache Refresh"
+                        android:summary="An Android Sync Adapter that checks for new devices, groups etc every 24 hours"
+                        android:defaultValue="true"
+                        />
+
+                <SwitchPreference
+                        android:key="AllowBackgroundService"
+                        android:title="Events Alerting"
+                        android:summary="Checks Zenoss for new events and raises notifications based on filters below"
+                        android:defaultValue="false"
+                        />
+
+                <ListPreference
+                        android:key="BackgroundServiceDelay"
+                        android:dependency="AllowBackgroundService"
+                        android:title="Poll Cycle"
+                        android:summary="Duration between polling for new events"
+                        android:entries="@array/BackgroundServiceDelay_preference"
+                        android:entryValues="@array/BackgroundServiceDelay_preference_values"
+                        android:defaultValue="60"
+                        android:dialogTitle="Delay between Alerting Poll" />
+        </PreferenceScreen>
     </PreferenceCategory>
 
     
@@ -45,14 +50,14 @@
 		<CheckBoxPreference
                 android:key="SeverityError"
                 android:title="Error Events"
-                android:summary="Query for (and alert on) Errors" 
+                android:summary="Query for (and alert on) Error Events"
                 android:defaultValue="true"
                 />
 		
 		<CheckBoxPreference
                 android:key="SeverityWarning"
                 android:title="Warning Events"
-                android:summary="Query for (and alert on) Warnings" 
+                android:summary="Query for (and alert on) Warning Events"
                 android:defaultValue="true"
                 />
 		
@@ -78,45 +83,43 @@
 		
 		<CheckBoxPreference
                 android:key="hideAckdAlerts"
-                android:title="Hide Acknowledged alerts"
+                android:title="Hide Acknowledged events"
                 android:summary="Hides alerts that have been acknowledged to reduce on-screen clutter" 
                 android:defaultValue="false"
                 />
 		
 		<EditTextPreference
                 android:key="SummaryFilter"
-                android:summary="Only raise an alert for items whose summary matches this field. (Use | to separate terms)" 
+                android:summary="Only query for for events where the summary matches this field. (Use | to separate terms)"
                 android:title="Summary Filter"
                 android:dialogTitle="Summary Filter" />
         
         <EditTextPreference
                 android:key="DeviceFilter"
-                android:summary="Only raise an alert for events from devices whose name match this field. (Use | to separate terms)" 
+                android:summary="Only query for events from devices whose hostname match this field. (Use | to separate terms)"
                 android:title="Device Name Filter"
                 android:dialogTitle="Device Name Filter" />
     </PreferenceCategory>
     
-    <PreferenceCategory android:title="Alert Filtering">
+    <PreferenceCategory android:title="Notification Configuration">
         <SwitchPreference
                 android:key="onlyProductionAlerts"
                 android:title="Production Only Alerting"
-                android:summary="Only raise an alert for production level events." 
+                android:summary="Only raise a Notification for production level events."
                 android:defaultValue="true"
-                android:dependency="AllowBackgroundService"
                 />
         
 		<SwitchPreference
                 android:key="notificationSound"
-                android:title="Audible Alerts"
-                android:summary="When raising an Event alert use sound." 
+                android:title="Audible Notifications"
+                android:summary="When raising a Notification alert use sound."
                 android:defaultValue="true"
-                android:dependency="AllowBackgroundService"
                 />
 		
 		<RingtonePreference 
 		    android:key="notificationSoundChoice"
 		    android:title="Notification Sound"
-		    android:summary="Choose the Zenoss Event alert sound." 
+		    android:summary="Choose the sound for Notifications."
 		    android:ringtoneType="all"
             android:defaultValue="content://settings/system/notification_sound"
 		    android:dependency="notificationSound"
@@ -145,8 +148,8 @@
             <EditTextPreference
                 android:key="URL"
                 android:title="Zenoss URL"
-                android:hint="https://zenoss.domain.com:8070"
-                android:summary="The full URL to your Zenoss istance including URI (http:// or https://) and the port (if not 80 / 443)"
+                android:hint="https://zenoss.domain.com:8080"
+                android:summary="The full URL to your Zenoss instance including URI (http:// or https://) and the port (if not 80 / 443)"
                 android:dialogTitle="Zenoss URL" />
             
             <EditTextPreference
@@ -184,7 +187,7 @@
     </PreferenceCategory>
     
     <PreferenceCategory android:title="Supplementary HTTP Basic Authentication"
-        android:summary="If you embed img tags in your Zenoss summary but they are behind HTTP basic auth add the details here">
+            android:summary="If you embed img tags in your Zenoss summary but they are behind HTTP basic auth add the details here">
            <EditTextPreference
                android:key="suppBAUser"
                android:title="Supplementary Basic Auth User"

@@ -49,9 +49,17 @@ public class ManageDatabase extends Activity
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.manage_database);
-        actionbar = getActionBar();
-		actionbar.setDisplayHomeAsUpEnabled(true);
-		actionbar.setHomeButtonEnabled(true);
+
+        try
+        {
+            actionbar = getActionBar();
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ManageDatabase", "OnCreate", e);
+        }
 
 		try
 		{

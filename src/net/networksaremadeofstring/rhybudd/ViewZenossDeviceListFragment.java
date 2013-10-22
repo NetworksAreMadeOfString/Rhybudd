@@ -32,6 +32,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +99,14 @@ public class ViewZenossDeviceListFragment extends ListFragment
                     if(msg.what == 0)
                     {
                         Toast.makeText(getActivity(), "An error was encountered;\r\n" + msg.getData().getString("exception"), Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            dialog.dismiss();
+                        }
+                        catch(Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "dialog.dismiss()", e);
+                        }
                     }
                     else if(msg.what == 1)
                     {
@@ -106,10 +115,25 @@ public class ViewZenossDeviceListFragment extends ListFragment
                     }
                     else if(msg.what == 2)
                     {
-                        dialog.dismiss();
-                        adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
-                        //((TextView) findViewById(R.id.ServerCountLabel)).setText("Monitoring " + DeviceCount + " servers");
-                        setListAdapter(adapter);
+                        try
+                        {
+                            dialog.dismiss();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "dialog.dismiss()", e);
+                        }
+
+                        try
+                        {
+                            adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
+                            //((TextView) findViewById(R.id.ServerCountLabel)).setText("Monitoring " + DeviceCount + " servers");
+                            setListAdapter(adapter);
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "setListAdapter", e);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -126,15 +150,22 @@ public class ViewZenossDeviceListFragment extends ListFragment
         catch(Exception e)
         {
             listOfDevices = null;
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "getLastNonConfigurationInstance", e);
             //BugSenseHandler.log("DeviceList", e);
         }
 
-        if(listOfDevices == null || listOfDevices.size() < 1)
+        /*if(listOfDevices == null || listOfDevices.size() < 1)
         {
             listOfDevices = new ArrayList<ZenossDevice>();
-            DBGetThread();
+            //DBGetThread();
         }
         else
+        {
+            adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
+            setListAdapter(adapter);
+        }*/
+
+        if(null != listOfDevices)
         {
             adapter = new ZenossDeviceAdaptor(getActivity(), listOfDevices);
             setListAdapter(adapter);
@@ -155,13 +186,30 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
     public void DBGetThread()
     {
-        dialog = new ProgressDialog(getActivity());
-        dialog.setTitle("Querying DB");
-        dialog.setMessage("Please wait:\nLoading Infrastructure....");
-        dialog.setCancelable(false);
-        dialog.show();
+        //Log.e("DBGetThread", "Launching");
+        try
+        {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setTitle("Querying DB");
+            dialog.setMessage("Please wait:\nLoading Infrastructure....");
+            dialog.setCancelable(true);
+            dialog.show();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "DBGetThread", e);
+        }
 
-        listOfDevices.clear();
+        try
+        {
+            if(null != listOfDevices)
+                listOfDevices.clear();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("DBGetThread", "listOfDevices.clear()", e);
+        }
+
         dataLoad = new Thread()
         {
             public void run()
@@ -176,16 +224,26 @@ public class ViewZenossDeviceListFragment extends ListFragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
-                    listOfDevices.clear();
+                    BugSenseHandler.sendExceptionMessage("DBGetThread", "DB GetRhybuddDevices", e);
+                    //e.printStackTrace();
+
+                    if(null != listOfDevices)
+                        listOfDevices.clear();
                 }
 
-                if(listOfDevices!= null && listOfDevices.size() > 0)
+                if(null != listOfDevices && listOfDevices.size() > 0)
                 {
-                    PopulateMetaLists();
-                    //DeviceCount = listOfZenossDevices.size();
-                    //Log.i("DeviceList","Found DB Data!");
-                    handler.sendEmptyMessage(2);
+                    try
+                    {
+                        PopulateMetaLists();
+                        handler.sendEmptyMessage(2);
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("DBGetThread", "PopulateMetaLists", e);
+                        //TODO Should we do a refresh?
+                        //Refresh();
+                    }
                 }
                 else
                 {
@@ -206,7 +264,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
                 dialog.setTitle("Contacting Zenoss...");
                 dialog.setMessage("Please wait:\nLoading Infrastructure....");
                 //TODO make cancelable
-                dialog.setCancelable(false);
+                dialog.setCancelable(true);
 
                 if(!dialog.isShowing())
                 {
@@ -343,7 +401,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
                             listOfDevices = null;
                         }
 
-                        if(listOfDevices != null && listOfDevices.size() > 0)
+                        if(null != listOfDevices && listOfDevices.size() > 0)
                         {
                             PopulateMetaLists();
 
@@ -370,6 +428,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
                 }
                 catch (Exception e)
                 {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "DBGetThread", e);
                     //BugSenseHandler.log("DeviceList", e);
                     Message msg = new Message();
                     Bundle bundle = new Bundle();
@@ -397,7 +456,9 @@ public class ViewZenossDeviceListFragment extends ListFragment
         textView.setText("New Devices can be added from the ActionBar");
         textView.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
         textView.setGravity(View.TEXT_ALIGNMENT_CENTER);*/
-        try
+
+        //Removing this due to http://stackoverflow.com/questions/8431342/listview-random-indexoutofboundsexception-on-froyo
+        /*try
         {
             View footerView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.device_list_footer, null, false);
             ((TextView) footerView.findViewById(R.id.DeviceFooterText)).setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
@@ -407,7 +468,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
         {
             e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment", "AddFooter", e);
-        }
+        }*/
     }
 
 

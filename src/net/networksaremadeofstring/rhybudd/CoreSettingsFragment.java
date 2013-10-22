@@ -265,7 +265,14 @@ public class CoreSettingsFragment extends Fragment
                     catch (NullPointerException npe)
                     {
                         BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Displaying toast with error message",npe);
-                        Toast.makeText(getActivity(), "An unknown error occured trying to display some debug output. It has been reported", Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "An unknown error occured trying to display some debug output. It has been reported", Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception ie)
+                        {
+                            BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Error Displaying toast",ie);
+                        }
                     }
                     catch (Exception e)
                     {

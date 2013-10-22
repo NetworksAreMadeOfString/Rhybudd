@@ -106,15 +106,36 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
             BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "NFC", e);
         }
 
-        currentDeviceID = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_UID);
-        //currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
+        try
+        {
+            currentDeviceID = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_UID);
+            //currentDeviceName = getIntent().getStringExtra(ViewZenossDeviceFragment.ARG_HOSTNAME);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "currentDeviceID", e);
+        }
 
-        DeviceNames = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES);
-        DeviceIDs = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS);
+        try
+        {
+            DeviceNames = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICENAMES);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "DeviceNames", e);
+        }
 
+        try
+        {
+            DeviceIDs = getIntent().getStringArrayListExtra(ViewZenossDeviceFragment.ARG_DEVICEIDS);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "DeviceIDs", e);
+        }
         //Log.e("ViewZenossDevice", "Checking...");
 
-        if(null == DeviceNames || DeviceNames.size() == 0 || null == currentDeviceID || currentDeviceID == "")
+        if(null == DeviceNames || DeviceNames.size() == 0 || null == currentDeviceID || currentDeviceID.equals(""))
         {
             //Log.e("ViewZenossDevice", "No device names, fancy that!");
             try
@@ -159,32 +180,55 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         }
         else
         {
-            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+            try
+            {
+                triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "triggerUIHandler UI_POPULATE", e);
+            }
         }
     }
 
     private void PopulatePager()
     {
-        int i = 0;
-
-        for(String str : DeviceIDs)
+        try
         {
-            if(str.equals(currentDeviceID))
+            int i = 0;
+
+            for(String str : DeviceIDs)
             {
-                currentIndex = i;
-                break;
+                if(str.equals(currentDeviceID))
+                {
+                    currentIndex = i;
+                    break;
+                }
+                i++;
             }
-            i++;
+
+            // Create the adapter that will return a fragment for each of the three
+            // primary sections of the app.
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+            // Set up the ViewPager with the sections adapter.
+            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            mViewPager.setCurrentItem(currentIndex);
         }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "PopulatePager", e);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(currentIndex);
+            try
+            {
+                Toast.makeText(ViewZenossDeviceActivity.this,"There was an error populating the ViewPager",Toast.LENGTH_LONG).show();
+            }
+            catch (Exception e1)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "PopulatePager Toast", e1);
+            }
+        }
     }
 
     @Override
@@ -250,11 +294,25 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         {
             e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
-            Toast.makeText(this, "There was a problem trying to find the device ID that was beamed", Toast.LENGTH_SHORT).show();
+            try
+            {
+                Toast.makeText(this, "There was a problem trying to find the device ID that was beamed", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e1)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent Toast",e1);
+            }
         }
         finally
         {
-            triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+            try
+            {
+                triggerUIHandler.sendEmptyMessage(UI_POPULATE);
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
+            }
         }
     }
 
@@ -285,13 +343,27 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
         @Override
         public int getCount()
         {
-            return DeviceIDs.size();
+            if(null != DeviceIDs)
+            {
+                return DeviceIDs.size();
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         @Override
         public CharSequence getPageTitle(int position)
         {
-            return DeviceNames.get(position);
+            if(null != DeviceNames)
+            {
+                return DeviceNames.get(position);
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 

@@ -57,28 +57,34 @@ public class ZenossWidget extends AppWidgetProvider
     		public void handleMessage(Message msg) 
     		{
                 //Log.e("Widget", "handleMessage");
+                try
+                {
+                    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
+                    Intent intent = new Intent(context, ViewZenossEventsListActivity.class);
+                    intent.putExtra("forceRefresh", true);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-				RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.zenoss_widget);
-				Intent intent = new Intent(context, ViewZenossEventsListActivity.class);
-				intent.putExtra("forceRefresh", true);
-	            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-	            
-				for (int i=0; i<N; i++) 
-		        {
-					int appWidgetId = appWidgetIds[i];
-					views.setTextViewText(R.id.CriticalCount, Integer.toString(msg.getData().getInt(CRITCOUNT,0)));
-					views.setTextViewText(R.id.WarningCount, Integer.toString(msg.getData().getInt(WARNCOUNT,0)));
-					views.setTextViewText(R.id.ErrorCount, Integer.toString(msg.getData().getInt(ERRCOUNT,0)));
-					
-					views.setOnClickPendingIntent(R.id.linearLayout1, pendingIntent);
-					views.setOnClickPendingIntent(R.id.CriticalCount, pendingIntent);
-					views.setOnClickPendingIntent(R.id.WarningCount, pendingIntent);
-					views.setOnClickPendingIntent(R.id.ErrorCount, pendingIntent);
-					
-					
-					appWidgetManager.updateAppWidget(appWidgetId, views);
-					//Log.i("handler","Told the widget to update");
-		        }
+                    for (int i=0; i<N; i++)
+                    {
+                        int appWidgetId = appWidgetIds[i];
+                        views.setTextViewText(R.id.CriticalCount, Integer.toString(msg.getData().getInt(CRITCOUNT,0)));
+                        views.setTextViewText(R.id.WarningCount, Integer.toString(msg.getData().getInt(WARNCOUNT,0)));
+                        views.setTextViewText(R.id.ErrorCount, Integer.toString(msg.getData().getInt(ERRCOUNT,0)));
+
+                        views.setOnClickPendingIntent(R.id.linearLayout1, pendingIntent);
+                        views.setOnClickPendingIntent(R.id.CriticalCount, pendingIntent);
+                        views.setOnClickPendingIntent(R.id.WarningCount, pendingIntent);
+                        views.setOnClickPendingIntent(R.id.ErrorCount, pendingIntent);
+
+
+                        appWidgetManager.updateAppWidget(appWidgetId, views);
+                        //Log.i("handler","Told the widget to update");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
     		}
     	};
     	
@@ -91,43 +97,50 @@ public class ZenossWidget extends AppWidgetProvider
 		{  
 			public void run() 
 			{
-                CritCount = 0;
-                ErrCount = 0;
-                WarnCount = 0;
+                try
+                {
+                    CritCount = 0;
+                    ErrCount = 0;
+                    WarnCount = 0;
 
-                RhybuddDataSource datasource = new RhybuddDataSource(context);
-                datasource.open();
-                tempZenossEvents = datasource.GetRhybuddEvents();
-                datasource.close();
-				
-				if(tempZenossEvents != null)
-				{
-					EventCount = tempZenossEvents.size();
-					
-					for(int i = 0; i < EventCount; i++)
-	    			{
-	    				if(tempZenossEvents.get(i).getSeverity().equals("5"))
-	    					CritCount++;
-	    				
-	    				if(tempZenossEvents.get(i).getSeverity().equals("4"))
-	    					ErrCount++;
-	    				
-	    				if(tempZenossEvents.get(i).getSeverity().equals("3"))
-	    					WarnCount++;
-	    			}
-					tempZenossEvents = null;
-				}
+                    RhybuddDataSource datasource = new RhybuddDataSource(context);
+                    datasource.open();
+                    tempZenossEvents = datasource.GetRhybuddEvents();
+                    datasource.close();
 
-                Bundle bundle = new Bundle();
-                Message msg = new Message();
-                bundle.putInt(CRITCOUNT,CritCount);
-                bundle.putInt(ERRCOUNT,ErrCount);
-                bundle.putInt(WARNCOUNT,WarnCount);
-                msg.setData(bundle);
-                msg.what = WHAT;
+                    if(tempZenossEvents != null)
+                    {
+                        EventCount = tempZenossEvents.size();
 
-				//No matter what send an update
-				handler.sendMessage(msg);
+                        for(int i = 0; i < EventCount; i++)
+                        {
+                            if(tempZenossEvents.get(i).getSeverity().equals("5"))
+                                CritCount++;
+
+                            if(tempZenossEvents.get(i).getSeverity().equals("4"))
+                                ErrCount++;
+
+                            if(tempZenossEvents.get(i).getSeverity().equals("3"))
+                                WarnCount++;
+                        }
+                        tempZenossEvents = null;
+                    }
+
+                    Bundle bundle = new Bundle();
+                    Message msg = new Message();
+                    bundle.putInt(CRITCOUNT,CritCount);
+                    bundle.putInt(ERRCOUNT,ErrCount);
+                    bundle.putInt(WARNCOUNT,WarnCount);
+                    msg.setData(bundle);
+                    msg.what = WHAT;
+
+                    //No matter what send an update
+                    handler.sendMessage(msg);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 			}
 		}.start();
     }

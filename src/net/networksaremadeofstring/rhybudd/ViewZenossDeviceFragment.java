@@ -168,7 +168,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","loadAverageHandler",e);
                 }
             }
         };
@@ -177,10 +177,17 @@ public class ViewZenossDeviceFragment extends Fragment
         {
             public void handleMessage(Message msg)
             {
-                CPUGraphView.setVisibility(View.GONE);
-                MemoryGraphView.setVisibility(View.GONE);
-                loadAverageGraphView.setVisibility(View.GONE);
-                hsv.setVisibility(View.GONE);
+                try
+                {
+                    CPUGraphView.setVisibility(View.GONE);
+                    MemoryGraphView.setVisibility(View.GONE);
+                    loadAverageGraphView.setVisibility(View.GONE);
+                    hsv.setVisibility(View.GONE);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","errorHandler",e);
+                }
             }
         };
 
@@ -195,7 +202,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","CPUGraphHandler",e);
                 }
             }
         };
@@ -211,7 +218,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","MemoryGraphHandler",e);
                 }
             }
         };
@@ -309,7 +316,14 @@ public class ViewZenossDeviceFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle bundle)
     {
-        deviceTitle.setText(getArguments().getString(ARG_HOSTNAME));
+        try
+        {
+            deviceTitle.setText(getArguments().getString(ARG_HOSTNAME));
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
+        }
 
         //Check if we have a bundle
         if(null != bundle)
@@ -323,7 +337,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                 }
             }
 
@@ -336,7 +350,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                 }
             }
 
@@ -349,7 +363,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                 }
             }
 
@@ -362,7 +376,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                 }
             }
 
@@ -400,7 +414,7 @@ public class ViewZenossDeviceFragment extends Fragment
                     }
                     catch(Exception e)
                     {
-                        e.printStackTrace();
+                        BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                     }
                 }
             }).start();
@@ -478,7 +492,7 @@ public class ViewZenossDeviceFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    e.printStackTrace();
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","onActivityCreated",e);
                 }
             }
         }).start();

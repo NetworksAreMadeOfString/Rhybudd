@@ -163,21 +163,29 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
         }
         else if(purpose.equals("ack"))
         {
-            RhybuddDataSource datasource = new RhybuddDataSource(arg0);
             try
             {
-                datasource.open();
-                datasource.ackEvent(extras.getString("evid",""));
+                RhybuddDataSource datasource = new RhybuddDataSource(arg0);
+                try
+                {
+                    datasource.open();
+                    datasource.ackEvent(extras.getString("evid",""));
+                }
+                catch(Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
+                }
+                finally
+                {
+                    datasource.close();
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage",e);
-            }
-            finally
-            {
-                datasource.close();
+                BugSenseHandler.sendExceptionMessage("GCMIntentService","onMessage ack",e);
             }
         }
+        //Why is this a duplicate?
         else if(purpose.equals("ack"))
         {
             try

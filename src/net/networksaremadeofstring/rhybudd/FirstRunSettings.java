@@ -81,59 +81,37 @@ public class FirstRunSettings extends FragmentActivity implements ActionBar.TabL
         }
     }
 
-    /*public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.initial_settings, menu);
-        return true;
-    }*/
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.save_settings:
-            {
-                DoSave();
-                return true;
-            }
-
-            default:
-            {
-                return false;
-            }
-        }
-    }*/
-
     public void setPushTab(int tab)
     {
         getActionBar().selectTab(getActionBar().getTabAt(tab));
     }
 
     @Override
-    public void onTabSelected(ActionBar.Tab tab,
-                              FragmentTransaction fragmentTransaction) {
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
+    {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
+    {
     }
 
     @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
+    {
     }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter
+    {
+        public SectionsPagerAdapter(FragmentManager fm)
+        {
             super(fm);
         }
 

@@ -321,7 +321,7 @@ public class DiagnosticActivity extends FragmentActivity
 
                 JSONObject dataContents = new JSONObject();
                 dataContents.put("start", 0);
-                dataContents.put("limit", 2000);
+                dataContents.put("limit", 10);
                 dataContents.put("dir", "DESC");
                 dataContents.put("sort", "severity");
 

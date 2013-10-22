@@ -42,17 +42,34 @@ public class ZenossSearchAdaptor extends BaseAdapter implements OnClickListener,
     }
     
 	@Override
-	public int getCount() {
-		 return listZenossDevices.size();
+	public int getCount()
+    {
+        if(null != listZenossDevices)
+        {
+		    return listZenossDevices.size();
+        }
+        else
+        {
+            return 0;
+        }
 	}
 
 	@Override
-	public Object getItem(int position) {
-		return listZenossDevices.get(position);
+	public Object getItem(int position)
+    {
+        if(null != listZenossDevices)
+        {
+            return listZenossDevices.get(position);
+        }
+        else
+        {
+            return null;
+        }
 	}
 
 	@Override
-	public long getItemId(int position) {
+	public long getItemId(int position)
+    {
 		return position;
 	}
 

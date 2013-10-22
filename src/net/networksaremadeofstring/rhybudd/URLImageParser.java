@@ -63,16 +63,23 @@ public class URLImageParser implements ImageGetter
 
     public Drawable getDrawable(String source) 
     {
-        URLDrawable urlDrawable = new URLDrawable(this.c);
+        try
+        {
+            URLDrawable urlDrawable = new URLDrawable(this.c);
 
-        // get the actual source
-        ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask( urlDrawable);
+            // get the actual source
+            ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask( urlDrawable);
 
-        asyncTask.execute(source);
+            asyncTask.execute(source);
 
-        // return reference to URLDrawable where I will change with actual image from
-        // the src tag
-        return urlDrawable;
+            // return reference to URLDrawable where I will change with actual image from
+            // the src tag
+            return urlDrawable;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public class ImageGetterAsyncTask extends AsyncTask<String, Void, Drawable>
@@ -93,24 +100,31 @@ public class URLImageParser implements ImageGetter
         @Override
         protected void onPostExecute(Drawable result)
         {
-        	if(null != result)
-        	{
-            // set the correct bound according to the result from HTTP call
-            urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0 + result.getIntrinsicHeight()); 
+            try
+            {
+                if(null != result)
+                {
+                    // set the correct bound according to the result from HTTP call
+                    urlDrawable.setBounds(0, 0, 0 + result.getIntrinsicWidth(), 0 + result.getIntrinsicHeight());
 
-            // change the reference of the current drawable to the result
-            // from the HTTP call
-            urlDrawable.drawable = result;
-        	}
-        	else
-        	{
-        		urlDrawable.drawable = null;
-        	}
-        
-            // redraw the image by invalidating the container
-            ((ImageView) URLImageParser.this.container).setImageDrawable(result);
-            URLImageParser.this.container.invalidate();
-            Summary.invalidate();
+                    // change the reference of the current drawable to the result
+                    // from the HTTP call
+                    urlDrawable.drawable = result;
+                }
+                else
+                {
+                    urlDrawable.drawable = null;
+                }
+
+                // redraw the image by invalidating the container
+                ((ImageView) URLImageParser.this.container).setImageDrawable(result);
+                URLImageParser.this.container.invalidate();
+                Summary.invalidate();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /***
