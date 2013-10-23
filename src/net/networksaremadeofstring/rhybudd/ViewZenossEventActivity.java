@@ -55,7 +55,7 @@ public class ViewZenossEventActivity extends FragmentActivity implements ViewZen
         }
         catch (Exception e)
         {
-            BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "OnCreate", e);
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventActivity", "OnCreate", e);
         }
 
         currentEVID = getIntent().getStringExtra("EventID");
@@ -65,22 +65,29 @@ public class ViewZenossEventActivity extends FragmentActivity implements ViewZen
 
         int i = 0;
 
-        for(String str : EVIDs)
+        try
         {
-            if(str.equals(currentEVID))
-                currentIndex = i;
+            for(String str : EVIDs)
+            {
+                if(str.equals(currentEVID))
+                    currentIndex = i;
 
-            i++;
+                i++;
+            }
+
+            // Create the adapter that will return a fragment for each of the three
+            // primary sections of the app.
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+            // Set up the ViewPager with the sections adapter.
+            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            mViewPager.setCurrentItem(currentIndex);
         }
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(currentIndex);
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventActivity","OnCreate",e);
+        }
 
     }
 
@@ -112,24 +119,27 @@ public class ViewZenossEventActivity extends FragmentActivity implements ViewZen
         @Override
         public int getCount()
         {
-            return EVIDs.size();
+            if(null != EVIDs)
+            {
+                return EVIDs.size();
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         @Override
         public CharSequence getPageTitle(int position)
         {
-            /*Locale l = Locale.getDefault();
-            switch (position)
+            if(null != EventNames)
             {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                return EventNames.get(position);
             }
-            return null;*/
-            return EventNames.get(position);
+            else
+            {
+                return "";
+            }
         }
     }
 

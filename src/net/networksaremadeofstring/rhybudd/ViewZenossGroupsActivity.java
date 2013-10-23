@@ -29,9 +29,16 @@ public class ViewZenossGroupsActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_zenoss_groups_activity);
 
-        getActionBar().setTitle("Rhybudd");
-        getActionBar().setSubtitle("Zenoss Groups List");
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        try
+        {
+            getActionBar().setTitle("Rhybudd");
+            getActionBar().setSubtitle("Zenoss Groups List");
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        catch (Exception gab)
+        {
+
+        }
 
     }
 }

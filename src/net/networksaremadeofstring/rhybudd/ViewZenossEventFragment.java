@@ -135,14 +135,6 @@ public class ViewZenossEventFragment extends Fragment
             e.printStackTrace();
         }
 
-        /*EventCount.setTypeface(Titles);
-        ((TextView) rootView.findViewById(R.id.ComponantLabel)).setTypeface(Subtitles);
-        ((TextView) rootView.findViewById(R.id.EventClassLabel)).setTypeface(Subtitles);
-        ((TextView) rootView.findViewById(R.id.StartTimeLabel)).setTypeface(Subtitles);
-        ((TextView) rootView.findViewById(R.id.EndTimeLabel)).setTypeface(Subtitles);
-        ((TextView) rootView.findViewById(R.id.AgentLabel)).setTypeface(Subtitles);
-        ((TextView) rootView.findViewById(R.id.LogLabel)).setTypeface(Subtitles);*/
-
         ackIcon.setOnClickListener(new View.OnClickListener()
         {
 
@@ -163,7 +155,18 @@ public class ViewZenossEventFragment extends Fragment
                             API = new ZenossAPICore();
                         }
 
-                        ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                        ZenossCredentials credentials = null;
+
+                        try
+                        {
+                            credentials=  new ZenossCredentials(getActivity());
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragmentUpdate", "credentials", e);
+                            credentials = null;
+                        }
+
                         try
                         {
                             API.Login(credentials);
@@ -278,36 +281,53 @@ public class ViewZenossEventFragment extends Fragment
 
             case R.id.AddLog:
             {
-                addMessageDialog = new Dialog(getActivity());
-                addMessageDialog.setContentView(R.layout.add_message);
-                addMessageDialog.setTitle("Add Message to Event Log");
-                ((Button) addMessageDialog.findViewById(R.id.SaveButton)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        AddLogMessage(((EditText) addMessageDialog.findViewById(R.id.LogMessage)).getText().toString());
-                        addMessageDialog.dismiss();
-                    }
-                });
+                try
+                {
+                    addMessageDialog = new Dialog(getActivity());
+                    addMessageDialog.setContentView(R.layout.add_message);
+                    addMessageDialog.setTitle("Add Message to Event Log");
+                    ((Button) addMessageDialog.findViewById(R.id.SaveButton)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AddLogMessage(((EditText) addMessageDialog.findViewById(R.id.LogMessage)).getText().toString());
+                            addMessageDialog.dismiss();
+                        }
+                    });
 
-                addMessageDialog.show();
-                return true;
+                    addMessageDialog.show();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragmentUpdate", "AddLog", e);
+                    return false;
+                }
             }
 
             case R.id.escalate:
             {
-                Intent intent = new Intent(android.content.Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                try
+                {
+                    Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
-                // Add data to the intent, the receiving app will decide what to do with it.
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Event on " + Title.getText());
-                String EventDetails = Summary.getText() + "\r\r\n" +
-                        LastTime.getText() + "\r\r\n" +
-                        "Count: " + EventCount.getText();
+                    // Add data to the intent, the receiving app will decide what to do with it.
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Escalation of Zenoss Event on " + Title.getText());
+                    String EventDetails = Summary.getText() + "\r\r\n" +
+                            LastTime.getText() + "\r\r\n" +
+                            "Count: " + EventCount.getText();
 
-                intent.putExtra(Intent.EXTRA_TEXT, EventDetails);
+                    intent.putExtra(Intent.EXTRA_TEXT, EventDetails);
 
-                startActivity(Intent.createChooser(intent, "How would you like to escalate this event?"));
+                    startActivity(Intent.createChooser(intent, "How would you like to escalate this event?"));
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventFragmentUpdate", "escalate", e);
+                    return false;
+                }
             }
 
             default:
@@ -328,16 +348,21 @@ public class ViewZenossEventFragment extends Fragment
     {
         super.onSaveInstanceState(outState);
 
-        //Log.e("Saving","Saving some data");
-
-        outState.putString("Title",Title.getText().toString());
-        outState.putString("Component",Component.getText().toString());
-        outState.putString("EventClass",EventClass.getText().toString());
-        outState.putString("Summary",Summary.getText().toString());
-        outState.putString("FirstTime",FirstTime.getText().toString());
-        outState.putString("LastTime",LastTime.getText().toString());
-        outState.putString("EventCount",EventCount.getText().toString());
-        outState.putString("agent",agent.getText().toString());
+        try
+        {
+            outState.putString("Title",Title.getText().toString());
+            outState.putString("Component",Component.getText().toString());
+            outState.putString("EventClass",EventClass.getText().toString());
+            outState.putString("Summary",Summary.getText().toString());
+            outState.putString("FirstTime",FirstTime.getText().toString());
+            outState.putString("LastTime",LastTime.getText().toString());
+            outState.putString("EventCount",EventCount.getText().toString());
+            outState.putString("agent",agent.getText().toString());
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragmentUpdate", "onSaveInstanceState", e);
+        }
 
         outState.putStringArray("LogEntries",LogEntries);
 
@@ -354,7 +379,6 @@ public class ViewZenossEventFragment extends Fragment
         }
         catch(Exception e)
         {
-            e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "onsaveinstance", e);
         }
 
@@ -371,7 +395,6 @@ public class ViewZenossEventFragment extends Fragment
         }
         catch(Exception e)
         {
-            e.printStackTrace();
             BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "onsaveinstance", e);
         }
     }
@@ -708,10 +731,17 @@ public class ViewZenossEventFragment extends Fragment
 
     private void AddLogMessage(final String Message)
     {
-        addMessageProgressDialog = new ProgressDialog(getActivity());
-        addMessageProgressDialog.setTitle("Contacting Zenoss");
-        addMessageProgressDialog.setMessage("Please wait:\nProcessing Event Log Updates");
-        addMessageProgressDialog.show();
+        try
+        {
+            addMessageProgressDialog = new ProgressDialog(getActivity());
+            addMessageProgressDialog.setTitle("Contacting Zenoss");
+            addMessageProgressDialog.setMessage("Please wait:\nProcessing Event Log Updates");
+            addMessageProgressDialog.show();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventFragment", "AddLogMessage Dialog", e);
+        }
 
         addLogMessageHandler = new Handler() {
             public void handleMessage(Message msg) {
@@ -741,41 +771,67 @@ public class ViewZenossEventFragment extends Fragment
                     catch (Exception e)
                     {
                         BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "AddMessageProgressHandler", e);
-                        Toast.makeText(getActivity(), "The log message was successfully sent to Zenoss but an error occured when updating the UI", Toast.LENGTH_LONG).show();
+                        try
+                        {
+                            Toast.makeText(getActivity(), "The log message was successfully sent to Zenoss but an error occured when updating the UI", Toast.LENGTH_LONG).show();
+                        }
+                        catch (Exception e1)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "AddMessageProgressHandler Toast", e1);
+                        }
                     }
                 }
                 else
                 {
-                    Toast.makeText(getActivity(), "An error was encountered adding your message to the log", Toast.LENGTH_LONG).show();
+                    try
+                    {
+                        Toast.makeText(getActivity(), "An error was encountered adding your message to the log", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "AddMessageProgressHandler", e);
+                    }
                 }
 
             }
         };
 
         addLogMessageThread = new Thread() {
-            public void run() {
+            public void run()
+            {
                 Boolean Success = false;
 
-                try {
-                    if (API == null) {
-                        if (settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false)) {
+                try
+                {
+                    if (API == null)
+                    {
+                        if (settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS, false))
+                        {
                             API = new ZenossAPIZaas();
-                        } else {
+                        }
+                        else
+                        {
                             API = new ZenossAPICore();
                         }
+
                         ZenossCredentials credentials = new ZenossCredentials(getActivity());
                         API.Login(credentials);
                     }
 
                     Success = API.AddEventLog(getArguments().getString("EventID"), Message);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     BugSenseHandler.sendExceptionMessage("ViewZenossEvent", "AddLogMessageThread", e);
                     addLogMessageHandler.sendEmptyMessage(0);
                 }
 
-                if (Success) {
+                if (Success)
+                {
                     addLogMessageHandler.sendEmptyMessage(1);
-                } else {
+                }
+                else
+                {
                     addLogMessageHandler.sendEmptyMessage(0);
                 }
             }

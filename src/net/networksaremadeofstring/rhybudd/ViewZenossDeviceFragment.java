@@ -485,7 +485,7 @@ public class ViewZenossDeviceFragment extends Fragment
                             }
                             catch(Exception e)
                             {
-                                e.printStackTrace();
+                                BugSenseHandler.sendExceptionMessage("ViewZenossDeviceFragment","getGraphs",e);
                             }
                         }
                     }

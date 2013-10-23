@@ -134,27 +134,43 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
 
             case R.id.adddevice:
             {
-                if (mTwoPane)
+                try
                 {
-                    AddDeviceFragment fragment = new AddDeviceFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.device_detail_container, fragment).commit();
-                    ab.setSubtitle(getString(R.string.AddDeviceTitle));
+                    if (mTwoPane)
+                    {
+                        AddDeviceFragment fragment = new AddDeviceFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.device_detail_container, fragment).commit();
+                        ab.setSubtitle(getString(R.string.AddDeviceTitle));
+                    }
+                    else
+                    {
+                        Intent AddDeviceIntent = new Intent(ViewZenossDeviceListActivity.this, AddDeviceActivity.class);
+                        //Not strictly required because we can get the activity to do it for us
+                        AddDeviceIntent.putExtra(AddDeviceFragment.TWOPANEINDICATOR,false);
+                        this.startActivity(AddDeviceIntent);
+                    }
+                    return true;
                 }
-                else
+                catch (Exception e)
                 {
-                    Intent AddDeviceIntent = new Intent(ViewZenossDeviceListActivity.this, AddDeviceActivity.class);
-                    //Not strictly required because we can get the activity to do it for us
-                    AddDeviceIntent.putExtra(AddDeviceFragment.TWOPANEINDICATOR,false);
-                    this.startActivity(AddDeviceIntent);
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListActivity","adddevice",e);
+                    return false;
                 }
-                return true;
             }
 
             case R.id.refresh:
             {
-                ViewZenossDeviceListFragment fragment = (ViewZenossDeviceListFragment) getSupportFragmentManager().findFragmentById(R.id.device_list);
-                fragment.Refresh();
-                return true;
+                try
+                {
+                    ViewZenossDeviceListFragment fragment = (ViewZenossDeviceListFragment) getSupportFragmentManager().findFragmentById(R.id.device_list);
+                    fragment.Refresh();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListActivity","refresh",e);
+                    return false;
+                }
             }
 
         }

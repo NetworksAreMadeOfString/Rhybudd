@@ -575,18 +575,32 @@ public class ViewZenossDeviceListFragment extends ListFragment
     //------------------------------------------------------------------//
     void doUnbindService()
     {
+        try
+        {
         if (mBound)
         {
             // Detach our existing connection.
             getActivity().unbindService(mConnection);
             mBound = false;
         }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment","doUnbindService",e);
+        }
     }
 
     void doBindService()
     {
-        getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
+        try
+        {
+            getActivity().bindService(new Intent(getActivity(), ZenossPoller.class), mConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment","doBindService",e);
+        }
     }
 
     @Override
@@ -599,15 +613,22 @@ public class ViewZenossDeviceListFragment extends ListFragment
 
         //If we've binded let's try and do a refresh
         //If it's been more than 15 minutes since we last updated we should do a full refresh
-        if(ZenossAPI.shouldRefresh(getActivity()))
+        try
         {
-            //Log.i("onResume","shouldRefresh() says we should do a full refresh");
-            Refresh();
+            if(ZenossAPI.shouldRefresh(getActivity()))
+            {
+                //Log.i("onResume","shouldRefresh() says we should do a full refresh");
+                Refresh();
+            }
+            else
+            {
+                //Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
+                DBGetThread();
+            }
         }
-        else
+        catch (Exception e)
         {
-            //Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
-            DBGetThread();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment","onResume",e);
         }
     }
 
@@ -654,11 +675,18 @@ public class ViewZenossDeviceListFragment extends ListFragment
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
         {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            //Toast.makeText(RhybuddHome.this, "Connected to Service", Toast.LENGTH_SHORT).show();
+            try
+            {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                ZenossPoller.LocalBinder binder = (ZenossPoller.LocalBinder) service;
+                mService = binder.getService();
+                mBound = true;
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossDeviceListFragment","onServiceConnected",e);
+                mBound = false;
+            }
         }
 
         @Override

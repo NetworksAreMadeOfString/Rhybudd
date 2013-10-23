@@ -43,9 +43,17 @@ public class ViewZenossGroupsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.view_zenoss_groups_fragment, null);
-        gridview = (GridView) view.findViewById(R.id.GroupsGrid);
-        return view;
+        try
+        {
+            View view = inflater.inflate(R.layout.view_zenoss_groups_fragment, null);
+            gridview = (GridView) view.findViewById(R.id.GroupsGrid);
+            return view;
+        }
+        catch (Exception v)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossGroupsFragment", "onCreateView", v);
+            return null;
+        }
     }
 
     @Override
@@ -70,8 +78,17 @@ public class ViewZenossGroupsFragment extends Fragment
                 }
                 catch(Exception e)
                 {
-                    Toast.makeText(getActivity(), "There was a problem getting the list of groups or rendering the grid", Toast.LENGTH_LONG).show();
                     BugSenseHandler.sendExceptionMessage("ViewZenossGroupsFragment", "onCreate", e);
+
+                    try
+                    {
+                        Toast.makeText(getActivity(), "There was a problem getting the list of groups or rendering the grid", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception t)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossGroupsFragment", "onCreate toast", t);
+                    }
+
                 }
             }
         };

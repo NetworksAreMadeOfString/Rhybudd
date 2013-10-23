@@ -94,101 +94,151 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
         setContentView(R.layout.view_zenoss_events_list);
 
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
+        try
+        {
+            settings = PreferenceManager.getDefaultSharedPreferences(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onCreate",e);
+        }
 
-        getActionBar().setTitle("Zenoss Events List");
-        getActionBar().setSubtitle(settings.getString("URL", ""));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        try
+        {
+            getActionBar().setTitle("Zenoss Events List");
+            getActionBar().setSubtitle(settings.getString("URL", ""));
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onCreate",e);
+        }
 
         //SenderID = settings.getString("SenderID",ZenossAPI.SENDER_ID);
 
         if (findViewById(R.id.event_detail_container) != null)
         {
-            mTwoPane = true;
-
-            ((ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list)).setActivateOnItemClick(true);
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-
-            if(savedInstanceState == null)
+            try
             {
-                EventsListWelcomeFragment fragment = new EventsListWelcomeFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_container, fragment).commit();
+                mTwoPane = true;
+
+                ((ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list)).setActivateOnItemClick(true);
+
+                // In two-pane mode, list items should be given the
+                // 'activated' state when touched.
+
+                if(savedInstanceState == null)
+                {
+                    EventsListWelcomeFragment fragment = new EventsListWelcomeFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_container, fragment).commit();
+                }
+            }
+            catch (Exception e)
+            {
+                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onCreate twopane",e);
             }
         }
 
-        ((ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list)).setHasOptionsMenu(true);
+        try
+        {
+            ((ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list)).setHasOptionsMenu(true);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","fragment has options",e);
+        }
 
         if((settings.getString("URL", "").equals("") || settings.getString("userName", "").equals("") || settings.getString("passWord", "").equals("")))
         {
             firstRun = true;
         }
 
-        mDrawerTitles = getResources().getStringArray(R.array.drawer_array);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDrawerTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        )
+        try
         {
-            public void onDrawerClosed(View view)
-            {
-                getActionBar().setTitle("Zenoss Events List");
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
+            mDrawerTitles = getResources().getStringArray(R.array.drawer_array);
+            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            mDrawerList = (ListView) findViewById(R.id.left_drawer);
+            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+            mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mDrawerTitles));
+            mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-            public void onDrawerOpened(View drawerView)
+            mDrawerToggle = new ActionBarDrawerToggle(
+                    this,                  /* host Activity */
+                    mDrawerLayout,         /* DrawerLayout object */
+                    R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                    R.string.drawer_open,  /* "open drawer" description for accessibility */
+                    R.string.drawer_close  /* "close drawer" description for accessibility */
+            )
             {
-                getActionBar().setTitle(getString(R.string.DrawerTitle));
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+                public void onDrawerClosed(View view)
+                {
+                    getActionBar().setTitle("Zenoss Events List");
+                    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                }
+
+                public void onDrawerOpened(View drawerView)
+                {
+                    getActionBar().setTitle(getString(R.string.DrawerTitle));
+                    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                }
+            };
+            mDrawerLayout.setDrawerListener(mDrawerToggle);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onCreate drawerlayout",e);
+        }
 
         // Create the dummy account
-        mAccount = CreateSyncAccount(this);
+        try
+        {
+            mAccount = CreateSyncAccount(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onCreate CreateSyncAccount",e);
+        }
     }
 
     public static Account CreateSyncAccount(Context context)
     {
-        // Create the account type and default account
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =(AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null))
+        try
         {
+            // Create the account type and default account
+            Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+            // Get an instance of the Android account manager
+            AccountManager accountManager =(AccountManager) context.getSystemService(ACCOUNT_SERVICE);
             /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
+             * Add the account and account type, no password or user data
+             * If successful, return the Account object, otherwise report an error.
              */
-            //Log.e("CreateSyncAccount","Success!");
-        }
-        else
-        {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-            //Log.e("CreateSyncAccount","Fail!");
-        }
+            if (accountManager.addAccountExplicitly(newAccount, null, null))
+            {
+                /*
+                 * If you don't set android:syncable="true" in
+                 * in your <provider> element in the manifest,
+                 * then call context.setIsSyncable(account, AUTHORITY, 1)
+                 * here.
+                 */
+                //Log.e("CreateSyncAccount","Success!");
+            }
+            else
+            {
+                /*
+                 * The account exists or some other error occurred. Log this, report it,
+                 * or handle it internally.
+                 */
+                //Log.e("CreateSyncAccount","Fail!");
+            }
 
-        return newAccount;
+            return newAccount;
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","CreateSyncAccount",e);
+            return null;
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener
@@ -212,15 +262,30 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         {
             case R.id.settings:
             {
-                Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
-                this.startActivityForResult(SettingsIntent, LAUNCHSETTINGS);
-                return true;
+                try
+                {
+                    Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
+                    this.startActivityForResult(SettingsIntent, LAUNCHSETTINGS);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onOptionsItemSelected settings",e);
+                    return false;
+                }
             }
 
             case R.id.search:
             {
-                onSearchRequested();
-                return true;
+                try
+                {
+                    onSearchRequested();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onOptionsItemSelected search",e);
+                }
             }
         }
 
@@ -233,45 +298,88 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         {
             case SETTINGS:
             {
-                Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
-                this.startActivityForResult(SettingsIntent, 99);
+                try
+                {
+                    Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
+                    this.startActivityForResult(SettingsIntent, 99);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick settings",e);
+                }
 
             }
             break;
 
             case CONFIGURERHYBUDDPUSH:
             {
-                Intent PushSettingsIntent = new Intent(ViewZenossEventsListActivity.this, PushConfigActivity.class);
-                this.startActivityForResult(PushSettingsIntent, ZenossAPI.ACTIVITYRESULT_PUSHCONFIG);
+                try
+                {
+                    Intent PushSettingsIntent = new Intent(ViewZenossEventsListActivity.this, PushConfigActivity.class);
+                    this.startActivityForResult(PushSettingsIntent, ZenossAPI.ACTIVITYRESULT_PUSHCONFIG);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick CONFIGURERHYBUDDPUSH",e);
+                }
             }
             break;
 
             case HELP:
             {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("http://wiki.zenoss.org/index.php?title=Rhybudd#Getting_Started"));
-                startActivity(i);
+                try
+                {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("http://wiki.zenoss.org/Android"));
+                    startActivity(i);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick HELP",e);
+                }
+
             }
             break;
 
             case INFRASTRUCTURE:
             {
-                Intent DeviceList = new Intent(ViewZenossEventsListActivity.this, ViewZenossDeviceListActivity.class);
-                ViewZenossEventsListActivity.this.startActivity(DeviceList);
+                try
+                {
+                    Intent DeviceList = new Intent(ViewZenossEventsListActivity.this, ViewZenossDeviceListActivity.class);
+                    ViewZenossEventsListActivity.this.startActivity(DeviceList);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick INFRASTRUCTURE",e);
+                }
             }
             break;
 
             case GROUPS:
             {
-                Intent GroupsIntent = new Intent(ViewZenossEventsListActivity.this, ViewZenossGroupsActivity.class);
-                ViewZenossEventsListActivity.this.startActivity(GroupsIntent);
+                try
+                {
+                    Intent GroupsIntent = new Intent(ViewZenossEventsListActivity.this, ViewZenossGroupsActivity.class);
+                    ViewZenossEventsListActivity.this.startActivity(GroupsIntent);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick GROUPS",e);
+                }
             }
             break;
 
             case MANAGEDATABASE:
             {
-                Intent MangeDBIntent = new Intent(ViewZenossEventsListActivity.this, ManageDatabase.class);
-                ViewZenossEventsListActivity.this.startActivity(MangeDBIntent);
+                try
+                {
+                    Intent MangeDBIntent = new Intent(ViewZenossEventsListActivity.this, ManageDatabase.class);
+                    ViewZenossEventsListActivity.this.startActivity(MangeDBIntent);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick MANAGEDATABASE",e);
+                }
             }
             break;
 
@@ -285,22 +393,45 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 }
                 catch(Exception e)
                 {
-                    Toast.makeText(ViewZenossEventsListActivity.this, "There was a problem launching your email client.\n\nPlease email Gareth@DataSift.com with your feedback.", Toast.LENGTH_LONG).show();
                     BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick FEEDBACK",e);
+
+                    try
+                    {
+                        Toast.makeText(ViewZenossEventsListActivity.this, "There was a problem launching your email client.\n\nPlease email Gareth@DataSift.com with your feedback.", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e1)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick FEEDBACK Toast",e1);
+                    }
+
                 }
             }
             break;
 
             case SEARCH:
             {
-                onSearchRequested();
+                try
+                {
+                    onSearchRequested();
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick SEARCH",e);
+                }
             }
             break;
 
             case DIAGNOSTIC:
             {
-                Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
-                ViewZenossEventsListActivity.this.startActivity(DiagIntent);
+                try
+                {
+                    Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
+                    ViewZenossEventsListActivity.this.startActivity(DiagIntent);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick DIAGNOSTIC",e);
+                }
             }
             break;
         }
@@ -315,7 +446,14 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick setitemchecked false",e);
         }
 
-        mDrawerLayout.closeDrawer(mDrawerList);
+        try
+        {
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","ProcessDrawerClick closeDrawer",e);
+        }
     }
 
     @Override
@@ -330,18 +468,39 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     {
         super.onResume();
 
-        //Can't hurt to try and start the service just in case
-        startService(new Intent(this, ZenossPoller.class));
-
-        //User is about to see the list of events - no need for them to hang around
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
-
-        //Might as well update GCM whilst we're here
-        if(settings.contains(ZenossAPI.PREFERENCE_PUSH_ENABLED) && settings.getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
+        try
         {
-            //Log.e("onResume","Doing a GCM Registration");
-            doGCMRegistration();
+            //Can't hurt to try and start the service just in case
+            startService(new Intent(this, ZenossPoller.class));
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onResume StartService",e);
+        }
+
+        try
+        {
+            //User is about to see the list of events - no need for them to hang around
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onResume Clear Notifications",e);
+        }
+
+        try
+        {
+            //Might as well update GCM whilst we're here
+            if(settings.contains(ZenossAPI.PREFERENCE_PUSH_ENABLED) && settings.getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
+            {
+                //Log.e("onResume","Doing a GCM Registration");
+                doGCMRegistration();
+            }
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onResume doGCMRegistration",e);
         }
 
         //Refreshes are done in the fragment - Forced login done in the activity
@@ -358,8 +517,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
     private void finishStart()
     {
-        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-        listFrag.DBGetThread();
+        try
+        {
+            ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+            listFrag.DBGetThread();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","finishStart",e);
+        }
     }
 
     @Override
@@ -370,8 +536,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         //Forces our onResume() function to do a DB call rather than a full HTTP request just cos we returned
         //from one of our subscreens
         //resumeOnResultPollAPI = false;
-
-        BackupManager bm = new BackupManager(this);
+        BackupManager bm = null;
+        try
+        {
+            bm = new BackupManager(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult BackupManager",e);
+        }
 
         switch(requestCode)
         {
@@ -379,31 +552,53 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             {
                 settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-                Intent intent = new Intent(this, ZenossPoller.class);
-                intent.putExtra("settingsUpdate", true);
-                startService(intent);
-                bm.dataChanged();
+                try
+                {
+                    Intent intent = new Intent(this, ZenossPoller.class);
+                    intent.putExtra("settingsUpdate", true);
+                    startService(intent);
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult startService",e);
+                }
+
+                try
+                {
+                    bm.dataChanged();
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult bm.dataChanged()",e);
+                }
 
                 //SyncAdapter stuff
                 if(null != mAccount)
                 {
-                    mResolver = getContentResolver();
-                    Bundle bndle = new Bundle();
-                    ContentResolver.addPeriodicSync(
-                            mAccount,
-                            AUTHORITY,
-                            bndle,
-                            86400);
+                    try
+                    {
+                        mResolver = getContentResolver();
+                        Bundle bndle = new Bundle();
+                        ContentResolver.addPeriodicSync(
+                                mAccount,
+                                AUTHORITY,
+                                bndle,
+                                86400);
 
-                    ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, settings.getBoolean("refreshCache", true));
+                        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, settings.getBoolean("refreshCache", true));
 
-                    /*bndle.putBoolean(
-                            ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                    bndle.putBoolean(
-                            ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                        /*bndle.putBoolean(
+                                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                        bndle.putBoolean(
+                                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
-                    Log.e("addPeriodicSync","Requesting a full sync!");
-                    ContentResolver.requestSync(mAccount, AUTHORITY, bndle);*/
+                        Log.e("addPeriodicSync","Requesting a full sync!");
+                        ContentResolver.requestSync(mAccount, AUTHORITY, bndle);*/
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult LAUNCHSETTINGS",e);
+                    }
                 }
                 else
                 {
@@ -414,11 +609,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
 
             case ZenossAPI.ACTIVITYRESULT_PUSHCONFIG:
             {
-                //if(null != data && data.hasExtra(ZenossAPI.PREFERENCE_PUSHKEY))
-                //{
+                try
+                {
                     GCMRegistrar.unregister(this);
                     doGCMRegistration();
-                //}
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult ACTIVITYRESULT_PUSHCONFIG",e);
+                }
             }
             break;
 
@@ -426,25 +625,41 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
             {
                 if(resultCode == 1)
                 {
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putBoolean("FirstRun", false);
-                    editor.commit();
+                    try
+                    {
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putBoolean("FirstRun", false);
+                        editor.commit();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult default",e);
+                    }
 
                     //Also update our onResume helper bool although it should already be set
                     firstRun = false;
+                    AlertDialog.Builder builder = null;
+                    AlertDialog welcomeDialog = null;
+                    try
+                    {
+                        builder = new AlertDialog.Builder(this);
+                        builder.setMessage("Additional settings and functionality can be found by pressing the Action bar overflow.\r\n" +
+                                "\r\nIf you experience issues please email;\r\nGareth@DataSift.com before leaving negative reviews.")
+                                .setTitle("Welcome to Rhybudd!")
+                                .setCancelable(true)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        finishStart();
+                                    }
+                                });
+                        welcomeDialog = builder.create();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult default",e);
+                    }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Additional settings and functionality can be found by pressing the Action bar overflow.\r\n" +
-                            "\r\nIf you experience issues please email;\r\nGareth@DataSift.com before leaving negative reviews.")
-                            .setTitle("Welcome to Rhybudd!")
-                            .setCancelable(true)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    finishStart();
-                                }
-                            });
-                    AlertDialog welcomeDialog = builder.create();
 
                     try
                     {
@@ -456,11 +671,25 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                         BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","OnActivityResult welcomedialog",e);
                     }
 
-                    bm.dataChanged();
+                    try
+                    {
+                        bm.dataChanged();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult default",e);
+                    }
                 }
                 else if(resultCode == 2)
                 {
-                    Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.FirstRunNeedSettings), Toast.LENGTH_LONG).show();
+                    try
+                    {
+                        Toast.makeText(ViewZenossEventsListActivity.this, getResources().getString(R.string.FirstRunNeedSettings), Toast.LENGTH_LONG).show();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onActivityResult resultcode 2",e);
+                    }
                     finish();
                 }
                 //Who knows what happened here - quit
@@ -477,35 +706,42 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     @Override
     public void fetchError()
     {
-        //Log.e("fetchError","fetchError");
+        AlertDialog.Builder builder = null;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Unable to get any events from the DB or from the API.\nCheck settings?")
-                .setCancelable(false)
-                .setPositiveButton("Edit Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id)
+        try
+        {
+            builder = new AlertDialog.Builder(this);
+            builder.setMessage("Unable to get any events from the DB or from the API.\nCheck settings?")
+                    .setCancelable(false)
+                    .setPositiveButton("Edit Settings", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
+                            startActivityForResult(SettingsIntent, 99);
+                            alertDialog.cancel();
+                        }
+                    })
+                    .setNeutralButton("Run Diagnostics", new DialogInterface.OnClickListener()
                     {
-                        Intent SettingsIntent = new Intent(ViewZenossEventsListActivity.this, SettingsFragment.class);
-                        startActivityForResult(SettingsIntent, 99);
-                        alertDialog.cancel();
-                    }
-                })
-                .setNeutralButton("Run Diagnostics", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
-                        startActivity(DiagIntent);
-                        alertDialog.cancel();
-                    }
-                })
-                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        alertDialog.cancel();
-                    }
-                });
-        alertDialog = builder.create();
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            Intent DiagIntent = new Intent(ViewZenossEventsListActivity.this, DiagnosticActivity.class);
+                            startActivity(DiagIntent);
+                            alertDialog.cancel();
+                        }
+                    })
+                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            alertDialog.cancel();
+                        }
+                    });
+            alertDialog = builder.create();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","fetchError",e);
+        }
 
         if(!isFinishing())
         {
@@ -524,8 +760,15 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     @Override
     public void onItemAcknowledged(int position)
     {
-        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-        listFrag.onItemAcknowledged(position);
+        try
+        {
+            ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+            listFrag.onItemAcknowledged(position);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onItemAcknowledged",e);
+        }
     }
 
     @Override
@@ -549,114 +792,108 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
     @Override
     public void onItemSelected(final ZenossEvent event, final int position)
     {
-        //Log.e("onItemSelected", "touched in activity");
-        if (mTwoPane)
+        try
         {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString("EventID", event.getEVID());
-            arguments.putString("EventTitle", event.getDevice());
-            arguments.putInt("EventCount", event.getCount());
-            arguments.putBoolean(ViewZenossDeviceFragment.ARG_2PANE, true);
-            arguments.putInt("position",position);
-            ViewZenossEventFragment fragment = new ViewZenossEventFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_container, fragment).commit();
-        }
-        else
-        {
-            AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-            alertbox.setTitle("Event Management");
-            alertbox.setMessage("What would you like to do?");
-
-            alertbox.setPositiveButton("Acknowledge", new DialogInterface.OnClickListener()
+            if (mTwoPane)
             {
-                public void onClick(DialogInterface arg0, int arg1)
-                {
-                    //AcknowledgeSingleEvent(position);
-                    ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-                    //Log.e("Activity","ack with position " + Integer.toString(position));
-                    listFrag.acknowledgeSingleEvent(position);
-                }
-            });
-
-            alertbox.setNeutralButton("View Details", new DialogInterface.OnClickListener()
+                // In two-pane mode, show the detail view in this activity by
+                // adding or replacing the detail fragment using a
+                // fragment transaction.
+                Bundle arguments = new Bundle();
+                arguments.putString("EventID", event.getEVID());
+                arguments.putString("EventTitle", event.getDevice());
+                arguments.putInt("EventCount", event.getCount());
+                arguments.putBoolean(ViewZenossDeviceFragment.ARG_2PANE, true);
+                arguments.putInt("position",position);
+                ViewZenossEventFragment fragment = new ViewZenossEventFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_container, fragment).commit();
+            }
+            else
             {
-                public void onClick(DialogInterface arg0, int arg1)
+                AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+                alertbox.setTitle("Event Management");
+                alertbox.setMessage("What would you like to do?");
+
+                alertbox.setPositiveButton("Acknowledge", new DialogInterface.OnClickListener()
                 {
-                    Intent ViewEventIntent = new Intent(ViewZenossEventsListActivity.this, ViewZenossEventActivity.class);
-                    ViewEventIntent.putExtra("EventID", event.getEVID());
-                    ViewEventIntent.putExtra("position",position);
-                    ViewEventIntent.putExtra("EventTitle", event.getDevice());
-                    ViewEventIntent.putExtra("EventCount", event.getCount());
-                    ArrayList<String> EventNames = new ArrayList<String>();
-                    ArrayList<String> EVIDs = new ArrayList<String>();
-
-                    ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-                    List<ZenossEvent> listOfZenossEvents = listFrag.getListOfEvents();
-
-                    for(ZenossEvent evt : listOfZenossEvents)
+                    public void onClick(DialogInterface arg0, int arg1)
                     {
-                        EventNames.add(evt.getDevice());
-                        EVIDs.add(evt.getEVID());
+                        //AcknowledgeSingleEvent(position);
+                        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+                        //Log.e("Activity","ack with position " + Integer.toString(position));
+                        listFrag.acknowledgeSingleEvent(position);
                     }
+                });
 
-                    ViewEventIntent.putStringArrayListExtra("eventnames",EventNames);
-                    ViewEventIntent.putStringArrayListExtra("evids",EVIDs);
-                    ViewZenossEventsListActivity.this.startActivity(ViewEventIntent);
-                }
-            });
-
-            alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface arg0, int arg1)
+                alertbox.setNeutralButton("View Details", new DialogInterface.OnClickListener()
                 {
-                }
-            });
-            alertbox.show();
+                    public void onClick(DialogInterface arg0, int arg1)
+                    {
+                        Intent ViewEventIntent = new Intent(ViewZenossEventsListActivity.this, ViewZenossEventActivity.class);
+                        ViewEventIntent.putExtra("EventID", event.getEVID());
+                        ViewEventIntent.putExtra("position",position);
+                        ViewEventIntent.putExtra("EventTitle", event.getDevice());
+                        ViewEventIntent.putExtra("EventCount", event.getCount());
+                        ArrayList<String> EventNames = new ArrayList<String>();
+                        ArrayList<String> EVIDs = new ArrayList<String>();
+
+                        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
+                        List<ZenossEvent> listOfZenossEvents = listFrag.getListOfEvents();
+
+                        for(ZenossEvent evt : listOfZenossEvents)
+                        {
+                            EventNames.add(evt.getDevice());
+                            EVIDs.add(evt.getEVID());
+                        }
+
+                        ViewEventIntent.putStringArrayListExtra("eventnames",EventNames);
+                        ViewEventIntent.putStringArrayListExtra("evids",EVIDs);
+                        ViewZenossEventsListActivity.this.startActivity(ViewEventIntent);
+                    }
+                });
+
+                alertbox.setNegativeButton("Nothing", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface arg0, int arg1)
+                    {
+                    }
+                });
+                alertbox.show();
+            }
+        }
+        catch (Exception e)
+        {
+            //Damn I'm lazy
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","onItemSelected",e);
         }
     }
 
-    /*public void AcknowledgeSingleEvent(final int Position)
-    {
-        ViewZenossEventsListFragment listFrag = (ViewZenossEventsListFragment) getSupportFragmentManager().findFragmentById(R.id.events_list);
-        listFrag.setInProgress(Position);
-
-        ((Thread) new Thread()
-        {
-            public void run()
-            {
-                try
-                {
-                    ZenossAPIv2 ackEventAPI = new ZenossAPIv2(settings.getString("userName", ""), settings.getString("passWord", ""), settings.getString("URL", ""));
-                    ackEventAPI.AcknowledgeEvent(listOfZenossEvents.get(Position).getEVID());//ackEventAPI
-
-                    listOfZenossEvents.get(Position).setProgress(false);
-                    listOfZenossEvents.get(Position).setAcknowledged();
-                    AckEventsHandler.sendEmptyMessage(1);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    BugSenseHandler.sendExceptionMessage("RhybuddHome","AcknowledgeSingleEvent",e);
-                    AckEventsHandler.sendEmptyMessage(99);
-                }
-            }
-        }).start();
-    }*/
-
     private void doGCMRegistration()
     {
-        GCMRegistrar.checkDevice(this);
-        GCMRegistrar.checkManifest(this);
-        regId = GCMRegistrar.getRegistrationId(this);
-
-        if (regId.equals(""))
+        try
         {
-            //Log.e("GCM", "Registering");
-            GCMRegistrar.register(this, settings.getString(ZenossAPI.PREFERENCE_PUSH_SENDERID,ZenossAPI.SENDER_ID));
+            GCMRegistrar.checkDevice(this);
+            GCMRegistrar.checkManifest(this);
+            regId = GCMRegistrar.getRegistrationId(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration()",e);
+        }
+
+        try
+        {
+            if (regId.equals(""))
+            {
+                //Log.e("GCM", "Registering");
+                GCMRegistrar.register(this, settings.getString(ZenossAPI.PREFERENCE_PUSH_SENDERID,ZenossAPI.SENDER_ID));
+            }
+        }
+        catch (Exception e)
+        {
+            //TODO we should probably do something about this
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration()",e);
         }
 
 
@@ -730,7 +967,6 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
         catch (Exception e)
         {
             BugSenseHandler.sendExceptionMessage("ViewZenossEventsListActivity","doGCMRegistration",e);
-            e.printStackTrace();
         }
 
     }

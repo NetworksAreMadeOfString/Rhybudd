@@ -82,11 +82,18 @@ public class WriteNFCActivity extends FragmentActivity
 
         BugSenseHandler.initAndStartSession(WriteNFCActivity.this, "44a76a8c");
 
-
-        getActionBar().setSubtitle(getString(R.string.NFCTitle));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         setContentView(R.layout.write_tag_activity);
+
+        try
+        {
+            getActionBar().setSubtitle(getString(R.string.NFCTitle));
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        catch (Exception gab)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate", gab);
+        }
+
         //Quick test
         try
         {
@@ -103,21 +110,41 @@ public class WriteNFCActivity extends FragmentActivity
                 idRecord = NdefRecord.createUri("rhybudd://"+UID);
             }
 
-
-
             ((TextView) findViewById(R.id.SizesText)).setText("This payload is " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " bytes.\n\nAn ultralight can store up to 46 bytes.\nAn Ultralight C or NTAG203 can store up to 137 bytes.\nDespite the name a 1K can only store up to 716 bytes.");
         }
         catch(Exception e)
         {
             BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate", e);
-            e.printStackTrace();
-            Toast.makeText(this, "Sorry there was error parsing the passed UID, we cannot continue.", Toast.LENGTH_SHORT).show();
+            try
+            {
+                Toast.makeText(this, "Sorry there was error parsing the passed UID, we cannot continue.", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception t)
+            {
+                BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate", t);
+            }
+
             finish();
         }
 
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
+        try
+        {
+            mAdapter = NfcAdapter.getDefaultAdapter(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate getDefaultAdapter", e);
+            mAdapter = null;
+        }
 
-        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        try
+        {
+            pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate pendingIntent", e);
+        }
 
         IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
 
@@ -132,10 +159,17 @@ public class WriteNFCActivity extends FragmentActivity
             throw new RuntimeException("fail", e);
         }
 
-        IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        intentFiltersArray = new IntentFilter[] {ndef, td};
+        try
+        {
+            IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+            intentFiltersArray = new IntentFilter[] {ndef, td};
 
-        techListsArray = new String[][] { new String[] { NfcF.class.getName(),NfcA.class.getName(),Ndef.class.getName(), NdefFormatable.class.getName() } };
+            techListsArray = new String[][] { new String[] { NfcF.class.getName(),NfcA.class.getName(),Ndef.class.getName(), NdefFormatable.class.getName() } };
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onCreate IntentFilter", e);
+        }
 
         CreateHandlers();
     }
@@ -160,22 +194,43 @@ public class WriteNFCActivity extends FragmentActivity
     {
         super.onPause();
 
-        if(mAdapter != null)
-            mAdapter.disableForegroundDispatch(this);
+        try
+        {
+            if(mAdapter != null)
+                mAdapter.disableForegroundDispatch(this);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onPause", e);
+        }
     }
 
     public void onResume()
     {
         super.onResume();
 
-        if(mAdapter != null)
-            mAdapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray);
+        try
+        {
+            if(mAdapter != null)
+                mAdapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onResume", e);
+        }
     }
 
     public void onNewIntent(Intent intent)
     {
-        Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        WriteTag(tagFromIntent);
+        try
+        {
+            Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            WriteTag(tagFromIntent);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "onNewIntent", e);
+        }
     }
 
 
@@ -185,70 +240,77 @@ public class WriteNFCActivity extends FragmentActivity
         {
             public void handleMessage(Message msg)
             {
-                if(msg.what == SERVER_IO_FAILURE)
+                try
                 {
-                    Toast.makeText(WriteNFCActivity.this, "There was an error communicating with the Zenoss Server", Toast.LENGTH_LONG).show();
-                    Intent in = new Intent();
-                    setResult(SERVER_IO_FAILURE,in);
-                    finish();
-                }
-                if(msg.what == SERVER_IO_FAILURE)
-                {
-                    Toast.makeText(WriteNFCActivity.this, "The Device UID is too large to write to the tag.", Toast.LENGTH_LONG).show();
-                    Intent in = new Intent();
-                    setResult(SERVER_IO_FAILURE,in);
-                    finish();
-                }
-                else if(msg.what == READY)
-                {
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyFirst);
-                }
-                else if(msg.what == TAG_IO_IN_PROGRESS)
-                {
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_working);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.VISIBLE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.GONE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagIOWait);
+                    if(msg.what == SERVER_IO_FAILURE)
+                    {
+                        Toast.makeText(WriteNFCActivity.this, "There was an error communicating with the Zenoss Server", Toast.LENGTH_LONG).show();
+                        Intent in = new Intent();
+                        setResult(SERVER_IO_FAILURE,in);
+                        finish();
+                    }
+                    if(msg.what == SERVER_IO_FAILURE)
+                    {
+                        Toast.makeText(WriteNFCActivity.this, "The Device UID is too large to write to the tag.", Toast.LENGTH_LONG).show();
+                        Intent in = new Intent();
+                        setResult(SERVER_IO_FAILURE,in);
+                        finish();
+                    }
+                    else if(msg.what == READY)
+                    {
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyFirst);
+                    }
+                    else if(msg.what == TAG_IO_IN_PROGRESS)
+                    {
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_working);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.VISIBLE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.GONE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagIOWait);
 
-                }
-                else if(msg.what == WRITE_SUCCESS)
-                {
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
+                    }
+                    else if(msg.what == WRITE_SUCCESS)
+                    {
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
 
-                    Toast.makeText(WriteNFCActivity.this, "Tag Written successfully!", Toast.LENGTH_LONG).show();
-                    Intent in = new Intent();
-                    setResult(0,in);
-                    finish();
+                        Toast.makeText(WriteNFCActivity.this, "Tag Written successfully!", Toast.LENGTH_LONG).show();
+                        Intent in = new Intent();
+                        setResult(0,in);
+                        finish();
+                    }
+                    else if(msg.what == READONLY)
+                    {
+                        Toast.makeText(WriteNFCActivity.this, "That tag was Read Only and couldn't be written too", Toast.LENGTH_LONG).show();
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
+                    }
+                    else if(msg.what == FORMATEXCEPTION)
+                    {
+                        Toast.makeText(WriteNFCActivity.this, "There was an error trying to format that tag", Toast.LENGTH_LONG).show();
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
+                    }
+                    else if(msg.what == IOEXCEPTION)
+                    {
+                        Toast.makeText(WriteNFCActivity.this, "AN I/O Error was encountered\n(Did you move the tag away before it was finished writing?)", Toast.LENGTH_LONG).show();
+                        ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
+                        ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
+                        ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
+                    }
                 }
-                else if(msg.what == READONLY)
+                catch (Exception e)
                 {
-                    Toast.makeText(WriteNFCActivity.this, "That tag was Read Only and couldn't be written too", Toast.LENGTH_LONG).show();
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
-                }
-                else if(msg.what == FORMATEXCEPTION)
-                {
-                    Toast.makeText(WriteNFCActivity.this, "There was an error trying to format that tag", Toast.LENGTH_LONG).show();
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
-                }
-                else if(msg.what == IOEXCEPTION)
-                {
-                    Toast.makeText(WriteNFCActivity.this, "AN I/O Error was encountered\n(Did you move the tag away before it was finished writing?)", Toast.LENGTH_LONG).show();
-                    ((RelativeLayout) findViewById(R.id.WriteTagIndicator)).setBackgroundResource(R.drawable.writetag_ready);
-                    ((ProgressBar) findViewById(R.id.IOProgressBar)).setVisibility(View.GONE);
-                    ((ImageView) findViewById(R.id.instructionImage)).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.IODesc)).setText(R.string.TagReadyNext);
+                    BugSenseHandler.sendExceptionMessage("WriteNFCActivity", "tagHandler handleMessage", e);
                 }
             }
         };
@@ -281,9 +343,10 @@ public class WriteNFCActivity extends FragmentActivity
 
                 if(null == thisNdef)
                 {
-                    NdefFormatable formatter = NdefFormatable.get(receivedTag);
+                    NdefFormatable formatter = null;
                     try
                     {
+                        formatter = NdefFormatable.get(receivedTag);
                         formatter.connect();
                         formatter.format( new NdefMessage(new NdefRecord[]{NdefRecord.createApplicationRecord("io.d0")}));
                         formatter.close();
@@ -310,27 +373,24 @@ public class WriteNFCActivity extends FragmentActivity
 
                     if(thisNdef.isWritable())
                     {
-                            //Final Tag Payload;
-                            //Log.i("WriteTag-Payload", tagMetaData.toString());
-
-                            //Is this a 203 or larger?
-                            if(thisNdef.getMaxSize() < aaRecord.toByteArray().length + idRecord.toByteArray().length)
-                            {
-                                /*Log.i("WriteTag","This tag was too big. tried to write " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());
-                                idRecord = NdefRecord.createMime("text/plain", Integer.toString(tagMetaData.getInt("i")).getBytes(Charset.forName("US-ASCII")));
-                                Log.i("WriteTag Size Check", "Writing " + (idRecord.toByteArray().length + aaRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());*/
-                                tagHandler.sendEmptyMessage(SIZE_ERROR);
-                            }
-                            else
-                            {
-                                //Log.i("WriteTag Size Check", "Writing " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());
-                                NdefMessage tagMsg = new NdefMessage(new NdefRecord[]{idRecord,aaRecord});
-                                //Log.i("WriteTag Size Check", "Wrote " + tagMsg.getByteArrayLength());
-                                thisNdef.writeNdefMessage(tagMsg);
-                                thisNdef.makeReadOnly();
-                                thisNdef.close();
-                                tagHandler.sendEmptyMessage(WRITE_SUCCESS);
-                            }
+                        //Is this a 203 or larger?
+                        if(thisNdef.getMaxSize() < aaRecord.toByteArray().length + idRecord.toByteArray().length)
+                        {
+                            /*Log.i("WriteTag","This tag was too big. tried to write " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());
+                            idRecord = NdefRecord.createMime("text/plain", Integer.toString(tagMetaData.getInt("i")).getBytes(Charset.forName("US-ASCII")));
+                            Log.i("WriteTag Size Check", "Writing " + (idRecord.toByteArray().length + aaRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());*/
+                            tagHandler.sendEmptyMessage(SIZE_ERROR);
+                        }
+                        else
+                        {
+                            //Log.i("WriteTag Size Check", "Writing " + (aaRecord.toByteArray().length + idRecord.toByteArray().length) + " to " + thisNdef.getMaxSize());
+                            NdefMessage tagMsg = new NdefMessage(new NdefRecord[]{idRecord,aaRecord});
+                            //Log.i("WriteTag Size Check", "Wrote " + tagMsg.getByteArrayLength());
+                            thisNdef.writeNdefMessage(tagMsg);
+                            thisNdef.makeReadOnly();
+                            thisNdef.close();
+                            tagHandler.sendEmptyMessage(WRITE_SUCCESS);
+                        }
                     }
                     else
                     {

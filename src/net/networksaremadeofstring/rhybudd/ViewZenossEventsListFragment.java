@@ -101,14 +101,29 @@ public class ViewZenossEventsListFragment extends ListFragment
 
     public void onItemAcknowledged(int position)
     {
-        listOfZenossEvents.get(position).setAcknowledged();
-        adapter.notifyDataSetChanged();
+        try
+        {
+            listOfZenossEvents.get(position).setAcknowledged();
+            adapter.notifyDataSetChanged();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","onItemAcknowledged",e);
+        }
+
     }
 
     public void setInProgress(int position)
     {
-        listOfZenossEvents.get(position).setProgress(true);
-        adapter.notifyDataSetChanged();
+        try
+        {
+            listOfZenossEvents.get(position).setProgress(true);
+            adapter.notifyDataSetChanged();
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","setInProgress",e);
+        }
     }
 
     public void acknowledgeSingleEvent(final int position)
