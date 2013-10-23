@@ -94,6 +94,8 @@ public class ZenossPoller extends Service
     public void PrepAPI(Boolean Login, Boolean inThread)
     {
             //There are some minor differences here
+        if(null != settings)
+        {
             if(settings.getBoolean(ZenossAPI.PREFERENCE_IS_ZAAS,false))
             {
                 //Log.e("PrepAPI","Am ZAAS");
@@ -104,7 +106,12 @@ public class ZenossPoller extends Service
                 //Log.e("PrepAPI","Am not ZAAS");
                 API = new ZenossAPICore();
             }
-
+        }
+        else
+        {
+            //Screw it
+            API = new ZenossAPICore();
+        }
 
         if(Login)
         {

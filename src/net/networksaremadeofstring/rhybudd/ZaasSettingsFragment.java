@@ -157,19 +157,26 @@ public class ZaasSettingsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        dialog = new ProgressDialog(getActivity());
-        dialog.setTitle("");
-        dialog.setMessage("Checking Details.....");
-        dialog.setCancelable(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface)
-            {
-                Intent in = new Intent();
-                getActivity().setResult(2,in);
-                getActivity().finish();
-            }
-        });
+        try
+        {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setTitle("");
+            dialog.setMessage("Checking Details.....");
+            dialog.setCancelable(true);
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface)
+                {
+                    Intent in = new Intent();
+                    getActivity().setResult(2,in);
+                    getActivity().finish();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "onCreate", e);
+        }
 
         settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -221,45 +228,62 @@ public class ZaasSettingsFragment extends Fragment
                         BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","Dismissing dialog in msg_caching_complete",e);
                     }
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
-                            .setTitle("Extra Configuration")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    ((FirstRunSettings) getActivity()).setPushTab(2);
-                                    alertDialog.cancel();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    alertDialog.cancel();
-                                    Intent in = new Intent();
-                                    in.putExtra("forceRefresh",true);
-                                    getActivity().setResult(1,in);
-                                    getActivity().finish();
-                                }
-                            });
-                    alertDialog = builder.create();
-                    alertDialog.show();
+                    try
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
+                                .setTitle("Extra Configuration")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        ((FirstRunSettings) getActivity()).setPushTab(2);
+                                        alertDialog.cancel();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        alertDialog.cancel();
+                                        Intent in = new Intent();
+                                        in.putExtra("forceRefresh",true);
+                                        getActivity().setResult(1,in);
+                                        getActivity().finish();
+                                    }
+                                });
+                        alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "handler", e);
+                    }
 
                 }
                 else if(msg.what == RhybuddHandlers.msg_caching_complete)
                 {
-                    dialog.setMessage("Caching complete!\r\nVerifying.");
+                    try
+                    {
+                        dialog.setMessage("Caching complete!\r\nVerifying.");
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "handler msg_caching_complete", e);
+                    }
                 }
                 else if(msg.what == RhybuddHandlers.msg_initial_verify_debug_output)
                 {
-                    //EditText debugOutput = (EditText) getActivity().findViewById(R.id.debugOutput);
-
-                    debugOutput.setText(debugOutput.getText() + s.format(new Date()) + " " + msg.getData().getString(ZenossAPI.MSG_DEBUG) + "\r\n");
+                    try
+                    {
+                        debugOutput.setText(debugOutput.getText() + s.format(new Date()) + " " + msg.getData().getString(ZenossAPI.MSG_DEBUG) + "\r\n");
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment", "handler msg_initial_verify_debug_output", e);
+                    }
                 }
                 else if(msg.what == RhybuddHandlers.msg_initial_verify_error)
                 {
-                    //((TextView) getActivity().findViewById(R.id.debugOutput)).setText(msg.getData().getString("exception") + "\n");
-
                     try
                     {
                         dialog.dismiss();
@@ -280,8 +304,15 @@ public class ZaasSettingsFragment extends Fragment
                     }
                     catch(Exception e)
                     {
-                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","Displaying toast with error message",e);
-                        Toast.makeText(getActivity(), "An unknown error occured. It has been reported.", Toast.LENGTH_SHORT).show();
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","setting debug",e);
+                        try
+                        {
+                            Toast.makeText(getActivity(), "An unknown error occured. It has been reported.", Toast.LENGTH_SHORT).show();
+                        }
+                        catch (Exception e1)
+                        {
+                            BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","Displaying toast with error message",e1);
+                        }
                     }
                 }
                 else
@@ -296,8 +327,15 @@ public class ZaasSettingsFragment extends Fragment
                         BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","Dismissing dialog in final handler else",e);
                     }
 
-                    Toast.makeText(getActivity(), "Login Failed - Please check details.", Toast.LENGTH_SHORT).show();
-                    debugOutput.setVisibility(View.VISIBLE);
+                    try
+                    {
+                        Toast.makeText(getActivity(), "Login Failed - Please check details.", Toast.LENGTH_SHORT).show();
+                        debugOutput.setVisibility(View.VISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("ZaasSettingsFragment","setting debug",e);
+                    }
                 }
             }
         };

@@ -74,19 +74,34 @@ public class ZenossEventsAdaptor extends BaseAdapter
     
     public void remove(int position)
     {
-        listZenossEvents.remove(position);
+        if(null != listZenossEvents)
+            listZenossEvents.remove(position);
     }
 
     @Override
 	public int getCount() 
     {
-    	 return listZenossEvents.size();
+        if(null != listZenossEvents)
+        {
+    	    return listZenossEvents.size();
+        }
+        else
+        {
+            return 0;
+        }
 	}
     
 	@Override
 	public Object getItem(int position) 
 	{
-		return listZenossEvents.get(position);
+        if(null != listZenossEvents)
+        {
+		    return listZenossEvents.get(position);
+        }
+        else
+        {
+            return null;
+        }
 	}
 	
 	@Override
