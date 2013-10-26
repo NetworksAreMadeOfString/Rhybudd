@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Diagnostic output will appear here..."
+                android:text="@string/DiagnosticOutputHint"
                 android:id="@+id/DiagOutput"
                 android:layout_below="@+id/ExplainText"
                 android:layout_alignParentLeft="true"
@@ -65,7 +65,7 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Start Diagnostics"
+        android:text="@string/DiagnosticButton"
         android:id="@+id/StartDiagButton"/>
 </LinearLayout>
 

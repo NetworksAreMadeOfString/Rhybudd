@@ -34,8 +34,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 
-import org.apache.http.cookie.CookieAttributeHandler;
-
 public class AddDeviceFragment extends Fragment
 {
     public static final String TWOPANEINDICATOR = "twopane";

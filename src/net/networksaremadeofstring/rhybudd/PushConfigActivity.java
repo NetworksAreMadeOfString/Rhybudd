@@ -29,10 +29,18 @@ public class PushConfigActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_push_config);
-        getActionBar().setTitle(getString(R.string.PushCategoryTitle));
-        getActionBar().setSubtitle(getString(R.string.PushSubtitle));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+
+        try
+        {
+            getActionBar().setTitle(getString(R.string.PushCategoryTitle));
+            getActionBar().setSubtitle(getString(R.string.PushSubtitle));
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+
+        }
     }
 
     @Override

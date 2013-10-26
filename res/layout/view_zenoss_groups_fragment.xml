@@ -8,4 +8,4 @@
     android:numColumns="@integer/GridColumns"
     android:stretchMode="columnWidth"
     android:gravity="center"
-    android:background="@color/ZaasDarkGray"></GridView>
+    android:background="@color/ZaasDarkGray"/>

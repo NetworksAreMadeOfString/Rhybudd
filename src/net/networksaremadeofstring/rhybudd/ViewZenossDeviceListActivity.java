@@ -20,6 +20,10 @@ package net.networksaremadeofstring.rhybudd;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -28,14 +32,18 @@ import android.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import java.util.ArrayList;
 
+import static android.nfc.NdefRecord.createMime;
 
-public class ViewZenossDeviceListActivity extends FragmentActivity implements ViewZenossDeviceListFragment.Callbacks
+
+public class ViewZenossDeviceListActivity extends FragmentActivity implements ViewZenossDeviceListFragment.Callbacks, NfcAdapter.CreateNdefMessageCallback
 {
     private boolean mTwoPane;
     String selectedDevice = "";
     String selectedUID = "";
     final static int LAUNCHDETAILACTIVITY = 2;
     ActionBar ab;
+    NfcAdapter mNfcAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -45,6 +53,22 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
 
         setContentView(R.layout.view_zenoss_device_list);
 
+
+        try
+        {
+            // Check for available NFC Adapter
+            mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+            if (null != mNfcAdapter)
+            {
+                // Register callback
+                mNfcAdapter.setNdefPushMessageCallback(this, this);
+            }
+        }
+        catch(Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("ViewZenossDevice", "NFC", e);
+        }
 
         ab = getActionBar();
         ab.setTitle("Rhybudd");
@@ -66,6 +90,31 @@ public class ViewZenossDeviceListActivity extends FragmentActivity implements Vi
             }
         }
      }
+
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent)
+    {
+        try
+        {
+            String UID = selectedUID.replace("/zport/dmd/Devices/","");
+
+            //UID = DeviceIDs.get(mViewPager.getCurrentItem());
+
+            NdefMessage msg = new NdefMessage(
+                    new NdefRecord[] { createMime(
+                            "application/vnd.net.networksaremadeofstring.rhybudd.devicepage", UID.getBytes())
+                            //,NdefRecord.createApplicationRecord("com.example.android.beam")
+                    });
+            return msg;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            BugSenseHandler.sendExceptionMessage("ViewZenossDeviceActivity","processIntent",e);
+            return null;
+        }
+    }
 
     /*@Override
     public void onItemSelected(ZenossDevice ZenossDevice)*/

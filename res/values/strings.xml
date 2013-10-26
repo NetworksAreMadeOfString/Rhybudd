@@ -49,7 +49,8 @@
     <string name="PushZPDevRegStatus">Registered with ZenPack</string>
     <string name="PushZPErrorNoZP">The ZenPacks.rhybudd.alerts ZenPack is not installed on your Server. Please install the ZenPack then try again.</string>
     <string name="PushZPNoHost">It appears there was an issue resolving the Zenoss Host name (this is not guaranteed to be the exact error)</string>
-
+    <string name="PushVersion">Version</string>
+    <string name="PushEnable">Enable</string>
 
 
     <string name="mangeDatabaseTitle">Manage Cache</string>
@@ -80,8 +81,10 @@
     
     <string name="deviceIDLabel">Device ID</string>
     <string name="uptimeLabel">Uptime</string>
+    <string name="uptimeLabelUnknown">Uptime: Unknown</string>
     <string name="deviceDetailsLastChange">Last Change</string>
     <string name="deviceDetailsModelTime">Model Time</string>
+    <string name="deviceDetailsLastCollected">Last Collected: Unknown</string>
     <string name="deviceDetailsMemorySwap">Memory / Swap</string>
     <string name="deviceDetailsTitle">Device Details</string>
     <string name="deviceDetailsOSModelLabel">OS Modeling:</string>
@@ -93,6 +96,7 @@
     <string name="deviceDetailsSNMPLocation">SNMP Location</string>
     <string name="deviceDetailsSNMPContact">SNMP Contact</string>
     <string name="deviceDetailsEventsTitle">Events</string>
+    <string name="deviceDetailsSNMPAgent">SNMP Agent</string>
 
     <!-- Event List -->
     <string name="EventListWelcomeTitle">Events Dashboard</string>
@@ -106,7 +110,7 @@
     <string name="eventDetailsSummaryLabel">Summary:</string>
     <string name="eventDetailsFirstSeenLabel">First Seen:</string>
     <string name="eventDetailslastSeenLabel">Last Seen:</string>
-    
+    <string name="Acknowledge">Acknowledge</string>
     <string name="eventDetailsEventCountLabel">Event Count:</string>
     <string name="eventDetailsAgentLabel">Agent:</string>
     <string name="eventDetailsLogLabel">Log:</string>
@@ -184,6 +188,8 @@
     <string name="AddDeviceTitle">Add a Device to Zenoss</string>
     <string name="AddDeviceButton">Add Device</string>
     <string name="CancelButton">Cancel</string>
+    <string name="AddDeviceFQDNHint">FQDN or IP</string>
+    <string name="AddDeviceTitleHint">Title</string>
 
     <string-array name="device_class">
         <item>/</item>
@@ -250,5 +256,8 @@
 
     <string name="DeviceFooterText">New Devices can be added from the Actionbar</string>
 
+    <!-- Diagnostics -->
     <string name="DiagnosticAdvice">If you are having trouble with Rhybudd this should show where the problem is.\n\nPlease ensure you read any output (e.g. user names and URLs) fully before raising a bug report.\n\nThe debug output supports long press to select and copy.</string>
+    <string name="DiagnosticOutputHint">Diagnostic output will appear here...</string>
+    <string name="DiagnosticButton">Start Diagnostics</string>
 </resources>

@@ -34,12 +34,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.widget.Toast;
-
 import com.bugsense.trace.BugSenseHandler;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static android.nfc.NdefRecord.createMime;
 
 
@@ -199,12 +196,15 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
 
             for(String str : DeviceIDs)
             {
+                //Log.e("PopularPager", "Comparing " + str + " to " + currentDeviceID + " (" + Integer.toString(currentIndex) + ")");
+
                 if(str.equals(currentDeviceID))
                 {
-                    currentIndex = i;
+                    //currentIndex = i;
                     break;
                 }
-                i++;
+
+                currentIndex++;
             }
 
             // Create the adapter that will return a fragment for each of the three
@@ -214,6 +214,8 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
             // Set up the ViewPager with the sections adapter.
             mViewPager = (ViewPager) findViewById(R.id.pager);
             mViewPager.setAdapter(mSectionsPagerAdapter);
+
+            //Log.e("PopularPager", "Setting current index to " + Integer.toString(currentIndex));
             mViewPager.setCurrentItem(currentIndex);
         }
         catch (Exception e)
@@ -248,7 +250,16 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
     {
         try
         {
-            String UID = currentDeviceID.replace("/zport/dmd/Devices/","");
+            //String UID = currentDeviceID.replace("/zport/dmd/Devices/","");
+
+            int item = 0;
+            if(mViewPager.getCurrentItem() > 0)
+                item = mViewPager.getCurrentItem();
+
+            String UID = DeviceIDs.get(item).replace("/zport/dmd/Devices/","");
+
+            //Log.e("createNdefMessage",UID);
+
             NdefMessage msg = new NdefMessage(
                     new NdefRecord[] { createMime(
                             "application/vnd.net.networksaremadeofstring.rhybudd.devicepage", UID.getBytes())
@@ -288,6 +299,7 @@ public class ViewZenossDeviceActivity extends FragmentActivity implements NfcAda
                 }*/
 
                 currentDeviceID = "/zport/dmd/Devices/" + new String(msg.getRecords()[0].getPayload());
+
             }
         }
         catch (Exception e)

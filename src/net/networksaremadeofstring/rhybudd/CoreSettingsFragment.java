@@ -89,7 +89,14 @@ public class CoreSettingsFragment extends Fragment
             {
                 dialog.show();
 
-                UpdateDebugMessage("Starting Login Process");
+                try
+                {
+                    UpdateDebugMessage("Starting Login Process");
+                }
+                catch (Exception e)
+                {
+                    BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreateView",e);
+                }
 
                 ((Thread) new Thread(){
                     public void run()
@@ -128,17 +135,24 @@ public class CoreSettingsFragment extends Fragment
                         }
                         catch(Exception e)
                         {
-                            e.printStackTrace();
-                            //HandleException(e, "Initialising the API Failed. An error message has been logged.");
-                            if(null != e.getMessage())
+                            BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Login",e);
+
+                            try
                             {
-                                UpdateDebugMessage(e.getMessage() + " " + e.getLocalizedMessage().toString() + " " + e.toString());
+                                if(null != e.getMessage())
+                                {
+                                    UpdateDebugMessage(e.getMessage() + " " + e.getLocalizedMessage().toString() + " " + e.toString());
+                                }
+                                else
+                                {
+                                    UpdateDebugMessage(e.getLocalizedMessage() + " " + e.toString());
+                                }
+                                handler.sendEmptyMessage(RhybuddHandlers.msg_initial_verify_error);
                             }
-                            else
+                            catch (Exception e2)
                             {
-                                UpdateDebugMessage(e.getLocalizedMessage() + " " + e.toString());
+                                BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Login",e2);
                             }
-                            handler.sendEmptyMessage(RhybuddHandlers.msg_initial_verify_error);
                         }
                     }}).start();
         }
@@ -152,21 +166,35 @@ public class CoreSettingsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        dialog = new ProgressDialog(getActivity());
-        dialog.setTitle("");
-        dialog.setMessage("Checking Details.....");
-        dialog.setCancelable(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface)
-            {
-                Intent in = new Intent();
-                getActivity().setResult(2,in);
-                getActivity().finish();
-            }
-        });
+        try
+        {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setTitle("");
+            dialog.setMessage("Checking Details.....");
+            dialog.setCancelable(true);
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface)
+                {
+                    Intent in = new Intent();
+                    getActivity().setResult(2,in);
+                    getActivity().finish();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+        }
 
-        settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        try
+        {
+            settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+        }
 
         handler = new Handler()
         {
@@ -174,9 +202,12 @@ public class CoreSettingsFragment extends Fragment
             {
                 if(msg.what == RhybuddHandlers.msg_initial_login_successful && API != null)// && API.getLoggedInStatus() == true
                 {
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putBoolean("credentialsSuccess", true);
-                    editor.commit();
+                    if(null != settings)
+                    {
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putBoolean("credentialsSuccess", true);
+                        editor.commit();
+                    }
 
                     try
                     {
@@ -201,7 +232,14 @@ public class CoreSettingsFragment extends Fragment
                 }
                 else if(msg.what == RhybuddHandlers.msg_events_cached)
                 {
-                    dialog.setMessage("Events Cached! Now caching Devices.\r\nPlease wait...");
+                    try
+                    {
+                        dialog.setMessage("Events Cached! Now caching Devices.\r\nPlease wait...");
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+                    }
                 }
                 else if (msg.what == RhybuddHandlers.msg_caching_complete)
                 {
@@ -214,34 +252,50 @@ public class CoreSettingsFragment extends Fragment
                         //Not much else we can do here :/
                         BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","Dismissing dialog in msg_caching_complete",e);
                     }
+                    String pushKey = "";
 
-                    String pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_PUSHKEY, "");
+                    try
+                    {
+                        pushKey = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(ZenossAPI.PREFERENCE_PUSHKEY, "");
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+                        pushKey = "";
+                    }
 
                     if(pushKey.equals(""))
                     {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
-                                .setTitle("Extra Configuration")
-                                .setCancelable(false)
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        ((FirstRunSettings) getActivity()).setPushTab(2);
-                                        alertDialog.cancel();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        alertDialog.cancel();
-                                        Intent in = new Intent();
-                                        in.putExtra("forceRefresh",true);
-                                        getActivity().setResult(1,in);
-                                        getActivity().finish();
-                                    }
-                                });
-                        alertDialog = builder.create();
-                        alertDialog.show();
+                        try
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setMessage("Would you like to configure Rhybudd Push to enable instant alert delivery?")
+                                    .setTitle("Extra Configuration")
+                                    .setCancelable(false)
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id)
+                                        {
+                                            ((FirstRunSettings) getActivity()).setPushTab(2);
+                                            alertDialog.cancel();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id)
+                                        {
+                                            alertDialog.cancel();
+                                            Intent in = new Intent();
+                                            in.putExtra("forceRefresh",true);
+                                            getActivity().setResult(1,in);
+                                            getActivity().finish();
+                                        }
+                                    });
+                            alertDialog = builder.create();
+                            alertDialog.show();
+                        }
+                        catch (Exception e)
+                        {
+                            BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+                        }
                     }
                     else
                     {
@@ -253,7 +307,14 @@ public class CoreSettingsFragment extends Fragment
                 }
                 else if(msg.what == RhybuddHandlers.msg_caching_complete)
                 {
-                    dialog.setMessage("Caching complete!\r\nVerifying.");
+                    try
+                    {
+                        dialog.setMessage("Caching complete!\r\nVerifying.");
+                    }
+                    catch (Exception e)
+                    {
+                        BugSenseHandler.sendExceptionMessage("CoreSettingsFragment","onCreate",e);
+                    }
                 }
                 else if(msg.what == RhybuddHandlers.msg_initial_verify_debug_output)
                 {

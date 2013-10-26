@@ -57,7 +57,6 @@
                     android:id="@+id/loadAverageGraph"
                     android:layout_width="@dimen/DeviceGraphWidth"
                     android:layout_height="@dimen/DeviceGraphHeight"
-                    android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="fitStart"
                     android:paddingLeft="@dimen/DeviceGraphPadding" />
@@ -66,8 +65,6 @@
                     android:id="@+id/CPUGraph"
                     android:layout_width="@dimen/DeviceGraphWidth"
                     android:layout_height="@dimen/DeviceGraphHeight"
-                    android:layout_below="@+id/loadAverageGraph"
-                    android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="fitStart"
                     android:paddingLeft="@dimen/DeviceGraphPadding"/>
@@ -76,8 +73,6 @@
                     android:id="@+id/MemoryGraph"
                     android:layout_width="@dimen/DeviceGraphWidth"
                     android:layout_height="@dimen/DeviceGraphHeight"
-                    android:layout_below="@+id/CPUGraph"
-                    android:layout_centerHorizontal="true"
                     android:src="@drawable/graph"
                     android:scaleType="fitStart"
                     android:paddingLeft="@dimen/DeviceGraphPadding"
@@ -98,14 +93,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="SNMP Location"
+                android:text="@string/deviceDetailsSNMPLocation"
                 android:id="@+id/snmpLocation"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="SNMP Agent"
+                android:text="@string/deviceDetailsSNMPAgent"
                 android:id="@+id/snmpAgent"
                 android:layout_below="@+id/snmpLocation"/>
 
@@ -113,7 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="SNMP Contact"
+                android:text="@string/deviceDetailsSNMPContact"
                 android:id="@+id/snmpContact"
                 android:layout_below="@+id/snmpAgent"/>
         </RelativeLayout>
@@ -122,7 +117,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Uptime: Unknown"
+            android:text="@string/uptimeLabelUnknown"
             android:id="@+id/uptime"
             android:padding="@dimen/DeviceDetailsPadding"
             android:layout_marginTop="8dp"
@@ -160,7 +155,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Last Collected: Unknown"
+            android:text="@string/deviceDetailsLastCollected"
             android:id="@+id/lastCollected"
             android:paddingLeft="@dimen/DeviceDetailsPadding"
             android:layout_marginTop="12dp"/>

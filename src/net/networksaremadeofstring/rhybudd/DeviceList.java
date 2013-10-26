@@ -82,8 +82,15 @@ public class DeviceList extends Activity
 	public void onAttachedToWindow() 
 	{
 		super.onAttachedToWindow();
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
+        try
+        {
+            Window window = getWindow();
+            window.setFormat(PixelFormat.RGBA_8888);
+        }
+        catch (Exception e)
+        {
+
+        }
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 <RelativeLayout android:id="@+id/relativeLayout1" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="fill_parent" android:layout_width="fill_parent">
-
+
+
 <ImageView
     android:id="@+id/graphCanvas"
     android:layout_width="290dp"
@@ -9,7 +10,12 @@
     android:src="@drawable/graph_placeholder" >
 
 </ImageView>
-
+
+
+
+
+
+
 <TextView
     android:id="@+id/Graphlabel"
     android:layout_width="wrap_content"
@@ -23,6 +29,6 @@
     android:text="@string/widget_GraphTitle"
     android:textAppearance="?android:attr/textAppearanceSmall"
     android:textColor="#FFFFFF"
-    android:textSize="12dp" />
+    android:textSize="12sp" />
 
 </RelativeLayout>

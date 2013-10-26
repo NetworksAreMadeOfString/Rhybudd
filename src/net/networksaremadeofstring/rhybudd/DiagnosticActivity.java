@@ -63,10 +63,17 @@ public class DiagnosticActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diagnostics);
-        getActionBar().setTitle("Diagnostics App");
-        getActionBar().setSubtitle("Helps to pin point any problems getting events");
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        try
+        {
+            getActionBar().setTitle("Diagnostics App");
+            getActionBar().setSubtitle("Helps to pin point any problems getting events");
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
+        catch (Exception e)
+        {
+
+        }
 
         DiagnosticOutput = (TextView) findViewById(R.id.DiagOutput);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -97,16 +104,26 @@ public class DiagnosticActivity extends FragmentActivity
 
                 if(msg.what == DIAGNOSTIC_PRE)
                 {
-                    if(progressBar.getSecondaryProgress() < 20)
+                    try
                     {
-                        progressBar.setSecondaryProgress((progressBar.getSecondaryProgress() + 1));
+                        if(progressBar.getSecondaryProgress() < 20)
+                            progressBar.setSecondaryProgress((progressBar.getSecondaryProgress() + 1));
+                    }
+                    catch (Exception e)
+                    {
+
                     }
                 }
                 else if(msg.what == DIAGNOSTIC_SUCCESS)
                 {
-                    if(progressBar.getProgress() < 20)
+                    try
                     {
-                        progressBar.setProgress((progressBar.getProgress() + 1));
+                        if(progressBar.getProgress() < 20)
+                            progressBar.setProgress((progressBar.getProgress() + 1));
+                    }
+                    catch (Exception e)
+                    {
+
                     }
                 }
                 else if(msg.what == DIAGNOSTIC_FAILURE)
@@ -135,9 +152,9 @@ public class DiagnosticActivity extends FragmentActivity
                         e.printStackTrace();
                     }
 
-                    Toast.makeText(DiagnosticActivity.this,"Diagnostics Complete!",Toast.LENGTH_SHORT);
                     try
                     {
+                        Toast.makeText(DiagnosticActivity.this,"Diagnostics Complete!",Toast.LENGTH_SHORT);
                         findViewById(R.id.StartDiagButton).setEnabled(true);
                     }
                     catch (Exception e)
@@ -150,7 +167,14 @@ public class DiagnosticActivity extends FragmentActivity
                     //Not much else
                 }
 
-                progressBar.invalidate();
+                try
+                {
+                    progressBar.invalidate();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         };
     }

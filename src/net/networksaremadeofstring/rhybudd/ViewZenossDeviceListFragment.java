@@ -24,26 +24,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bugsense.trace.BugSenseHandler;
-
-import org.apache.http.conn.ConnectTimeoutException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -346,7 +337,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
                         }
                     }*/
 
-                    if (null == mService && !mBound)
+                    if (null == mService || !mBound)
                     {
                         //Log.e("Refresh","Service was dead or something so sleeping");
                         try
@@ -359,9 +350,9 @@ public class ViewZenossDeviceListFragment extends ListFragment
                         }
                     }
 
-                    if (null == mService && !mBound)
+                    if (null == mService || !mBound)
                     {
-                        bundle.putString("exception","There was an error binding to the Rhybudd internal service to query the API");
+                        bundle.putString("exception","There was an error binding to the Rhybudd internal service to query the API. Try pressing refresh.");
                         msg.setData(bundle);
                         msg.what = 0;
                         handler.sendMessage(msg);
@@ -395,6 +386,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
                         }
                         catch(Exception e)
                         {
+                            e.printStackTrace();
                             if(e.getMessage() != null)
                                 MessageExtra = e.getMessage();
 
@@ -615,7 +607,9 @@ public class ViewZenossDeviceListFragment extends ListFragment
         //If it's been more than 15 minutes since we last updated we should do a full refresh
         try
         {
-            if(ZenossAPI.shouldRefresh(getActivity()))
+            //We always get from the DB first
+            DBGetThread();
+            /*if(ZenossAPI.shouldRefresh(getActivity()))
             {
                 //Log.i("onResume","shouldRefresh() says we should do a full refresh");
                 Refresh();
@@ -624,7 +618,7 @@ public class ViewZenossDeviceListFragment extends ListFragment
             {
                 //Log.i("onResume","shouldRefresh() says we're good to do a DB fetch");
                 DBGetThread();
-            }
+            }*/
         }
         catch (Exception e)
         {

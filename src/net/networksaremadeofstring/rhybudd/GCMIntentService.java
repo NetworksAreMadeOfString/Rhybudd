@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -260,7 +259,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
     @Override
     protected void onUnregistered(final Context arg0, String arg1)
     {
-       Log.e("GCMIntentService", "onUnregistered");
+       //Log.e("GCMIntentService", "onUnregistered");
 
         ((Thread) new Thread(){
             public void run()

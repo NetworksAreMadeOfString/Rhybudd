@@ -2,6 +2,6 @@
 <account-authenticator
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:accountType="zenoss.com"
-        android:icon="@drawable/icon"
-        android:smallIcon="@drawable/icon"
+        android:icon="@drawable/ic_launcher"
+        android:smallIcon="@drawable/ic_launcher"
         android:label="@string/SyncAccountName"/>

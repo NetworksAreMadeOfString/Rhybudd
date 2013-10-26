@@ -76,6 +76,8 @@ public class ZenossDeviceAdaptor extends BaseAdapter
 	{
         //if(null == listZenossDevices)
         //    return null;
+        if(null == listZenossDevices || listZenossDevices.size() < position)
+            return null;
 
 		ZenossDevice Device = listZenossDevices.get(position);
         if (convertView == null) 

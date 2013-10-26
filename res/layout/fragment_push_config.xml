@@ -153,7 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Version"
+                android:text="@string/PushVersion"
                 android:id="@+id/ZenPackVersionLabel"
                 android:layout_marginRight="30dp"/>
 
@@ -168,7 +168,7 @@
     <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enable"
+            android:text="@string/PushEnable"
             android:id="@+id/PushEnabledSwitch"
             android:layout_below="@+id/ZenPackVersionContainer"
             android:layout_alignRight="@+id/ZenPackVersionContainer"

@@ -22,7 +22,6 @@ package net.networksaremadeofstring.rhybudd;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.view.MenuItem;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;

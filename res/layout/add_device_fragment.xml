@@ -36,7 +36,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:hint="FQDN or IP"
+        android:hint="@string/AddDeviceFQDNHint"
         android:layout_margin="16dp"/>
 
     <EditText
@@ -46,7 +46,7 @@
         android:layout_below="@+id/FQDN"
         android:layout_alignLeft="@+id/FQDN"
         android:layout_alignRight="@+id/FQDN"
-        android:hint="Title"
+        android:hint="@string/AddDeviceTitleHint"
         android:layout_marginBottom="16dp"/>
 
     <LinearLayout

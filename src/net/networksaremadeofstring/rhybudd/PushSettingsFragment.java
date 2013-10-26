@@ -33,6 +33,7 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -545,7 +546,7 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
 
                     if(null != zp && zp.Installed)
                     {
-                        //Log.e("ZP",zp.SenderID);
+                        //Log.e("ZP", zp.SenderID);
 
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                         editor.putString(ZenossAPI.PREFERENCE_PUSH_SENDERID, zp.SenderID);
@@ -602,8 +603,11 @@ public class PushSettingsFragment extends Fragment implements NfcAdapter.CreateN
             {
                 try
                 {
-                    progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-                    progressbar.setVisibility(View.GONE);
+                    if(null != progressbar)
+                    {
+                        progressbar.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+                        progressbar.setVisibility(View.GONE);
+                    }
                 }
                 catch (NullPointerException npe)
                 {

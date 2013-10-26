@@ -347,7 +347,7 @@ public class ZenossAPI
                         {
                             zp.SenderID = json.getJSONObject("result").getJSONObject("data").getString("senderid");
 
-                            if(zp.SenderID.equals(""))
+                            if(null == zp.SenderID || zp.SenderID.equals("") || zp.SenderID.equals("null"))
                                 zp.SenderID = ZenossAPI.SENDER_ID;
                         }
                         catch (Exception e)

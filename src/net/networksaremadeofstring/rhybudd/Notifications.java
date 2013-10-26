@@ -18,21 +18,19 @@
  */
 package net.networksaremadeofstring.rhybudd;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
-import android.util.Log;
-
 import java.util.Calendar;
 import java.util.List;
 
@@ -120,7 +118,7 @@ public class Notifications
         //We don't need to overwhelm the user with their notification sound / vibrator
         if((now.toMillis(true) - PreferenceManager.getDefaultSharedPreferences(context).getLong("lastCheck",now.toMillis(true))) < 3000)
         {
-            Log.e("SendGCMNotification", "Not publishing a notification due to stampede control");
+            //Log.e("SendGCMNotification", "Not publishing a notification due to stampede control");
             return;
         }
 
@@ -129,61 +127,96 @@ public class Notifications
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        Uri soundURI;
-        if(settings.getString("notificationSoundChoice", "").equals(""))
+        Uri soundURI = null;
+        try
         {
-            soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }
-        else
-        {
-            try
-            {
-                soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
-            }
-            catch(Exception e)
+            if(settings.getString("notificationSoundChoice", "").equals(""))
             {
                 soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             }
+            else
+            {
+                try
+                {
+                    soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
+                }
+                catch(Exception e)
+                {
+                    soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+
         }
 
         String notifTitle = "New Events Received";
         int notifPriority = Notification.PRIORITY_DEFAULT;
         //int AlertType = NOTIFICATION_GCM_GENERIC;
 
-        if(Event.getSeverity().equals("5"))
+        try
         {
-            notifTitle = context.getString(R.string.CriticalNotificationTitle);
-            notifPriority = Notification.PRIORITY_MAX;
-            //AlertType = NOTIFICATION_GCM_CRITICAL;
+            if(Event.getSeverity().equals("5"))
+            {
+                notifTitle = context.getString(R.string.CriticalNotificationTitle);
+                notifPriority = Notification.PRIORITY_MAX;
+                //AlertType = NOTIFICATION_GCM_CRITICAL;
+            }
+            else if(Event.getSeverity().equals("4"))
+            {
+                notifTitle = context.getString(R.string.ErrorNotificationTitle);
+                notifPriority = Notification.PRIORITY_HIGH;
+                //AlertType = NOTIFICATION_GCM_ERROR;
+            }
+            else if(Event.getSeverity().equals("3"))
+            {
+                notifTitle = context.getString(R.string.WarnNotificationTitle);
+                notifPriority = Notification.PRIORITY_DEFAULT;
+                //AlertType = NOTIFICATION_GCM_WARNING;
+            }
+            else if(Event.getSeverity().equals("2"))
+            {
+                notifTitle = context.getString(R.string.InfoNotificationTitle);
+                notifPriority = Notification.PRIORITY_LOW;
+                //AlertType = NOTIFICATION_GCM_INFO;
+            }
+            else if(Event.getSeverity().equals("1"))
+            {
+                notifTitle = context.getString(R.string.DebugNotificationTitle);
+                notifPriority = Notification.PRIORITY_MIN;
+                //AlertType = NOTIFICATION_GCM_DEBUG;
+            }
         }
-        else if(Event.getSeverity().equals("4"))
+        catch (Exception e)
         {
-            notifTitle = context.getString(R.string.ErrorNotificationTitle);
-            notifPriority = Notification.PRIORITY_HIGH;
-            //AlertType = NOTIFICATION_GCM_ERROR;
-        }
-        else if(Event.getSeverity().equals("3"))
-        {
-            notifTitle = context.getString(R.string.WarnNotificationTitle);
-            notifPriority = Notification.PRIORITY_DEFAULT;
-            //AlertType = NOTIFICATION_GCM_WARNING;
-        }
-        else if(Event.getSeverity().equals("2"))
-        {
-            notifTitle = context.getString(R.string.InfoNotificationTitle);
-            notifPriority = Notification.PRIORITY_LOW;
-            //AlertType = NOTIFICATION_GCM_INFO;
-        }
-        else if(Event.getSeverity().equals("1"))
-        {
-            notifTitle = context.getString(R.string.DebugNotificationTitle);
-            notifPriority = Notification.PRIORITY_MIN;
-            //AlertType = NOTIFICATION_GCM_DEBUG;
+
         }
 
-        Intent broadcastDownload = new Intent();
-        broadcastDownload.setAction(MassAcknowledgeReceiver.BROADCAST_ACTION);
-        PendingIntent pBroadcastDownload = PendingIntent.getBroadcast(context,0,broadcastDownload,0);
+        long[] vibrate = {0,100,200,300};
+
+        try
+        {
+            AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+            //Log.e("audio.getRingerMode()",Integer.toString(audio.getRingerMode()));
+            switch( audio.getRingerMode() )
+            {
+                case AudioManager.RINGER_MODE_SILENT:
+                    //Do nothing to fix GitHub issue #13
+                    //Log.e("AudioManager","Doing nothing because we are silent");
+                    vibrate = new long[] {0,0};
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Intent broadcastMassAck = new Intent();
+        broadcastMassAck.setAction(MassAcknowledgeReceiver.BROADCAST_ACTION);
+        PendingIntent pBroadcastMassAck = PendingIntent.getBroadcast(context,0,broadcastMassAck,0);
 
         if(Build.VERSION.SDK_INT >= 16)
         {
@@ -193,9 +226,10 @@ public class Notifications
                             .setPriority(notifPriority)
                             .setAutoCancel(true)
                             .setSound(soundURI)
+                            .setVibrate(vibrate)
                             .setContentText(Event.getDevice())
                             .setContentIntent(contentIntent)
-                            .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastDownload)
+                            .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastMassAck)
                             .setSmallIcon(R.drawable.ic_stat_alert))
                             .bigText(Event.getSummary() + "\r\n" +
                                     Event.getComponentText() + "\r\n" +
@@ -219,7 +253,8 @@ public class Notifications
                             .setContentText(Event.getDevice() + ": " + Event.getSummary())
                             .setContentIntent(contentIntent)
                             .setSound(soundURI)
-                            .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastDownload)
+                            .setVibrate(vibrate)
+                            .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastMassAck)
                             .setAutoCancel(true)
                             .setPriority(notifPriority);
 
@@ -235,9 +270,9 @@ public class Notifications
         notificationIntent.putExtra("forceRefresh", true);
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        Intent broadcastDownload = new Intent();
-        broadcastDownload.setAction(MassAcknowledgeReceiver.BROADCAST_ACTION);
-        PendingIntent pBroadcastDownload = PendingIntent.getBroadcast(context,0,broadcastDownload,0);
+        Intent broadcastMassAck = new Intent();
+        broadcastMassAck.setAction(MassAcknowledgeReceiver.BROADCAST_ACTION);
+        PendingIntent pBroadcastMassAck = PendingIntent.getBroadcast(context,0,broadcastMassAck,0);
 
         /*Intent broadcastIgnore = new Intent();
         broadcastIgnore.setAction(BatchIgnoreReceiver.BROADCAST_ACTION);
@@ -266,71 +301,114 @@ public class Notifications
         }
 
 
-        if(EventDetails.size() > 1)
+        try
         {
-            Event1 = EventDetails.get(0);
-            Event2 = EventDetails.get(1);
-            remainingCount = EventCount - 2;
+            if(EventDetails.size() > 1)
+            {
+                Event1 = EventDetails.get(0);
+                Event2 = EventDetails.get(1);
+                remainingCount = EventCount - 2;
+            }
+            else
+            {
+                Event1 = EventDetails.get(0);
+                remainingCount = EventCount - 1;
+            }
         }
-        else
+        catch (Exception e)
         {
-            Event1 = EventDetails.get(0);
-            remainingCount = EventCount - 1;
+
         }
 
+        long[] vibrate = {0,100,200,300};
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_stat_alert)
-                        .setContentTitle(Integer.toString(EventCount) + " new Zenoss Events!")
-                        .setContentText("Tap to start Rhybudd")
-                        .setContentIntent(contentIntent)
-                        .setNumber(EventCount)
-                        .setSound(soundURI)
-                        .setAutoCancel(true)
-                        .addAction(R.drawable.ic_action_resolve_all,"Acknowledge all Events",pBroadcastDownload)
-                        .setPriority(Notification.PRIORITY_HIGH);
+        try
+        {
+            AudioManager audio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-        Notification notif = mBuilder.build();
-        notif.tickerText = Integer.toString(EventCount) + " new Zenoss Events!";
+            //Log.e("audio.getRingerMode()",Integer.toString(audio.getRingerMode()));
+            switch( audio.getRingerMode() )
+            {
+                case AudioManager.RINGER_MODE_SILENT:
+                    //Do nothing to fix GitHub issue #13
+                    //Log.e("AudioManager","Doing nothing because we are silent");
+                    vibrate = new long[] {0,0};
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-        if(settings.getBoolean("notificationSoundInsistent", false))
-            notif.flags |= Notification.FLAG_INSISTENT;
+        try
+        {
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_stat_alert)
+                            .setContentTitle(Integer.toString(EventCount) + " new Zenoss Events!")
+                            .setContentText("Tap to start Rhybudd")
+                            .setContentIntent(contentIntent)
+                            .setNumber(EventCount)
+                            .setSound(soundURI)
+                            .setVibrate(vibrate)
+                            .setAutoCancel(true)
+                            .setOngoing(false)
+                            .addAction(R.drawable.ic_action_resolve_all, "Acknowledge all Events", pBroadcastMassAck)
+                            .setPriority(Notification.PRIORITY_HIGH);
 
-        NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNM.notify(NOTIFICATION_POLLED_ALERTS, notif);
+            Notification notif = mBuilder.build();
+            notif.tickerText = Integer.toString(EventCount) + " new Zenoss Events!";
+
+            if(settings.getBoolean("notificationSoundInsistent", false))
+                notif.flags |= Notification.FLAG_INSISTENT;
+
+            NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNM.notify(NOTIFICATION_POLLED_ALERTS, notif);
+        }
+        catch (Exception e)
+        {
+
+        }
     }
 
 
     public static void SendStickyNotification(Context context)
     {
-        Calendar date = Calendar.getInstance();
-        String strDate = "";
-        if(date.get(Calendar.MINUTE) < 10)
+        try
         {
-            strDate = Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + ":0" + Integer.toString(date.get(Calendar.MINUTE));
+            Calendar date = Calendar.getInstance();
+            String strDate = "";
+            if(date.get(Calendar.MINUTE) < 10)
+            {
+                strDate = Integer.toString(date.get(Calendar.HOUR_OF_DAY)) + ":0" + Integer.toString(date.get(Calendar.MINUTE));
+            }
+            else
+            {
+                strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
+            }
+
+            Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            notificationIntent.putExtra("forceRefresh", true);
+            PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_stat_polling)
+                            .setContentTitle("Rhybudd is actively polling for events")
+                            .setContentText("Last query: " + strDate + " (Moving to Rhybudd Push would reduce battery drain & data usage)")
+                            .setOngoing(true)
+                            .setOnlyAlertOnce(true)
+                            .setContentIntent(contentIntent)
+                            .setPriority(Notification.PRIORITY_LOW);
+
+            NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNM.notify(NOTIFICATION_POLLED_STICKY, mBuilder.build());
         }
-        else
+        catch (Exception e)
         {
-            strDate = date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE);
+
         }
-
-        Intent notificationIntent = new Intent(context, ViewZenossEventsListActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        notificationIntent.putExtra("forceRefresh", true);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_stat_polling)
-                        .setContentTitle("Rhybudd is actively polling for events")
-                        .setContentText("Last query: " + strDate + " (Moving to Rhybudd Push would reduce battery drain & data usage)")
-                        .setOngoing(true)
-                        .setOnlyAlertOnce(true)
-                        .setContentIntent(contentIntent)
-                        .setPriority(Notification.PRIORITY_LOW);
-
-        NotificationManager mNM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNM.notify(NOTIFICATION_POLLED_STICKY, mBuilder.build());
     }
 }

@@ -612,7 +612,9 @@ public class ViewZenossEventsListActivity extends FragmentActivity implements Vi
                 try
                 {
                     GCMRegistrar.unregister(this);
-                    doGCMRegistration();
+
+                    if(PreferenceManager.getDefaultSharedPreferences(ViewZenossEventsListActivity.this).getBoolean(ZenossAPI.PREFERENCE_PUSH_ENABLED,false))
+                        doGCMRegistration();
                 }
                 catch (Exception e)
                 {

@@ -34,10 +34,24 @@ public class MassAcknowledgeReceiver extends BroadcastReceiver
     @Override
     public void onReceive(final Context context, Intent intent)
     {
-        //Log.e("MassAcknowledgeReceiver", "Acknowledging all");
-        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
-        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
-        settings = PreferenceManager.getDefaultSharedPreferences(context);
+        try
+        {
+            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_GCM_GENERIC);
+            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(Notifications.NOTIFICATION_POLLED_ALERTS);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("MassAcknowledgeReceiver", "onReceive", e);
+        }
+
+        try
+        {
+            settings = PreferenceManager.getDefaultSharedPreferences(context);
+        }
+        catch (Exception e)
+        {
+            BugSenseHandler.sendExceptionMessage("MassAcknowledgeReceiver", "onReceive", e);
+        }
 
         ((Thread) new Thread()
         {

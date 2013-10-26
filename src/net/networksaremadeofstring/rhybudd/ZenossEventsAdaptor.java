@@ -180,7 +180,7 @@ public class ZenossEventsAdaptor extends BaseAdapter
         ((TextView) convertView.findViewById(R.id.dateTime)).setText(strDate);
         
         TextView DeviceNameTextView = (TextView) convertView.findViewById(R.id.DeviceName);
-        DeviceNameTextView.setText(Event.getDevice().replaceAll("sysms.net","android-zenoss.info"));
+        DeviceNameTextView.setText(Event.getDevice());
 
         TextView SummaryTextView = (TextView) convertView.findViewById(R.id.EventSummary);
         SummaryTextView.setText(Event.getSummary());

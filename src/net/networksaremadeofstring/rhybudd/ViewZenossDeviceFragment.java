@@ -300,7 +300,8 @@ public class ViewZenossDeviceFragment extends Fragment
 
         try
         {
-            outState.putString("json", deviceJSON.toString());
+            if(null != deviceJSON)
+                outState.putString("json", deviceJSON.toString());
         }
         catch(Exception e)
         {
@@ -311,6 +312,11 @@ public class ViewZenossDeviceFragment extends Fragment
         /*outState.putParcelable("cpuimg",((BitmapDrawable) CPUGraphView.getDrawable()).getBitmap());
         outState.putParcelable("loadavgimg",((BitmapDrawable) loadAverageGraphView.getDrawable()).getBitmap());
         outState.putParcelable("memimg",((BitmapDrawable) MemoryGraphView.getDrawable()).getBitmap());*/
+    }
+
+    public String GetUID()
+    {
+        return getArguments().getString(ARG_UID);
     }
 
     @Override
