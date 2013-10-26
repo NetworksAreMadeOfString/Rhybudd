@@ -52,9 +52,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-/**
- * Created by Gareth on 19/09/13.
- */
 public class WriteNFCActivity extends FragmentActivity
 {
     public static String PAYLOAD_UID = "uid";

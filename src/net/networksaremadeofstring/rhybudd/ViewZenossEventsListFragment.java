@@ -37,9 +37,6 @@ import com.bugsense.trace.BugSenseHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Gareth on 09/06/13.
- */
 public class ViewZenossEventsListFragment extends ListFragment
 {
     private static final int EVENTSLISTHANDLER_ERROR = 0;

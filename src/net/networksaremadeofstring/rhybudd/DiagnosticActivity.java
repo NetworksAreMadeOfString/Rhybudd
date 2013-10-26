@@ -154,7 +154,7 @@ public class DiagnosticActivity extends FragmentActivity
 
                     try
                     {
-                        Toast.makeText(DiagnosticActivity.this,"Diagnostics Complete!",Toast.LENGTH_SHORT);
+                        Toast.makeText(DiagnosticActivity.this,"Diagnostics Complete!",Toast.LENGTH_SHORT).show();
                         findViewById(R.id.StartDiagButton).setEnabled(true);
                     }
                     catch (Exception e)
