@@ -33,6 +33,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class Notifications
 {
@@ -130,20 +131,27 @@ public class Notifications
         Uri soundURI = null;
         try
         {
-            if(settings.getString("notificationSoundChoice", "").equals(""))
+            if(settings.getBoolean("notificationSound",true))
             {
-                soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            }
-            else
-            {
-                try
-                {
-                    soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
-                }
-                catch(Exception e)
+                if(settings.getString("notificationSoundChoice", "").equals(""))
                 {
                     soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 }
+                else
+                {
+                    try
+                    {
+                        soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
+                    }
+                    catch(Exception e)
+                    {
+                        soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    }
+                }
+            }
+            else
+            {
+                soundURI = null;
             }
         }
         catch (Exception e)
@@ -284,20 +292,34 @@ public class Notifications
         String Event1 = "--", Event2 = "---";
         int remainingCount = 0;
 
-        if(settings.getString("notificationSoundChoice", "").equals(""))
+        try
         {
-            soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            if(settings.getBoolean("notificationSound",true))
+            {
+                if(settings.getString("notificationSoundChoice", "").equals(""))
+                {
+                    soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                }
+                else
+                {
+                    try
+                    {
+                        soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
+                    }
+                    catch(Exception e)
+                    {
+                        soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    }
+                }
+            }
+            else
+            {
+                soundURI = null;
+            }
         }
-        else
+        catch (Exception e)
         {
-            try
-            {
-                soundURI = Uri.parse(settings.getString("notificationSoundChoice", ""));
-            }
-            catch(Exception e)
-            {
-                soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            }
+            soundURI = null;
         }
 
 
