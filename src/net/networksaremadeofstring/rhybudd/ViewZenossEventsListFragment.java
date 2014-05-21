@@ -345,77 +345,84 @@ public class ViewZenossEventsListFragment extends ListFragment
         {
             case R.id.resolveall:
             {
-                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_PROGRESS);
-                final List<String> EventIDs = new ArrayList<String>();
+            	AlertDialog.Builder rconfirm = new AlertDialog.Builder(getActivity());
+            	rconfirm.setMessage("Acknowledge all events?");
+            	rconfirm.setNegativeButton("Cancel", null);
+            	rconfirm.setPositiveButton("OK",
+            	    new DialogInterface.OnClickListener() {
+            	    public void onClick(DialogInterface dialog, int which) {
+            	    	AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_PROGRESS);
+                        final List<String> EventIDs = new ArrayList<String>();
 
 
-                if(null != listOfZenossEvents)
-                {
-                    try
-                    {
-                        for (ZenossEvent evt : listOfZenossEvents)
+                        if(null != listOfZenossEvents)
                         {
-                            if(!evt.getEventState().equals("Acknowledged"))
+                            try
                             {
-                                evt.setProgress(true);
-                                EventIDs.add(evt.getEVID());
+                                for (ZenossEvent evt : listOfZenossEvents)
+                                {
+                                    if(!evt.getEventState().equals("Acknowledged"))
+                                    {
+                                        evt.setProgress(true);
+                                        EventIDs.add(evt.getEVID());
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolveall",e);
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolveall",e);
-                    }
-                }
 
-                new Thread()
-                {
-                    public void run()
-                    {
-                        try
+                        new Thread()
                         {
-                            if (null != mService && mBound)
+                            public void run()
                             {
                                 try
                                 {
-                                    if(null == mService.API)
+                                    if (null != mService && mBound)
                                     {
-                                        mService.PrepAPI(true,true);
+                                        try
+                                        {
+                                            if(null == mService.API)
+                                            {
+                                                mService.PrepAPI(true,true);
+                                            }
+
+                                            ZenossCredentials credentials = new ZenossCredentials(getActivity());
+                                            mService.API.Login(credentials);
+
+                                            mService.API.AcknowledgeEvents(EventIDs);
+
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(null != AckEventsHandler)
+                                            AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
                                     }
 
-                                    ZenossCredentials credentials = new ZenossCredentials(getActivity());
-                                    mService.API.Login(credentials);
-
-                                    mService.API.AcknowledgeEvents(EventIDs);
-
+                                    //TODO Check it actually succeeded
+                                    if(null != AckEventsHandler)
+                                        AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
                                 }
                                 catch (Exception e)
                                 {
-                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","AckAllThread",e);
+                                    //e.printStackTrace();
+                                    if(null != AckEventsHandler)
+                                        AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
+
+                                    BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolve all outer catch",e);
                                 }
                             }
-                            else
-                            {
-                                if(null != AckEventsHandler)
-                                    AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
-                            }
-
-                            //TODO Check it actually succeeded
-                            if(null != AckEventsHandler)
-                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_SUCCESS);
-                        }
-                        catch (Exception e)
-                        {
-                            //e.printStackTrace();
-                            if(null != AckEventsHandler)
-                                AckEventsHandler.sendEmptyMessage(ACKEVENTHANDLER_FAILURE);
-
-                            BugSenseHandler.sendExceptionMessage("ViewZenossEventsListFragment","resolve all outer catch",e);
-                        }
-                    }
-                }.start();
-
-                return true;
+                        }.start();
+            	    }});
+            	rconfirm.show();
+            	return true;
             }
 
 
